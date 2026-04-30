@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ホーム - 平工マッチング</title>
+    <link rel="stylesheet" href="home-style.css">
+</head>
+<body>
+
+<header class="navbar">
+    <div class="logo" onclick="location.reload()">平工マッチング</div>
+    <div class="nav-links">
+        <span class="nav-item" id="tab-recruit" onclick="switchTab('recruit')">募集</span>
+        <span class="nav-item active" id="tab-search" onclick="switchTab('search')">探す</span>
+        <span class="nav-item" onclick="location.href='messages.html'">メッセージ</span>
+        <span class="nav-item" onclick="location.href='mypages.html'">マイページ</span>
+        <button class="btn-logout" onclick="logout()">ログアウト</button>
+    </div>
+</header>
+
+<main class="container">
+    <div class="main-layout" style="display: flex; gap: 20px; width: 100%;">
+        
+        <aside class="my-info-card" style="flex: 1; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); height: fit-content; min-width: 250px;">
+            <h3>自分のプロフィール</h3>
+            <div id="my-info-display">
+                <p><strong>名前:</strong> <span id="display-name-val">未設定</span></p>
+                <p><strong>自己紹介:</strong></p>
+                <p id="display-bio-val" style="font-size: 0.9rem; color: #666; line-height: 1.5;">まだ自己紹介がありません。マイページから設定してください。</p>
+            </div>
+            <button class="btn-flat" onclick="location.href='mypages.html'" style="padding: 10px 0; text-align: left; color: #1a73e8; background:none; border:none; cursor:pointer; text-decoration:underline;">プロフィールを編集する</button>
+        </aside>
+
+        <div style="flex: 3;">
+            <section id="recruit-form-area" style="display: none;">
+                <div class="sidebar" style="width: 100%; box-sizing: border-box;">
+                    <h3>新規募集を投稿</h3>
+                    <div class="filter-group">
+                        <label>投稿名</label>
+                        <input type="text" id="rec-name" placeholder="表示される名前">
+                    </div>
+                    <div class="filter-group">
+                        <label>学年</label>
+                        <select id="rec-grade"> <option value="１年">１年</option>
+                            <option value="２年">２年</option>
+                            <option value="３年">３年</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>学科</label>
+                        <select id="rec-dept">
+                            <option value="機械工学科">機械工学科</option>
+                            <option value="電気工学科">電気工学科</option>
+                            <option value="建築工学科">建築工学科</option>
+                            <option value="土木環境工学科">土木環境工学科</option>
+                            <option value="情報工学科">情報工学科</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>募集内容</label>
+                        <textarea id="rec-content" rows="4" style="width:100%; border-radius:5px; border:1px solid #ddd; padding: 10px; box-sizing: border-box;"></textarea>
+                    </div>
+                    <button class="btn-search" onclick="submitRecruitment()">投稿する</button>
+                    <p id="recruit-msg" style="margin-top:10px; font-weight:bold;"></p>
+                </div>
+            </section>
+
+            <section id="search-area">
+                <div class="main-content">
+                    <h2>募集中のユーザー一覧</h2>
+                    <div class="user-grid" id="user-list">
+                        <p>読み込み中...</p>    
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+
+<script>
+    
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
+
+function logout() { 
+    if(confirm("ログアウトしますか？")) {
+        localStorage.clear(); 
+        window.location.href = "index.html"; 
+    }
+}
+
+function updateMyProfileDisplay() {
+    const savedName = localStorage.getItem("userName") || "未設定";
+    const savedBio = localStorage.getItem("userBio") || "まだ自己紹介がありません。";
+    document.getElementById("display-name-val").innerText = savedName;
+    document.getElementById("display-bio-val").innerText = savedBio;
+}
+
+function switchTab(mode) {
+    const recArea = document.getElementById("recruit-form-area");
+    const searchArea = document.getElementById("search-area");
+    const tabRec = document.getElementById("tab-recruit");
+    const tabSearch = document.getElementById("tab-search");
+
+    if(mode === 'recruit') {
+        recArea.style.display = "block";
+        searchArea.style.display = "none";
+        tabRec.classList.add("active");
+        tabSearch.classList.remove("active");
+    } else {
+        recArea.style.display = "none";
+        searchArea.style.display = "block";
+        tabRec.classList.remove("active");
+        tabSearch.classList.add("active");
+        loadRecruitments();
+    }
+}
+
+async function submitRecruitment() {
+    const name = document.getElementById("rec-name").value;
+    const grade = document.getElementById("rec-grade").value; // 学年を取得
+    const dept = document.getElementById("rec-dept").value;
+    const content = document.getElementById("rec-content").value;
+    const myEmail = localStorage.getItem("userEmail");
+
+    if(!name || !content) return alert("入力してください");
+
+    try {
+        const res = await fetch(GAS_URL, {
+            method: "POST",
+            body: JSON.stringify({ 
+                mode: "postRecruitment", 
+                name: name, 
+                grade: grade, // 学年を送信
+                dept: dept, 
+                content: content, 
+                email: myEmail 
+            })
+        });
+        const result = await res.json();
+        if(result.status === "success") {
+            alert("投稿完了！");
+            document.getElementById("rec-name").value = "";
+            document.getElementById("rec-content").value = "";
+            switchTab('search');
+        }
+    } catch(e) { 
+        console.error(e);
+        alert("通信エラー：GASのデプロイ設定を「全員」にしているか確認してください。"); 
+    }
+}
+
+async function loadRecruitments() {
+    const listDiv = document.getElementById("user-list");
+    try {
+        const res = await fetch(GAS_URL, {
+            method: "POST",
+            body: JSON.stringify({ mode: "getRecruitments" })
+        });
+        const result = await res.json();
+        if(result.status === "success") {
+            listDiv.innerHTML = "";
+            result.message.reverse().forEach(item => {
+                const card = document.createElement("div");
+                card.className = "user-card";
+                // バッジ部分に学年と学科を表示
+                card.innerHTML = `
+                    <div class="user-badge">${item.grade || ''} | ${item.dept}</div>
+                    <div class="user-icon">👤</div>
+                    <h3>${item.name}</h3>
+                    <p>${item.content}</p>
+                    <button class="btn-match" onclick="startChat('${item.name}')">メッセージを送る</button>
+                `;
+                listDiv.appendChild(card);
+            });
+        }
+    } catch(e) { listDiv.innerHTML = "取得失敗"; }
+}
+
+function startChat(targetName) {
+    localStorage.setItem("chatTarget", targetName);
+    window.location.href = "messages.html";
+}
+
+window.onload = function() {
+    loadRecruitments();
+    updateMyProfileDisplay();
+    if(location.search.includes('tab=recruit')) switchTab('recruit');
+};
+</script>
+</body>
+</html>

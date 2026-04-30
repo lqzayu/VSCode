@@ -1,0 +1,20 @@
+編集が終わったら必ずシェアサーバーにコードを張り付けること！！
+
+App Scriptの使い方
+１．コードを編集する
+２．右上の「デプロイ」をクリック
+３．「デプロイを管理」をクリック
+４．
+GAS：
+https://script.google.com/u/0/home/projects/1RKs-FmrgOEdLC8tTEolvM7cZJJFkdJ_z57DpWC458JbZm67X3OB1ISdX/edit?pli=1
+
+ToDoリストスプレッドシート：
+https://docs.google.com/spreadsheets/d/1ckcA0ZDfsNTEUeiQTNtP64F_VlsXAxbSIJssqQLYfqA/edit?usp=sharing
+
+データベーススプレッドシートURL：
+https://docs.google.com/spreadsheets/d/1f8MOhb6MD_rMjxmO2GAWWHXF4DMDGuoT5t5FFb9ULz0/edit?usp=sharing
+
+VSCodeシェアリンク（随時変更）
+https://prod.liveshare.vsengsaas.visualstudio.com/join?E88664D9C8646C1DBED365C978E8C617825F
+
+

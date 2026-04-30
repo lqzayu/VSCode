@@ -1,0 +1,87 @@
+/* 全体のレイアウト設定 */
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100dvh; /* スマホのバーを考慮した高さ */
+    background-color: #f0f2f5;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+}
+
+/* ログインカード */
+.login-card {
+    background-color: #ffffff;
+    padding: 30px 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 380px;
+    text-align: center;
+    box-sizing: border-box; /* パディングによるはみ出し防止 */
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 25px;
+    font-size: 1.5rem;
+}
+
+/* 入力エリア */
+input {
+    width: 100%;
+    padding: 14px; /* 少し大きめにしてタップしやすく */
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 16px; /* iOSの自動ズーム防止 */
+    transition: all 0.3s;
+    -webkit-appearance: none; /* iOSのデフォルトスタイルをリセット */
+}
+
+input:focus {
+    outline: none;
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+}
+
+/* メッセージエリア */
+.message {
+    min-height: 20px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-weight: bold;
+}
+.success { color: #28a745; }
+.error { color: #dc3545; }
+
+/* ボタン設定 */
+button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+    border: none;
+    display: block;
+}
+
+.btn-primary {
+    background-color: #1a73e8;
+    color: white;
+}
+
+.btn-flat {
+    background-color: transparent;
+    color: #666;
+    text-decoration: underline;
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+button:hover { opacity: 0.8; }
+button:active { transform: scale(0.98); }
