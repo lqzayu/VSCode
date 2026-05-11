@@ -4,158 +4,35 @@
     <meta charset="UTF-8">
     <title>マイページ - 平工マッチング</title>
     <link rel="stylesheet" href="home-style.css">
-    <style>
-        /* マイページ専用のスタイル調整 */
-        .mypage-card {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            max-width: 500px;
-            margin: 50px auto;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .form-group label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-        }
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
-        .danger-zone {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-    </style>
 </head>
 <body>
     <header class="navbar">
-        <div class="logo" onclick="location.href='home.html'" style="cursor:pointer">平工マッチング</div>
+        <div class="logo" onclick="location.href='home.html'">平工マッチング</div>
         <div class="nav-links">
-            <span class="nav-item" onclick="location.href='home.html?tab=recruit'">募集</span>
-            <span class="nav-item" onclick="location.href='home.html'">探す</span>
+            <span class="nav-item" onclick="location.href='home.html'">ホーム</span>
             <span class="nav-item" onclick="location.href='messages.html'">メッセージ</span>
             <span class="nav-item active">マイページ</span>
             <button class="btn-logout" onclick="logout()">ログアウト</button>
         </div>
     </header>
-
     <main class="container">
-        <div class="mypage-card">
-            <h2>プロフィール編集</h2>
-            
-            <div class="form-group">
-                <label>表示名</label>
-                <input type="text" id="my-name" placeholder="例：鮎澤 蓮">
-            </div>
-
-            <div class="form-group">
-                <label>自己紹介</label>
-                <textarea id="my-bio" rows="5" placeholder="趣味や学科など自由に書いてください"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label>新しいパスワード</label>
-                <input type="password" id="new-password" placeholder="変更する場合のみ入力">
-            </div>
-
-            <button class="btn-search" onclick="saveProfile()" style="margin-top: 10px;">保存してホームに戻る</button>
-
-            <div class="danger-zone">
-                <p style="font-size: 0.85rem; color: #999; margin-bottom: 10px;">一度変更すると元に戻せません</p>
-                <button class="btn-delete" onclick="deleteAccount()" style="background-color: #ff4d4f; color: white;">アカウントを削除する</button>
-            </div>
+        <div style="background:white; padding:30px; border-radius:10px; max-width:500px; margin:40px auto; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+            <h2>プロフィール設定</h2>
+            <label>表示名</label>
+            <input type="text" id="my-name" style="width:100%; padding:10px; margin:10px 0;">
+            <button class="btn-search" onclick="saveProfile()" style="width:100%;">保存する</button>
         </div>
     </main>
-
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
-
-        window.onload = function() {
-            document.getElementById("my-name").value = localStorage.getItem("userName") || "";
-            document.getElementById("my-bio").value = localStorage.getItem("userBio") || "";
-        }
-
+        window.onload = () => { document.getElementById("my-name").value = localStorage.getItem("userName") || ""; };
         function saveProfile() {
-            async function saveProfile() {
-                const name = document.getElementById("my-name").value;
-                const bio = document.getElementById("my-bio").value;
-                const newPassword = document.getElementById("new-password").value;
-                const email = localStorage.getItem("userEmail");
-
-            // ローカルストレージに名前と自己紹介を保存
-                localStorage.setItem("userName", name);
-                localStorage.setItem("userBio", bio);
-
-            // パスワードが入力されていればGASへ送信
-                if (newPassword) {
-                    try {
-                        const res = await fetch(GAS_URL, {
-                            method: "POST",
-                            body: JSON.stringify({ 
-                            mode: "updatePassword", 
-                            email: email, 
-                            newPassword: newPassword 
-                })
-            });
-            const result = await res.json();
-            if (result.status !== "success") {
-                alert("パスワードの更新に失敗しました。");
-                return;
-            }
-        } catch (e) {
-            alert("通信エラー：パスワードは更新されませんでした。");
-            return;
+            const name = document.getElementById("my-name").value;
+            if(!name) return alert("名前を入力してください");
+            localStorage.setItem("userName", name);
+            alert("保存しました");
+            location.href = 'home.html';
         }
-    }
-
-    alert("プロフィールを保存しました！");
-    location.href = 'home.html';
-}
-        }
-
-        async function deleteAccount() {
-            const email = localStorage.getItem("userEmail");
-            if (!email) return alert("エラー：ログイン情報が見つかりません。");
-
-            if (confirm("本当にアカウントを削除しますか？\nこれまでの投稿やメッセージも消去されます。")) {
-                try {
-                    const res = await fetch(GAS_URL, {
-                        method: "POST",
-                        body: JSON.stringify({ mode: "deleteAccount", email: email })
-                    });
-                    const result = await res.json();
-                    
-                    if (result.status === "success") {
-                        alert("アカウントを削除しました。");
-                        localStorage.clear();
-                        window.location.href = "index.html";
-                    } else {
-                        alert("削除に失敗しました: " + result.message);
-                    }
-                } catch (e) {
-                    alert("通信エラーが発生しました。");
-                }
-            }
-        }
-
-        function logout() {
-            if(confirm("ログアウトしますか？")) {
-                window.location.href = "index.html";
-            }
-        }
+        function logout() { localStorage.clear(); window.location.href = "index.html"; }
     </script>
 </body>
 </html>
