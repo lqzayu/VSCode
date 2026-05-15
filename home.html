@@ -27,10 +27,11 @@
                 
             <div class="sidebar">
                 
-                <input type="text" class="perfect-circle" placeholder="検索">//kennsaku
+                <input type="text" class="perfect-circle" placeholder="検索">
 
 <p><strong>表示名:</strong> <span id="display-name">未設定</span></p>
-                <button class="perfect-circle" onclick="location.href='mypages.html'" style="background:#c7dd66; width:100%;">マイページ</button>
+                <button class="perfect-circle" onclick="location.href='mypages.html'" style="background:#c7dd66; width:100%;"></button>
+                document.getElementById("display-name").innerText = localStorage.getItem("userName") || "未設定";
             </div>
 
             <div class="sidebar">
