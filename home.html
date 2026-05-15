@@ -7,12 +7,11 @@
     <link rel="stylesheet" href="home-style.css">
 </head>
 <body>
-
 <header class="navbar">
-    <div class="logo" onclick="location.reload()">平工マッチング</div>
+    <div class="logo" onclick="location.href='home.html'">平工マッチング</div>
     <div class="nav-links">
-        <span class="nav-item" id="tab-recruit" onclick="switchTab('recruit')">募集投稿</span>
-        <span class="nav-item active" id="tab-search" onclick="switchTab('search')">ユーザーを探す</span>
+        <span class="nav-item" id="tab-recruit-btn" onclick="switchTab('recruit')">募集投稿</span>
+        <span class="nav-item active" id="tab-search-btn" onclick="switchTab('search')">ユーザーを探す</span>
         <span class="nav-item" onclick="location.href='messages.html'">メッセージ</span>
         <span class="nav-item" onclick="location.href='mypages.html'">マイページ</span>
         <button class="btn-logout" onclick="logout()">ログアウト</button>
@@ -20,172 +19,113 @@
 </header>
 
 <main class="container">
+
+   
+
     <div class="main-layout" style="display: flex; gap: 20px;">
+        <aside style="flex: 1; min-width: 250px;">
+
+
+}
+
+                     
+            <div class="sidebar">
+                <span class="circle-text">①</span>
+                <p><strong>表示名:</strong> <span id="display-name">未設定</span></p>
+                <button class="btn-search" onclick="location.href='mypages.html'" style="background:#34a853; width:100%;">マイページ</button>
+            </div>
+            
+            <div class="sidebar">
         
-        <!-- サイドバー：新規チャット開始ボタン -->
-        <aside style="flex: 1; min-width: 200px;">
-            <div class="sidebar-card" style="background:#fff; padding:20px; border-radius:12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-                <h3>クイック操作</h3>
-                <button class="btn-search" onclick="openUserListModal()" style="width:100%; margin-bottom:10px; background:#34a853;">+ 新規チャット</button>
-                <p style="font-size:0.8rem; color:666;">※ユーザー一覧から直接チャットを開始できます。</p>
+                <button class="btn-search" onclick="location.href='messages.html'" style="background:#34a853; width:100%;">トーク一覧を開く</button>
             </div>
         </aside>
 
-        <!-- メインエリア -->
         <div style="flex: 3;">
-            <!-- 募集投稿フォーム -->
             <section id="recruit-form-area" style="display: none;">
                 <div class="sidebar" style="width: 100%;">
-                    <h3>新規募集を投稿</h3>
-                    <div class="filter-group">
-                        <label>表示名</label>
-                        <input type="text" id="rec-name" placeholder="投稿者名">
-                    </div>
-                    <div class="filter-group">
-                        <label>学年</label>
-                        <select id="rec-grade">
-                            <option value="1年">1年</option>
-                            <option value="2年">2年</option>
-                            <option value="3年">3年</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>学科</label>
-                        <select id="rec-dept">
-                            <option value="情報工学科">情報工学科</option>
-                            <option value="機械工学科">機械工学科</option>
-                            <option value="電気工学科">電気工学科</option>
-                            <option value="建築工学科">建築工学科</option>
-                            <option value="土木環境工学科">土木環境工学科</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>内容</label>
-                        <textarea id="rec-content" rows="4"></textarea>
-                    </div>
-                    <button class="btn-search" onclick="submitRecruitment()">投稿する</button>
+                    <h3 id="form-title">募集を投稿する</h3>
+                    <input type="text" id="rec-name" readonly style="width:100%; margin-bottom:10px; padding:8px; background:#eee;" placeholder="マイページで名前を設定してください">
+                    <select id="rec-grade" style="width:100%; margin-bottom:10px; padding:8px;">
+                        <option value="1年">1年</option>
+                        <option value="2年">2年</option>
+                        <option value="3年">3年</option>
+                    </select>
+                    <select id="rec-dept" style="width:100%; margin-bottom:10px; padding:8px;">
+                        <option value="機械工学科">機械工学科</option>
+                        <option value="電気工学科">電気工学科</option>
+                        <option value="制御工学科">制御工学科</option>
+                        <option value="土木環境工学科">土木環境工学科</option>
+                        <option value="情報工学科">情報工学科</option>
+                    </select>
+                    <textarea id="rec-content" rows="4" placeholder="募集内容を入力してください" style="width:100%; margin-bottom:10px; padding:8px;"></textarea>
+                    <button class="btn-search" id="submit-btn" onclick="submitRecruitment()">投稿する</button>
                 </div>
             </section>
 
-            <!-- 募集一覧 -->
             <section id="search-area">
-                <h2>募集中のユーザー</h2>
-                <div class="user-grid" id="user-list">
-                    <p>読み込み中...</p>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2>募集一覧</h2>
+                    <button onclick="loadRecruitments()" style="background:none; border:none; color:#1a73e8; cursor:pointer;">🔄 更新</button>
                 </div>
+                <div class="user-grid" id="user-list">読み込み中...</div>
             </section>
         </div>
     </div>
 </main>
 
-<!-- 全ユーザー選択モーダル -->
-<div id="user-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000;">
-    <div style="background:white; max-width:450px; margin:80px auto; padding:25px; border-radius:15px; position:relative;">
-        <h3 style="margin-top:0;">チャット相手を選択</h3>
-        <div id="modal-user-list" style="max-height:400px; overflow-y:auto; border:1px solid #eee; border-radius:8px;">
-            <!-- GASから取得した全ユーザーを表示 -->
-        </div>
-        <button onclick="document.getElementById('user-modal').style.display='none'" style="margin-top:15px; width:100%; padding:10px; border:none; background:#eee; border-radius:5px; cursor:pointer;">閉じる</button>
-    </div>
-</div>
-
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec"; //[cite: 5]
+const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
 
-// タブ切り替え
 function switchTab(mode) {
     document.getElementById("recruit-form-area").style.display = (mode === 'recruit') ? "block" : "none";
     document.getElementById("search-area").style.display = (mode === 'search') ? "block" : "none";
-    document.getElementById("tab-recruit").classList.toggle("active", mode === 'recruit');
-    document.getElementById("tab-search").classList.toggle("active", mode === 'search');
-    if(mode === 'search') loadRecruitments();
+    document.getElementById("tab-recruit-btn").classList.toggle("active", mode === 'recruit');
+    document.getElementById("tab-search-btn").classList.toggle("active", mode === 'search');
+    if(mode === 'recruit') document.getElementById("rec-name").value = localStorage.getItem("userName") || "未設定";
 }
 
-// 募集投稿[cite: 2]
+async function loadRecruitments() {
+    const myEmail = localStorage.getItem("userEmail");
+    try {
+        const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ mode: "getRecruitments", email: myEmail }) });
+        const result = await res.json();
+        const listDiv = document.getElementById("user-list");
+        listDiv.innerHTML = result.message.length ? "" : "<p>現在募集はありません</p>";
+        result.message.reverse().forEach(item => {
+            const card = document.createElement("div");
+            card.className = "user-card";
+            card.innerHTML = `<div class="user-badge">${item.grade} | ${item.dept}</div><h3>${item.name}</h3><p>${item.content}</p>
+                <button class="btn-match" onclick="startChat('${item.email}')">チャット</button>`;
+            listDiv.appendChild(card);
+        });
+    } catch(e) { document.getElementById("user-list").innerText = "読み込みエラーが発生しました。"; }
+}
+
 async function submitRecruitment() {
     const data = {
         mode: "postRecruitment",
-        name: document.getElementById("rec-name").value,
+        name: localStorage.getItem("userName"),
         grade: document.getElementById("rec-grade").value,
         dept: document.getElementById("rec-dept").value,
         content: document.getElementById("rec-content").value,
         email: localStorage.getItem("userEmail")
     };
-    try {
-        const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(data) });
-        const result = await res.json();
-        if(result.status === "success") {
-            alert("投稿しました！");
-            switchTab('search');
-        }
-    } catch(e) { alert("エラーが発生しました。"); }
+    await fetch(GAS_URL, { method: "POST", body: JSON.stringify(data) });
+    alert("投稿しました");
+    location.reload();
 }
 
-// 全ユーザー取得＆モーダル表示（新規チャット機能）
-async function openUserListModal() {
-    const modal = document.getElementById('user-modal');
-    const listDiv = document.getElementById('modal-user-list');
-    modal.style.display = 'block';
-    listDiv.innerHTML = "<p style='padding:20px;'>読み込み中...</p>";
-
-    try {
-        const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ mode: "getAllUsers" }) });
-        const result = await res.json();
-        if(result.status === "success") {
-            listDiv.innerHTML = "";
-            const myEmail = localStorage.getItem("userEmail");
-            result.message.forEach(user => {
-                if(user.email === myEmail) return; // 自分は表示しない
-                const div = document.createElement("div");
-                div.style = "padding:15px; border-bottom:1px solid #f9f9f9; display:flex; justify-content:space-between; align-items:center;";
-                div.innerHTML = `
-                    <div>
-                        <div style="font-weight:bold;">${user.name || '名前未設定'}</div>
-                        <div style="font-size:0.75rem; color:#999;">${user.email}</div>
-                    </div>
-                    <button onclick="startChat('${user.email}')" style="background:#1a73e8; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">チャット</button>
-                `;
-                listDiv.appendChild(div);
-            });
-        }
-    } catch(e) { listDiv.innerHTML = "取得に失敗しました。"; }
+function startChat(email) {
+    localStorage.setItem("chatTarget", email);
+    location.href = 'messages.html';
 }
 
-function startChat(targetEmail) {
-    localStorage.setItem("chatTarget", targetEmail);
-    window.location.href = "messages.html";
-}
-
-function logout() {
-    if(confirm("ログアウトしますか？")) {
-        localStorage.clear();
-        window.location.href = "index.html";
-    }
-}
-
-window.onload = () => { loadRecruitments(); switchTab('search'); };
-
-async function loadRecruitments() {
-    const listDiv = document.getElementById("user-list");
-    try {
-        const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ mode: "getRecruitments" }) });
-        const result = await res.json();
-        if(result.status === "success") {
-            listDiv.innerHTML = "";
-            result.message.reverse().forEach(item => {
-                const card = document.createElement("div");
-                card.className = "user-card";
-                card.innerHTML = `
-                    <div class="user-badge">${item.grade} | ${item.dept}</div>
-                    <h3>${item.name}</h3>
-                    <p>${item.content}</p>
-                    <button class="btn-match" onclick="startChat('${item.email}')">メッセージを送る</button>
-                `;
-                listDiv.appendChild(card);
-            });
-        }
-    } catch(e) { listDiv.innerHTML = "取得失敗"; }
-}
+function logout() { localStorage.clear(); window.location.href = "index.html"; }
+window.onload = () => {
+    document.getElementById("display-name").innerText = localStorage.getItem("userName") || "未設定";
+    loadRecruitments();
+};
 </script>
 </body>
 </html>

@@ -1,0 +1,415 @@
+/*
+【補足】
+- 「ul」の子要素「li」に直接文字を書いてもいいですが、デザイン上、今回は「li」の子要素「divに文字を書いていきます。（吹き出しテキストの「padding」，「line-height」，改行などが複雑になるのを防ぐため）
+- ロボットの吹き出し「li」には「.chatbot-left」というクラスを当て左寄せに、自分の吹き出し「li」には「.chatbot-right」というクラスを当て右寄せにしています。
+*/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+css{
+   touch-action: none;
+}
+body { 
+    box-sizing: border-box;
+    background: #FFF;
+    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, "Helvetica Neue", YuGothic, "ヒラギノ角ゴ ProN W3", Hiragino Kaku Gothic ProN, Arial, "メイリオ", Meiryo, sans-serif;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    tap-highlight-color: rgba(0, 0, 0, 0);
+    overflow-x: hidden;
+/*    overflow-y: scroll;*/
+    -webkit-overflow-scrolling: touch;
+}
+a {
+  color: #2196F3;
+  text-decoration: none;
+}
+
+
+/*---------- チャットボットここから  ----------*/
+/* 今回は、li（幅100%）の中に、div（吹き出し）を
+挿入する。吹き出しの三角形は疑似要素を使用する。 */
+/*チャットボット本体*/
+#chatbot { 
+    position: fixed;
+    overflow: hidden;
+    opacity: 1;
+    transition: .4s;
+    background: #FFF;
+    -webkit-font-smoothing: none;
+    -webkit-font-smoothing: antialiased;
+    -webkit-font-smoothing: subpixel-antialiased; /* Safari での Default値 */
+}
+#chatbot.chatbot-zoom {
+    height: 100vh;
+    width: 100vw;
+    box-shadow: none;
+    border-radius: 0;
+    top: 0;
+    left: 0;
+    margin: 0;
+    transition: 0;
+    transform: translate(0);
+    -webkit-transform: translate(0);
+    -moz-transform: translate(0);
+}
+@media screen and (min-width: 700px) { /*PC*/
+    #chatbot {
+        height: 80vh;
+        width: 350px;
+        bottom: 0;
+        right: 0;
+        margin: 0;
+        box-shadow: 0px 0 25px -5px #888;
+        border-radius: 10px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        -webkit-transform: translate(-50%, -50%);
+        -moz-transform: translate(-50%, -50%);
+    }
+}
+@media screen and (max-width: 700px) { /*スマホ*/
+    #chatbot {
+        height: 100vh;
+        width: 100vw;
+    }
+}
+#chatbot-header {
+    height: 60px;
+    background: #335C80;
+    position: relative;
+    display: flex;
+    justify-content:space-between;
+}
+#chatbot-logo {
+    color: #FFF;
+    line-height: 60px;
+    padding: 0 30px;
+    font-size: 16px;
+}
+#chatbot-zoom-icon {
+    display: block;
+    height: 100%;
+    line-height: 60px;
+    padding: 0 20px;
+    color: #FFF;
+    cursor: pointer;
+}
+#chatbot-zoom-icon:active {
+    background: #4D7999;
+}
+@media screen and (max-width: 700px) { /*スマホ*/
+  #chatbot-zoom-icon {
+    display: none;
+  }
+}
+
+/*チャットのフィールド*/
+#chatbot-body {
+    width: 100%;
+    height: calc(80vh - 110px);
+    padding-top: 10px;
+    background: #FFF;
+    box-sizing: border-box;
+    /*横向きのスクロール禁止*/
+    overflow-x: hidden;
+    /*縦向きのスクロール許可*/
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    /*IE、Edgeでスクロールバーを非表示にする*/
+    -ms-overflow-style: none;
+}
+@media screen and (max-width: 700px) { /*スマホ*/
+  #chatbot-body {
+    height: calc(100vh - 170px);
+  }
+}
+#chatbot-body.chatbot-body-zoom {
+    width: 100%;
+}
+#chatbot-body.chatbot-body-zoom {
+    height: calc(100vh - 170px);
+}
+/*Chrome、Safariでスクロールバーを非表示にする*/
+#chatbot-body::-webkit-scrollbar {
+    display:none;
+}
+#chatbot-footer {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    box-sizing: border-box;
+    background: #FFF;
+    border-top: 1.5px solid #EEE;
+}
+@media screen and (min-width: 700px) { /*PC*/
+    #chatbot-footer.chatbot-footer-zoom {
+        margin-bottom: 0;
+    }
+}
+@media screen and (max-width: 700px) { /*スマホ*/
+    #chatbot-footer.chatbot-footer-zoom {
+        position: fixed;
+        margin-bottom: 60px;
+    }
+}
+/*入力する場所*/
+#chatbot-text {
+    height: 40px;
+    width: 72%;
+    display: block;
+    font-size: 16px;
+    box-sizing: border-box;
+    padding-left: 10px;
+    margin: auto 10px auto 15px;
+    color: #777;
+    border: 0;
+    outline: 0;
+}
+#chatbot-text:focus{
+    border: none;
+    outline: none;
+}
+/*送信ボタン*/
+#chatbot-submit{
+    cursor: pointer;
+    height: 35px;
+    padding: 0 30px;
+    margin: auto;
+    margin-right: 15px; 
+    font-size: 16px;
+    background: #335C80;
+    color: white;
+    display: block;
+    /*デフォルトのボーダーを消す*/
+    border: none;
+    box-sizing: border-box;
+    border-radius: 7px;
+}
+#chatbot-submit:active{
+    outline: 0;
+    background: #86ABBF;
+}
+
+#chatbot-ul{
+    /*ulのデフォルの隙間を消す*/
+    padding: 0;
+    list-style: none;
+}
+#chatbot-ul > li{
+    position: relative;
+    /* display: block; */
+    width: 100%;
+    padding-bottom: 10px;
+    word-wrap: break-word;
+}
+#chatbot-ul > li > div {
+    display: inline-block;
+    box-sizing: border-box;
+    min-height: 23px;
+    max-width: 70%;
+    padding: 7px 13px;
+    font-size: 16px;
+    line-height: 1.3em;
+    position: relative;
+}
+
+#chatbot-ul > li > div.chatbot-short {
+    width: 53%;
+}
+/*相手の吹き出しのデザイン*/
+.chatbot-left{
+    margin-left: 20px;
+    background: #E6F0F7;
+    border-radius: 0 9px 9px 9px;
+    color: #1A5F80;
+}
+.chatbot-left-rounded {
+    margin-left: 20px;
+    background: #E6F0F7;
+    border-radius: 9px;
+    color: #1A5F80;
+}
+/*自分の吹き出し*/
+.chatbot-right{
+    margin-right: 20px;
+    background: #456F99;
+    text-align: left;
+    border-radius: 9px 0 9px 9px;
+    color: #FFF;
+}
+.left{
+  text-align: left;
+}
+.right{
+  text-align: right;
+}
+.choice-title {
+    position: absolute;
+    width: 100%;
+    height: 25px;
+    line-height: 25px;
+    border-radius: 9px 9px 0 0;
+    text-align: center;
+    font-size: 15px;
+    top: 0;
+    left: 0;
+    background: #456F99;
+    color: #FFF;
+    letter-spacing: .05em;
+}
+.choice-q {
+/*     width: 180px; */
+    margin: 25px 0 .7rem;
+    font-size: 15px;
+    line-height: 1.3em;
+    letter-spacing: .05em;
+}
+.choice-button {
+    cursor: pointer;
+    user-select: none;
+    background: #456F99;
+    color: #FFF;
+    border-radius: 3px;
+    /* margin-top: 8px; */
+    margin-bottom: 8px;
+    text-align: left;
+    padding: 7px 13px;
+    font-size: 16px;
+    line-height: 1.3em;
+    letter-spacing: .05em;
+    border: none;
+    display: block;
+    width: 100%;
+}
+.choice-button:active {
+    background: #B8D1E6;
+}
+.choice-button-disabled {
+    background: #B8D1E6;
+}
+
+
+
+@media screen and (max-width: 700px) { /*スマホ*/
+    #chatbot-start-button {
+        margin: 30px 40px;
+    }
+    #chatbot-logo {
+        font-size: 17px;
+    }
+    /*入力する場所*/
+    #chatbot-text {
+        height: 45px;
+        font-size: 17px;
+    }
+    /*送信ボタン*/
+    #chatbot-submit {
+        height: 40px;
+        font-size: 16px;
+    }
+    #chatbot-ul > li > div {
+        min-height: 30px;
+        padding: 10px 16px;
+        font-size: 17px;
+    }
+    .choice-title {
+        height: 30px;
+        line-height: 30px;
+        font-size: 17px;
+    }
+    .choice-q {
+        margin: 30px 0 1rem;
+        font-size: 17px;
+    }
+    .choice-button {
+        margin-bottom: 10px;
+        padding: 10px 16px;
+        font-size: 16.5px;
+    }
+}
+/*---------- チャットボットここまで  ----------*/
+
+
+
+/*---------- ロボット考え中アニメーション ----------*/
+#robot-loading-field {
+    display: inline-block;
+    height: 100%;
+    width: 26px;
+    position: relative;
+}
+#robot-loading-field > span {
+    color: #335C80;
+    font-size: 10px;
+    transform: scale(.7);
+    position: absolute;
+    top: -12px;
+}
+#robot-loading-circle1 {
+    animation: rlc1 .8s linear infinite alternate;
+}
+@keyframes rlc1 {
+    0% {
+        margin-top: -6px;
+    }
+    25% {
+        margin-top: 0px;
+    }
+    50% {
+        margin-top: 6px;
+    }
+    75% {
+        margin-top: 0px;
+    }
+    100% {
+        margin-top: -6px;
+    }
+}
+#robot-loading-circle2 {
+    animation: rlc2 .8s linear infinite;
+    margin-left: 8px;
+}
+@keyframes rlc2 {
+    0% {
+        margin-top: 0px;
+    }
+    25% {
+        margin-top: -6px;
+    }
+    50% {
+        margin-top: 0px;
+    }
+    75% {
+        margin-top: 6px;
+    }
+    100% {
+        margin-top: 0px;
+    }
+}
+#robot-loading-circle3 {
+    animation: rlc3 .8s linear infinite alternate;
+    margin-left: 16px;
+}
+@keyframes rlc3 {
+    0% {
+        margin-top: 6px;
+    }
+    25% {
+        margin-top: 0px;
+    }
+    50% {
+        margin-top: -6px;
+    }
+    75% {
+        margin-top: 0px;
+    }
+    100% {
+        margin-top: 6px;
+    }
+}
