@@ -17,3 +17,13 @@ body { margin: 0; background-color: #f0f2f5; font-family: sans-serif; color: #33
 .user-badge { position: absolute; top: 10px; right: 10px; background: #e8f0fe; color: #1a73e8; font-size: 11px; padding: 3px 8px; border-radius: 10px; }
 .user-icon { font-size: 50px; margin: 10px 0; }
 .btn-match { background: #1a73e8; color: white; border: none; padding: 10px; border-radius: 20px; width: 100%; cursor: pointer; margin-top: 10px; font-weight: bold; }
+.perfect-circle {
+                    width: 100px;           /* 横幅（縦と同じにする） */
+                    height: 100px;          /* 縦幅（横と同じにする） */
+                    border-radius: 50%;     /* 50%にすることで完全な正円になる */
+  
+                    text-align: center;     /* 文字を中央に配置 */
+                    border: 2px solid #ccc; /* 枠線の太さと色 */
+                    box-sizing: border-box; /* サイズ計算を崩さないための設定 */
+                    outline: none;          /* クリック時の青い外枠を消す */
+}
