@@ -1,20 +1,132 @@
-•ÒW‚ªI‚í‚Á‚½‚ç•K‚¸ƒVƒFƒAƒT[ƒo[‚ÉƒR[ƒh‚ğ’£‚è•t‚¯‚é‚±‚ÆII
+massages.html
 
-App Script‚Ìg‚¢•û
-‚PDƒR[ƒh‚ğ•ÒW‚·‚é
-‚QD‰Eã‚ÌuƒfƒvƒƒCv‚ğƒNƒŠƒbƒN
-‚RDuƒfƒvƒƒC‚ğŠÇ—v‚ğƒNƒŠƒbƒN
-‚SD
-GASF
-https://script.google.com/u/0/home/projects/1RKs-FmrgOEdLC8tTEolvM7cZJJFkdJ_z57DpWC458JbZm67X3OB1ISdX/edit?pli=1
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ - å¹³å·¥ãƒãƒƒãƒãƒ³ã‚°</title>
+    <link rel="stylesheet" href="home-style.css">
+    <style>
+        .chat-container { width: 100%; max-width: 600px; margin: 0 auto; background: #fff; border-radius: 15px; height: 80vh; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; background: #f0f2f5; display: flex; flex-direction: column; gap: 10px; }
+        .bubble { max-width: 75%; padding: 10px; border-radius: 10px; font-size: 0.9rem; }
+        .msg-left { align-self: flex-start; background: white; }
+        .msg-right { align-self: flex-end; background: #1a73e8; color: white; }
+        .chat-input-area { padding: 15px; display: flex; gap: 10px; border-top: 1px solid #eee; }
+    </style>
 
-ToDoƒŠƒXƒgƒXƒvƒŒƒbƒhƒV[ƒgF
-https://docs.google.com/spreadsheets/d/1ckcA0ZDfsNTEUeiQTNtP64F_VlsXAxbSIJssqQLYfqA/edit?usp=sharing
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo" onclick="location.href='home.html'">å¹³å·¥ãƒãƒƒãƒãƒ³ã‚°</div>
+        <div class="nav-links">
+            <span class="nav-item" onclick="location.href='home.html'">ãƒ›ãƒ¼ãƒ </span>
+            <span class="nav-item active">ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸</span>
+            <span class="nav-item" onclick="location.href='mypages.html'">ãƒã‚¤ãƒšãƒ¼ã‚¸</span>
+            <button class="btn-logout" onclick="logout()">ãƒ­ã‚°ã‚¢ã‚¦ãƒˆ</button>
+        </div>
+    </header>
 
-ƒf[ƒ^ƒx[ƒXƒXƒvƒŒƒbƒhƒV[ƒgURLF
-https://docs.google.com/spreadsheets/d/1f8MOhb6MD_rMjxmO2GAWWHXF4DMDGuoT5t5FFb9ULz0/edit?usp=sharing
+        <main class="container">
+    <div class="main-layout" style="display: flex; gap: 20px;">
+        <aside style="flex: 1; min-width: 200px;">
+            <div class="sidebar">
+                <h3>ãƒ›ãƒ¼ãƒ </h3>
+                <button class="btn-search" onclick="location.href='home.html'" style="background:#34a853; width:100%;">ãƒ¦ãƒ¼ã‚¶ãƒ¼ã‚’æ¢ã™</button>
+            </div>
+            </main>
 
-VSCodeƒVƒFƒAƒŠƒ“ƒNi•ÏXj
-https://prod.liveshare.vsengsaas.visualstudio.com/join?E88664D9C8646C1DBED365C978E8C617825F
+    <main class="container">
+        <div class="chat-container">
+            <div id="view-list">
+                <div id="chat-history-list"></div>
+            </div>
+            <div id="view-detail" style="display:none; flex-direction:column; height:100%;">
+                <div style="padding:10px; background:#1a73e8; color:white;"><button onclick="location.reload()" style="color:white; background:none; border:none; cursor:pointer;">â—€ æˆ»ã‚‹</button> <span id="target-name"></span></div>
+                <div class="chat-messages" id="message-area"></div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" style="flex:1; padding:10px; border-radius:20px; border:1px solid #ddd;">
+                    <button onclick="sendMessage()" style="padding:10px 20px; background:#1a73e8; color:white; border:none; border-radius:20px;">é€ä¿¡</button>
+                </div>
+            </div>
+        </div>
+    </main>
 
+     
 
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
+        const myEmail = localStorage.getItem("userEmail");
+        let currentTarget = "";
+
+        window.onload = () => {
+            const t = localStorage.getItem("chatTarget");
+            if(t) { openChat(t); localStorage.removeItem("chatTarget"); }
+            else { showList(); }
+            setInterval(loadMessages, 3000);
+        };
+
+        function showList() {
+            const list = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+            const area = document.getElementById("chat-history-list");
+            area.innerHTML = list.length ? "" : "<p style='padding:20px;'>ãƒˆãƒ¼ã‚¯å±¥æ­´ã¯ã‚ã‚Šã¾ã›ã‚“</p>";
+            list.forEach(email => {
+                const div = document.createElement("div");
+                div.style.padding = "20px; border-bottom:1px solid #eee; cursor:pointer;";
+                div.innerText = "ğŸ‘¤ " + email;
+                div.onclick = () => openChat(email);
+                area.appendChild(div);
+            });
+        }
+
+        function openChat(email) {
+            currentTarget = email;
+            document.getElementById("view-list").style.display = "none";
+            document.getElementById("view-detail").style.display = "flex";
+            document.getElementById("target-name").innerText = email;
+            // å±¥æ­´ã«è¿½åŠ 
+            let list = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+            if(!list.includes(email)) { list.push(email); localStorage.setItem("chatHistory", JSON.stringify(list)); }
+            loadMessages();
+        }
+
+        async function sendMessage() {
+            const text = document.getElementById("chat-input").value;
+            if(!text) return;
+            document.getElementById("chat-input").value = "";
+            await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ mode: "sendMessage", from: myEmail, to: currentTarget, text: text }) });
+            loadMessages();
+        }
+
+        async function loadMessages() {
+    if (!currentTarget) return;
+    try {
+        const res = await fetch(GAS_URL, { 
+            method: "POST", 
+            body: JSON.stringify({ mode: "getMessages", user1: myEmail, user2: currentTarget }) 
+        });
+        const result = await res.json();
+        
+        if (result.status === "success") {
+            const area = document.getElementById("message-area");
+            // ä»Šè¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹å†…å®¹ã¨å–å¾—ã—ãŸä»¶æ•°ãŒé•ã†å ´åˆã®ã¿æ›¸ãæ›ãˆã‚‹ï¼ˆãƒãƒ©ã¤ãé˜²æ­¢ï¼‰
+            if (area.children.length !== result.message.length) {
+                area.innerHTML = "";
+                result.message.forEach(msg => {
+                    const div = document.createElement("div");
+                    div.className = "bubble " + (msg.from === myEmail ? "msg-right" : "msg-left");
+                    div.innerText = msg.text;
+                    area.appendChild(div);
+                });
+                area.scrollTop = area.scrollHeight;
+            }
+        }
+    } catch (e) {
+        console.error("å—ä¿¡ã‚¨ãƒ©ãƒ¼:", e);
+    }
+}
+
+        function logout() { localStorage.clear(); window.location.href = "index.html"; }
+    </script>
+</body>
+</html>

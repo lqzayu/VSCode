@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "chrome",
+            "name": "http://127.0.0.1:3000/1/index.html?serverWindowId=c5d8f3f6-2de7-46d8-bb2b-bfb5878c9ef5",
+            "request": "launch",
+            "url": "http://127.0.0.1:3000/1/index.html?serverWindowId=c5d8f3f6-2de7-46d8-bb2b-bfb5878c9ef5"
+        }
+    ]
+}
