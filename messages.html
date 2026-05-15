@@ -2,8 +2,13 @@
 <link href= "https://fonts.googleapis.com/icon?family=Material+Icons" rel= "stylesheet">
 <style>
 
+    /*
+【補足】
+- 「ul」の子要素「li」に直接文字を書いてもいいですが、デザイン上、今回は「li」の子要素「divに文字を書いていきます。（吹き出しテキストの「padding」，「line-height」，改行などが複雑になるのを防ぐため）
+- ロボットの吹き出し「li」には「.chatbot-left」というクラスを当て左寄せに、自分の吹き出し「li」には「.chatbot-right」というクラスを当て右寄せにしています。
+*/
 
- {
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
