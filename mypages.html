@@ -5,6 +5,16 @@
     <title>マイページ - 平工マッチング</title>
     <link rel="stylesheet" href="home-style.css">
 </head>
+    
+    <!--プロフィール-->
+    <label>プロフィール画像</label>
+
+    <input type="file"
+       id="profile-image"
+       accept="image/*"
+       style="margin:10px 0;">
+    <!--ここまで-->
+
 <body>
     <header class="navbar">
         <div class="logo" onclick="location.href='home.html'">平工マッチング</div>
@@ -25,14 +35,41 @@
     </main>
     <script>
         window.onload = () => { document.getElementById("my-name").value = localStorage.getItem("userName") || ""; };
-        function saveProfile() {
+        /*function saveProfile() {
             const name = document.getElementById("my-name").value;
             if(!name) return alert("名前を入力してください");
             localStorage.setItem("userName", name);
             alert("保存しました");
             location.href = 'home.html';
         }
-        function logout() { localStorage.clear(); window.location.href = "index.html"; }
-    </script>
+        function logout() { localStorage.clear(); window.location.href = "index.html"; }*/
+        
+        
+    function saveProfile() {
+    const name = document.getElementById("my-name").value;
+    if(!name) return alert("名前を入力してください");
+    localStorage.setItem("userName", name);
+    // 画像保存
+    const file = document.getElementById("profile-image").files[0];
+    if(file){
+        const reader = new FileReader();
+        reader.onload = function(e){
+            localStorage.setItem(
+                "profileImage",
+                e.target.result
+            );
+            finishSave();
+        };
+        reader.readAsDataURL(file);
+    } else {
+        finishSave();
+    }
+}
+function finishSave(){
+    alert("保存しました");
+    location.href = 'home.html';
+}
+ 
+</script>
 </body>
 </html>
