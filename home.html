@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="home-style.css">
 </head>
 <body>
+
+<!--ヘッダー（画面上部の部分）-->
 <header class="navbar">
     <div class="logo" onclick="location.href='home.html'">平工マッチング</div>
     <div class="nav-links">
@@ -17,27 +19,35 @@
         <button class="btn-logout" onclick="logout()">ログアウト</button>
     </div>
 </header>
+<!--ヘッダー終了-->
 
+<!--メイン(メインの画面)-->
+<main class="container">
+<!--マイページ-->
+<div class="sidebar">
+    <div class="mypage-area">
 
+        <img id="profile-icon"
+            class="big-profile-icon"
+            src=""
+            alt="icon"
+            onclick="location.href='mypages.html'">
 
+        <div id="mypage-text">マイページ</div>
 
-/*<main class="container">
-    <div class="main-layout" style="display: flex; gap: 20px;">
-        <aside style="flex: 1; min-width: 150px;">
-                
-            <div class="sidebar">
-                
-                <input type="text" class="perfect-circle" placeholder="検索">
+    </div>
+<!--マイページ終了-->
+<!--トーク-->
+    <div class="circle-group">
 
-<p><strong>表示名:</strong> <span id="display-name">未設定</span></p>
-                <button class="perfect-circle" onclick="location.href='mypages.html'" style="background:#c7dd66; width:100%;"></button>
-                document.getElementById("display-name").innerText = localStorage.getItem("userName") || "未設定";
-            </div>
+        <button class="perfect-circle"
+            onclick="location.href='messages.html'"
+            style="background:#1cbdc5;">💬<br>トーク</button>
 
-            <div class="sidebar">
-                <button  class="perfect-circle" onclick="location.href='messages.html'" style="background:#1cbdc5; width:100%;">トーク</button>
-        </aside>*/
+    </div>
 
+</div>
+<!--トーク終了-->
 
 
         <div style="flex: 3;">
@@ -62,16 +72,30 @@
                 </div>
             </section>
 
-            <section id="search-area">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h2>募集一覧</h2>
-                    <button onclick="loadRecruitments()" style="background:none; border:none; color:#1a73e8; cursor:pointer;">🔄 更新</button>
-                </div>
-                <div class="user-grid" id="user-list">読み込み中...</div>
-            </section>
-        </div>
+
+    <!-- 右側 -->
+    <div class="main-content">
+
+        <section id="search-area">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>募集一覧</h2>
+
+                <button onclick="loadRecruitments()"
+                    style="background:none; border:none; color:#1a73e8; cursor:pointer;">
+                    🔄 更新
+                </button>
+            </div>
+
+            <div class="user-grid" id="user-list">
+                読み込み中...
+            </div>
+        </section>
+
+    </div>
+
     </div>
 </main>
+<!--メイン終了-->
 
 <script>
 const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
@@ -120,11 +144,55 @@ function startChat(email) {
     location.href = 'messages.html';
 }
 
-function logout() { localStorage.clear(); window.location.href = "index.html"; }
+/*function logout() { localStorage.clear(); window.location.href = "index.html"; }
 window.onload = () => {
     document.getElementById("display-name").innerText = localStorage.getItem("userName") || "未設定";
     loadRecruitments();
+};*/
+
+/*window.onload = () => {
+
+
+    const userName = localStorage.getItem("userName");
+
+    // 表示名
+    document.getElementById("display-name").innerText =
+        userName || "未設定";
+
+    // 丸ボタンの名前変更
+    document.getElementById("mypage-text").innerText =
+        userName || "マイページ";
+
+    loadRecruitments();
+};*/
+//ここから
+window.onload = () => {
+
+    const userName =
+        localStorage.getItem("userName");
+
+    const profileImage =
+        localStorage.getItem("profileImage");
+
+    // 名前
+    document.getElementById("mypage-text").innerText =
+        userName || "マイページ";
+
+    // 画像
+    if(profileImage){
+
+        document.getElementById("profile-icon").src =
+            profileImage;
+
+    } else {
+
+        document.getElementById("profile-icon").src =
+        "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+    }
+
+    loadRecruitments();
 };
+//ここまで
 </script>
 </body>
 </html>

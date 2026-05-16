@@ -70,3 +70,5 @@ function updateMsg(txt, type) {
     el.innerText = txt;
     el.className = "message " + type;
 }
+
+localStorage.setItem("userName", name);

@@ -1,4 +1,4 @@
-body { margin: 0; background-color: #f0f2f5; font-family: sans-serif; color: #333; }
+.body { margin: 0; background-color: #f0f2f5; font-family: sans-serif; color: #333; }
 .navbar { background: white; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: sticky; top: 0; }
 .logo { font-size: 1.5rem; font-weight: bold; color: #1a73e8; cursor: pointer; }
 .nav-links { display: flex; align-items: center; }
@@ -6,7 +6,7 @@ body { margin: 0; background-color: #f0f2f5; font-family: sans-serif; color: #33
 .nav-item.active { color: #1a73e8; border-bottom: 2px solid #1a73e8; }
 .btn-logout { padding: 8px 15px; border-radius: 5px; border: 1px solid #ddd; background: none; cursor: pointer; }
 .container { display: flex; max-width: 1200px; margin: 30px auto; padding: 0 20px; }
-.sidebar { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.sidebar {width: 250px;display: flex;flex-direction: column;align-items: center;padding-top: 30px;background:transparent;box-shadow: none;}
 .filter-group { margin-bottom: 15px; text-align: left; }
 .filter-group label { display: block; margin-bottom: 5px; font-weight: bold; }
 .filter-group input, .filter-group select { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd; box-sizing: border-box; }
@@ -17,13 +17,18 @@ body { margin: 0; background-color: #f0f2f5; font-family: sans-serif; color: #33
 .user-badge { position: absolute; top: 10px; right: 10px; background: #e8f0fe; color: #1a73e8; font-size: 11px; padding: 3px 8px; border-radius: 10px; }
 .user-icon { font-size: 50px; margin: 10px 0; }
 .btn-match { background: #1a73e8; color: white; border: none; padding: 10px; border-radius: 20px; width: 100%; cursor: pointer; margin-top: 10px; font-weight: bold; }
-.perfect-circle {
-                    width: 100px;           /* 横幅（縦と同じにする） */
-                    height: 100px;          /* 縦幅（横と同じにする） */
-                    border-radius: 50%;     /* 50%にすることで完全な正円になる */
-  
-                    text-align: center;     /* 文字を中央に配置 */
-                    border: 2px solid #ccc; /* 枠線の太さと色 */
-                    box-sizing: border-box; /* サイズ計算を崩さないための設定 */
-                    outline: none;          /* クリック時の青い外枠を消す */
-}
+.perfect-circle {width: 130px;height: 130px;border-radius: 50%;display: flex;flex-direction: column;justify-content: center;align-items: center;gap: 12px;border: none;color: white;font-weight: bold;cursor: pointer;box-shadow: 0 4px 10px rgba(0,0,0,0.15);transition: 0.2s;text-align: center;}
+/* ホバー */
+.perfect-circle:hover {transform: scale(1.05);}
+/* ボタンを離す */
+.circle-group {display: flex;flex-direction: column;gap: 40px;   /* ボタン間の距離 */align-items: center;}
+.sidebar {width: 250px;background: transparent; /* 背景消す */box-shadow: none;/* 影消す */padding: 0;}
+/*アイコン*/
+.profile-icon {width: 55px;height: 55px;border-radius: 50%;object-fit: cover;border: 3px solid white;}
+.big-profile-icon {width: 150px;height: 150px;border-radius: 50%;object-fit: cover;object-position: center;display: block;cursor: pointer;box-shadow: 0 6px 18px rgba(0,0,0,0.2);transition: 0.2s;}
+.big-profile-icon:hover {transform: scale(1.05);}
+/*ここまで*/
+.mypage-area {display: flex;flex-direction: column;align-items: center;gap: 14px; /* ← 少し広げる */margin-bottom: 40px;}
+#mypage-text {font-size: 20px;font-weight: bold;color: #333;line-height: 1;margin-top: 4px; /* ← 追加 */}
+.perfect-circle {width: 130px;height: 130px;}
+.display-name {margin-bottom: 20px;font-size: 28px;font-weight: bold;}
