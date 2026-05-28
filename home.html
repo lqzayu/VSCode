@@ -391,6 +391,11 @@ function startChat(email) {
     location.href = 'messages.html';
 }
 
+function logout() {
+    localStorage.clear();
+    window.location.href = "index.html";
+}
+
 
 /* =========================
    ページ読み込み時の処理

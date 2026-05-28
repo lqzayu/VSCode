@@ -1,911 +1,395 @@
-<!--Import Google Icon Font-->
-<link href= "https://fonts.googleapis.com/icon?family=Material+Icons" rel= "stylesheet">
-<style>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メッセージ - 平工マッチング</title>
+    <link rel="stylesheet" href="home-style.css">
+    <style>
+        body {
+            background-color: #f0f2f5;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .main-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            height: calc(100vh - 70px);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
 
-    /*
+        /* --- 1, トーク一覧画面のスタイル --- */
+        .list-header {
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border-bottom: 1px solid #eee;
+            background: #fff;
+        }
+        .partner-list {
+            flex: 1;
+            overflow-y: auto;
+            background: #fff;
+        }
+        .partner-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #f9f9f9;
+            cursor: pointer;
+            gap: 12px;
+            transition: background 0.2s;
+        }
+        .partner-item:hover {
+            background: #f5f5f5;
+        }
+        .partner-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .partner-info {
+            flex: 1;
+        }
+        .partner-name {
+            font-weight: bold;
+            font-size: 15px;
+            color: #333;
+        }
+        .partner-arrow {
+            color: #ccc;
+            font-size: 14px;
+        }
 
+        /* --- チャット画面のスタイル（LINE風背景） --- */
+        .chat-view {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background: #7494c0; /* LINE風背景色 */
+        }
+        .chat-header {
+            background: #ffffff;
+            color: #333333;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .header-info {
+            flex: 1;
+        }
+        .header-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .header-email {
+            font-size: 11px;
+            color: #888;
+        }
+        .btn-back {
+            background: #1cbdc5;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .chat-box {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .msg-wrapper {
+            display: flex;
+            flex-direction: column;
+            max-width: 75%;
+        }
+        .msg-wrapper.me { align-self: flex-end; }
+        .msg-wrapper.target { align-self: flex-start; }
+        .msg {
+            padding: 9px 14px;
+            border-radius: 18px;
+            font-size: 14px;
+            word-wrap: break-word;
+            line-height: 1.4;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+        .msg-wrapper.me .msg {
+            background: #8ee59d;
+            color: #000;
+            border-top-right-radius: 2px;
+        }
+        .msg-wrapper.target .msg {
+            background: #ffffff;
+            color: #000;
+            border-top-left-radius: 2px;
+        }
+        .chat-input-area {
+            display: flex;
+            padding: 12px;
+            background: #ffffff;
+            gap: 10px;
+            border-top: 1px solid #eee;
+        }
+        .chat-input-area input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+            background: #f8f9fa;
+        }
+        .btn-send {
+            background: #1cbdc5;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    user-select: none;
-}
-
-css{
-   touch-action: none;
-}
-body { 
-    box-sizing: border-box;
-    background: #FFF;
-    font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, "Helvetica Neue", YuGothic, "ヒラギノ角ゴ ProN W3", Hiragino Kaku Gothic ProN, Arial, "メイリオ", Meiryo, sans-serif;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-    overflow-x: hidden;
-/*    overflow-y: scroll;*/
-    -webkit-overflow-scrolling: touch;
-}
-a {
-  color: #2196F3;
-  text-decoration: none;
-}
-
-
-/*---------- チャットボットここから  ----------*/
-/* 今回は、li（幅100%）の中に、div（吹き出し）を
-挿入する。吹き出しの三角形は疑似要素を使用する。 */
-/*チャットボット本体*/
-#chatbot { 
-    position: fixed;
-    overflow: hidden;
-    opacity: 1;
-    transition: .4s;
-    background: #FFF;
-    -webkit-font-smoothing: none;
-    -webkit-font-smoothing: antialiased;
-    -webkit-font-smoothing: subpixel-antialiased; /* Safari での Default値 */
-}
-#chatbot.chatbot-zoom {
-    height: 100vh;
-    width: 100vw;
-    box-shadow: none;
-    border-radius: 0;
-    top: 0;
-    left: 0;
-    margin: 0;
-    transition: 0;
-    transform: translate(0);
-    -webkit-transform: translate(0);
-    -moz-transform: translate(0);
-}
-@media screen and (min-width: 700px) { /*PC*/
-    #chatbot {
-        height: 80vh;
-        width: 350px;
-        bottom: 0;
-        right: 0;
-        margin: 0;
-        box-shadow: 0px 0 25px -5px #888;
-        border-radius: 10px;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        -webkit-transform: translate(-50%, -50%);
-        -moz-transform: translate(-50%, -50%);
-    }
-}
-@media screen and (max-width: 700px) { /*スマホ*/
-    #chatbot {
-        height: 100vh;
-        width: 100vw;
-    }
-}
-#chatbot-header {
-    height: 60px;
-    background: #335C80;
-    position: relative;
-    display: flex;
-    justify-content:space-between;
-}
-#chatbot-logo {
-    color: #FFF;
-    line-height: 60px;
-    padding: 0 30px;
-    font-size: 16px;
-}
-#chatbot-zoom-icon {
-    display: block;
-    height: 100%;
-    line-height: 60px;
-    padding: 0 20px;
-    color: #FFF;
-    cursor: pointer;
-}
-#chatbot-zoom-icon:active {
-    background: #4D7999;
-}
-@media screen and (max-width: 700px) { /*スマホ*/
-  #chatbot-zoom-icon {
-    display: none;
-  }
-}
-
-/*チャットのフィールド*/
-#chatbot-body {
-    width: 100%;
-    height: calc(80vh - 110px);
-    padding-top: 10px;
-    background: #FFF;
-    box-sizing: border-box;
-    /*横向きのスクロール禁止*/
-    overflow-x: hidden;
-    /*縦向きのスクロール許可*/
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-    /*IE、Edgeでスクロールバーを非表示にする*/
-    -ms-overflow-style: none;
-}
-@media screen and (max-width: 700px) { /*スマホ*/
-  #chatbot-body {
-    height: calc(100vh - 170px);
-  }
-}
-#chatbot-body.chatbot-body-zoom {
-    width: 100%;
-}
-#chatbot-body.chatbot-body-zoom {
-    height: calc(100vh - 170px);
-}
-/*Chrome、Safariでスクロールバーを非表示にする*/
-#chatbot-body::-webkit-scrollbar {
-    display:none;
-}
-#chatbot-footer {
-    width: 100%;
-    height: 50px;
-    display: flex;
-    box-sizing: border-box;
-    background: #FFF;
-    border-top: 1.5px solid #EEE;
-}
-@media screen and (min-width: 700px) { /*PC*/
-    #chatbot-footer.chatbot-footer-zoom {
-        margin-bottom: 0;
-    }
-}
-@media screen and (max-width: 700px) { /*スマホ*/
-    #chatbot-footer.chatbot-footer-zoom {
-        position: fixed;
-        margin-bottom: 60px;
-    }
-}
-/*入力する場所*/
-#chatbot-text {
-    height: 40px;
-    width: 72%;
-    display: block;
-    font-size: 16px;
-    box-sizing: border-box;
-    padding-left: 10px;
-    margin: auto 10px auto 15px;
-    color: #777;
-    border: 0;
-    outline: 0;
-}
-#chatbot-text:focus{
-    border: none;
-    outline: none;
-}
-/*送信ボタン*/
-#chatbot-submit{
-    cursor: pointer;
-    height: 35px;
-    padding: 0 30px;
-    margin: auto;
-    margin-right: 15px; 
-    font-size: 16px;
-    background: #335C80;
-    color: white;
-    display: block;
-    /*デフォルトのボーダーを消す*/
-    border: none;
-    box-sizing: border-box;
-    border-radius: 7px;
-}
-#chatbot-submit:active{
-    outline: 0;
-    background: #86ABBF;
-}
-
-#chatbot-ul{
-    /*ulのデフォルの隙間を消す*/
-    padding: 0;
-    list-style: none;
-}
-#chatbot-ul > li{
-    position: relative;
-    /* display: block; */
-    width: 100%;
-    padding-bottom: 10px;
-    word-wrap: break-word;
-}
-#chatbot-ul > li > div {
-    display: inline-block;
-    box-sizing: border-box;
-    min-height: 23px;
-    max-width: 70%;
-    padding: 7px 13px;
-    font-size: 16px;
-    line-height: 1.3em;
-    position: relative;
-}
-
-#chatbot-ul > li > div.chatbot-short {
-    width: 53%;
-}
-/*相手の吹き出しのデザイン*/
-.chatbot-left{
-    margin-left: 20px;
-    background: #E6F0F7;
-    border-radius: 0 9px 9px 9px;
-    color: #1A5F80;
-}
-.chatbot-left-rounded {
-    margin-left: 20px;
-    background: #E6F0F7;
-    border-radius: 9px;
-    color: #1A5F80;
-}
-/*自分の吹き出し*/
-.chatbot-right{
-    margin-right: 20px;
-    background: #456F99;
-    text-align: left;
-    border-radius: 9px 0 9px 9px;
-    color: #FFF;
-}
-.left{
-  text-align: left;
-}
-.right{
-  text-align: right;
-}
-.choice-title {
-    position: absolute;
-    width: 100%;
-    height: 25px;
-    line-height: 25px;
-    border-radius: 9px 9px 0 0;
-    text-align: center;
-    font-size: 15px;
-    top: 0;
-    left: 0;
-    background: #456F99;
-    color: #FFF;
-    letter-spacing: .05em;
-}
-.choice-q {
-/*     width: 180px; */
-    margin: 25px 0 .7rem;
-    font-size: 15px;
-    line-height: 1.3em;
-    letter-spacing: .05em;
-}
-.choice-button {
-    cursor: pointer;
-    user-select: none;
-    background: #456F99;
-    color: #FFF;
-    border-radius: 3px;
-    /* margin-top: 8px; */
-    margin-bottom: 8px;
-    text-align: left;
-    padding: 7px 13px;
-    font-size: 16px;
-    line-height: 1.3em;
-    letter-spacing: .05em;
-    border: none;
-    display: block;
-    width: 100%;
-}
-.choice-button:active {
-    background: #B8D1E6;
-}
-.choice-button-disabled {
-    background: #B8D1E6;
-}
-
-
-
-@media screen and (max-width: 700px) { /*スマホ*/
-    #chatbot-start-button {
-        margin: 30px 40px;
-    }
-    #chatbot-logo {
-        font-size: 17px;
-    }
-    /*入力する場所*/
-    #chatbot-text {
-        height: 45px;
-        font-size: 17px;
-    }
-    /*送信ボタン*/
-    #chatbot-submit {
-        height: 40px;
-        font-size: 16px;
-    }
-    #chatbot-ul > li > div {
-        min-height: 30px;
-        padding: 10px 16px;
-        font-size: 17px;
-    }
-    .choice-title {
-        height: 30px;
-        line-height: 30px;
-        font-size: 17px;
-    }
-    .choice-q {
-        margin: 30px 0 1rem;
-        font-size: 17px;
-    }
-    .choice-button {
-        margin-bottom: 10px;
-        padding: 10px 16px;
-        font-size: 16.5px;
-    }
-}
-/*---------- チャットボットここまで  ----------*/
-
-
-
-/*---------- ロボット考え中アニメーション ----------*/
-#robot-loading-field {
-    display: inline-block;
-    height: 100%;
-    width: 26px;
-    position: relative;
-}
-#robot-loading-field > span {
-    color: #335C80;
-    font-size: 10px;
-    transform: scale(.7);
-    position: absolute;
-    top: -12px;
-}
-#robot-loading-circle1 {
-    animation: rlc1 .8s linear infinite alternate;
-}
-@keyframes rlc1 {
-    0% {
-        margin-top: -6px;
-    }
-    25% {
-        margin-top: 0px;
-    }
-    50% {
-        margin-top: 6px;
-    }
-    75% {
-        margin-top: 0px;
-    }
-    100% {
-        margin-top: -6px;
-    }
-}
-#robot-loading-circle2 {
-    animation: rlc2 .8s linear infinite;
-    margin-left: 8px;
-}
-@keyframes rlc2 {
-    0% {
-        margin-top: 0px;
-    }
-    25% {
-        margin-top: -6px;
-    }
-    50% {
-        margin-top: 0px;
-    }
-    75% {
-        margin-top: 6px;
-    }
-    100% {
-        margin-top: 0px;
-    }
-}
-#robot-loading-circle3 {
-    animation: rlc3 .8s linear infinite alternate;
-    margin-left: 16px;
-}
-@keyframes rlc3 {
-    0% {
-        margin-top: 6px;
-    }
-    25% {
-        margin-top: 0px;
-    }
-    50% {
-        margin-top: -6px;
-    }
-    75% {
-        margin-top: 0px;
-    }
-    100% {
-        margin-top: 6px;
-    }
-}
-
-
-</style>
-
-
-  <div id= "chatbot">
-    
-    <div id= "chatbot-header">
-      <div id= "chatbot-logo">AI Chatbot</div>
-      <i id= "chatbot-zoom-icon" class="material-icons waves-effect waves-light" onclick= "chatbotZoom()">fullscreen</i>
+<header class="navbar">
+    <div class="logo" onclick="location.href='home.html'">平工マッチング</div>
+    <div class="nav-links">
+        <span class="nav-item" onclick="location.href='home.html'">ホーム（募集一覧）</span>
+        <span class="nav-item active" onclick="location.href='messages.html'">メッセージ</span>
+        <span class="nav-item" onclick="location.href='mypages.html'">マイページ</span>
     </div>
-    
-    <div id= "chatbot-body">
-      <ul id= "chatbot-ul"></ul>
+</header>
+
+<div class="main-container">
+    <div id="partner-list-view" style="display: block; height: 100%; display: flex; flex-direction: column;">
+        <div class="list-header">トーク履歴一覧</div>
+        <div class="partner-list" id="partner-list-box">
+            <p style="text-align: center; color: #888; padding: 20px;">読み込み中...</p>
+        </div>
     </div>
-    
-    <!--入力場所，送信ボタン-->
-    <form onsubmit= "return false">
-      <div id= "chatbot-footer">
-        <input type= "text" id= "chatbot-text" class= "browser-default" placeholder= "テキストを入力">
-        <input type= "submit" value= "送信" id= "chatbot-submit">
-      </div>
-    </form>
-  </div>
 
-  <script>
-    //厳格モード、つまり、的確なエラーチェックが行われる
-'use strict';
+    <div id="chat-view" class="chat-view" style="display: none;">
+        <div class="chat-header">
+            <img id="target-icon" class="header-icon" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="icon">
+            <div class="header-info">
+                <div id="chat-title" class="header-name">対話中</div>
+                <div id="chat-email" class="header-email">-------</div>
+            </div>
+            <button class="btn-back" onclick="backToPartnerList()">一覧へ戻る</button>
+        </div>
+        
+        <div class="chat-box" id="chat-box"></div>
+        
+        <div class="chat-input-area">
+            <input type="text" id="msg-input" placeholder="メッセージを入力..." onkeypress="handleKeyPress(event)">
+            <button class="btn-send" onclick="sendChatMessage()">送信</button>
+        </div>
+    </div>
+</div>
 
-/*
-【補足】
-- チャットの画面にある「ul」にJavaScriptで「li」を追加していく仕組みです。
-- ロボットが返信する度に、「robotCount」を1ずつ足していきます。この値がロボットが話す内容をまとめた「chatList」オブジェクトの数値に対応します。自分がテキストを入力し、送信ボタンを押した瞬間の「robotCount」の値に応じて、配列から次のメッセージを選び返信させます。
-- 今回作った関数は、ロボットの投稿をする「robotOutput()」と、自分が送信ボタンを押したときの関数（無名関数）です。
+<script>
+const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
 
+const myEmail = localStorage.getItem("userEmail");
+let currentTargetEmail = null; // 現在チャットしている相手
+let chatIntervalId = null;     // 自動更新用タイマーのID
 
-【開発状況】
-[✓] ロボットからの投稿 20190918完成
-[✓] 自分の投稿 20190918完成
-[✓] option.normal 処理
-[✓] option.random 処理
-[✓] option.select 処理 利用 20210524完成
-[✓] continue 処理
-[✓] save 処理，chatDataList 利用 20210524完成
-[×] さらなる会話の分岐 
-[✓] ロボットからのリンクの送信
-[×] 正解なし質問に応じた返答
-[×] テキストマイニング
-[✓] ロボットの考え中のアニメーション
-[×] ロボットのアイコン
-[×] 「他に知りたいことはありますか？」というようなループ
-[×] 「」というようなループ
-[×] ロボットの質問番号の自動化
+window.onload = () => {
+    if (!myEmail) {
+        alert("ログイン情報が見つかりません。");
+        location.href = "index.html";
+        return;
+    }
 
-
-【開発捕捉】
-■ chatList のoptionの種類
-- chatList[n].option = ['normal', 'random', 'select'];
-
-■ chatList のプロパティの種類
-- text -> ロボットが表示する文字
-- continue -> 次もロボットが連続で投稿するときは true を指定する
-- option -> normal は普通，random は配列状態の text をランダムで一つ投稿する，select は選択肢（個数に制限なし）を提示する
-- link: trueでリンク化
-*/
-
-
-// ロボットからの投稿一覧のオブジェクト
-// textには投稿文，continueは次も連続で投稿するかどうか，optionは普通の投稿or選択肢orランダム投稿など
-const chatList = {
-    1: {text: 'ようこそ「AI chatbot」へ！', continue: true, option: 'normal'},
-    2: {text: '会話内容は管理者へ送信されませんので、ご安心ください。', continue: true, option: 'normal'},
-    3: {text: {title: 'Q1', question: '何を知りたいですか？', choices: ['開発者について', '参考にしたチャットボット', 'Flutter デモアプリ', '島根県美郷町 HP']}, continue: false, option: 'choices', questionNextSupport: true}, // questionNextSupportは次に質問に対する詳細を投稿するかどうか
-    // userCount1：ユーザーが思う世界一高い山
-    4: {text: ['https://mf3px.sakura.ne.jp/', 'https://www.hubspot.jp/', 'https://gallery.flutter.dev/', 'https://www.town.shimane-misato.lg.jp/misatoto/'], continue: true, option: 'normal', link: true},
-    5: {text: 'こちらの文字をクリックしてください。', continue: true, option: 'normal'},
-    6: {text: 'あなたのお名前は何ですか？', continue: false, option: 'normal'},
-    // userCount2：名前
-    7: {text: '', continue: true, option: 'normal'},
-    8: {text: '今日の体調はいかがですか？', continue: false, option: 'normal'},
-    // userCount3：体調
-    9: {text: ['そうですか！', 'わかりました！', '承知致しました！'], continue: true, option: 'random'},
-    10: {text: 'ここで問題です！', continue: true, option: 'normal'},
-    11: {text: {title: 'Q2', question: 'どの山が世界一高いでしょう？', choices: ['エベレスト', 'K2', '富士山'], answer: '0'}, continue: false, option: 'choices'},
-    // userCount4：ユーザーが思う世界一高い山
-    12: {text: {qTrue: '', qFalse:'残念！正解は「エベレスト」でした。'}, continue: true, option: 'normal'},
-    13: {text: '', continue: true, option: 'normal'},
-    14: {text: {title: '満足度調査', question: 'このAIチャットボットの満足度を5段階で教えてください（数字が大きいほど満足度が高いものとします。）。', choices: ['5', '4', '3', '2', '1']}, continue: false, option: 'choices'},
-    // userCount5：満足度
-    15: {text: 'ありがとうございます。最後に、ご感想をお聞かせください。', continue: false, option: 'normal'},
-    // userCount6：感想
-    16: {text: '', continue: false, option: 'normal'}
+    // 🌟 募集カードの「チャット」から直接飛んできたかチェック
+    const directTarget = localStorage.getItem("chatTarget");
+    if (directTarget) {
+        localStorage.removeItem("chatTarget"); // 一度消してメモリをクリーンに
+        openChat(directTarget, "対話中...");   // 直接チャット画面を開く
+    } else {
+        // 通常はトーク相手一覧を読み込む
+        loadPartnerList();
+    }
 };
 
+// 📇 トーク相手一覧をGASから取得して描写する
+async function loadPartnerList() {
+    try {
+        const res = await fetch(GAS_URL, {
+            method: "POST",
+            body: JSON.stringify({ mode: "getChatPartners", email: myEmail })
+        });
+        const result = await res.json();
+        
+        if (result.status === "success") {
+            const listBox = document.getElementById("partner-list-box");
+            listBox.innerHTML = "";
 
-// 上記の投稿文（空の「text」）を加工する関数（中に相手の名前などを挿入する際に用いる）
-// userData === ["何を知りたいですか？", 名前","体調","山の質問","満足度","感想"];
-// userData はユーザーの回答内容の全てを記憶
-function textSpecial() {
-    chatList[7].text = `こんにちは！${userData[1]}さん！`;
-    chatList[12].text.qTrue = `正解！${userData[1]}さん、すごいですね！`;
-    chatList[13].text = `${userData[1]}さん、ありがとうございました。今日はここで終了とさせていただきます。`; 
-    chatList[16].text = `${userData[1]}さんの満足度は「${userData[4]}」，ご感想は「${userData[5]}」ですね！ありがとうございました。`;
-}
-
-
-
-
-
-
-// 「userCount」は実質必要ないが、管理しやすくするために導入する（「chatList」のコメントアウト，最後のやまびこ，今後の開発）
-let userCount = 0;
-// ユーザーの発言，回答内容を記憶する配列
-let userData = [];
-
-// 一番下へ
-function chatToBottom() {
-    const chatField = document.getElementById('chatbot-body');
-    chatField.scroll(0, chatField.scrollHeight - chatField.clientHeight);
-}
-
-const userText = document.getElementById('chatbot-text');
-const chatSubmitBtn = document.getElementById('chatbot-submit');
-
-// ロボットが投稿をする度にカウントしていき、投稿を管理する
-let robotCount = 0;
-// 選択肢の正解個数
-let qPoint = 0;
-
-// 選択肢ボタンを押したときの次の選択肢（textのa，bなど）
-let nextTextOption = '';
-
-// 選択肢ボタンを押したとき（必要があれば、正解判別）
-function pushChoice(e) {
-    userCount ++;
-    console.log(`userCount: ${userCount}`);
-
-    const choicedId = e.getAttribute('id'); // 選択した選択肢のid
-    // 回答内容の保存
-    userData.push(document.getElementById(choicedId).textContent);
-    if (chatList[robotCount].text.answer) {
-        // 正解，不正解のある選択肢
-        const trueChoice = `q-${robotCount}-${chatList[robotCount].text.answer}`// 正解選択肢のid
-        if (choicedId === trueChoice) {
-            // 正解
-            nextTextOption = 'qTrue';
-            qPoint ++;
-        } else {
-            // 不正解
-            nextTextOption = 'qFalse';
-        }
-    } else {
-        // 正解のない質問
-        if(chatList[robotCount].questionNextSupport) {
-            if (String(robotCount).length === 1) {
-                // robotCountの桁数が1桁の時
-                nextTextOption = choicedId.slice(4);
-            } else if (String(robotCount).length === 2) {
-                // robotCountの桁数が2桁の時
-                nextTextOption = choicedId.slice(5);
-            } else if (String(robotCount).length === 3) {
-                // robotCountの桁数が3桁の時
-                nextTextOption = choicedId.slice(6);
+            if (result.message.length === 0) {
+                listBox.innerHTML = '<p style="text-align: center; color: #888; padding: 40px; font-size: 14px;">過去のチャット履歴はありません。<br>ホーム画面から誰かにチャットを送ってみましょう！</p>';
+                return;
             }
+
+            result.message.forEach(partner => {
+                const item = document.createElement("div");
+                item.className = "partner-item";
+                // クリックしたらその人とのチャットを開く
+                item.onclick = () => openChat(partner.email, partner.name);
+
+                item.innerHTML = `
+                    <img class="partner-icon" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="icon">
+                    <div class="partner-info">
+                        <div class="partner-name">${partner.name}</div>
+                        <div style="font-size: 12px; color: #888;">${partner.email}</div>
+                    </div>
+                    <div class="partner-arrow">＞</div>
+                `;
+                listBox.appendChild(item);
+            });
         }
+    } catch (e) {
+        document.getElementById("partner-list-box").innerText = "一覧の読み込みに失敗しました。";
     }
-    for (let i = 0; i < chatList[robotCount].text.choices.length; i ++) {
-        document.getElementById('q-' + robotCount + '-' + i).disabled = true;
-        document.getElementById('q-' + robotCount + '-' + i).classList.add('choice-button-disabled');
-        document.getElementById(choicedId).classList.remove('choice-button-disabled');
-    }
-
-  　robotOutput();
-
-    console.log(userData);
 }
 
-// 拡大ボタン
-let chatbotZoomState = 'none';
-const chatbot = document.getElementById('chatbot');
-const chatbotBody = document.getElementById('chatbot-body');
-const chatbotFooter = document.getElementById('chatbot-footer');
-const chatbotZoomIcon = document.getElementById('chatbot-zoom-icon');
-
-
-// --------------------ロボットの投稿--------------------
-function robotOutput() {
-    // 相手の返信が終わるまで、その間は返信不可にする
-    // なぜなら、自分の返信を複数受け取ったことになり、その全てに返信してきてしまうから
-    // 例："Hi!〇〇!"を複数など
-      
-    robotCount ++;
-    console.log('robotCount：' + robotCount);
-
-    chatSubmitBtn.disabled = true;
+// 💬 特定の相手とのチャット画面に切り替える関数
+function openChat(email, name) {
+    currentTargetEmail = email;
     
-  // ulとliを作り、左寄せのスタイルを適用し投稿する
-    const ul = document.getElementById('chatbot-ul');
-    const li = document.createElement('li');
-    li.classList.add('left');
-    ul.appendChild(li);
+    // 画面の表示切り替え
+    document.getElementById("partner-list-view").style.display = "none";
+    document.getElementById("chat-view").style.display = "flex";
     
-    // 考え中アニメーションここから
-    const robotLoadingDiv = document.createElement('div');
+    // ヘッダー情報のセット
+    document.getElementById("chat-title").innerText = `対話中: ${name}`;
+    document.getElementById("chat-email").innerText = email;
+    
+    // 相手の最新プロフィール（マイページでの最新名）を裏で取り直す
+    fetchRealtimeProfile(email);
 
-    setTimeout( ()=> {
-        li.appendChild(robotLoadingDiv);
-        robotLoadingDiv.classList.add('chatbot-left');
-        robotLoadingDiv.innerHTML = '<div id= "robot-loading-field"><span id= "robot-loading-circle1" class="material-icons">circle</span> <span id= "robot-loading-circle2" class="material-icons">circle</span> <span id= "robot-loading-circle3" class="material-icons">circle</span>';
-        console.log('考え中');
-        // 考え中アニメーションここまで
+    // 最初の履歴読み込み
+    loadChatMessages();
+    
+    // 5秒おきの自動更新を開始
+    if (chatIntervalId) clearInterval(chatIntervalId);
+    chatIntervalId = setInterval(loadChatMessages, 5000);
+}
 
-        // 一番下までスクロール
-        chatToBottom();
-    }, 800);
+// ↩️ チャット画面から一覧画面に戻る関数
+function backToPartnerList() {
+    currentTargetEmail = null;
+    if (chatIntervalId) {
+        clearInterval(chatIntervalId); // タイマー停止
+        chatIntervalId = null;
+    }
+    // 画面の表示切り替え
+    document.getElementById("chat-view").style.display = "none";
+    document.getElementById("partner-list-view").style.display = "flex";
+    
+    // 一覧を最新状態に再読み込み
+    loadPartnerList();
+}
 
-    setTimeout( ()=> {
+// 相手のリアルタイムな設定名を取得する
+async function fetchRealtimeProfile(email) {
+    try {
+        const res = await fetch(GAS_URL, {
+            method: "POST",
+            body: JSON.stringify({ mode: "login", email: email })
+        });
+        const result = await res.json();
+        if (result.status === "success") {
+            document.getElementById("chat-title").innerText = `対話中: ${result.message.name}`;
+        }
+    } catch(e){}
+}
 
-        // 考え中アニメーション削除
-        robotLoadingDiv.remove();
-
-        if (chatList[robotCount].option === 'choices') {
-            const qAnswer = `q-${robotCount}-${chatList[robotCount].text.answer}`;
-            const choiceField = document.createElement('div');
-            choiceField.id = `q-${robotCount}`;
-            choiceField.classList.add('chatbot-left-rounded');
-            li.appendChild(choiceField);
-          
-            // 質問タイトル
-            const choiceTitle = document.createElement('div');
-            choiceTitle.classList.add('choice-title');
-            choiceTitle.textContent = chatList[robotCount].text.title;
-            choiceField.appendChild(choiceTitle);
-            // 質問文
-            const choiceQ = document.createElement('div');
-            choiceQ.textContent = chatList[robotCount].text.question;
-            choiceQ.classList.add('choice-q');
-            choiceField.appendChild(choiceQ);
-          
-            // 選択肢作成
-            for (let i = 0; i < chatList[robotCount].text.choices.length; i ++) {
-                const choiceButton = document.createElement('button');
-                choiceButton.id = `${choiceField.id}-${i}`; // id設定
-                choiceButton.setAttribute('onclick', 'pushChoice(this)'); // ボタンを押した際の合図
-                choiceButton.classList.add('choice-button');
-                choiceField.appendChild(choiceButton);
-                choiceButton.textContent = chatList[robotCount].text.choices[i];
-            }
-          
-        } else {
-            // このdivにテキストを指定
-            const div = document.createElement('div');
-            li.appendChild(div);
-            div.classList.add('chatbot-left');
+// メッセージ履歴の取得（currentTargetEmail宛て）
+async function loadChatMessages() {
+    if (!currentTargetEmail) return;
+    try {
+        const res = await fetch(GAS_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                mode: "getMessages",
+                user1: myEmail,
+                user2: currentTargetEmail
+            })
+        });
+        const result = await res.json();
+        
+        if (result.status === "success" && currentTargetEmail) {
+            const chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML = "";
             
-            // テキストを加工する場合（次の回答が選択型でも使えるようにここに設置）
-            textSpecial();  
-          
-            switch(chatList[robotCount].option) {
-                case 'normal':
-                    if (chatList[robotCount].text.qTrue) {
-                        // 複数のテキストのうち特定のものを設定するとき
-                        if(chatList[robotCount].link) {
-                            div.innerHTML = `<a href= "${chatList[robotCount].text[nextTextOption]}" onclick= "chatbotLinkClick()">${chatList[robotCount].text[nextTextOption]}</a>`;
-                        } else {
-                            div.textContent = chatList[robotCount].text[nextTextOption];
-                        }
-                    } else if (robotCount > 1 && chatList[robotCount - 1].questionNextSupport) {
-                        console.log('次の回答の選択肢は' + nextTextOption);
-                        // 答えのない質問（次にサポートあり）
-                        if(chatList[robotCount].link) {
-                            div.innerHTML = `<a href= "${String(chatList[robotCount].text[nextTextOption])}" onclick= "chatbotLinkClick()">${String(chatList[robotCount].text[nextTextOption])}</a>`;
-                        } else {
-                            div.textContent = String(chatList[robotCount].text[nextTextOption]);
-                        }
-                    } else {
-                        // 通常
-                        if(chatList[robotCount].link) {
-                            div.innerHTML = `<a href= "${chatList[robotCount].text}" onclick= "chatbotLinkClick()">${chatList[robotCount].text}</a>`;
-                        } else {
-                            div.textContent = chatList[robotCount].text;
-                        }
-                    }
-                break;
-
-                case 'random':
-                    if(chatList[robotCount].link) {
-                        div.innerHTML = `<a href= "${chatList[robotCount].text[Math.floor(Math.random() * chatList[robotCount].text.length)]}" onclick= "chatbotLinkClick()">${chatList[robotCount].text[Math.floor(Math.random() * chatList[robotCount].text.length)]}</a>`;
-                    } else {
-                        div.textContent = chatList[robotCount].text[Math.floor(Math.random() * chatList[robotCount].text.length)];
-                    }
-                    
-                break;
-            }
-            chatSubmitBtn.disabled = false;
+            result.message.forEach(msg => {
+                const wrapper = document.createElement("div");
+                const msgDiv = document.createElement("div");
+                msgDiv.className = "msg";
+                msgDiv.innerText = msg.text;
+                
+                if (msg.from === myEmail) {
+                    wrapper.className = "msg-wrapper me";
+                } else {
+                    wrapper.className = "msg-wrapper target";
+                }
+                
+                wrapper.appendChild(msgDiv);
+                chatBox.appendChild(wrapper);
+            });
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
+    } catch (e) { console.error(e); }
+}
 
-        // 一番下までスクロール
-        chatToBottom();
+// メッセージ送信
+async function sendChatMessage() {
+    const input = document.getElementById("msg-input");
+    const text = input.value.trim();
+    if (!text || !currentTargetEmail) return;
 
-        // 連続投稿
-        if (chatList[robotCount].continue) {
-            robotOutput();
+    input.value = "";
+
+    try {
+        const res = await fetch(GAS_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                mode: "sendMessage",
+                from: myEmail,
+                to: currentTargetEmail,
+                text: text
+            })
+        });
+        const result = await res.json();
+        if (result.status === "success") {
+            loadChatMessages();
         }
-    }, 2000);
+    } catch (e) { alert("通信エラー"); }
+}
 
-    if(chatbotZoomState === 'large' && window.matchMedia('(min-width:700px)').matches) {
-        document.querySelectorAll('.chatbot-left').forEach((cl) => {
-            cl.style.maxWidth = '52vw';
-        });
-        document.querySelectorAll('.chatbot-right').forEach((cr) => {
-            cr.style.maxWidth = '52vw';
-        });
-        document.querySelectorAll('.chatbot-left-rounded').forEach((cr) => {
-            cr.style.maxWidth = '52vw';
-        });
+function handleKeyPress(event) {
+    if (event.key === "Enter") {
+        sendChatMessage();
     }
 }
-
-// 最初にロボットから話しかける
-robotOutput();
-
-
-// --------------------自分の投稿（送信ボタンを押した時の処理）--------------------
-chatSubmitBtn.addEventListener('click', () => {
-  
-  // 空行の場合送信不可
-  if (!userText.value || !userText.value.match(/\S/g)) return false;
-
-  userCount ++;
-
-  console.log(`userCount: ${userCount}`);
-
-  // 投稿内容を後に活用するために、配列に保存しておく
-  userData.push(userText.value);
-  console.log(userData);
-
-  // ulとliを作り、右寄せのスタイルを適用し投稿する
-  const ul = document.getElementById('chatbot-ul');
-  const li = document.createElement('li');
-  // このdivにテキストを指定
-  const div = document.createElement('div');
-
-  li.classList.add('right');
-  ul.appendChild(li);
-  li.appendChild(div);
-  div.classList.add('chatbot-right');
-  div.textContent = userText.value;
-
-  if(robotCount < Object.keys(chatList).length) {
-    robotOutput();
-  } else {
-    // repeatRobotOutput(userText.value);
-    repeatRobotOutput();
-  }
-
-  // 一番下までスクロール
-  chatToBottom();
-
-  // テキスト入力欄を空白にする
-  userText.value = '';
-});
-
-
-// 最後やまびこ
-function repeatRobotOutput() {
-    robotCount ++;
-    console.log(robotCount);
-
-    chatSubmitBtn.disabled = true;
-                   
-    const ul = document.getElementById('chatbot-ul');
-    const li = document.createElement('li');
-    li.classList.add('left');
-    ul.appendChild(li);
-
-    // 考え中アニメーションここから
-    const robotLoadingDiv = document.createElement('div');
-
-    setTimeout( ()=> {
-        li.appendChild(robotLoadingDiv);
-        robotLoadingDiv.classList.add('chatbot-left');
-        robotLoadingDiv.innerHTML = '<div id= "robot-loading-field"><span id= "robot-loading-circle1" class="material-icons">circle</span> <span id= "robot-loading-circle2" class="material-icons">circle</span> <span id= "robot-loading-circle3" class="material-icons">circle</span>';
-        console.log('考え中');
-        // 考え中アニメーションここまで
-
-        // 一番下までスクロール
-        chatToBottom();
-    }, 800);
-    
-    setTimeout( ()=> {
-
-        // 考え中アニメーション削除
-        robotLoadingDiv.remove();
-      
-        // このdivにテキストを指定
-        const div = document.createElement('div');
-        li.appendChild(div);
-        div.classList.add('chatbot-left');
-
-        div.textContent = userData[userCount - 1];
-      
-        // 一番下までスクロール
-        chatToBottom();
-
-        chatSubmitBtn.disabled = false;
-
-    }, 2000);
-
-    if(chatbotZoomState === 'large') {
-        document.querySelectorAll('.chatbot-left').forEach((cl) => {
-            cl.style.maxWidth = '52vw';
-        });
-        document.querySelectorAll('.chatbot-right').forEach((cr) => {
-            cr.style.maxWidth = '52vw';
-        });
-        document.querySelectorAll('.chatbot-left-rounded').forEach((cr) => {
-            cr.style.maxWidth = '52vw';
-        });
-    }
-}
-
-
-
-
-// PC用の拡大縮小機能
-function chatbotZoomShape() {
-    chatbotZoomState = 'large';
-    console.log(chatbotZoomState);
-    
-    chatbot.classList.add('chatbot-zoom');
-    chatbotBody.classList.add('chatbot-body-zoom');
-    chatbotFooter.classList.add('chatbot-footer-zoom');
-    // 縮小アイコンに変更
-    chatbotZoomIcon.textContent = 'fullscreen_exit';
-    chatbotZoomIcon.setAttribute('onclick', 'chatbotZoomOff()');
-
-    if (window.matchMedia('(min-width:700px)').matches) {
-        //PC処理
-        document.querySelectorAll('.chatbot-left').forEach((cl) => {
-            cl.style.maxWidth = '52vw';
-        });
-        document.querySelectorAll('.chatbot-right').forEach((cr) => {
-            cr.style.maxWidth = '52vw';
-        });
-        document.querySelectorAll('.chatbot-left-rounded').forEach((cr) => {
-            cr.style.maxWidth = '52vw';
-        });
-    }
-}
-function chatbotZoom() {
-    // 拡大する
-    chatbotZoomShape();
-    window.location.href = '#chatbot';
-    // フルスクリーン
-    // document.body.requestFullscreen();
-}
-function chatbotZoomOffShape() {
-    chatbotZoomState = 'middle';
-    console.log(chatbotZoomState);
-
-    chatbot.classList.remove('chatbot-zoom');
-    chatbotBody.classList.remove('chatbot-body-zoom');
-    chatbotFooter.classList.remove('chatbot-footer-zoom');
-    // 拡大アイコンに変更
-    chatbotZoomIcon.textContent = 'fullscreen';
-    chatbotZoomIcon.setAttribute('onclick', 'chatbotZoom()');
-
-    document.querySelectorAll('.chatbot-left').forEach((cl) => {
-        cl.style.maxWidth = '70%';
-    });
-    document.querySelectorAll('.chatbot-right').forEach((cr) => {
-        cr.style.maxWidth = '70%';
-    });
-    document.querySelectorAll('.chatbot-left-rounded').forEach((cr) => {
-        cr.style.maxWidth = '70%';
-    });
-}
-function chatbotZoomOff() {
-    // 縮小する
-    chatbotZoomOffShape();
-    window.history.back();
-    // フルスクリーン解除
-    // document.exitFullscreen();
-}
-
-
-// チャットボット内のリンクが押されたとき
-function chatbotLinkClick() {
-    chatbotZoomOffShape();
-    // 折りたたむ
-    document.getElementById('chatbot').classList.add('chatbot-none');
-    document.getElementById('chatbot-back').classList.add('none');
-    document.getElementById('chatbot-start-button-icon').textContent = 'question_answer';
-}
-  </script>
+</script>
