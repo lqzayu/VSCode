@@ -1,184 +1,423 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    <!-- 文字コードをUTF-8に設定 -->
     <meta charset="UTF-8">
+
+    <!-- スマホなどで画面サイズに合わせる設定 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ブラウザのタブに表示されるタイトル -->
     <title>ホーム - 平工マッチング</title>
+
+    <!-- 外部CSSファイルを読み込み -->
     <link rel="stylesheet" href="home-style.css">
 </head>
+
 <body>
 
-<!--ヘッダー（画面上部の部分）-->
+<!-- =========================
+     ヘッダー部分
+========================= -->
 <header class="navbar">
-    <div class="logo" onclick="location.href='home.html'">平工マッチング</div>
+
+    <!-- ロゴ（クリックするとホームへ移動） -->
+    <div class="logo" onclick="location.href='home.html'">
+        平工マッチング
+    </div>
+
+    <!-- ナビゲーションメニュー -->
     <div class="nav-links">
-        <span class="nav-item" id="tab-recruit-btn" onclick="switchTab('recruit')">募集投稿</span>
-        <span class="nav-item active" id="tab-search-btn" onclick="switchTab('search')">ユーザーを探す</span>
-        <span class="nav-item" onclick="location.href='messages.html'">メッセージ</span>
-        <span class="nav-item" onclick="location.href='mypages.html'">マイページ</span>
-        <button class="btn-logout" onclick="logout()">ログアウト</button>
+
+        <!-- 募集投稿タブ -->
+        <span class="nav-item"
+              id="tab-recruit-btn"
+              onclick="switchTab('recruit')">
+              募集投稿
+        </span>
+
+        <!-- ユーザー検索タブ（最初からactive状態） -->
+        <span class="nav-item active"
+              id="tab-search-btn"
+              onclick="switchTab('search')">
+              ユーザーを探す
+        </span>
+
+        <!-- メッセージページへ -->
+        <span class="nav-item"
+              onclick="location.href='messages.html'">
+              メッセージ
+        </span>
+
+        <!-- マイページへ -->
+        <span class="nav-item"
+              onclick="location.href='mypages.html'">
+              マイページ
+        </span>
+
+        <!-- ログアウトボタン -->
+        <button class="btn-logout" onclick="logout()">
+            ログアウト
+        </button>
+
     </div>
 </header>
-<!--ヘッダー終了-->
+<!-- ヘッダー終了 -->
 
-<!--メイン(メインの画面)-->
+
+<!-- =========================
+     メイン画面
+========================= -->
 <main class="container">
-<!--マイページ-->
-<div class="sidebar">
-    <div class="mypage-area">
 
-        <img id="profile-icon"
-            class="big-profile-icon"
-            src=""
-            alt="icon"
-            onclick="location.href='mypages.html'">
+    <!-- =========================
+         サイドバー
+    ========================= -->
+    <div class="sidebar">
 
-        <div id="mypage-text">マイページ</div>
+        <!-- マイページ表示エリア -->
+        <div class="mypage-area">
 
-    </div>
-<!--マイページ終了-->
-<!--トーク-->
-    <div class="circle-group">
-
-        <button class="perfect-circle"
-            onclick="location.href='messages.html'"
-            style="background:#1cbdc5;">💬<br>トーク</button>
-
-    </div>
-
-</div>
-<!--トーク終了-->
-
-
-        <div style="flex: 3;">
-            <section id="recruit-form-area" style="display: none;">
-                <div class="sidebar" style="width: 100%;">
-                    <h3 id="form-title">募集を投稿する</h3>
-                    <input type="text" id="rec-name" readonly style="width:100%; margin-bottom:10px; padding:8px; background:#eee;" placeholder="マイページで名前を設定してください">
-                    <select id="rec-grade" style="width:100%; margin-bottom:10px; padding:8px;">
-                        <option value="1年">1年</option>
-                        <option value="2年">2年</option>
-                        <option value="3年">3年</option>
-                    </select>
-                    <select id="rec-dept" style="width:100%; margin-bottom:10px; padding:8px;">
-                        <option value="機械工学科">機械工学科</option>
-                        <option value="電気工学科">電気工学科</option>
-                        <option value="制御工学科">制御工学科</option>
-                        <option value="土木環境工学科">土木環境工学科</option>
-                        <option value="情報工学科">情報工学科</option>
-                    </select>
-                    <textarea id="rec-content" rows="4" placeholder="募集内容を入力してください" style="width:100%; margin-bottom:10px; padding:8px;"></textarea>
-                    <button class="btn-search" id="submit-btn" onclick="submitRecruitment()">投稿する</button>
-                </div>
-            </section>
-
-
-    <!-- 右側 -->
-    <div class="main-content">
-
-        <section id="search-area">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2>募集一覧</h2>
-
-                <button onclick="loadRecruitments()"
-                    style="background:none; border:none; color:#1a73e8; cursor:pointer;">
-                    🔄 更新
-                </button>
+            <!-- プロフィール画像 -->
+            <img id="profile-icon"
+                 class="big-profile-icon"
+                 src=""
+                 alt="icon"
+                 onclick="location.href='mypages.html'"><!-- クリックするとマイページへ -->
+            
+            <!-- ユーザー名表示 -->
+            <div id="mypage-text">
+                マイページ
             </div>
 
-            <div class="user-grid" id="user-list">
-                読み込み中...
+        </div>
+        <!-- マイページ終了 -->
+
+
+        <!-- =========================
+             トークボタン
+        ========================= -->
+        <div class="circle-group">
+
+            <!-- メッセージ画面へ移動 -->
+            <button class="perfect-circle"
+                    onclick="location.href='messages.html'"
+                    style="background:#1cbdc5;">
+
+                    💬<br>トーク
+            </button>
+
+        </div>
+
+    </div>
+    <!-- サイドバー終了 -->
+
+
+    <!-- =========================
+         右側メインエリア
+    ========================= -->
+    <div style="flex: 3;">
+
+
+        <!-- =========================
+             募集投稿フォーム
+        ========================= -->
+        <section id="recruit-form-area" style="display: none;">
+
+            <div class="sidebar" style="width: 100%;">
+
+                <!-- フォームタイトル -->
+                <h3 id="form-title">
+                    募集を投稿する
+                </h3>
+
+                <!-- ユーザー名表示（編集不可） -->
+                <input type="text"
+                       id="rec-name"
+                       readonly
+                       style="width:100%; margin-bottom:10px; padding:8px; background:#eee;"
+                       placeholder="マイページで名前を設定してください">
+
+                <!-- 学年選択 -->
+                <select id="rec-grade"
+                        style="width:100%; margin-bottom:10px; padding:8px;">
+
+                    <option value="1年">1年</option>
+                    <option value="2年">2年</option>
+                    <option value="3年">3年</option>
+
+                </select>
+
+                <!-- 学科選択 -->
+                <select id="rec-dept"
+                        style="width:100%; margin-bottom:10px; padding:8px;">
+
+                    <option value="機械工学科">機械工学科</option>
+                    <option value="電気工学科">電気工学科</option>
+                    <option value="制御工学科">制御工学科</option>
+                    <option value="土木環境工学科">土木環境工学科</option>
+                    <option value="情報工学科">情報工学科</option>
+
+                </select>
+
+                <!-- 募集内容入力欄 -->
+                <textarea id="rec-content"
+                          rows="4"
+                          placeholder="募集内容を入力してください"
+                          style="width:100%; margin-bottom:10px; padding:8px;">
+                </textarea>
+
+                <!-- 投稿ボタン -->
+                <button class="btn-search"
+                        id="submit-btn"
+                        onclick="submitRecruitment()">
+
+                        投稿する
+                </button>
+
             </div>
         </section>
+        <!-- 募集投稿フォーム終了 -->
+
+
+        <!-- =========================
+             募集一覧表示エリア
+        ========================= -->
+        <div class="main-content">
+
+            <section id="search-area">
+
+                <!-- タイトルと更新ボタン -->
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+
+                    <h2>募集一覧</h2>
+
+                    <!-- 募集一覧を再読み込み -->
+                    <button onclick="loadRecruitments()"
+                            style="background:none; border:none; color:#1a73e8; cursor:pointer;">
+
+                            🔄 更新
+                    </button>
+
+                </div>
+
+                <!-- 募集カードを表示する場所 -->
+                <div class="user-grid" id="user-list">
+
+                    <!-- 最初は読み込み中表示 -->
+                    読み込み中...
+
+                </div>
+
+            </section>
+
+        </div>
+        <!-- 募集一覧終了 -->
 
     </div>
 
-    </div>
 </main>
-<!--メイン終了-->
+<!-- メイン終了 -->
 
+
+<!-- =========================
+     JavaScript
+========================= -->
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
 
+/* =========================
+   Google Apps Script のURL
+========================= */
+const GAS_URL =
+"https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
+
+
+/* =========================
+   タブ切り替え処理
+========================= */
 function switchTab(mode) {
-    document.getElementById("recruit-form-area").style.display = (mode === 'recruit') ? "block" : "none";
-    document.getElementById("search-area").style.display = (mode === 'search') ? "block" : "none";
-    document.getElementById("tab-recruit-btn").classList.toggle("active", mode === 'recruit');
-    document.getElementById("tab-search-btn").classList.toggle("active", mode === 'search');
-    if(mode === 'recruit') document.getElementById("rec-name").value = localStorage.getItem("userName") || "未設定";
+
+    // 募集投稿フォームの表示/非表示
+    document.getElementById("recruit-form-area").style.display =
+        (mode === 'recruit') ? "block" : "none";
+
+    // 募集一覧画面の表示/非表示
+    document.getElementById("search-area").style.display =
+        (mode === 'search') ? "block" : "none";
+
+    // タブのactiveクラス切り替え
+    document.getElementById("tab-recruit-btn")
+        .classList.toggle("active", mode === 'recruit');
+
+    document.getElementById("tab-search-btn")
+        .classList.toggle("active", mode === 'search');
+
+    // 募集投稿タブを開いた時、
+    // localStorageから名前を取得して表示
+    if(mode === 'recruit') {
+
+        document.getElementById("rec-name").value =
+            localStorage.getItem("userName") || "未設定";
+    }
 }
 
+
+/* =========================
+   募集一覧を読み込む関数
+========================= */
 async function loadRecruitments() {
-    const myEmail = localStorage.getItem("userEmail");
+
+    // 自分のメールアドレス取得
+    const myEmail =
+        localStorage.getItem("userEmail");
+
     try {
-        const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ mode: "getRecruitments", email: myEmail }) });
+
+        // GASへPOST通信
+        const res = await fetch(GAS_URL, {
+
+            method: "POST",
+
+            body: JSON.stringify({
+
+                mode: "getRecruitments",
+                email: myEmail
+
+            })
+        });
+
+        // JSONデータへ変換
         const result = await res.json();
-        const listDiv = document.getElementById("user-list");
-        listDiv.innerHTML = result.message.length ? "" : "<p>現在募集はありません</p>";
+
+        // 一覧表示エリア取得
+        const listDiv =
+            document.getElementById("user-list");
+
+        // 募集が0件ならメッセージ表示
+        listDiv.innerHTML =
+            result.message.length
+            ? ""
+            : "<p>現在募集はありません</p>";
+
+        // 新しい投稿順に並び替え
         result.message.reverse().forEach(item => {
-            const card = document.createElement("div");
+
+            // カード作成
+            const card =
+                document.createElement("div");
+
             card.className = "user-card";
-            card.innerHTML = `<div class="user-badge">${item.grade} | ${item.dept}</div><h3>${item.name}</h3><p>${item.content}</p>
-                <button class="btn-match" onclick="startChat('${item.email}')">チャット</button>`;
+
+            // カードの中身
+            card.innerHTML = `
+                <div class="user-badge">
+                    ${item.grade} | ${item.dept}
+                </div>
+
+                <h3>${item.name}</h3>
+
+                <p>${item.content}</p>
+
+                <button class="btn-match"
+                        onclick="startChat('${item.email}')">
+
+                        チャット
+                </button>
+            `;
+
+            // 一覧に追加
             listDiv.appendChild(card);
         });
-    } catch(e) { document.getElementById("user-list").innerText = "読み込みエラーが発生しました。"; }
+
+    } catch(e) {
+
+        // エラー時
+        document.getElementById("user-list").innerText =
+            "読み込みエラーが発生しました。";
+    }
 }
 
+
+/* =========================
+   募集投稿処理
+========================= */
 async function submitRecruitment() {
+
+    // 投稿データ作成
     const data = {
+
         mode: "postRecruitment",
+
+        // localStorageからユーザー情報取得
         name: localStorage.getItem("userName"),
-        grade: document.getElementById("rec-grade").value,
-        dept: document.getElementById("rec-dept").value,
-        content: document.getElementById("rec-content").value,
-        email: localStorage.getItem("userEmail")
+
+        grade:
+            document.getElementById("rec-grade").value,
+
+        dept:
+            document.getElementById("rec-dept").value,
+
+        content:
+            document.getElementById("rec-content").value,
+
+        email:
+            localStorage.getItem("userEmail")
     };
-    await fetch(GAS_URL, { method: "POST", body: JSON.stringify(data) });
+
+    // GASへ送信
+    await fetch(GAS_URL, {
+
+        method: "POST",
+        body: JSON.stringify(data)
+    });
+
+    // 投稿完了メッセージ
     alert("投稿しました");
+
+    // ページ再読み込み
     location.reload();
 }
 
+
+/* =========================
+   チャット開始処理
+========================= */
 function startChat(email) {
+
+    // チャット相手のメール保存
     localStorage.setItem("chatTarget", email);
+
+    // メッセージページへ移動
     location.href = 'messages.html';
 }
 
-/*function logout() { localStorage.clear(); window.location.href = "index.html"; }
-window.onload = () => {
-    document.getElementById("display-name").innerText = localStorage.getItem("userName") || "未設定";
-    loadRecruitments();
-};*/
 
-/*window.onload = () => {
-
-
-    const userName = localStorage.getItem("userName");
-
-    // 表示名
-    document.getElementById("display-name").innerText =
-        userName || "未設定";
-
-    // 丸ボタンの名前変更
-    document.getElementById("mypage-text").innerText =
-        userName || "マイページ";
-
-    loadRecruitments();
-};*/
-//ここから
+/* =========================
+   ページ読み込み時の処理
+========================= */
 window.onload = () => {
 
+    // localStorageからユーザー名取得
     const userName =
         localStorage.getItem("userName");
 
+    // localStorageからプロフィール画像取得
     const profileImage =
         localStorage.getItem("profileImage");
 
-    // 名前
+
+    /* -------------------------
+       名前表示
+    ------------------------- */
     document.getElementById("mypage-text").innerText =
         userName || "マイページ";
 
-    // 画像
+
+    /* -------------------------
+       プロフィール画像表示
+    ------------------------- */
+
+    // 画像が保存されている場合
     if(profileImage){
 
         document.getElementById("profile-icon").src =
@@ -186,13 +425,19 @@ window.onload = () => {
 
     } else {
 
+        // 画像が無い場合はデフォルト画像
         document.getElementById("profile-icon").src =
         "https://cdn-icons-png.flaticon.com/512/149/149071.png";
     }
 
+
+    /* -------------------------
+       募集一覧を読み込む
+    ------------------------- */
     loadRecruitments();
 };
-//ここまで
+
 </script>
+
 </body>
 </html>

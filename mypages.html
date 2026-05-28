@@ -34,16 +34,7 @@
         </div>
     </main>
     <script>
-        window.onload = () => { document.getElementById("my-name").value = localStorage.getItem("userName") || ""; };
-        /*function saveProfile() {
-            const name = document.getElementById("my-name").value;
-            if(!name) return alert("名前を入力してください");
-            localStorage.setItem("userName", name);
-            alert("保存しました");
-            location.href = 'home.html';
-        }
-        function logout() { localStorage.clear(); window.location.href = "index.html"; }*/
-        
+        window.onload = () => { document.getElementById("my-name").value = localStorage.getItem("userName") || ""; };   
         
     function saveProfile() {
     const name = document.getElementById("my-name").value;
