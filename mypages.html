@@ -6,14 +6,7 @@
     <link rel="stylesheet" href="home-style.css">
 </head>
     
-    <!--プロフィール-->
-    <label>プロフィール画像</label>
-
-    <input type="file"
-       id="profile-image"
-       accept="image/*"
-       style="margin:10px 0;">
-    <!--ここまで-->
+ 
 
 <body>
     <header class="navbar">
@@ -26,9 +19,25 @@
         </div>
     </header>
     <main class="container">
-        <div style="background:white; padding:30px; border-radius:10px; max-width:500px; margin:40px auto; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+        <div style="background:white; padding:60px; border-radius:10px; max-width:500px; margin:40px auto; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
             <h2>プロフィール設定</h2>
-            <label>表示名</label>
+
+             <!--プロフィール-->
+            <label>プロフィール画像</label>
+
+               <img id="profile-icon"
+                 class="big-profile-icon2"
+                 src=""
+                 alt="icon"
+                 onclick="location.href='mypages.html'">
+
+            <input type="file"
+                id="profile-image"
+                accept="image/*"
+                style="margin:10px 0;">
+                <!--ここまで-->
+
+            <label><br>表示名</label>
             <input type="text" id="my-name" style="width:100%; padding:10px; margin:10px 0;">
             <button class="btn-search" onclick="saveProfile()" style="width:100%;">保存する</button>
         </div>
