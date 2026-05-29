@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>メッセージ - 平工マッチング</title>
     <link rel="stylesheet" href="home-style.css">
-    <style>
+    <style> /*css-style*/
         body {
             background-color: #f0f2f5;
             margin: 0;
@@ -208,6 +208,13 @@
 </div>
 
 <script>
+/**
+ * =======================================================
+ * バックエンド（Google Apps Script）連携設定
+ * =======================================================
+ * GAS側にデプロイしたWebアプリのURL。
+ * チャットデータの取得や送信の要求（リクエスト）をこのURLに対して送ります。
+ */
 const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
 
 const myEmail = localStorage.getItem("userEmail");

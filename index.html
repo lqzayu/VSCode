@@ -13,8 +13,13 @@
 
         <div class="input-group">
             <input type="text" id="email" placeholder="名前" inputmode="email">
-            <input type="password" id="password" placeholder="Password">
-            <input type="password" id="confirm-password" placeholder="Confirm Password" style="display: none;">
+
+            <div class="password-wrapper">
+                <input type="password" id="password" placeholder="Password" class="password-input">
+                <button type="button" id="toggle-password" onclick="togglePasswordVisibility()" class="toggle-password-btn" >表示</button>
+            </div>    
+            
+            <input type="password" id="confirm-password" placeholder="Confirm Password" class="confirm-password-input">
         </div>
         <p id="message" class="message"></p>
         <div class="button-group">

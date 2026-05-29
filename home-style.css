@@ -341,20 +341,6 @@ body {
     transition: 0.2s;
 }
 
-.big-profile-icon2 {
-    width: 150px;
-    height: 150x;
-    border-radius: 50%;
-    /* 画像を綺麗に切り抜く */
-    object-fit: cover;
-    /* 中央基準 */
-    object-position: center;
-    display: block;
-    cursor: pointer;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-    transition: 0.2s;
-}
-
 /* マウスを乗せると拡大 */
 .big-profile-icon:hover {
     transform: scale(1.05);
@@ -363,6 +349,18 @@ body {
 
 /* =====================================
    マイページエリア
+===================================== */
+.mypage-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* 要素間の距離 */
+    gap: 14px;
+    margin-bottom: 40px;
+}
+
+/* =====================================
+   マイページエリア2
 ===================================== */
 .mypage-area {
     display: flex;
@@ -404,3 +402,61 @@ body {
     font-weight: bold;
 }
 
+ /* ==========================================
+           【サイズ変更】全体のレイアウト
+           ========================================== */
+        .profile-card {
+            background: white; 
+            padding: 80px 50px;       /* ★変更：上下左右の余白を広げてゆったりさせた */
+            border-radius: 12px; 
+            width: 100%;
+            max-width: 550px;         /* ★変更：白いボックス全体の横幅を大きく（500px → 550px） */
+            margin: 80px auto; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            text-align: center;
+        }
+
+        /* ★変更：タイトル（プロフィール設定）の文字を大きく（24px → 32px） */
+        .profile-card h2 {
+            font-size: 32px; 
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        /* ★変更：「プロフィール画像」などのラベル文字を大きく（16px → 20px） */
+        .profile-card label {
+            font-size: 20px; 
+            font-weight: bold;
+            color: #444;
+        }
+
+        /* ==========================================
+           【サイズ変更】表示名の入力欄（input）
+           ========================================== */
+        .input-large {
+            width: 100%; 
+            padding: 15px;            /* ★変更：中の余白を広げて入力欄を太くした */
+            margin: 15px 0 35px 0; 
+            font-size: 20px;          /* ★変更：入力する文字のサイズを大きく（16px → 20px） */
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        /* ==========================================
+           【サイズ変更】保存するボタン（button）
+           ========================================== */
+        .btn-large {
+            width: 100%; 
+            padding: 18px 0;          /* ★変更：ボタンの上下幅を広げて押しやすく太くした */
+            font-size: 22px;          /* ★変更：ボタンの文字を大きく（16px → 22px） */
+            font-weight: bold;
+            background-color: #1a73e8; 
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn-large:hover {
+            background-color: #1557b0; 
+        }

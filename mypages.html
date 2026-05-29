@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <title>マイページ - 平工マッチング</title>
     <link rel="stylesheet" href="home-style.css">
-</head>
     
- 
+</head>
 
 <body>
     <header class="navbar">
@@ -18,58 +17,93 @@
             <button class="btn-logout" onclick="logout()">ログアウト</button>
         </div>
     </header>
+    
     <main class="container">
-        <div style="background:white; padding:60px; border-radius:10px; max-width:500px; margin:40px auto; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+        <div class="profile-card">
+
             <h2>プロフィール設定</h2>
+            
+            <div class="mypage-area">
+                <label>プロフィール画像</label>
+                
+                <div style="margin: 20px 0;">
+                    <img id="profile-icon"
+                         class="big-profile-icon2"
+                         src=""
+                         alt="icon"
+                         style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; cursor: pointer; margin: 0 auto; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                </div>     <!-- ★変更：画像の縦横サイズを大きく（100px → 140px）にしました -->
 
-             <!--プロフィール-->
-            <label>プロフィール画像</label>
-
-               <img id="profile-icon"
-                 class="big-profile-icon2"
-                 src=""
-                 alt="icon"
-                 onclick="location.href='mypages.html'">
-
-            <input type="file"
-                id="profile-image"
-                accept="image/*"
-                style="margin:10px 0;">
-                <!--ここまで-->
-
-            <label><br>表示名</label>
-            <input type="text" id="my-name" style="width:100%; padding:10px; margin:10px 0;">
-            <button class="btn-search" onclick="saveProfile()" style="width:100%;">保存する</button>
+                <div style="margin: 25px auto;">
+                    <!-- 変更：文字サイズを16pxに上げ、paddingを広げてボタン自体も大きくした -->
+                    <label for="profile-image" style="display: inline-block; padding: 12px 24px; background-color: #f5f5f5; color: #007bff; border: 1px solid #007bff; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;">
+                         画像を選択する
+                    </label>
+                    <input type="file"
+                           id="profile-image"
+                           accept="image/*"
+                           style="display: none;"
+                           onchange="autoSaveImage()"> </div>
+                       
+                <input type="text" id="my-name" class="input-large" placeholder="名前を入力してください">
+                <button class="btn-large" onclick="saveProfile()">保存する</button>
+            </div>
         </div>
     </main>
-    <script>
-        window.onload = () => { document.getElementById("my-name").value = localStorage.getItem("userName") || ""; };   
+
+<script>
+    window.onload = () => { 
+        document.getElementById("my-name").value = localStorage.getItem("userName") || ""; 
+
+        const profileImage = localStorage.getItem("profileImage");
+        const profileIconEl = document.getElementById("profile-icon");
+
+        if (profileImage) {
+            profileIconEl.src = profileImage;
+        } else {
+            profileIconEl.src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+        }
+    };   
+       
+    
+    //画像を選択したら「すぐ自動保存」されるプログラム
+    function autoSaveImage() {
+        const file = document.getElementById("profile-image").files[0];
         
-    function saveProfile() {
-    const name = document.getElementById("my-name").value;
-    if(!name) return alert("名前を入力してください");
-    localStorage.setItem("userName", name);
-    // 画像保存
-    const file = document.getElementById("profile-image").files[0];
-    if(file){
-        const reader = new FileReader();
-        reader.onload = function(e){
-            localStorage.setItem(
-                "profileImage",
-                e.target.result
-            );
-            finishSave();
-        };
-        reader.readAsDataURL(file);
-    } else {
-        finishSave();
+        // ファイルがちゃんと選択されている場合だけ処理する
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // 画像をローカルストレージに保存
+                localStorage.setItem("profileImage", e.target.result);
+            
+            };
+            reader.readAsDataURL(file);
+        }
     }
-}
-function finishSave(){
-    alert("保存しました");
-    location.href = 'home.html';
-}
- 
+    // 名前を入力して「保存する」ボタンを押したときのプログラム
+    function saveProfile() {
+        const name = document.getElementById("my-name").value;
+        if(!name) return alert("名前を入力してください");
+        localStorage.setItem("userName", name);
+
+        const file = document.getElementById("profile-image").files[0];
+        if(file){
+            const reader = new FileReader();
+            reader.onload = function(e){
+                localStorage.setItem("profileImage", e.target.result);
+                finishSave();
+            };
+            reader.readAsDataURL(file);
+        } else {
+            finishSave();
+        }
+    }
+
+    function finishSave(){
+        alert("保存しました");
+        location.href = 'home.html';
+    }
 </script>
 </body>
 </html>

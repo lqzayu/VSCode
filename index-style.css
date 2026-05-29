@@ -1,16 +1,16 @@
-/* �ｿｽ�ｽｿ�ｽｽS�ｿｽ�ｽｿ�ｽｽ�ｾ後�ｮ�ｿｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽC�ｿｽ�ｽｿ�ｽｽA�ｿｽ�ｽｿ�ｽｽE�ｿｽ�ｽｿ�ｽｽg�ｿｽ�ｽｿ�ｽｽ�ｾ晄慣�ｽｿ�ｽｽ */
+/* ログインページのスタイル */
 body {
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100dvh; /* �ｿｽ�ｽｿ�ｽｽX�ｿｽ�ｽｿ�ｽｽ}�ｿｽ�ｽｿ�ｽｽz�ｿｽ�ｽｿ�ｽｽ�ｾ後ヰ�ｿｽ�ｽｿ�ｽｽ[�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽl�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ */
+    min-height: 100dvh; /* ビューポートの高さに合わせる */
     background-color: #f0f2f5;
-    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; /* フォントスタイルを追加 */
 }
 
-/* �ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽO�ｿｽ�ｽｿ�ｽｽC�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽJ�ｿｽ�ｽｿ�ｽｽ[�ｿｽ�ｽｿ�ｽｽh */
+/* ログインカード */
 .login-card {
     background-color: #ffffff;
     padding: 30px 25px;
@@ -19,7 +19,44 @@ body {
     width: 90%;
     max-width: 380px;
     text-align: center;
-    box-sizing: border-box; /* �ｿｽ�ｽｿ�ｽｽp�ｿｽ�ｽｿ�ｽｽf�ｿｽ�ｽｿ�ｽｽB�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽO�ｿｽ�ｽｿ�ｽｽ�ｾ峨ｑ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｾ阪∩蜃ｺ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽh�ｿｽ�ｽｿ�ｽｽ~ */
+    box-sizing: border-box; 
+}
+
+/* パスワード入力欄とボタンを包む外枠 */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* パスワード入力欄そのもの */
+.password-input {
+    width: 100% !important;
+    padding-right: 35px; /* 右側にボタンが重なるための余白 */
+    box-sizing: border-box;
+}
+
+/* 表示/非表示 切り替えボタン */
+.toggle-password-btn {
+    position: absolute;
+    right: 10px;         /* 右端から10pxの位置に固定 */
+    width: max-content;  /* 横幅を文字ぴったりに縮める */
+    background: none !important;    /* 背景を透明に */
+    border: none !important;        /* 枠線を消す */
+    cursor: pointer;     /* マウスカーソルを指マークに */
+    padding: 0;          /* 内側の余白をゼロに */
+    color: #333;         /* 文字の色を濃いグレーに */
+    font-size: 16px;     /* 文字の大きさ */
+    line-height: 1;      /* 行の高さを詰める */
+    z-index: 10;
+    margin-bottom: 10px;
+}
+
+/* 確認用パスワード入力欄（最初は隠しておく） */
+.confirm-password-input {
+    display: none;
 }
 
 h1 {
@@ -28,17 +65,17 @@ h1 {
     font-size: 1.5rem;
 }
 
-/* �ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｾ阪お�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽA */
+
 input {
     width: 100%;
-    padding: 14px; /* �ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ陋ｯ�ｽｫ�ｿｽ�ｽｿ�ｽｽ�ｾ溘↓繧托ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｾ�繧ｿ�ｿｽ�ｽｿ�ｽｽb�ｿｽ�ｽｿ�ｽｽv�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ遶��ｽｷ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ */
+    padding: 14px; 
     margin-bottom: 15px;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-sizing: border-box;
-    font-size: 16px; /* iOS�ｿｽ�ｽｿ�ｽｽ�ｾ瑚ｶ｣�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽY�ｿｽ�ｽｿ�ｽｽ[�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽh�ｿｽ�ｽｿ�ｽｽ~ */
+    font-size: 16px; 
     transition: all 0.3s;
-    -webkit-appearance: none; /* iOS�ｿｽ�ｽｿ�ｽｽ�ｾ後ョ�ｿｽ�ｽｿ�ｽｽt�ｿｽ�ｽｿ�ｽｽH�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽg�ｿｽ�ｽｿ�ｽｽX�ｿｽ�ｽｿ�ｽｽ^�ｿｽ�ｽｿ�ｽｽC�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽZ�ｿｽ�ｽｿ�ｽｽb�ｿｽ�ｽｿ�ｽｽg */
+    -webkit-appearance: none; 
 }
 
 input:focus {
@@ -47,7 +84,6 @@ input:focus {
     box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
 }
 
-/* �ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽb�ｿｽ�ｽｿ�ｽｽZ�ｿｽ�ｽｿ�ｽｽ[�ｿｽ�ｽｿ�ｽｽW�ｿｽ�ｽｿ�ｽｽG�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽA */
 .message {
     min-height: 20px;
     margin-bottom: 15px;
@@ -57,7 +93,6 @@ input:focus {
 .success { color: #28a745; }
 .error { color: #dc3545; }
 
-/* �ｿｽ�ｽｿ�ｽｽ{�ｿｽ�ｽｿ�ｽｽ^�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｿｽ�ｽｿ�ｽｽ�ｾ晄慣�ｽｿ�ｽｽ */
 button {
     width: 100%;
     padding: 14px;

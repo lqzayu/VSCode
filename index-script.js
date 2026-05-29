@@ -45,6 +45,21 @@ async function handleLogin() {
     } catch (e) { updateMsg("通信エラー", "error"); }
 }
 
+function togglePasswordVisibility(){
+    // HTMLからパスワード入力欄とボタンの要素を取得
+    const passwordInput = document.getElementById('password');
+    const toggleButton = document.getElementById('toggle-password');
+
+    // 現在のタイプが「password」なら「text」に、そうじゃなければ「password」に戻す
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleButton.textContent = '非表示'; // ボタンの文字を変える
+    } else {
+        passwordInput.type = 'password';
+        toggleButton.textContent = '表示'; // ボタンの文字を戻す
+    }
+}
+
 async function handleRegister() {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
@@ -70,5 +85,11 @@ function updateMsg(txt, type) {
     el.innerText = txt;
     el.className = "message " + type;
 }
+
+/*function handleKeyPress(event) {  /*Enterでログインできるようにしたい
+    if (event.key === "Enter") {
+        handleLogin();
+    }
+}*/
 
 localStorage.setItem("userName", name);
