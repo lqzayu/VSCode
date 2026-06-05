@@ -54,8 +54,34 @@ body {
     margin-bottom: 10px;
 }
 
+.confirm-password-wrapper{
+    position: relative;
+    display:flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
 /* 確認用パスワード入力欄（最初は隠しておく） */
 .confirm-password-input {
+    width: 100% !important;
+    padding-right: 35px;
+    display: none;
+}
+
+.toggle-confirm-btn {
+    position: absolute;
+    right: 10px;         /* 右端から10pxの位置に固定 */
+    width: max-content;  /* 横幅を文字ぴったりに縮める */
+    background: none !important;    /* 背景を透明に */
+    border: none !important;        /* 枠線を消す */
+    cursor: pointer;     /* マウスカーソルを指マークに */
+    padding: 0;          /* 内側の余白をゼロに */
+    color: #333;         /* 文字の色を濃いグレーに */
+    font-size: 16px;     /* 文字の大きさ */
+    line-height: 1;      /* 行の高さを詰める */
+    z-index: 10;
+    margin-bottom: 10px;
     display: none;
 }
 

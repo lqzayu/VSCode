@@ -3,6 +3,7 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb
 function toggleMode(mode) {
     const title = document.getElementById("form-title");
     const confirmPass = document.getElementById("confirm-password");
+    const toggleconfirm = document.getElementById("toggle-confirm");
     const loginSec = document.getElementById("login-section");
     const registerSec = document.getElementById("register-section");
     const msg = document.getElementById("message");
@@ -11,6 +12,7 @@ function toggleMode(mode) {
     if (mode === 'register') {
         title.innerText = "新規登録";
         confirmPass.style.display = "block";
+        toggleconfirm.style.display = "block";
         loginSec.style.display = "none";
         registerSec.style.display = "block";
     } else {
@@ -57,6 +59,21 @@ function togglePasswordVisibility(){
     } else {
         passwordInput.type = 'password';
         toggleButton.textContent = '表示'; // ボタンの文字を戻す
+    }
+}
+
+function toggleconfirmVisibility(){        
+    // HTMLからパスワード入力欄とボタンの要素を取得
+    const confirmpasswordInput = document.getElementById('confirm-password');
+    const toggleconfirmButton = document.getElementById('toggle-confirm');
+
+    // 現在のタイプが「password」なら「text」に、そうじゃなければ「password」に戻す
+    if (confirmpasswordInput.type === 'password') {
+        confirmpasswordInput.type = 'text';
+        toggleconfirmButton.textContent = '非表示'; // ボタンの文字を変える
+    } else {
+        confirmpasswordInput.type = 'password';
+        toggleconfirmButton.textContent = '表示'; // ボタンの文字を戻す
     }
 }
 
