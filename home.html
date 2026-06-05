@@ -2,270 +2,140 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>ホーム - 平工マッチング</title>
-
     <link rel="stylesheet" href="home-style.css">
 </head>
 
 <body>
 
 <header class="navbar">
-
-    <div class="logo" onclick="location.href='home.html'">
-        平工マッチング
-    </div>
-
+    <div class="logo" onclick="location.href='home.html'">平工マッチング</div>
     <div class="nav-links">
-
-        <span class="nav-item"
-              id="tab-recruit-btn"
-              onclick="switchTab('recruit')">
-              募集投稿
-        </span>
-
-        <span class="nav-item active"
-              id="tab-search-btn"
-              onclick="switchTab('search')">
-              ユーザーを探す
-        </span>
-
-        <span class="nav-item"
-              onclick="location.href='messages.html'">
-              メッセージ
-        </span>
-
-        <span class="nav-item"
-              onclick="location.href='mypages.html'">
-              マイページ
-        </span>
-
-        <button class="btn-logout" onclick="logout()">
-            ログアウト
-        </button>
-
+        <span class="nav-item" id="tab-recruit-btn" onclick="switchTab('recruit')">募集投稿</span>
+        <span class="nav-item active" id="tab-search-btn" onclick="switchTab('search')">ユーザーを探す</span>
+        <span class="nav-item" onclick="location.href='messages.html'">メッセージ</span>
+        <span class="nav-item" onclick="location.href='mypages.html'">マイページ</span>
+        <button class="btn-logout" onclick="logout()">ログアウト</button>
     </div>
 </header>
+
 <main class="container">
 
     <div class="sidebar">
-
         <div class="mypage-area">
-
-            <img id="profile-icon"
-                 class="big-profile-icon"
-                 src=""
-                 alt="icon"
-                 onclick="location.href='mypages.html'"><div id="mypage-text">
-                マイページ
-            </div>
-
+            <img id="profile-icon" class="big-profile-icon" src="" alt="icon" onclick="location.href='mypages.html'">
+            <div id="mypage-text">マイページ</div>
         </div>
+
         <div id="my-post-area" style="background: #fff; padding: 15px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: left;">
             <h4 style="margin: 0 0 10px 0; color: #333; border-bottom: 2px solid #1cbdc5; padding-bottom: 5px; font-size: 14px;">📢 あなたの現在の募集</h4>
             <div id="my-post-content" style="font-size: 13px; color: #666;">
                 現在、投稿している募集はありません。
             </div>
         </div>
-
-        <div class="circle-group" style="margin-top: 20px;">
-
-            <button class="perfect-circle"
-                    onclick="location.href='messages.html'"
-                    style="background:rgb(65, 52, 240);">
-
-                    💬<br>トーク
-            </button>
-
-        </div>
-
     </div>
+
     <div style="flex: 3;">
-
-
         <section id="recruit-form-area" style="display: none;">
-
             <div class="sidebar" style="width: 100%;">
-
-                <h3 id="form-title">
-                    募集を投稿する
-                </h3>
-
-                <input type="text"
-                       id="rec-name"
-                       readonly
-                       style="width:100%; margin-bottom:10px; padding:8px; background:#eee;"
-                       placeholder="マイページで名前を設定してください">
-
-                <select id="rec-grade"
-                        style="width:100%; margin-bottom:10px; padding:8px;">
-
+                <h3 id="form-title">募集を投稿する</h3>
+                <input type="text" id="rec-name" readonly style="width:80%; margin-bottom:10px; padding:8px; background:#eee;" placeholder="マイページで名前を設定してください">
+                <select id="rec-grade" style="width:80%; margin-bottom:10px; padding:8px;">
                     <option value="1年">1年</option>
                     <option value="2年">2年</option>
                     <option value="3年">3年</option>
-
                 </select>
-
-                <select id="rec-dept"
-                        style="width:100%; margin-bottom:10px; padding:8px;">
-
+                <select id="rec-dept" style="width:80%; margin-bottom:10px; padding:8px;">
                     <option value="機械工学科">機械工学科</option>
                     <option value="電気工学科">電気工学科</option>
                     <option value="制御工学科">制御工学科</option>
                     <option value="土木環境工学科">土木環境工学科</option>
                     <option value="情報工学科">情報工学科</option>
-
                 </select>
-
-                <textarea id="rec-content"
-                          rows="4"
-                          placeholder="募集内容を入力してください"
-                          style="width:100%; margin-bottom:10px; padding:8px;"></textarea>
-
-                <button class="btn-search"
-                        id="submit-btn"
-                        onclick="submitRecruitment()">
-
-                        投稿する
-                </button>
-
+                <textarea id="rec-content" rows="4" placeholder="募集内容を入力してください" style="width:80%; margin-bottom:10px; padding:8px;"></textarea>
+                <button class="btn-search" id="submit-btn" onclick="submitRecruitment()">投稿する</button>
             </div>
         </section>
+
         <div class="main-content">
-
             <section id="search-area">
-
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-
                     <h2>他ユーザーの募集一覧</h2>
-
-                    <button onclick="loadRecruitments()"
-                            style="background:none; border:none; color:#1a73e8; cursor:pointer;">
-
-                            🔄 更新
-                    </button>
-
+                    <button onclick="loadRecruitments()" style="background:none; border:none; color:#1a73e8; cursor:pointer;">🔄 更新</button>
                 </div>
-
-                <div class="user-grid" id="user-list">
-
-                    読み込み中...
-
-                </div>
-
+                <div class="user-grid" id="user-list">読み込み中...</div>
             </section>
-
         </div>
-        </div>
-
+    </div>
 </main>
+
 <script>
+const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
 
-/* =========================
-   Google Apps Script のURL
-========================= */
-const GAS_URL =
-"https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
-
-
-/* =========================
-   タブ切り替え処理
-========================= */
 function switchTab(mode) {
-
-    // 募集投稿フォームの表示/非表示
-    document.getElementById("recruit-form-area").style.display =
-        (mode === 'recruit') ? "block" : "none";
-
-    // 募集一覧画面の表示/非表示
-    document.getElementById("search-area").style.display =
-        (mode === 'search') ? "block" : "none";
-
-    // タブのactiveクラス切り替え
-    document.getElementById("tab-recruit-btn")
-        .classList.toggle("active", mode === 'recruit');
-
-    document.getElementById("tab-search-btn")
-        .classList.toggle("active", mode === 'search');
-
-    // 募集投稿タブを開いた時、
-    // localStorageから名前を取得して表示
+    document.getElementById("recruit-form-area").style.display = (mode === 'recruit') ? "block" : "none";
+    document.getElementById("search-area").style.display = (mode === 'search') ? "block" : "none";
+    document.getElementById("tab-recruit-btn").classList.toggle("active", mode === 'recruit');
+    document.getElementById("tab-search-btn").classList.toggle("active", mode === 'search');
     if(mode === 'recruit') {
-
-        document.getElementById("rec-name").value =
-            localStorage.getItem("userName") || "未設定";
+        document.getElementById("rec-name").value = localStorage.getItem("userName") || "未設定";
     }
 }
 
-
 /* =========================
-   募集一覧を読み込む関数（★ここを大改造！）
+   募集一覧を読み込む関数（削除ボタン表示に対応）
 ========================= */
 async function loadRecruitments() {
-
-    // 自分のメールアドレス取得
     const myEmail = localStorage.getItem("userEmail");
 
     try {
-        // GASへPOST通信
         const res = await fetch(GAS_URL, {
             method: "POST",
-            body: JSON.stringify({
-                mode: "getRecruitments",
-                email: myEmail
-            })
+            body: JSON.stringify({ mode: "getRecruitments", email: myEmail })
         });
 
         const result = await res.json();
         const listDiv = document.getElementById("user-list");
         const myPostContentDiv = document.getElementById("my-post-content");
 
-        // 一旦表示をリセット
         listDiv.innerHTML = "";
         myPostContentDiv.innerHTML = "現在、投稿している募集はありません。";
 
         let otherPostsCount = 0;
 
-        // 新しい投稿順に並び替え
         result.message.reverse().forEach(item => {
-
-            // 🌟 処理A：もし投稿のメールアドレスが「自分自身」だった場合
+            // 🌟 自分の投稿だった場合：削除ボタン付きでサイドバーに表示
             if (item.email === myEmail) {
-                // サイドバーのマイページの下に表示させて、中央の一覧には追加しない！
                 myPostContentDiv.innerHTML = `
                     <div style="font-weight: bold; margin-bottom: 5px; color:#1cbdc5;">
                         ${item.grade} | ${item.dept}
                     </div>
-                    <div style="word-wrap: break-word; line-height: 1.4;">
+                    <div style="word-wrap: break-word; line-height: 1.4; margin-bottom: 10px;">
                         ${item.content}
                     </div>
+                    <button onclick="deleteMyRecruitment()" style="width: 100%; background: #ff4d4d; color: white; border: none; padding: 5px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">
+                        ✖ この募集を削除する
+                    </button>
                 `;
-                return; // ここでこのループの処理をスキップ（continueと同じ効果）
+                return; 
             }
 
-            // 🌟 処理B：他人の投稿だった場合は、従来通り中央の募集一覧カードを作成
+            // 他人の投稿だった場合：中央の一覧にカードを作成
             otherPostsCount++;
             const card = document.createElement("div");
             card.className = "user-card";
-
             card.innerHTML = `
-                <div class="user-badge">
-                    ${item.grade} | ${item.dept}
-                </div>
+                <div class="user-badge">${item.grade} | ${item.dept}</div>
                 <h3>${item.name}</h3>
                 <p>${item.content}</p>
-                <button class="btn-match" onclick="startChat('${item.email}')">
-                    チャット
-                </button>
+                <button class="btn-match" onclick="startChat('${item.email}')">チャット</button>
             `;
             listDiv.appendChild(card);
         });
 
-        // 他人の募集が1件もなかった場合のメッセージ表示
         if (otherPostsCount === 0) {
-            listDiv.innerHTML = "<p>現在ユーザーの募集はありません</p>";
+            listDiv.innerHTML = "<p>現在他ユーザーの募集はありません</p>";
         }
 
     } catch(e) {
@@ -273,13 +143,37 @@ async function loadRecruitments() {
     }
 }
 
-
 /* =========================
-   募集投稿処理
+   🌟【新設】自分の募集を削除する関数
 ========================= */
-async function submitRecruitment() {
+async function deleteMyRecruitment() {
+    // ユーザーに確認メッセージを出す（誤タップ防止）
+    if (!confirm("本当にこの募集を削除しますか？")) return;
 
-    // 投稿データ作成
+    const myEmail = localStorage.getItem("userEmail");
+
+    try {
+        const res = await fetch(GAS_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                mode: "deleteRecruitment",
+                email: myEmail
+            })
+        });
+        const result = await res.json();
+
+        if (result.status === "success") {
+            alert("募集を削除しました。");
+            loadRecruitments(); // 画面を再読み込みして表示を更新
+        } else {
+            alert("削除に失敗しました。");
+        }
+    } catch (e) {
+        alert("通信エラーが発生しました。");
+    }
+}
+
+async function submitRecruitment() {
     const data = {
         mode: "postRecruitment",
         name: localStorage.getItem("userName"),
@@ -289,68 +183,38 @@ async function submitRecruitment() {
         email: localStorage.getItem("userEmail")
     };
 
-    // GASへ送信
-    await fetch(GAS_URL, {
-        method: "POST",
-        body: JSON.stringify(data)
-    });
-
-    // 投稿完了メッセージ
+    await fetch(GAS_URL, { method: "POST", body: JSON.stringify(data) });
     alert("投稿しました");
-
-    // ページ再読み込み
-    location.reload();
+    
+    // 投稿が完了したら、自動的に「ユーザーを探す」タブに戻して一覧を更新する
+    switchTab('search');
+    loadRecruitments();
+    // フォームの入力欄をクリア
+    document.getElementById("rec-content").value = "";
 }
 
-
-/* =========================
-   チャット開始処理
-========================= */
 function startChat(email) {
-    // チャット相手のメール保存
     localStorage.setItem("chatTarget", email);
-    // メッセージページへ移動
     location.href = 'messages.html';
 }
 
-
-/* =========================
-   ログアウト処理
-========================= */
 function logout() {
     localStorage.clear();
     window.location.href = "index.html";
 }
 
-
-/* =========================
-   ページ読み込み時の処理
-========================= */
 window.onload = () => {
-
     const userName = localStorage.getItem("userName");
     const profileImage = localStorage.getItem("profileImage");
-
-    /* -------------------------
-       名前表示
-    ------------------------- */
     document.getElementById("mypage-text").innerText = userName || "マイページ";
 
-    /* -------------------------
-       プロフィール画像表示
-    ------------------------- */
     if(profileImage){
         document.getElementById("profile-icon").src = profileImage;
     } else {
         document.getElementById("profile-icon").src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
     }
-
-    /* -------------------------
-       募集一覧を読み込む
-    ------------------------- */
     loadRecruitments();
 };
-
 </script>
 
 </body>

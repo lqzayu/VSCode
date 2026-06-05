@@ -18,6 +18,7 @@ function toggleMode(mode) {
     } else {
         title.innerText = "ログイン";
         confirmPass.style.display = "none";
+        toggleconfirm.style.display = "none";
         loginSec.style.display = "block";
         registerSec.style.display = "none";
     }
