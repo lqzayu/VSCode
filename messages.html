@@ -212,8 +212,8 @@
  * =======================================================
  * バックエンド（Google Apps Script）連携設定
  * =======================================================
- * GAS側にデプロイしたWebアプリのURL。
- * チャットデータの取得や送信の要求（リクエスト）をこのURLに対して送ります。
+ * GAS側にデプロイしたWebアプリのURL
+ * チャットデータの取得や送信の要求（リクエスト）をこのURLに対して送る
  */
 const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
 
@@ -369,13 +369,34 @@ async function loadChatMessages() {
     } catch (e) { console.error(e); }
 }
 
-// メッセージ送信
+// 🌟大改造：メッセージ送信（楽観的UI更新を組み込み）
 async function sendChatMessage() {
     const input = document.getElementById("msg-input");
     const text = input.value.trim();
     if (!text || !currentTargetEmail) return;
 
+    // 入力欄を即座にクリア
     input.value = "";
+
+    // 🚀【ラグ解消】通信を待たずに、画面に吹き出しをすぐ表示する
+    const chatBox = document.getElementById("chat-box");
+    
+    // 案内用テキスト（pタグ）が残っていれば一回消す
+    if (chatBox.querySelector("p")) {
+        chatBox.innerHTML = "";
+    }
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "msg-wrapper me"; // 自分側（右側）のスタイル
+    const msgDiv = document.createElement("div");
+    msgDiv.className = "msg";
+    msgDiv.innerText = text;
+    
+    wrapper.appendChild(msgDiv);
+    chatBox.appendChild(wrapper);
+    
+    // 送信した瞬間に一番下までオートスクロール
+    chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
         const res = await fetch(GAS_URL, {
@@ -388,10 +409,15 @@ async function sendChatMessage() {
             })
         });
         const result = await res.json();
+        
+        // 通信成功時、裏で最新の履歴データを同期させる
         if (result.status === "success") {
             loadChatMessages();
         }
-    } catch (e) { alert("通信エラー"); }
+    } catch (e) {
+        // 万が一ネットワークエラーなどで失敗した時の処理
+        alert("メッセージの送信に失敗しました。電波状況を確認してください。");
+    }
 }
 
 function handleKeyPress(event) {
@@ -400,3 +426,5 @@ function handleKeyPress(event) {
     }
 }
 </script>
+</body>
+</html>

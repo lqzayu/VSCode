@@ -1,4 +1,3 @@
-// GASのURLをここに貼り付け
 const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
 
 function toggleMode(mode) {
@@ -45,7 +44,8 @@ async function handleLogin() {
     } catch (e) { updateMsg("通信エラー", "error"); }
 }
 
-function togglePasswordVisibility(){
+//パスワード表示／非表示
+function togglePasswordVisibility(){        
     // HTMLからパスワード入力欄とボタンの要素を取得
     const passwordInput = document.getElementById('password');
     const toggleButton = document.getElementById('toggle-password');

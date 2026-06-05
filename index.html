@@ -12,10 +12,10 @@
         <h1 id="form-title">ログイン</h1>
 
         <div class="input-group">
-            <input type="text" id="email" placeholder="名前" inputmode="email">
+            <input type="text" id="email" placeholder="ユーザID" inputmode="email" onkeypress="handleKeyPress(event)">
 
             <div class="password-wrapper">
-                <input type="password" id="password" placeholder="Password" class="password-input">
+                <input type="password" id="password" placeholder="パスワード" class="password-input">
                 <button type="button" id="toggle-password" onclick="togglePasswordVisibility()" class="toggle-password-btn" >表示</button>
             </div>    
             
