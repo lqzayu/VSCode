@@ -62,23 +62,7 @@
             <section id="search-area">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <h2>他ユーザーの募集一覧</h2>
-                    <button onclick="loadRecruitments()" style=" padding: 7px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);background: #00ffd5;margin: 0 0 10px 0; color: #333;padding-bottom: 5px; font-size: 30px;"> 
-                    <div style="margin: 20px 0;">
-                    <img id="profile-icon"
-                         class="big-profile-icon2"
-                         src=""
-                         alt="icon"
-                         style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; cursor: pointer; margin: 0 auto; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
-                </div>     <!-- ★変更：画像の縦横サイズを大きく（100px → 140px）にしました -->
-
-                <div style="margin: 25px auto;">
-                    <!-- 変更：文字サイズを16pxに上げ、paddingを広げてボタン自体も大きくした -->
-                    <input type="file"
-                           id="profile-image"
-                           accept="image/*"
-                           style="display: none;"
-                           onchange="autoSaveImage()"> </div>
-
+                    <button onclick="loadRecruitments()" style=" padding: 7px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);background: #00ffd5;margin: 0 0 10px 0; color: #333;padding-bottom: 5px; font-size: 30px;"> 更新</button>
                 </div>
                 <div class="user-grid" id="user-list">読み込み中...</div>
             </section>
