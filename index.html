@@ -1,3 +1,5 @@
+<!--
+
 <!DOCTYPE html>  
 <html lang="ja">
 <head>
@@ -39,17 +41,14 @@
 </body>
 </html>
 
-
-
-<!--(googleログイン版)
+-->
 
 <!DOCTYPE html>
 <html lang="ja">
-<head>s
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ログイン - 平工マッチング</title>
-     Googleログイン用の公式スクリプトを読み込む 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         /* 💡 全体のデザイン（平工マッチングのテーマカラーに合わせて調整） */
@@ -86,9 +85,9 @@
         }
 
         .alert-box {
-            background-color: #e3f2fd;
-            color: #0d47a1;
-            padding: 10px;
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            padding: 12px;
             border-radius: 6px;
             font-size: 12px;
             margin-bottom: 25px;
@@ -110,14 +109,11 @@
     <h1>平工マッチング</h1>
     <div class="subtitle">ログインして仲間と繋がろう</div>
 
-    <!-- 注意書きエリア 
     <div class="alert-box">
-        ⚠️ <strong>セキュリティ制限</strong><br>
-        このアプリは関係者限定テスト中のため、学校のGoogleアカウント以外ではログインできません。
+        💡 <strong>ログイン方法</strong><br>
+        お持ちのGoogleアカウント（学校・個人どちらでも可）を使って、ワンタップで安全にログインできます。
     </div>
 
-    <!-- 🌟 Googleログイン API 設定エリア -->
-    <!-- data-client_id の部分に、Google Cloudで発行したクライアントIDを貼り付けてください 
     <div id="g_id_onload"
          data-client_id="718397833063-hnjdohievu9umae3gbfg6v4661bff5id.apps.googleusercontent.com"
          data-context="signin"
@@ -126,7 +122,6 @@
          data-auto_prompt="false">
     </div>
 
-    <!-- 🌟 Googleログインボタン本体 -
     <div class="button-wrapper">
         <div class="g_id_signin"
              data-type="standard"
@@ -151,16 +146,9 @@ async function handleCredentialResponse(response) {
         const name = responsePayload.name;
         const picture = responsePayload.picture; // Googleのアイコン画像URL
 
-        // 🌟【重要】学校のドメインを指定して制限をかける
-        // 例: "@taira-th.ed.jp" など、実際の学校のメールアドレスの末尾に書き換えてください
-        const allowedDomain = "@.ed.jp"; 
-        
-        if (!email.endsWith(allowedDomain)) {
-            alert("無効なアカウントです。\n学校指定のGoogleアカウント（" + allowedDomain + "）でログインしてください。");
-            return;
-        }
+        // 🌟【変更点】特定の学校ドメイン（@fcs.ed.jp）に縛るif文のチェック制限を完全削除しました
 
-        // 認証が通ったら、ユーザー情報をブラウザ（localStorage）に安全に保存
+        // ユーザー情報をブラウザ（localStorage）に安全に保存
         localStorage.setItem("userEmail", email);
         localStorage.setItem("userName", name);
         if (picture) {
@@ -200,5 +188,3 @@ window.onload = () => {
 
 </body>
 </html>
-
--->
