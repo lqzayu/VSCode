@@ -4,10 +4,10 @@
 body {
     /* 画面の余白をなくす */
     margin: 0;
-    /* 背景色 */
-    background-color: #f0f2f5;
+    /* 背景色（少し柔らかいニュアンスグレーに変更） */
+    background-color: #f8fafc;
     /* フォント設定 */
-    font-family: sans-serif;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
     /* 文字色 */
     color: #333;
 }
@@ -27,11 +27,12 @@ body {
     /* 縦中央揃え */
     align-items: center;
     /* 下に影をつける */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     /* スクロールしても上に固定 */
     position: sticky;
     /* 上端に固定 */
     top: 0;
+    z-index: 100;
 }
 
 
@@ -44,7 +45,7 @@ body {
     /* 太字 */
     font-weight: bold;
     /* 文字色 */
-    color: #1a73e8;
+    color: #1cbdc5; /* 🌟テーマカラーのミントグリーンに変更 */
     /* マウスを乗せると指マーク */
     cursor: pointer;
 }
@@ -75,10 +76,10 @@ body {
 
 /* 選択中のタブ */
 .nav-item.active {
-    /* 青色 */
-    color: #1a73e8;
+    /* ミントグリーン */
+    color: #1cbdc5;
     /* 下線 */
-    border-bottom: 2px solid #1a73e8;
+    border-bottom: 2px solid #1cbdc5;
 }
 
 /* =====================================
@@ -132,7 +133,30 @@ body {
 
 
 /* =====================================
-   検索フィルター
+   📢 募集投稿フォーム全体の枠（新設）
+===================================== */
+#recruit-form-area .sidebar {
+    width: 100%;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 16px; /* なめらかな角丸 */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); /* 高級感のある柔らかい影 */
+    box-sizing: border-box;
+}
+
+/* 🏷️ フォームのタイトル */
+#form-title {
+    font-size: 18px;
+    color: #333333;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: bold;
+    border-left: 4px solid #1cbdc5; /* アクセントカラーの縦線 */
+    padding-left: 10px;
+}
+
+/* =====================================
+   検索フィルター ＆ 投稿入力欄のおしゃれ化
 ===================================== */
 .filter-group {
      /* 隣との余白 */
@@ -141,7 +165,6 @@ body {
     text-align: left;
 }
 
-
 /* ラベル */
 .filter-group label {
     display: block;
@@ -149,31 +172,82 @@ body {
     font-weight: bold;
 }
 
-
-/* 入力欄 */
+/* 🌟 入力欄・セレクトボックス・テキストエリアの共通おしゃれデザイン */
 .filter-group input,
-.filter-group select {
+.filter-group select,
+#rec-name, 
+#rec-grade, 
+#rec-dept, 
+#rec-content {
     width: 100%;
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    /* paddingを含めたサイズ計算 */
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0; /* 少しグレーがかった優しい枠線 */
+    border-radius: 10px; /* なめらかな角丸 */
+    font-size: 14px;
+    color: #333333;
+    background-color: #f8fafc; /* ほんのりグレーの背景で立体感を出す */
     box-sizing: border-box;
+    transition: all 0.3s ease; /* アニメーションを滑らかに */
+    outline: none;
+}
+
+/* 🔒 読み取り専用の名前入力欄（マイページ連動） */
+#rec-name[readonly] {
+    background-color: #e2e8f0;
+    color: #64748b;
+    cursor: not-allowed;
+    border-color: #cbd5e1;
+}
+
+/* 🌟 入力欄をクリック（フォーカス）したときのアニメーション */
+.filter-group input:focus,
+.filter-group select:focus,
+#rec-grade:focus, 
+#rec-dept:focus, 
+#rec-content:focus {
+    border-color: #1cbdc5; /* テーマカラーの緑に変化 */
+    background-color: #ffffff; /* 背景を白にして入力中を目立たせる */
+    box-shadow: 0 0 0 4px rgba(28, 189, 197, 0.15); /* 外側にふわっとした光を纏わせる */
+}
+
+/* ✍️ 募集内容のテキストエリア専用設定 */
+#rec-content {
+    resize: vertical; /* 縦方向にだけサイズ変更を許可 */
+    min-height: 120px; /* 最低限のスマートな高さを確保 */
+    line-height: 1.6;
 }
 
 
 /* =====================================
-   検索ボタン
+   検索ボタン ＆ 投稿ボタン（立体感とグラデーション）
 ===================================== */
-.btn-search {
-    width: 80%;
-    padding: 10px;
-    background: #1a73e8;
+.btn-search,
+#submit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #1cbdc5 0%, #17a2b8 100%); /* 綺麗なグラデーション */
     color: white;
     border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 15px;
     font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(28, 189, 197, 0.2);
+    box-sizing: border-box;
+}
+
+/* 🖱️ ボタンにマウスを乗せたとき（ホバー） */
+.btn-search:hover,
+#submit-btn:hover {
+    transform: translateY(-2px); /* ボタンが少し上に浮き上がる */
+    box-shadow: 0 6px 18px rgba(28, 189, 197, 0.35); /* 影を強くして浮遊感を出す */
+}
+
+/* 👆 ボタンをクリックした瞬間 */
+.btn-search:active,
+#submit-btn:active {
+    transform: translateY(0); /* 押し込まれた感覚を出す */
 }
 
 
@@ -211,24 +285,30 @@ body {
 ===================================== */
 .user-card {
     background: white;
-    padding: 20px;
-    border-radius: 12px;
+    padding: 24px;
+    border-radius: 16px;
     text-align: center;
     position: relative;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    transition: transform 0.2s ease;
+}
+
+.user-card:hover {
+    transform: translateY(-4px); /* カードもホバーで少し浮き上がらせる */
 }
 
 
 /* 学年・学科バッジ */
 .user-badge {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background: #e8f0fe;
-    color: #1a73e8;
+    top: 12px;
+    right: 12px;
+    background: #e6f9fa;
+    color: #1cbdc5;
     font-size: 11px;
-    padding: 3px 8px;
-    border-radius: 10px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: bold;
 }
 
 
@@ -243,15 +323,20 @@ body {
    マッチングボタン
 ===================================== */
 .btn-match {
-    background: #1a73e8;
+    background: #1cbdc5;
     color: white;
     border: none;
     padding: 10px;
     border-radius: 20px;
     width: 100%;
     cursor: pointer;
-    margin-top: 10px;
+    margin-top: 15px;
     font-weight: bold;
+    transition: background 0.2s;
+}
+
+.btn-match:hover {
+    background: #159ea4;
 }
 
 
@@ -277,10 +362,7 @@ body {
     text-align: center;
 }
 
-
-/* =====================================
-   ホバー時（マウスを乗せた時）
-===================================== */
+/* ホバー時（マウスを乗せた時） */
 .perfect-circle:hover {
     /* 少し拡大 */
     transform: scale(1.05);
@@ -337,7 +419,7 @@ body {
     object-position: center;
     display: block;
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
     transition: 0.2s;
 }
 
@@ -373,15 +455,6 @@ body {
 
 
 /* =====================================
-   丸ボタンサイズ再指定
-===================================== */
-.perfect-circle {
-    width: 130px;
-    height: 130px;
-}
-
-
-/* =====================================
    表示名
 ===================================== */
 .display-name {
@@ -390,61 +463,62 @@ body {
     font-weight: bold;
 }
 
- /* ==========================================
-           【サイズ変更】全体のレイアウト
-           ========================================== */
-        .profile-card {
-            background: white; 
-            padding: 80px 50px;       /* ★変更：上下左右の余白を広げてゆったりさせた */
-            border-radius: 12px; 
-            width: 100%;
-            max-width: 550px;         /* ★変更：白いボックス全体の横幅を大きく（500px → 550px） */
-            margin: 80px auto; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-            text-align: center;
-        }
+/* ==========================================
+   【サイズ変更】全体のレイアウト
+========================================== */
+.profile-card {
+    background: white; 
+    padding: 80px 50px;       /* ★変更：上下左右の余白を広げてゆったりさせた */
+    border-radius: 12px; 
+    width: 100%;
+    max-width: 550px;         /* ★変更：白いボックス全体の横幅を大きく（500px → 550px） */
+    margin: 80px auto; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+    text-align: center;
+}
 
-        /* ★変更：タイトル（プロフィール設定）の文字を大きく（24px → 32px） */
-        .profile-card h2 {
-            font-size: 32px; 
-            margin-bottom: 40px;
-            color: #333;
-        }
+/* ★変更：タイトル（プロフィール設定）の文字を大きく（24px → 32px） */
+.profile-card h2 {
+    font-size: 32px; 
+    margin-bottom: 40px;
+    color: #333;
+}
 
-        /* ★変更：「プロフィール画像」などのラベル文字を大きく（16px → 20px） */
-        .profile-card label {
-            font-size: 20px; 
-            font-weight: bold;
-            color: #444;
-        }
+/* ★変更：「プロフィール画像」などのラベル文字を大きく（16px → 20px） */
+.profile-card label {
+    font-size: 20px; 
+    font-weight: bold;
+    color: #444;
+}
 
-        /* ==========================================
-           【サイズ変更】表示名の入力欄（input）
-           ========================================== */
-        .input-large {
-            width: 100%; 
-            padding: 15px;            /* ★変更：中の余白を広げて入力欄を太くした */
-            margin: 15px 0 35px 0; 
-            font-size: 20px;          /* ★変更：入力する文字のサイズを大きく（16px → 20px） */
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
+/* ==========================================
+   【サイズ変更】表示名の入力欄（input）
+========================================== */
+.input-large {
+    width: 100%; 
+    padding: 15px;            /* ★変更：中の余白を広げて入力欄を太くした */
+    margin: 15px 0 35px 0; 
+    font-size: 20px;          /* ★変更：入力する文字のサイズを大きく（16px → 20px） */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
 
-        /* ==========================================
-           【サイズ変更】保存するボタン（button）
-           ========================================== */
-        .btn-large {
-            width: 100%; 
-            padding: 18px 0;          /* ★変更：ボタンの上下幅を広げて押しやすく太くした */
-            font-size: 22px;          /* ★変更：ボタンの文字を大きく（16px → 22px） */
-            font-weight: bold;
-            background-color: #1a73e8; 
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .btn-large:hover {
-            background-color: #1557b0; 
-        }
+/* ==========================================
+   【サイズ変更】保存するボタン（button）
+========================================== */
+.btn-large {
+    width: 100%; 
+    padding: 18px 0;          /* ★変更：ボタンの上下幅を広げて押しやすく太くした */
+    font-size: 22px;          /* ★変更：ボタンの文字を大きく（16px → 22px） */
+    font-weight: bold;
+    background-color: #1cbdc5; /* 🌟テーマカラーに統一 */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-large:hover {
+    background-color: #159ea4; 
+}

@@ -31,7 +31,7 @@
         <div id="my-post-area" style="background: #fff; padding: 15px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: left;">
             <h4 style="margin: 0 0 10px 0; color: #333; border-bottom: 2px solid #1cbdc5; padding-bottom: 5px; font-size: 14px;">📢 あなたの現在の募集</h4>
             <div id="my-post-content" style="font-size: 13px; color: #666;">
-                現在、投稿している募集はありません。
+                投稿している募集はありません。
             </div>
         </div>
     </div>
@@ -62,7 +62,23 @@
             <section id="search-area">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <h2>他ユーザーの募集一覧</h2>
-                    <button onclick="loadRecruitments()" style="background:none; border:none; color:#1a73e8; cursor:pointer;">🔄 更新</button>
+                    <button onclick="loadRecruitments()" style=" padding: 7px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);background: #00ffd5;margin: 0 0 10px 0; color: #333;padding-bottom: 5px; font-size: 30px;"> 
+                    <div style="margin: 20px 0;">
+                    <img id="profile-icon"
+                         class="big-profile-icon2"
+                         src=""
+                         alt="icon"
+                         style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; cursor: pointer; margin: 0 auto; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                </div>     <!-- ★変更：画像の縦横サイズを大きく（100px → 140px）にしました -->
+
+                <div style="margin: 25px auto;">
+                    <!-- 変更：文字サイズを16pxに上げ、paddingを広げてボタン自体も大きくした -->
+                    <input type="file"
+                           id="profile-image"
+                           accept="image/*"
+                           style="display: none;"
+                           onchange="autoSaveImage()"> </div>
+
                 </div>
                 <div class="user-grid" id="user-list">読み込み中...</div>
             </section>
@@ -88,6 +104,17 @@ function switchTab(mode) {
 ========================= */
 async function loadRecruitments() {
     const myEmail = localStorage.getItem("userEmail");
+    const listDiv = document.getElementById("user-list");
+    const myPostContentDiv = document.getElementById("my-post-content");
+
+    // 💡 1. 通信が始まる前に「読み込み中」の表示にする
+    listDiv.innerHTML = `
+        <div class="loading-box">
+            <div class="spinner"></div>
+            <p>データを更新中...</p>
+        </div>
+    `;
+    myPostContentDiv.innerHTML = "更新中...";
 
     try {
         const res = await fetch(GAS_URL, {
@@ -96,52 +123,51 @@ async function loadRecruitments() {
         });
 
         const result = await res.json();
-        const listDiv = document.getElementById("user-list");
-        const myPostContentDiv = document.getElementById("my-post-content");
-
+        
+        // 💡 2. データが届いたら中身を一旦リセット（読み込み中を消す）
         listDiv.innerHTML = "";
-        myPostContentDiv.innerHTML = "現在、投稿している募集はありません。";
+        myPostContentDiv.innerHTML = "投稿している募集はありません。";
 
-        let otherPostsCount = 0;
+        const items = result.message.reverse();
+        const myPosts = items.filter(item => item.email === myEmail);
+        const otherPosts = items.filter(item => item.email !== myEmail);
 
-        result.message.reverse().forEach(item => {
-            // 🌟 自分の投稿だった場合：削除ボタン付きでサイドバーに表示
-            if (item.email === myEmail) {
-                myPostContentDiv.innerHTML = `
-                    <div style="font-weight: bold; margin-bottom: 5px; color:#1cbdc5;">
-                        ${item.grade} | ${item.dept}
-                    </div>
-                    <div style="word-wrap: break-word; line-height: 1.4; margin-bottom: 10px;">
-                        ${item.content}
-                    </div>
-                    <button onclick="deleteMyRecruitment()" style="width: 100%; background: #ff4d4d; color: white; border: none; padding: 5px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">
-                        ✖ この募集を削除する
-                    </button>
-                `;
-                return; 
-            }
-
-            // 他人の投稿だった場合：中央の一覧にカードを作成
-            otherPostsCount++;
-            const card = document.createElement("div");
-            card.className = "user-card";
-            card.innerHTML = `
-                <div class="user-badge">${item.grade} | ${item.dept}</div>
-                <h3>${item.name}</h3>
-                <p>${item.content}</p>
-                <button class="btn-match" onclick="startChat('${item.email}')">チャット</button>
+        // --- 以下、元の表示処理と同じ ---
+        if (myPosts.length > 0) {
+            const myItem = myPosts[0];
+            myPostContentDiv.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 5px; color:#1cbdc5;">${myItem.grade} | ${myItem.dept}</div>
+                <div style="word-wrap: break-word; line-height: 1.4; margin-bottom: 10px;">${myItem.content}</div>
+                <button onclick="deleteMyRecruitment()" style="width: 100%; background: #ff4d4d; color: white; border: none; padding: 5px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">
+                    ✖ この募集を削除する
+                </button>
             `;
-            listDiv.appendChild(card);
-        });
+        }
 
-        if (otherPostsCount === 0) {
+        if (otherPosts.length === 0) {
             listDiv.innerHTML = "<p>現在他ユーザーの募集はありません</p>";
+        } else {
+            const fragment = document.createDocumentFragment();
+            otherPosts.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "user-card";
+                card.innerHTML = `
+                    <div class="user-badge">${item.grade} | ${item.dept}</div>
+                    <h3>${item.name}</h3>
+                    <p>${item.content}</p>
+                    <button class="btn-match" onclick="startChat('${item.email}')">チャット</button>
+                `;
+                fragment.appendChild(card);
+            });
+            listDiv.appendChild(fragment);
         }
 
     } catch(e) {
-        document.getElementById("user-list").innerText = "読み込みエラーが発生しました。";
+        console.error(e);
+        listDiv.innerText = "読み込みエラーが発生しました。";
     }
 }
+
 
 /* =========================
    🌟【新設】自分の募集を削除する関数

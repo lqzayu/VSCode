@@ -89,14 +89,21 @@
         }
         .header-info {
             flex: 1;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
         }
         .header-name {
             font-weight: bold;
             font-size: 16px;
+            color: #333;
+            line-height: 1.2;
         }
         .header-email {
-            font-size: 11px;
+            font-size: 12px;
             color: #888;
+            line-height: 1.2;
         }
         .btn-back {
             background: #1cbdc5;
@@ -167,6 +174,25 @@
             font-weight: bold;
             font-size: 14px;
         }
+
+        /* 💡デザイン修正: 横並び（Flex）のパーツとして絶対に隠れない位置に配置 */
+        .btn-room-delete {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap; /* ボタン内の文字が改行されるのを防ぐ */
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .btn-room-delete:hover {
+            opacity: 1;
+            background: #e60000;
+        }
     </style>
 </head>
 <body>
@@ -192,7 +218,7 @@
         <div class="chat-header">
             <img id="target-icon" class="header-icon" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="icon">
             <div class="header-info">
-                <div id="chat-title" class="header-name">対話中</div>
+                <div id="chat-title" class="header-name">読み込み中...</div>
                 <div id="chat-email" class="header-email">-------</div>
             </div>
             <button class="btn-back" onclick="backToPartnerList()">一覧へ戻る</button>
@@ -208,18 +234,11 @@
 </div>
 
 <script>
-/**
- * =======================================================
- * バックエンド（Google Apps Script）連携設定
- * =======================================================
- * GAS側にデプロイしたWebアプリのURL
- * チャットデータの取得や送信の要求（リクエスト）をこのURLに対して送る
- */
 const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
 
 const myEmail = localStorage.getItem("userEmail");
-let currentTargetEmail = null; // 現在チャットしている相手
-let chatIntervalId = null;     // 自動更新用タイマーのID
+let currentTargetEmail = null;
+let chatIntervalId = null;
 
 window.onload = () => {
     if (!myEmail) {
@@ -228,18 +247,15 @@ window.onload = () => {
         return;
     }
 
-    // 🌟 募集カードの「チャット」から直接飛んできたかチェック
     const directTarget = localStorage.getItem("chatTarget");
     if (directTarget) {
-        localStorage.removeItem("chatTarget"); // 一度消してメモリをクリーンに
-        openChat(directTarget, "対話中...");   // 直接チャット画面を開く
+        localStorage.removeItem("chatTarget");
+        openChat(directTarget, "読み込み中...");
     } else {
-        // 通常はトーク相手一覧を読み込む
         loadPartnerList();
     }
 };
 
-// 📇 トーク相手一覧をGASから取得して描写する
 async function loadPartnerList() {
     try {
         const res = await fetch(GAS_URL, {
@@ -260,7 +276,6 @@ async function loadPartnerList() {
             result.message.forEach(partner => {
                 const item = document.createElement("div");
                 item.className = "partner-item";
-                // クリックしたらその人とのチャットを開く
                 item.onclick = () => openChat(partner.email, partner.name);
 
                 item.innerHTML = `
@@ -269,6 +284,7 @@ async function loadPartnerList() {
                         <div class="partner-name">${partner.name}</div>
                         <div style="font-size: 12px; color: #888;">${partner.email}</div>
                     </div>
+                    <button class="btn-room-delete" onclick="event.stopPropagation(); deleteChatRoom('${partner.email}', '${partner.name}', this.parentElement);">削除</button>
                     <div class="partner-arrow">＞</div>
                 `;
                 listBox.appendChild(item);
@@ -279,45 +295,59 @@ async function loadPartnerList() {
     }
 }
 
-// 💬 特定の相手とのチャット画面に切り替える関数
+async function deleteChatRoom(targetEmail, targetName, itemElement) {
+    if (!confirm(`${targetName} さんとのトークルーム（すべてのメッセージ履歴）を完全に削除しますか？`)) return;
+
+    itemElement.remove();
+
+    try {
+        const res = await fetch(GAS_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                mode: "deleteChatRoom",
+                myEmail: myEmail,
+                targetEmail: targetEmail
+            })
+        });
+        const result = await res.json();
+        if (result.status === "success") {
+            loadPartnerList();
+        }
+    } catch (e) {
+        alert("トークルームの削除に失敗しました。電波状況を確認してください。");
+        loadPartnerList();
+    }
+}
+
 function openChat(email, name) {
     currentTargetEmail = email;
     
-    // 画面の表示切り替え
     document.getElementById("partner-list-view").style.display = "none";
     document.getElementById("chat-view").style.display = "flex";
     
-    // ヘッダー情報のセット
-    document.getElementById("chat-title").innerText = `対話中: ${name}`;
+    // 🌟 「対話中:」の文字列を完全に排除して名前だけをセットするよう修正
+    document.getElementById("chat-title").innerText = name;
     document.getElementById("chat-email").innerText = email;
     
-    // 相手の最新プロフィール（マイページでの最新名）を裏で取り直す
     fetchRealtimeProfile(email);
-
-    // 最初の履歴読み込み
     loadChatMessages();
     
-    // 5秒おきの自動更新を開始
     if (chatIntervalId) clearInterval(chatIntervalId);
     chatIntervalId = setInterval(loadChatMessages, 5000);
 }
 
-// ↩️ チャット画面から一覧画面に戻る関数
 function backToPartnerList() {
     currentTargetEmail = null;
     if (chatIntervalId) {
-        clearInterval(chatIntervalId); // タイマー停止
+        clearInterval(chatIntervalId);
         chatIntervalId = null;
     }
-    // 画面の表示切り替え
     document.getElementById("chat-view").style.display = "none";
     document.getElementById("partner-list-view").style.display = "flex";
     
-    // 一覧を最新状態に再読み込み
     loadPartnerList();
 }
 
-// 相手のリアルタイムな設定名を取得する
 async function fetchRealtimeProfile(email) {
     try {
         const res = await fetch(GAS_URL, {
@@ -325,13 +355,13 @@ async function fetchRealtimeProfile(email) {
             body: JSON.stringify({ mode: "login", email: email })
         });
         const result = await res.json();
-        if (result.status === "success") {
-            document.getElementById("chat-title").innerText = `対話中: ${result.message.name}`;
+        if (result.status === "success" && currentTargetEmail === email) {
+            // 🌟 リアルタイム更新時も「対話中:」を付けずに取得したユーザー名のみを代入
+            document.getElementById("chat-title").innerText = result.message.name;
         }
     } catch(e){}
 }
 
-// メッセージ履歴の取得（currentTargetEmail宛て）
 async function loadChatMessages() {
     if (!currentTargetEmail) return;
     try {
@@ -369,33 +399,26 @@ async function loadChatMessages() {
     } catch (e) { console.error(e); }
 }
 
-// 🌟大改造：メッセージ送信（楽観的UI更新を組み込み）
 async function sendChatMessage() {
     const input = document.getElementById("msg-input");
     const text = input.value.trim();
     if (!text || !currentTargetEmail) return;
 
-    // 入力欄を即座にクリア
     input.value = "";
 
-    // 🚀【ラグ解消】通信を待たずに、画面に吹き出しをすぐ表示する
     const chatBox = document.getElementById("chat-box");
-    
-    // 案内用テキスト（pタグ）が残っていれば一回消す
     if (chatBox.querySelector("p")) {
         chatBox.innerHTML = "";
     }
 
     const wrapper = document.createElement("div");
-    wrapper.className = "msg-wrapper me"; // 自分側（右側）のスタイル
+    wrapper.className = "msg-wrapper me";
     const msgDiv = document.createElement("div");
     msgDiv.className = "msg";
     msgDiv.innerText = text;
     
     wrapper.appendChild(msgDiv);
     chatBox.appendChild(wrapper);
-    
-    // 送信した瞬間に一番下までオートスクロール
     chatBox.scrollTop = chatBox.scrollHeight;
 
     try {
@@ -410,12 +433,10 @@ async function sendChatMessage() {
         });
         const result = await res.json();
         
-        // 通信成功時、裏で最新の履歴データを同期させる
         if (result.status === "success") {
             loadChatMessages();
         }
     } catch (e) {
-        // 万が一ネットワークエラーなどで失敗した時の処理
         alert("メッセージの送信に失敗しました。電波状況を確認してください。");
     }
 }
