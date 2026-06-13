@@ -1,148 +1,105 @@
-<!--いったんgoogleアカウントであればだれでもログインできるようにしてます-->
+<!--いったん従来通りログインできるようにしてます-->
 <!--今まで通りに直したい場合はmemo.txtからC&Pしてきてください-->
 
-<!DOCTYPE html>
+<!DOCTYPE html>  
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ログイン - 平工マッチング</title>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <style>
-        /* 💡 全体のデザイン（平工マッチングのテーマカラーに合わせて調整） */
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .login-container {
-            background-color: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 100%;
-            max-width: 360px;
-        }
-
-        h1 {
-            color: #333;
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-
-        .subtitle {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-
-        .alert-box {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            margin-bottom: 25px;
-            line-height: 1.4;
-            text-align: left;
-        }
-
-        /* Googleボタンを中央に寄せるための調整 */
-        .button-wrapper {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="index-style.css">
 </head>
 <body>
-
 <div class="login-container">
-    <h1>平工マッチング</h1>
-    <div class="subtitle">ログインして仲間と繋がろう</div>
+    <div class="login-card">
+        <h1 id="form-title">ログイン</h1>
 
-    <div class="alert-box">
-        💡 <strong>ログイン方法</strong><br>
-        お持ちのGoogleアカウント（学校・個人どちらでも可）を使って、ワンタップで安全にログインできます。
-    </div>
+        <div class="input-group">
+            <input type="text" id="email" placeholder="ユーザID" inputmode="email" onkeypress="handleKeyPress(event)">
 
-    <div id="g_id_onload"
-         data-client_id="718397833063-hnjdohievu9umae3gbfg6v4661bff5id.apps.googleusercontent.com"
-         data-context="signin"
-         data-ux_mode="popup"
-         data-callback="handleCredentialResponse"
-         data-auto_prompt="false">
-    </div>
-
-    <div class="button-wrapper">
-        <div class="g_id_signin"
-             data-type="standard"
-             data-shape="pill"
-             data-theme="outline"
-             data-text="signin_with"
-             data-size="large"
-             data-logo_alignment="left">
+            <div class="password-wrapper">
+                <input type="password" id="password" placeholder="パスワード" class="password-input" onkeypress="handleKeyPress(event)">
+                <button type="button" id="toggle-password" onclick="togglePasswordVisibility()" class="toggle-password-btn" >表示</button>
+            </div>    
+            <div class="confirm-password-wrapper">
+                <input type="password" id="confirm-password" placeholder="Confirm Password" class="confirm-password-input" onkeypress="handleKeyPress(event)">
+                <button type="button" id="toggle-confirm" onclick="toggleconfirmVisibility()" class="toggle-confirm-btn" >表示</button>
+            </div>
+            <p id="message" class="message"></p>
+            <div class="button-group">
+                <div id="login-section">
+                    <button class="btn-primary" onclick="handleLogin()">ログイン</button>
+                    <button class="btn-flat" onclick="toggleMode('register')">新規登録はこちら</button>
+                </div>
+                <div id="register-section" style="display: none;">
+                    <button class="btn-primary" onclick="handleRegister()">アカウント作成</button>
+                    <button class="btn-flat" onclick="toggleMode('login')">ログインに戻る</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-/* ========================================================
-   Googleログイン成功時に実行される関数
-======================================================== */
-async function handleCredentialResponse(response) {
-    try {
-        // Googleから送られてきた暗号化データ（JWT）を解読してユーザー情報を取得
-        const responsePayload = parseJwt(response.credential);
-        const email = responsePayload.email;
-        const name = responsePayload.name;
-        const picture = responsePayload.picture; // Googleのアイコン画像URL
+    // これらの関数は通常 index-script.js に記述されますが、
+    // 今回の変更を index.html だけで完結させるため、ここに記述します。
 
-        // 🌟【変更点】特定の学校ドメイン（@fcs.ed.jp）に縛るif文のチェック制限を完全削除しました
+    function handleLogin() {
+        // 実際のログイン処理をここに記述します
+        console.log("ログインボタンが押されました (Enterキー)");
+        alert("ログイン処理を実行します。");
+        // 例: ログイン成功後にホーム画面へ遷移
+        // window.location.href = "home.html";
+    }
 
-        // ユーザー情報をブラウザ（localStorage）に安全に保存
-        localStorage.setItem("userEmail", email);
-        localStorage.setItem("userName", name);
-        if (picture) {
-            localStorage.setItem("profileImage", picture); // Googleのプロフィール写真をそのままアプリに反映
+    function handleRegister() {
+        // 実際のアカウント作成処理をここに記述します
+        console.log("アカウント作成ボタンが押されました (Enterキー)");
+        alert("アカウント作成処理を実行します。");
+        // 例: アカウント作成成功後にログイン画面へ戻る
+        // toggleMode('login');
+    }
+
+    function toggleMode(mode) {
+        const formTitle = document.getElementById("form-title");
+        const loginSection = document.getElementById("login-section");
+        const registerSection = document.getElementById("register-section");
+        const confirmPasswordWrapper = document.querySelector(".confirm-password-wrapper");
+        const confirmPasswordInput = document.getElementById("confirm-password");
+        const toggleConfirmBtn = document.getElementById("toggle-confirm");
+
+        if (mode === 'register') {
+            formTitle.innerText = "新規登録";
+            loginSection.style.display = "none";
+            registerSection.style.display = "block";
+            confirmPasswordWrapper.style.display = "block";
+            confirmPasswordInput.style.display = "block";
+            toggleConfirmBtn.style.display = "block";
+        } else {
+            formTitle.innerText = "ログイン";
+            loginSection.style.display = "block";
+            registerSection.style.display = "none";
+            confirmPasswordWrapper.style.display = "none";
+            confirmPasswordInput.style.display = "none";
+            toggleConfirmBtn.style.display = "none";
         }
-        
-        alert("ログインに成功しました！\nこんにちは、" + name + "さん");
-        
-        // メイン画面（ホーム）へジャンプ！
-        window.location.href = "home.html";
-
-    } catch (error) {
-        console.error("ログイン処理中にエラーが発生しました:", error);
-        alert("ログイン処理に失敗しました。もう一度お試しください。");
     }
-}
 
-/* ========================================================
-   JWT（Googleの暗号化データ）を解読するための補助関数
-======================================================== */
-function parseJwt(token) {
-    var base64Url = token.split('.')[1];
-    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
-    return JSON.parse(jsonPayload);
-}
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Enterキーによるフォームの自動送信を防ぐ
 
-// 既にログイン済みの場合は自動でホームへ飛ばす処理
-window.onload = () => {
-    if (localStorage.getItem("userEmail")) {
-        window.location.href = "home.html";
+            const loginSection = document.getElementById("login-section");
+            const registerSection = document.getElementById("register-section");
+
+            if (loginSection.style.display !== "none") {
+                handleLogin();
+            } else if (registerSection.style.display !== "none") {
+                handleRegister();
+            }
+        }
     }
-};
 </script>
-
+<script src="index-script.js"></script>
 </body>
 </html>
