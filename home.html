@@ -5,6 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ホーム - 平工マッチング</title>
     <link rel="stylesheet" href="home-style.css">
+    <style>
+        /* デバイスの画面幅やアスペクト比に応じたスタイル調整 */
+        @media screen and (max-width: 768px) {
+            /* スマホ・タブレット等の縦長画面では横並びを解除して縦並びに */
+            .container {
+                flex-direction: column !important;
+                display: flex;
+                padding: 10px;
+            }
+            .sidebar {
+                width: 100% !important;
+                margin-bottom: 20px;
+            }
+            /* メインコンテンツの幅を100%にする */
+            div[style*="flex: 3"] {
+                width: 100% !important;
+                flex: none !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -129,7 +149,7 @@ async function loadRecruitments() {
         }
 
         if (otherPosts.length === 0) {
-            listDiv.innerHTML = "<p>現在他ユーザーの募集はありません</p>";
+            listDiv.innerHTML = "<p>現在、ユーザーの募集はありません</p>";
         } else {
             const fragment = document.createDocumentFragment();
             otherPosts.forEach(item => {

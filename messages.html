@@ -21,6 +21,17 @@
             box-shadow: 0 0 10px rgba(0,0,0,0.05);
         }
 
+        /* スマホ（アスペクト比が縦長）の場合の調整 */
+        @media screen and (max-width: 600px) {
+            .main-container {
+                max-width: 100%;
+                height: calc(100vh - 60px); /* ヘッダー分を除いた全画面 */
+            }
+            .msg {
+                font-size: 16px; /* スマホで読みやすいサイズに拡大 */
+            }
+        }
+
         /* --- 1, トーク一覧画面のスタイル --- */
         .list-header {
             padding: 15px;
