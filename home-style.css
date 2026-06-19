@@ -194,11 +194,17 @@ body {
 }
 
 /* 🔒 読み取り専用の名前入力欄（マイページ連動） */
-#rec-name[readonly] {
+#user-name {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0; /* 少しグレーがかった優しい枠線 */
+    border-radius: 10px; /* なめらかな角丸 */
+    color: rgb(117, 117, 117);
     background-color: #e2e8f0;
-    color: #64748b;
     cursor: not-allowed;
     border-color: #cbd5e1;
+    outline: none;
+    margin-bottom:10px;
 }
 
 /* 🌟 入力欄をクリック（フォーカス）したときのアニメーション */
@@ -544,6 +550,7 @@ body {
     overflow: hidden; /* 画像が丸からはみ出ないようにする */
 }
 
+
 /* 中のネット画像（img）のサイズとアニメーション設定 */
 .refresh-icon {
     width: 64px;  /* ボタンより少し小さくして余白を作る */
@@ -552,16 +559,17 @@ body {
     transition: transform 0.9s ease; /* 回転スピード */
 }
 
+
 /* 🖱️ マウスを乗せたとき（ホバー） */
 .btn-refresh:hover {
     background-color: #f0fdfa; /* ほんのり薄いミントグリーン背景にする */
     box-shadow: 0 6px 16px rgba(28, 189, 197, 0.25); /* 影を強めて浮遊感を出す */
 }
-
 /* ホバーした時に中の画像がクルッと綺麗に1回転 */
 .btn-refresh:hover .refresh-icon {
     transform: rotate(360deg);
 }
+
 
 /* 👆 ボタンをクリックした瞬間 */
 .btn-refresh:active {
