@@ -117,6 +117,62 @@
                 margin-bottom: 25px !important;
             }
         }
+
+        /* 📸 画像選択・削除ボタンのスタイル */
+        .image-action-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin: 25px auto;
+            flex-wrap: wrap;
+        }
+
+        .btn-select-image {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #f5f5f5;
+            color: #1cbdc5;
+            border: 1px solid #1cbdc5;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .btn-select-image:hover {
+            background-color: #1cbdc5;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn-delete-image {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #fff5f5;
+            color: #e55353;
+            border: 1px solid #e55353;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .btn-delete-image:hover {
+            background-color: #e55353;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(229, 83, 83, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .btn-select-image:active, .btn-delete-image:active {
+            transform: translateY(1px);
+        }
     </style>
 </head>
 
@@ -153,10 +209,13 @@
                          style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; cursor: pointer; margin: 0 auto; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
                 </div>
 
-                <div style="margin: 25px auto;">
-                    <label for="profile-image" style="display: inline-block; padding: 12px 24px; background-color: #f5f5f5; color: #1cbdc5; border: 1px solid #1cbdc5; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;">
+                <div class="image-action-container">
+                    <label for="profile-image" class="btn-select-image">
                          画像を選択する
                     </label>
+                    <button type="button" class="btn-delete-image" onclick="deleteImage()">
+                         画像を削除する
+                    </button>
                     <input type="file"
                            id="profile-image"
                            accept="image/*"
@@ -200,6 +259,12 @@
             };
             reader.readAsDataURL(file);
         }
+    }
+
+    function deleteImage() {
+        localStorage.removeItem("profileImage");
+        document.getElementById("profile-icon").src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+        document.getElementById("profile-image").value = "";
     }
 
     function saveProfile() {
