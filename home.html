@@ -48,7 +48,7 @@
             <div id="mypage-text">マイページ</div>
         </div>
 
-        <div id="my-post-area" style="background: #fff; padding: 15px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: left;">
+        <div id="my-post-area" style="border: 1.5px solid #1cbdc5; background: #fff; padding: 15px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: left;">
             <h4 style="margin: 0 0 10px 0; color: #333; border-bottom: 2px solid #1cbdc5; padding-bottom: 5px; font-size: 14px;">📢 あなたの現在の募集</h4>
             <div id="my-post-content" style="font-size: 13px; color: #666;">
                 投稿している募集はありません。
@@ -58,31 +58,35 @@
 
     <div style="flex: 3;">
         <section id="recruit-form-area" style="display: none;">
-            <div class="sidebar" style="width: 100%;">
+            <div class="sidebar" style="width: 100%;border: 1.5px solid #1cbdc5;">
                 <h3 id="form-title">募集を投稿する</h3>
-                <input type="text" id="rec-name" readonly style="width:80%; margin-bottom:10px; padding:8px; background:#eee;" placeholder="マイページで名前を設定してください">
-                <select id="rec-grade" style="width:80%; margin-bottom:10px; padding:8px;">
+                <input type="text" id="rec-name" readonly style="width:80%; border: 1.5px solid #1cbdc5; margin-bottom:10px; padding:8px; background:#eee;" placeholder="マイページで名前を設定してください">
+                <select id="rec-grade" style="width:80%; border: 1.5px solid #1cbdc5; margin-bottom:10px; padding:8px;">
                     <option value="1年">1年</option>
                     <option value="2年">2年</option>
                     <option value="3年">3年</option>
                 </select>
-                <select id="rec-dept" style="width:80%; margin-bottom:10px; padding:8px;">
+                <select id="rec-dept" style="width:80%; border: 1.5px solid #1cbdc5; margin-bottom:10px; padding:8px;">
                     <option value="機械工学科">機械工学科</option>
                     <option value="電気工学科">電気工学科</option>
                     <option value="制御工学科">制御工学科</option>
                     <option value="土木環境工学科">土木環境工学科</option>
                     <option value="情報工学科">情報工学科</option>
                 </select>
-                <textarea id="rec-content" rows="4" placeholder="募集内容を入力してください" style="width:80%; margin-bottom:10px; padding:8px;"></textarea>
+                <textarea id="rec-content" rows="4" placeholder="募集内容を入力してください" style="width:80%; border: 1.5px solid #1cbdc5; margin-bottom:10px; padding:8px;"></textarea>
                 <button class="btn-search" id="submit-btn" onclick="submitRecruitment()">投稿する</button>
             </div>
         </section>
 
         <div class="main-content">
             <section id="search-area">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h2>他ユーザーの募集一覧</h2>
-                    <button onclick="loadRecruitments()" style=" padding: 7px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);background: #00ffd5;margin: 0 0 10px 0; color: #333;padding-bottom: 5px; font-size: 30px;"> 更新</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+                
+        <h2>他ユーザーの募集一覧</h2>
+            <button onclick="loadRecruitments()" class="btn-refresh" title="一覧を更新">
+                <img class="refresh-icon" src="https://kotonohaworks.com/free-icons/wp-content/uploads/kkrn_icon_koushin_15.png" alt="更新">
+            </button>
+        </div>
                 </div>
                 <div class="user-grid" id="user-list">読み込み中...</div>
             </section>

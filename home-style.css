@@ -96,6 +96,8 @@ body {
     background: none;
     /* 指マーク */
     cursor: pointer;
+    color: #ffffff;
+    background-color: #ff0000;
 }
 
 
@@ -521,4 +523,47 @@ body {
 }
 .btn-large:hover {
     background-color: #159ea4; 
+}
+
+/* =====================================
+   🔄 更新ボタン（ネットの画像ファイル対応版）
+===================================== */
+.btn-refresh {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%; /* 綺麗な丸型 */
+    border: 2px solid #0a8614; /* テーマカラーの枠線 */
+    background-color: #ffffff; /* 白背景 */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(28, 189, 197, 0.12); /* 柔らかいミントの影 */
+    transition: all 0.3s ease; /* 滑らかな動き */
+    padding: 0;
+    overflow: hidden; /* 画像が丸からはみ出ないようにする */
+}
+
+/* 中のネット画像（img）のサイズとアニメーション設定 */
+.refresh-icon {
+    width: 64px;  /* ボタンより少し小さくして余白を作る */
+    height: 64px;
+    object-fit: contain; /* 画像の比率を崩さない */
+    transition: transform 0.9s ease; /* 回転スピード */
+}
+
+/* 🖱️ マウスを乗せたとき（ホバー） */
+.btn-refresh:hover {
+    background-color: #f0fdfa; /* ほんのり薄いミントグリーン背景にする */
+    box-shadow: 0 6px 16px rgba(28, 189, 197, 0.25); /* 影を強めて浮遊感を出す */
+}
+
+/* ホバーした時に中の画像がクルッと綺麗に1回転 */
+.btn-refresh:hover .refresh-icon {
+    transform: rotate(360deg);
+}
+
+/* 👆 ボタンをクリックした瞬間 */
+.btn-refresh:active {
+    transform: scale(0.92); /* ぽちっと押し込まれる演出 */
 }

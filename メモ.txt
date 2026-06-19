@@ -316,3 +316,264 @@ window.onload = () => {
 </body>
 </html>
 
+
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------
+
+
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ホーム - 平工マッチング</title>
+    <link rel="stylesheet" href="home-style.css">
+    <style>
+        /* デバイスの画面幅やアスペクト比に応じたスタイル調整 */
+        @media screen and (max-width: 768px) {
+            /* スマホ・タブレット等の縦長画面では横並びを解除して縦並びに */
+            .container {
+                flex-direction: column !important;
+                display: flex;
+                padding: 10px;
+            }
+            .sidebar {
+                width: 100% !important;
+                margin-bottom: 20px;
+            }
+            /* メインコンテンツの幅を100%にする */
+            div[style*="flex: 3"] {
+                width: 100% !important;
+                flex: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="navbar">
+    <div class="logo" onclick="location.href='home.html'">平工マッチング</div>
+    <div class="nav-links">
+        <span class="nav-item" id="tab-recruit-btn" onclick="switchTab('recruit')">募集投稿</span>
+        <span class="nav-item active" id="tab-search-btn" onclick="switchTab('search')">ユーザーを探す</span>
+        <span class="nav-item" onclick="location.href='messages.html'">メッセージ</span>
+        <span class="nav-item" onclick="location.href='mypages.html'">マイページ</span>
+        <button class="btn-logout" onclick="logout()">ログアウト</button>
+    </div>
+</header>
+
+<main class="container">
+
+    <div class="sidebar">
+        <div class="mypage-area">
+            <img id="profile-icon" class="big-profile-icon" src="" alt="icon" onclick="location.href='mypages.html'">
+            <div id="mypage-text">マイページ</div>
+        </div>
+
+        <div id="my-post-area" style="background: #fff; padding: 15px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: left;">
+            <h4 style="margin: 0 0 10px 0; color: #333; border-bottom: 2px solid #1cbdc5; padding-bottom: 5px; font-size: 14px;">📢 あなたの現在の募集</h4>
+            <div id="my-post-content" style="font-size: 13px; color: #666;">
+                投稿している募集はありません。
+            </div>
+        </div>
+    </div>
+
+    <div style="flex: 3;">
+        <section id="recruit-form-area" style="display: none;">
+            <div class="sidebar" style="width: 100%;">
+                <h3 id="form-title">募集を投稿する</h3>
+                <input type="text" id="rec-name" readonly style="width:80%; margin-bottom:10px; padding:8px; background:#eee;" placeholder="マイページで名前を設定してください">
+                <select id="rec-grade" style="width:80%; margin-bottom:10px; padding:8px;">
+                    <option value="1年">1年</option>
+                    <option value="2年">2年</option>
+                    <option value="3年">3年</option>
+                </select>
+                <select id="rec-dept" style="width:80%; margin-bottom:10px; padding:8px;">
+                    <option value="機械工学科">機械工学科</option>
+                    <option value="電気工学科">電気工学科</option>
+                    <option value="制御工学科">制御工学科</option>
+                    <option value="土木環境工学科">土木環境工学科</option>
+                    <option value="情報工学科">情報工学科</option>
+                </select>
+                <textarea id="rec-content" rows="4" placeholder="募集内容を入力してください" style="width:80%; margin-bottom:10px; padding:8px;"></textarea>
+                <button class="btn-search" id="submit-btn" onclick="submitRecruitment()">投稿する</button>
+            </div>
+        </section>
+
+        <div class="main-content">
+            <section id="search-area">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h2>他ユーザーの募集一覧</h2>
+                    <button onclick="loadRecruitments()" style=" padding: 7px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);background: #00ffd5;margin: 0 0 10px 0; color: #333;padding-bottom: 5px; font-size: 30px;"> 更新</button>
+                </div>
+                <div class="user-grid" id="user-list">読み込み中...</div>
+            </section>
+        </div>
+    </div>
+</main>
+
+<script>
+const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
+
+function switchTab(mode) {
+    document.getElementById("recruit-form-area").style.display = (mode === 'recruit') ? "block" : "none";
+    document.getElementById("search-area").style.display = (mode === 'search') ? "block" : "none";
+    document.getElementById("tab-recruit-btn").classList.toggle("active", mode === 'recruit');
+    document.getElementById("tab-search-btn").classList.toggle("active", mode === 'search');
+    if(mode === 'recruit') {
+        document.getElementById("rec-name").value = localStorage.getItem("userName") || "未設定";
+    }
+}
+
+/* =========================
+   募集一覧を読み込む関数（削除ボタン表示に対応）
+========================= */
+async function loadRecruitments() {
+    const myEmail = localStorage.getItem("userEmail");
+    const listDiv = document.getElementById("user-list");
+    const myPostContentDiv = document.getElementById("my-post-content");
+
+    // 💡 1. 通信が始まる前に「読み込み中」の表示にする
+    listDiv.innerHTML = `
+        <div class="loading-box">
+            <div class="spinner"></div>
+            <p>データを更新中...</p>
+        </div>
+    `;
+    myPostContentDiv.innerHTML = "更新中...";
+
+    try {
+        const res = await fetch(GAS_URL, {
+            method: "POST",
+            body: JSON.stringify({ mode: "getRecruitments", email: myEmail })
+        });
+
+        const result = await res.json();
+        
+        // 💡 2. データが届いたら中身を一旦リセット（読み込み中を消す）
+        listDiv.innerHTML = "";
+        myPostContentDiv.innerHTML = "投稿している募集はありません。";
+
+        const items = result.message.reverse();
+        const myPosts = items.filter(item => item.email === myEmail);
+        const otherPosts = items.filter(item => item.email !== myEmail);
+
+        // --- 以下、元の表示処理と同じ ---
+        if (myPosts.length > 0) {
+            const myItem = myPosts[0];
+            myPostContentDiv.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 5px; color:#1cbdc5;">${myItem.grade} | ${myItem.dept}</div>
+                <div style="word-wrap: break-word; line-height: 1.4; margin-bottom: 10px;">${myItem.content}</div>
+                <button onclick="deleteMyRecruitment()" style="width: 100%; background: #ff4d4d; color: white; border: none; padding: 5px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">
+                    ✖ この募集を削除する
+                </button>
+            `;
+        }
+
+        if (otherPosts.length === 0) {
+            listDiv.innerHTML = "<p>現在、ユーザーの募集はありません</p>";
+        } else {
+            const fragment = document.createDocumentFragment();
+            otherPosts.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "user-card";
+                card.innerHTML = `
+                    <div class="user-badge">${item.grade} | ${item.dept}</div>
+                    <h3>${item.name}</h3>
+                    <p>${item.content}</p>
+                    <button class="btn-match" onclick="startChat('${item.email}')">チャット</button>
+                `;
+                fragment.appendChild(card);
+            });
+            listDiv.appendChild(fragment);
+        }
+
+    } catch(e) {
+        console.error(e);
+        listDiv.innerText = "読み込みエラーが発生しました。";
+    }
+}
+
+
+/* =========================
+   🌟【新設】自分の募集を削除する関数
+========================= */
+async function deleteMyRecruitment() {
+    // ユーザーに確認メッセージを出す（誤タップ防止）
+    if (!confirm("本当にこの募集を削除しますか？")) return;
+
+    const myEmail = localStorage.getItem("userEmail");
+
+    try {
+        const res = await fetch(GAS_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                mode: "deleteRecruitment",
+                email: myEmail
+            })
+        });
+        const result = await res.json();
+
+        if (result.status === "success") {
+            alert("募集を削除しました。");
+            loadRecruitments(); // 画面を再読み込みして表示を更新
+        } else {
+            alert("削除に失敗しました。");
+        }
+    } catch (e) {
+        alert("通信エラーが発生しました。");
+    }
+}
+
+async function submitRecruitment() {
+    const data = {
+        mode: "postRecruitment",
+        name: localStorage.getItem("userName"),
+        grade: document.getElementById("rec-grade").value,
+        dept: document.getElementById("rec-dept").value,
+        content: document.getElementById("rec-content").value,
+        email: localStorage.getItem("userEmail")
+    };
+
+    await fetch(GAS_URL, { method: "POST", body: JSON.stringify(data) });
+    alert("投稿しました");
+    
+    // 投稿が完了したら、自動的に「ユーザーを探す」タブに戻して一覧を更新する
+    switchTab('search');
+    loadRecruitments();
+    // フォームの入力欄をクリア
+    document.getElementById("rec-content").value = "";
+}
+
+function startChat(email) {
+    localStorage.setItem("chatTarget", email);
+    location.href = 'messages.html';
+}
+
+function logout() {
+    localStorage.clear();
+    window.location.href = "index.html";
+}
+
+window.onload = () => {
+    const userName = localStorage.getItem("userName");
+    const profileImage = localStorage.getItem("profileImage");
+    document.getElementById("mypage-text").innerText = userName || "マイページ";
+
+    if(profileImage){
+        document.getElementById("profile-icon").src = profileImage;
+    } else {
+        document.getElementById("profile-icon").src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+    }
+    loadRecruitments();
+};
+</script>
+
+</body>
+</html>
