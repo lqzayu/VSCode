@@ -198,7 +198,7 @@ body {
     padding: 12px 16px;
     border: 2px solid #e2e8f0; /* 少しグレーがかった優しい枠線 */
     border-radius: 10px; /* なめらかな角丸 */
-    color: rgb(117, 117, 117);
+    color: rgb(0, 0, 0);
     background-color: #e2e8f0;
     cursor: not-allowed;
     border-color: #cbd5e1;
@@ -552,8 +552,8 @@ body {
 
 /* 中のネット画像（img）のサイズとアニメーション設定 */
 .refresh-icon {
-    width: 50px;  /* ボタンより少し小さくして余白を作る */
-    height: 50px;
+    width: 50px #1cbdc5;  /* ボタンより少し小さくして余白を作る */
+    height: 50px #1cbdc5;
     object-fit: contain; /* 画像の比率を崩さない */
     transition: transform 0.9s ease; /* 回転スピード */
 }
