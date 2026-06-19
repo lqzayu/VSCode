@@ -177,7 +177,6 @@ body {
 /* 🌟 入力欄・セレクトボックス・テキストエリアの共通おしゃれデザイン */
 .filter-group input,
 .filter-group select,
-#rec-name, 
 #rec-grade, 
 #rec-dept, 
 #rec-content {
@@ -538,7 +537,7 @@ body {
     width: 48px;
     height: 48px;
     border-radius: 50%; /* 綺麗な丸型 */
-    border: 2px solid #0a8614; /* テーマカラーの枠線 */
+    border: 2px solid #000000; /* テーマカラーの枠線 */
     background-color: #ffffff; /* 白背景 */
     cursor: pointer;
     display: flex;
@@ -553,8 +552,8 @@ body {
 
 /* 中のネット画像（img）のサイズとアニメーション設定 */
 .refresh-icon {
-    width: 64px;  /* ボタンより少し小さくして余白を作る */
-    height: 64px;
+    width: 50px;  /* ボタンより少し小さくして余白を作る */
+    height: 50px;
     object-fit: contain; /* 画像の比率を崩さない */
     transition: transform 0.9s ease; /* 回転スピード */
 }
@@ -567,7 +566,7 @@ body {
 }
 /* ホバーした時に中の画像がクルッと綺麗に1回転 */
 .btn-refresh:hover .refresh-icon {
-    transform: rotate(360deg);
+    transform: rotate(-360deg);
 }
 
 
