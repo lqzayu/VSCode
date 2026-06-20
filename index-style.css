@@ -5,9 +5,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100dvh; /* ビューポートの高さに合わせる */
+    min-height: 100dvh;
+    /* ビューポートの高さに合わせる */
     background-color: #f0f2f5;
-    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; /* フォントスタイルを追加 */
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    /* フォントスタイルを追加 */
 }
 
 /* ログインカード */
@@ -19,7 +21,7 @@ body {
     width: 90%;
     max-width: 380px;
     text-align: center;
-    box-sizing: border-box; 
+    box-sizing: border-box;
 }
 
 /* パスワード入力欄とボタンを包む外枠 */
@@ -34,29 +36,39 @@ body {
 /* パスワード入力欄そのもの */
 .password-input {
     width: 100% !important;
-    padding-right: 35px; /* 右側にボタンが重なるための余白 */
+    padding-right: 35px;
+    /* 右側にボタンが重なるための余白 */
     box-sizing: border-box;
 }
 
 /* 表示/非表示 切り替えボタン */
 .toggle-password-btn {
     position: absolute;
-    right: 10px;         /* 右端から10pxの位置に固定 */
-    width: max-content;  /* 横幅を文字ぴったりに縮める */
-    background: none !important;    /* 背景を透明に */
-    border: none !important;        /* 枠線を消す */
-    cursor: pointer;     /* マウスカーソルを指マークに */
-    padding: 0;          /* 内側の余白をゼロに */
-    color: #333;         /* 文字の色を濃いグレーに */
-    font-size: 16px;     /* 文字の大きさ */
-    line-height: 1;      /* 行の高さを詰める */
+    right: 10px;
+    /* 右端から10pxの位置に固定 */
+    width: max-content;
+    /* 横幅を文字ぴったりに縮める */
+    background: none !important;
+    /* 背景を透明に */
+    border: none !important;
+    /* 枠線を消す */
+    cursor: pointer;
+    /* マウスカーソルを指マークに */
+    padding: 0;
+    /* 内側の余白をゼロに */
+    color: #333;
+    /* 文字の色を濃いグレーに */
+    font-size: 16px;
+    /* 文字の大きさ */
+    line-height: 1;
+    /* 行の高さを詰める */
     z-index: 10;
     margin-bottom: 10px;
 }
 
-.confirm-password-wrapper{
+.confirm-password-wrapper {
     position: relative;
-    display:flex;
+    display: flex;
     align-items: center;
     width: 100%;
     box-sizing: border-box;
@@ -71,15 +83,24 @@ body {
 
 .toggle-confirm-btn {
     position: absolute;
-    right: 10px;         /* 右端から10pxの位置に固定 */
-    width: max-content;  /* 横幅を文字ぴったりに縮める */
-    background: none !important;    /* 背景を透明に */
-    border: none !important;        /* 枠線を消す */
-    cursor: pointer;     /* マウスカーソルを指マークに */
-    padding: 0;          /* 内側の余白をゼロに */
-    color: #333;         /* 文字の色を濃いグレーに */
-    font-size: 16px;     /* 文字の大きさ */
-    line-height: 1;      /* 行の高さを詰める */
+    right: 10px;
+    /* 右端から10pxの位置に固定 */
+    width: max-content;
+    /* 横幅を文字ぴったりに縮める */
+    background: none !important;
+    /* 背景を透明に */
+    border: none !important;
+    /* 枠線を消す */
+    cursor: pointer;
+    /* マウスカーソルを指マークに */
+    padding: 0;
+    /* 内側の余白をゼロに */
+    color: #333;
+    /* 文字の色を濃いグレーに */
+    font-size: 16px;
+    /* 文字の大きさ */
+    line-height: 1;
+    /* 行の高さを詰める */
     z-index: 10;
     margin-bottom: 10px;
     display: none;
@@ -94,14 +115,14 @@ h1 {
 
 input {
     width: 100%;
-    padding: 14px; 
+    padding: 14px;
     margin-bottom: 15px;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-sizing: border-box;
-    font-size: 16px; 
+    font-size: 16px;
     transition: all 0.3s;
-    -webkit-appearance: none; 
+    -webkit-appearance: none;
 }
 
 input:focus {
@@ -116,8 +137,14 @@ input:focus {
     font-size: 14px;
     font-weight: bold;
 }
-.success { color: #28a745; }
-.error { color: #dc3545; }
+
+.success {
+    color: #28a745;
+}
+
+.error {
+    color: #dc3545;
+}
 
 button {
     width: 100%;
@@ -144,5 +171,10 @@ button {
     margin-top: 15px;
 }
 
-button:hover { opacity: 0.8; }
-button:active { transform: scale(0.98); }
+button:hover {
+    opacity: 0.8;
+}
+
+button:active {
+    transform: scale(0.98);
+}

@@ -1,29 +1,36 @@
-<!DOCTYPE html>  
+<!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ログイン - 平工マッチング</title>
     <link rel="stylesheet" href="index-style.css">
-    
+
     <style>
         /* スマホでの表示崩れ（左ずれ）修正スタイル */
-        
+
         /* 画面幅が 480px 以下（一般的なスマホ）の時に適用 */
         @media screen and (max-width: 480px) {
+
             /* 全体を囲むコンテナの余白を少し狭くして、はみ出しを防止 */
             .login-container {
                 padding: 10px;
-                box-sizing: border-box; /* paddingを横幅の計算に含める設定 */
+                box-sizing: border-box;
+                /* paddingを横幅の計算に含める設定 */
             }
 
             /* スマホ時における白いカード自体の設定 */
             .login-card {
-                width: 100% !important; /* 横幅を画面幅いっぱいに指定 */
+                width: 100% !important;
+                /* 横幅を画面幅いっぱいに指定 */
                 max-width: 100% !important;
-                padding: 30px 20px !important; /* 内側の左右余白をスマホ向けに最適化 */
-                margin: 0 auto !important; /* 左右の余白を自動調整し、完全に中央配置 */
-                box-sizing: border-box !important; /* paddingが外側に飛び出すのを防止 */
+                padding: 30px 20px !important;
+                /* 内側の左右余白をスマホ向けに最適化 */
+                margin: 0 auto !important;
+                /* 左右の余白を自動調整し、完全に中央配置 */
+                box-sizing: border-box !important;
+                /* paddingが外側に飛び出すのを防止 */
                 border-radius: 12px;
             }
 
@@ -36,12 +43,14 @@
             /* 入力欄のデザイン調整 */
             .input-group input {
                 padding: 12px 15px !important;
-                font-size: 16px !important; /* スマホで入力しやすい文字サイズ */
+                font-size: 16px !important;
+                /* スマホで入力しやすい文字サイズ */
                 border-radius: 8px !important;
             }
 
             /* ボタンのデザイン調整 */
-            .btn-primary, .btn-flat {
+            .btn-primary,
+            .btn-flat {
                 padding: 12px !important;
                 font-size: 16px !important;
                 border-radius: 8px !important;
@@ -49,98 +58,104 @@
         }
     </style>
 </head>
+
 <body>
-<div class="login-container">
-    <div class="login-card">
-        <h1 id="form-title">ログイン</h1>
+    <div class="login-container">
+        <div class="login-card">
+            <h1 id="form-title">ログイン</h1>
 
-        <div class="input-group">
-            <input type="text" id="email" placeholder="ユーザID" inputmode="email" onkeypress="handleKeyPress(event)">
+            <div class="input-group">
+                <input type="text" id="email" placeholder="ユーザID" inputmode="email" onkeypress="handleKeyPress(event)">
 
-            <div class="password-wrapper">
-                <input type="password" id="password" placeholder="パスワード" class="password-input" onkeypress="handleKeyPress(event)">
-                <button type="button" id="toggle-password" onclick="togglePasswordVisibility()" class="toggle-password-btn" >表示</button>
-            </div>    
-            <div class="confirm-password-wrapper">
-                <input type="password" id="confirm-password" placeholder="Confirm Password" class="confirm-password-input" onkeypress="handleKeyPress(event)">
-                <button type="button" id="toggle-confirm" onclick="toggleconfirmVisibility()" class="toggle-confirm-btn" >表示</button>
-            </div>
-            <p id="message" class="message"></p>
-            <div class="button-group">
-                <div id="login-section">
-                    <button class="btn-primary" onclick="handleLogin()">ログイン</button>
-                    <button class="btn-flat" onclick="toggleMode('register')">新規登録はこちら</button>
+                <div class="password-wrapper">
+                    <input type="password" id="password" placeholder="パスワード" class="password-input"
+                        onkeypress="handleKeyPress(event)">
+                    <button type="button" id="toggle-password" onclick="togglePasswordVisibility()"
+                        class="toggle-password-btn">表示</button>
                 </div>
-                <div id="register-section" style="display: none;">
-                    <button class="btn-primary" onclick="handleRegister()">アカウント作成</button>
-                    <button class="btn-flat" onclick="toggleMode('login')">ログインに戻る</button>
+                <div class="confirm-password-wrapper">
+                    <input type="password" id="confirm-password" placeholder="Confirm Password"
+                        class="confirm-password-input" onkeypress="handleKeyPress(event)">
+                    <button type="button" id="toggle-confirm" onclick="toggleconfirmVisibility()"
+                        class="toggle-confirm-btn">表示</button>
+                </div>
+                <p id="message" class="message"></p>
+                <div class="button-group">
+                    <div id="login-section">
+                        <button class="btn-primary" onclick="handleLogin()">ログイン</button>
+                        <button class="btn-flat" onclick="toggleMode('register')">新規登録はこちら</button>
+                    </div>
+                    <div id="register-section" style="display: none;">
+                        <button class="btn-primary" onclick="handleRegister()">アカウント作成</button>
+                        <button class="btn-flat" onclick="toggleMode('login')">ログインに戻る</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 
-<script>
-    // これらの関数は通常 index-script.js に記述されますが、
-    // 今回の変更を index.html だけで完結させるため、ここに記述しています。
+    <script>
+        // これらの関数は通常 index-script.js に記述されますが、
+        // 今回の変更を index.html だけで完結させるため、ここに記述しています。
 
-    function handleLogin() {
-        // 実際のログイン処理をここに記述します
-        console.log("ログインボタンが押されました (Enterキー)");
-        alert("ログイン処理を実行します。");
-        // 例: ログイン成功後にホーム画面へ遷移
-        // window.location.href = "home.html";
-    }
-
-    function handleRegister() {
-        // 実際のアカウント作成処理をここに記述します
-        console.error("アカウント作成ボタンが押されました (Enterキー)");
-        alert("アカウント作成処理を実行します。");
-        // 例: アカウント作成成功後にログイン画面へ戻る
-        // toggleMode('login');
-    }
-
-    function toggleMode(mode) {
-        const formTitle = document.getElementById("form-title");
-        const loginSection = document.getElementById("login-section");
-        const registerSection = document.getElementById("register-section");
-        const confirmPasswordWrapper = document.querySelector(".confirm-password-wrapper");
-        const confirmPasswordInput = document.getElementById("confirm-password");
-        const toggleConfirmBtn = document.getElementById("toggle-confirm");
-
-        if (mode === 'register') {
-            formTitle.innerText = "新規登録";
-            loginSection.style.display = "none";
-            registerSection.style.display = "block";
-            confirmPasswordWrapper.style.display = "block";
-            confirmPasswordInput.style.display = "block";
-            toggleConfirmBtn.style.display = "block";
-        } else {
-            formTitle.innerText = "ログイン";
-            loginSection.style.display = "block";
-            registerSection.style.display = "none";
-            confirmPasswordWrapper.style.display = "none";
-            confirmPasswordInput.style.display = "none";
-            toggleConfirmBtn.style.display = "none";
+        function handleLogin() {
+            // 実際のログイン処理をここに記述します
+            console.log("ログインボタンが押されました (Enterキー)");
+            alert("ログイン処理を実行します。");
+            // 例: ログイン成功後にホーム画面へ遷移
+            // window.location.href = "home.html";
         }
-    }
 
-    function handleKeyPress(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Enterキーによるフォームの自動送信を防止
+        function handleRegister() {
+            // 実際のアカウント作成処理をここに記述します
+            console.error("アカウント作成ボタンが押されました (Enterキー)");
+            alert("アカウント作成処理を実行します。");
+            // 例: アカウント作成成功後にログイン画面へ戻る
+            // toggleMode('login');
+        }
 
+        function toggleMode(mode) {
+            const formTitle = document.getElementById("form-title");
             const loginSection = document.getElementById("login-section");
             const registerSection = document.getElementById("register-section");
+            const confirmPasswordWrapper = document.querySelector(".confirm-password-wrapper");
+            const confirmPasswordInput = document.getElementById("confirm-password");
+            const toggleConfirmBtn = document.getElementById("toggle-confirm");
 
-            if (loginSection.style.display !== "none") {
-                handleLogin();
-            } else if (registerSection.style.display !== "none") {
-                handleRegister();
+            if (mode === 'register') {
+                formTitle.innerText = "新規登録";
+                loginSection.style.display = "none";
+                registerSection.style.display = "block";
+                confirmPasswordWrapper.style.display = "block";
+                confirmPasswordInput.style.display = "block";
+                toggleConfirmBtn.style.display = "block";
+            } else {
+                formTitle.innerText = "ログイン";
+                loginSection.style.display = "block";
+                registerSection.style.display = "none";
+                confirmPasswordWrapper.style.display = "none";
+                confirmPasswordInput.style.display = "none";
+                toggleConfirmBtn.style.display = "none";
             }
         }
-    }
-</script>
-<script src="index-script.js"></script>
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Enterキーによるフォームの自動送信を防止
+
+                const loginSection = document.getElementById("login-section");
+                const registerSection = document.getElementById("register-section");
+
+                if (loginSection.style.display !== "none") {
+                    handleLogin();
+                } else if (registerSection.style.display !== "none") {
+                    handleRegister();
+                }
+            }
+        }
+    </script>
+    <script src="index-script.js"></script>
 </body>
+
 </html>

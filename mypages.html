@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +8,10 @@
     <link rel="stylesheet" href="home-style.css">
     <style>
         /* ========================================================
-           📱 レスポンシブ & ハンバーガーメニュー追加スタイル
+           レスポンシブ & 3本線追加スタイル
         ======================================================== */
-        
-        /* 🍔 通常時（PC）は3本線ボタンを隠す */
+
+        /* 通常時（PC）は3本線ボタンを隠す */
         .menu-toggle {
             display: none;
             flex-direction: column;
@@ -21,7 +22,8 @@
             border: none;
             cursor: pointer;
             padding: 0;
-            z-index: 110; /* メニューより前面に */
+            z-index: 110;
+            /* メニューより前面に */
         }
 
         /* 3本線の棒のデザイン */
@@ -30,36 +32,42 @@
             height: 3px;
             background-color: #333;
             border-radius: 3px;
-            transition: all 0.3s ease; /* ❌から3本線に戻る時のモーション */
+            transition: all 0.3s ease;
+            /*3本線に戻る時のモーション */
         }
 
         /* デバイスの画面幅やアスペクト比に応じたスタイル調整 */
         @media screen and (max-width: 768px) {
+
             /* スマホ・タブレット等の縦長画面では横並びを解除して縦並びに */
             .container {
                 flex-direction: column !important;
                 display: flex;
                 padding: 10px;
-                box-sizing: border-box; /* 🌟はみ出し防止 */
+                box-sizing: border-box;
+                /* 🌟はみ出し防止 */
             }
 
-            /* 🍔 スマホ画面の時だけ3本線ボタンを表示 */
+            /*スマホ画面の時だけ3本線ボタンを表示 */
             .menu-toggle {
                 display: flex;
             }
 
-            /* 📱 スマホ時のナビゲーションリンクを「隠しバナー」にする */
+            /*スマホ時のナビゲーションリンクを「隠しバナー」にする */
             .nav-links {
                 position: fixed;
-                top: -100%; /* 初期状態は画面の上に隠しておく */
+                top: -100%;
+                /* 初期状態は画面の上に隠しておく */
                 left: 0;
                 width: 100%;
                 background: rgba(255, 255, 255, 0.98);
-                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
                 flex-direction: column;
-                padding: 80px 0 30px 0; /* ヘッダーと被らないように上をあける */
+                padding: 80px 0 30px 0;
+                /* ヘッダーと被らないように上をあける */
                 gap: 20px;
-                transition: top 0.4s cubic-bezier(0.25, 1, 0.5, 1); /* スッと滑らかに降りてくるモーション */
+                transition: top 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+                /* スッと滑らかに降りてくるモーション */
                 z-index: 100;
             }
 
@@ -69,7 +77,8 @@
             }
 
             .nav-item {
-                margin-right: 0 !important; /* 横の余白をリセット */
+                margin-right: 0 !important;
+                /* 横の余白をリセット */
                 font-size: 18px;
                 padding: 10px 0;
                 width: 100%;
@@ -83,37 +92,46 @@
                 padding: 12px 0;
             }
 
-            /* 3本線ボタンが押された時の「❌」変形モーション */
+            /* 3本線ボタンが押された時の変形モーション */
             .menu-toggle.active span:nth-child(1) {
                 transform: translateY(9px) rotate(45deg);
             }
+
             .menu-toggle.active span:nth-child(2) {
                 opacity: 0;
             }
+
             .menu-toggle.active span:nth-child(3) {
                 transform: translateY(-9px) rotate(-45deg);
             }
-            
+
             /* 🌟【超重要：はみ出し修正】スマホ時にカードサイズと余白を画面幅にぴったり合わせる */
             .profile-card {
                 margin: 20px auto !important;
-                padding: 40px 20px !important; /* 内側の左右余白を50pxから20pxに狭めてはみ出しを防ぐ */
+                padding: 40px 20px !important;
+                /* 内側の左右余白を50pxから20pxに狭めてはみ出しを防ぐ */
                 width: 100% !important;
                 max-width: 100% !important;
-                box-sizing: border-box !important; /* paddingが外側に飛び出すのを防ぐおまけ */
+                box-sizing: border-box !important;
+                /* paddingが外側に飛び出すのを防ぐおまけ */
             }
 
             /* 🌟【超重要：はみ出し修正】入力欄やボタンの文字が大きすぎてはみ出さないように微調整 */
             .input-large {
-                font-size: 16px !important; /* 20pxから16pxに調整（スマホでの入力に最適） */
+                font-size: 16px !important;
+                /* 20pxから16pxに調整（スマホでの入力に最適） */
                 padding: 12px !important;
             }
+
             .btn-large {
-                font-size: 18px !important; /* 22pxから18pxに調整 */
+                font-size: 18px !important;
+                /* 22pxから18pxに調整 */
                 padding: 14px 0 !important;
             }
+
             .profile-card h2 {
-                font-size: 24px !important; /* 32pxから24pxに調整 */
+                font-size: 24px !important;
+                /* 32pxから24pxに調整 */
                 margin-bottom: 25px !important;
             }
         }
@@ -170,7 +188,8 @@
             transform: translateY(-1px);
         }
 
-        .btn-select-image:active, .btn-delete-image:active {
+        .btn-select-image:active,
+        .btn-delete-image:active {
             transform: translateY(1px);
         }
     </style>
@@ -179,7 +198,7 @@
 <body>
     <header class="navbar">
         <div class="logo" onclick="location.href='home.html'">平工マッチング</div>
-        
+
         <button class="menu-toggle" id="menu-toggle" onclick="toggleMenu()">
             <span></span>
             <span></span>
@@ -193,107 +212,102 @@
             <button class="btn-logout" onclick="logout()">ログアウト</button>
         </div>
     </header>
-    
+
     <main class="container">
         <div class="profile-card">
             <h2>プロフィール設定</h2>
-            
+
             <div class="mypage-area">
                 <label>プロフィール画像</label>
-                
+
                 <div style="margin: 20px 0;">
-                    <img id="profile-icon"
-                         class="big-profile-icon2"
-                         src=""
-                         alt="icon"
-                         style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; cursor: pointer; margin: 0 auto; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                    <img id="profile-icon" class="big-profile-icon2" src="" alt="icon"
+                        style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; cursor: pointer; margin: 0 auto; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
                 </div>
 
                 <div class="image-action-container">
                     <label for="profile-image" class="btn-select-image">
-                         画像を選択する
+                        画像を選択する
                     </label>
                     <button type="button" class="btn-delete-image" onclick="deleteImage()">
-                         画像を削除する
+                        画像を削除する
                     </button>
-                    <input type="file"
-                           id="profile-image"
-                           accept="image/*"
-                           style="display: none;"
-                           onchange="autoSaveImage()">
+                    <input type="file" id="profile-image" accept="image/*" style="display: none;"
+                        onchange="autoSaveImage()">
                 </div>
-                       
+
                 <input type="text" id="rec-name" class="input-large" placeholder="名前を入力してください">
                 <button class="btn-large" onclick="saveProfile()">保存する</button>
             </div>
         </div>
     </main>
 
-<script>
-    function toggleMenu() {
-        document.getElementById("menu-toggle").classList.toggle("active");
-        document.getElementById("nav-links").classList.toggle("active");
-    }
-
-    window.onload = () => { 
-        document.getElementById("rec-name").value = localStorage.getItem("userName") || ""; 
-
-        const profileImage = localStorage.getItem("profileImage");
-        const profileIconEl = document.getElementById("profile-icon");
-
-        if (profileImage) {
-            profileIconEl.src = profileImage;
-        } else {
-            profileIconEl.src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+    <script>
+        function toggleMenu() {
+            document.getElementById("menu-toggle").classList.toggle("active");
+            document.getElementById("nav-links").classList.toggle("active");
         }
-    };   
-        
-    function autoSaveImage() {
-        const file = document.getElementById("profile-image").files[0];
-        
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                localStorage.setItem("profileImage", e.target.result);
-                document.getElementById("profile-icon").src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+
+        window.onload = () => {
+            document.getElementById("rec-name").value = localStorage.getItem("userName") || "";
+
+            const profileImage = localStorage.getItem("profileImage");
+            const profileIconEl = document.getElementById("profile-icon");
+
+            if (profileImage) {
+                profileIconEl.src = profileImage;
+            } else {
+                profileIconEl.src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+            }
+        };
+
+        function autoSaveImage() {
+            const file = document.getElementById("profile-image").files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    localStorage.setItem("profileImage", e.target.result);
+                    document.getElementById("profile-icon").src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
         }
-    }
 
-    function deleteImage() {
-        localStorage.removeItem("profileImage");
-        document.getElementById("profile-icon").src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-        document.getElementById("profile-image").value = "";
-    }
+        function deleteImage() {
+            localStorage.removeItem("profileImage");
+            document.getElementById("profile-icon").src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+            document.getElementById("profile-image").value = "";
+        }
 
-    function saveProfile() {
-        const name = document.getElementById("rec-name").value;
-        if(!name) return alert("名前を入力してください");
-        localStorage.setItem("userName", name);
+        function saveProfile() {
+            const name = document.getElementById("rec-name").value;
+            if (!name) return alert("名前を入力してください");
+            localStorage.setItem("userName", name);
 
-        const file = document.getElementById("profile-image").files[0];
-        if(file){
-            const reader = new FileReader();
-            reader.onload = function(e){
-                localStorage.setItem("profileImage", e.target.result);
+            const file = document.getElementById("profile-image").files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    localStorage.setItem("profileImage", e.target.result);
+                    finishSave();
+                };
+                reader.readAsDataURL(file);
+            } else {
                 finishSave();
-            };
-            reader.readAsDataURL(file);
-        } else {
-            finishSave();
+            }
         }
-    }
 
-    function finishSave(){
-        alert("保存しました");
-        location.href = 'home.html';
-    }
+        function finishSave() {
+            alert("保存しました");
+            location.href = 'home.html';
+        }
 
-    function logout() {
-        localStorage.clear();
-        window.location.href = "index.html";
-    }
-</script>
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+    </script>
 </body>
+
 </html>
