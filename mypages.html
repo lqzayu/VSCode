@@ -8,10 +8,9 @@
     <link rel="stylesheet" href="home-style.css">
     <style>
         /* ========================================================
-           レスポンシブ & 3本線追加スタイル
+           レスポンシブ & ハンバーガーメニュー追加スタイル
         ======================================================== */
 
-        /* 通常時（PC）は3本線ボタンを隠す */
         .menu-toggle {
             display: none;
             flex-direction: column;
@@ -23,62 +22,92 @@
             cursor: pointer;
             padding: 0;
             z-index: 110;
-            /* メニューより前面に */
         }
 
-        /* 3本線の棒のデザイン */
         .menu-toggle span {
             width: 100%;
             height: 3px;
             background-color: #333;
             border-radius: 3px;
             transition: all 0.3s ease;
-            /*3本線に戻る時のモーション */
         }
 
-        /* デバイスの画面幅やアスペクト比に応じたスタイル調整 */
-        @media screen and (max-width: 768px) {
+        /* 画像操作ボタンの共通スタイル（サイズ拡大とフォントバランス調整） */
+        .profile-img-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 160px;
+            /* 140px から 160px に拡大 */
+            height: 52px;
+            /* 45px から 52px に拡大し、より押しやすく */
+            border-radius: 8px;
+            /* 大きさに合わせて角丸を少し滑らかに */
+            font-size: 16px;
+            /* 文字サイズを 14px から 16px に上げて視認性を向上 */
+            font-weight: bold;
+            cursor: pointer;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+            text-align: center;
+            margin: 0 8px;
+            /* ボタン間の隙間を少し広げて調整 */
+        }
 
-            /* スマホ・タブレット等の縦長画面では横並びを解除して縦並びに */
+        /* 画像選択ボタン専用（ミントグリーンの枠線） */
+        .btn-select-label {
+            background-color: #f5f5f5;
+            color: #1cbdc5;
+            border: 2px solid #1cbdc5;
+        }
+
+        .btn-select-label:hover {
+            background-color: #e6f9fa;
+        }
+
+        /* 画像削除ボタン専用（赤色の枠線） */
+        .btn-delete-action {
+            background-color: #f5f5f5;
+            color: #ff4d4d;
+            border: 2px solid #ff4d4d;
+        }
+
+        .btn-delete-action:hover {
+            background-color: #fff5f5;
+        }
+
+        @media screen and (max-width: 768px) {
             .container {
                 flex-direction: column !important;
                 display: flex;
                 padding: 10px;
                 box-sizing: border-box;
-                /* 🌟はみ出し防止 */
             }
 
-            /*スマホ画面の時だけ3本線ボタンを表示 */
             .menu-toggle {
                 display: flex;
             }
 
-            /*スマホ時のナビゲーションリンクを「隠しバナー」にする */
             .nav-links {
                 position: fixed;
                 top: -100%;
-                /* 初期状態は画面の上に隠しておく */
                 left: 0;
                 width: 100%;
                 background: rgba(255, 255, 255, 0.98);
                 box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
                 flex-direction: column;
                 padding: 80px 0 30px 0;
-                /* ヘッダーと被らないように上をあける */
                 gap: 20px;
                 transition: top 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-                /* スッと滑らかに降りてくるモーション */
                 z-index: 100;
             }
 
-            /* メニューが開いた（activeクラスがついた）時の設定 */
             .nav-links.active {
                 top: 0;
             }
 
             .nav-item {
                 margin-right: 0 !important;
-                /* 横の余白をリセット */
                 font-size: 18px;
                 padding: 10px 0;
                 width: 100%;
@@ -92,7 +121,6 @@
                 padding: 12px 0;
             }
 
-            /* 3本線ボタンが押された時の変形モーション */
             .menu-toggle.active span:nth-child(1) {
                 transform: translateY(9px) rotate(45deg);
             }
@@ -105,92 +133,44 @@
                 transform: translateY(-9px) rotate(-45deg);
             }
 
-            /* 🌟【超重要：はみ出し修正】スマホ時にカードサイズと余白を画面幅にぴったり合わせる */
             .profile-card {
                 margin: 20px auto !important;
                 padding: 40px 20px !important;
-                /* 内側の左右余白を50pxから20pxに狭めてはみ出しを防ぐ */
                 width: 100% !important;
                 max-width: 100% !important;
                 box-sizing: border-box !important;
-                /* paddingが外側に飛び出すのを防ぐおまけ */
             }
 
-            /* 🌟【超重要：はみ出し修正】入力欄やボタンの文字が大きすぎてはみ出さないように微調整 */
             .input-large {
                 font-size: 16px !important;
-                /* 20pxから16pxに調整（スマホでの入力に最適） */
                 padding: 12px !important;
             }
 
             .btn-large {
                 font-size: 18px !important;
-                /* 22pxから18pxに調整 */
                 padding: 14px 0 !important;
             }
 
             .profile-card h2 {
                 font-size: 24px !important;
-                /* 32pxから24pxに調整 */
                 margin-bottom: 25px !important;
             }
-        }
 
-        /* 📸 画像選択・削除ボタンのスタイル */
-        .image-action-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
-            margin: 25px auto;
-            flex-wrap: wrap;
-        }
+            /* スマホ環境でボタンが画面幅に収まるよう自動調整するコンテナ */
+            .profile-btn-group {
+                display: flex;
+                justify-content: center;
+                width: 100%;
+            }
 
-        .btn-select-image {
-            display: inline-block;
-            padding: 12px 24px;
-            background-color: #f5f5f5;
-            color: #1cbdc5;
-            border: 1px solid #1cbdc5;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.2s ease;
-            text-align: center;
-        }
-
-        .btn-select-image:hover {
-            background-color: #1cbdc5;
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.2);
-            transform: translateY(-1px);
-        }
-
-        .btn-delete-image {
-            display: inline-block;
-            padding: 12px 24px;
-            background-color: #fff5f5;
-            color: #e55353;
-            border: 1px solid #e55353;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.2s ease;
-            text-align: center;
-        }
-
-        .btn-delete-image:hover {
-            background-color: #e55353;
-            color: #ffffff;
-            box-shadow: 0 4px 12px rgba(229, 83, 83, 0.2);
-            transform: translateY(-1px);
-        }
-
-        .btn-select-image:active,
-        .btn-delete-image:active {
-            transform: translateY(1px);
+            /* 横幅が非常に狭いスマホでも並びが崩れないよう調整 */
+            .profile-img-btn {
+                width: 45% !important;
+                /* スマホ時は画面幅に応じた比率に可変 */
+                max-width: 160px;
+                margin: 0 4px;
+                font-size: 15px !important;
+            }
         }
     </style>
 </head>
@@ -225,15 +205,17 @@
                         style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; cursor: pointer; margin: 0 auto; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
                 </div>
 
-                <div class="image-action-container">
-                    <label for="profile-image" class="btn-select-image">
-                        画像を選択する
+                <div class="profile-btn-group"
+                    style="margin: 25px auto; display: flex; justify-content: center; align-items: center;">
+                    <label for="profile-image" class="profile-img-btn btn-select-label">
+                        画像を選択
                     </label>
-                    <button type="button" class="btn-delete-image" onclick="deleteImage()">
-                        画像を削除する
-                    </button>
                     <input type="file" id="profile-image" accept="image/*" style="display: none;"
                         onchange="autoSaveImage()">
+
+                    <button type="button" class="profile-img-btn btn-delete-action" onclick="clearProfileImage()">
+                        画像を削除
+                    </button>
                 </div>
 
                 <input type="text" id="rec-name" class="input-large" placeholder="名前を入力してください">
@@ -274,10 +256,14 @@
             }
         }
 
-        function deleteImage() {
+        function clearProfileImage() {
+            if (!confirm("プロフィール画像を削除して初期アイコンに戻しますか？")) return;
+
             localStorage.removeItem("profileImage");
             document.getElementById("profile-icon").src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
             document.getElementById("profile-image").value = "";
+
+            alert("画像を削除しました。変更を確定するには保存ボタンを押してください。");
         }
 
         function saveProfile() {
