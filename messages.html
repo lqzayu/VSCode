@@ -8,7 +8,7 @@
 
     <style>
         /* =====================================
-           ページ全体の基本スタイル（共通化）
+           ページ全体の基本スタイル
         ===================================== */
         body {
             margin: 0;
@@ -32,8 +32,6 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            flex-wrap: wrap;
-            gap: 10px;
         }
 
         .logo {
@@ -46,11 +44,10 @@
         .nav-links {
             display: flex;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
         }
 
         .nav-item {
+            margin-right: 20px;
             cursor: pointer;
             color: #666;
             font-weight: bold;
@@ -73,8 +70,32 @@
             background-color: #ff0000;
         }
 
+        /* ========================================================
+           ハンバーガーボタンの設定
+        ======================================================== */
+        .hamburger-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 21px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 110;
+        }
+
+        .hamburger-btn span {
+            width: 100%;
+            height: 3px;
+            background-color: #333;
+            border-radius: 3px;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
         /* =====================================
-           メッセージ画面専用コンテンツレイアウト
+           メッセージ専用レイアウト
         ===================================== */
         .container {
             flex: 1;
@@ -103,7 +124,6 @@
             padding-left: 10px;
         }
 
-        /* チャット相手リストのアイテム */
         .partner-item {
             display: flex;
             align-items: center;
@@ -120,7 +140,6 @@
             border-color: #1cbdc5;
             background-color: #ffffff;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.08);
         }
 
         .partner-info {
@@ -149,7 +168,6 @@
             font-size: 14px;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.2s;
         }
 
         .btn-chat-open:hover {
@@ -160,13 +178,9 @@
             text-align: center;
             color: #666;
             font-size: 14px;
-            line-height: 1.6;
             padding: 40px 0;
         }
 
-        /* =====================================
-           フッターのスタイル
-        ===================================== */
         .footer {
             background-color: #ffffff;
             border-top: 1px solid rgba(0, 0, 0, 0.05);
@@ -204,6 +218,9 @@
             margin: 0;
         }
 
+        /* =====================================
+           📱 スマホ・縦長画面用の安定表示
+        ===================================== */
         @media screen and (max-width: 768px) {
             .container {
                 margin: 20px auto;
@@ -212,6 +229,63 @@
 
             .chat-list-card {
                 padding: 20px;
+            }
+
+            .hamburger-btn {
+                display: flex !important;
+            }
+
+            .nav-links {
+                position: fixed !important;
+                top: 56px !important;
+                left: 0 !important;
+                width: 100% !important;
+                background: rgba(255, 255, 255, 0.98) !important;
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+                flex-direction: column !important;
+                padding: 20px 0 !important;
+                gap: 15px !important;
+                z-index: 99 !important;
+
+                opacity: 0 !important;
+                pointer-events: none !important;
+                transform: translateY(-10px) !important;
+                transition: transform 0.3s ease, opacity 0.3s ease !important;
+            }
+
+            .nav-links.open {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                transform: translateY(0) !important;
+            }
+
+            .nav-item {
+                margin-right: 0 !important;
+                font-size: 18px !important;
+                padding: 10px 0 !important;
+                width: 100% !important;
+                text-align: center !important;
+            }
+
+            .btn-logout {
+                margin-top: 10px !important;
+                width: 80% !important;
+                text-align: center !important;
+                padding: 12px 0 !important;
+                margin: 0 auto !important;
+            }
+
+            .hamburger-btn.open span:nth-child(1) {
+                transform: translateY(9px) rotate(45deg) !important;
+            }
+
+            .hamburger-btn.open span:nth-child(2) {
+                opacity: 0 !important;
+                transform: scale(0) !important;
+            }
+
+            .hamburger-btn.open span:nth-child(3) {
+                transform: translateY(-9px) rotate(-45deg) !important;
             }
         }
     </style>
@@ -222,7 +296,14 @@
     <header class="navbar">
         <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
 
-        <nav class="nav-links">
+        <!-- 3本線ボタン -->
+        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <nav class="nav-links" id="nav-links">
             <a class="nav-item" href="main.html">ホーム</a>
             <a class="nav-item active" href="messages.html">メッセージ</a>
             <a class="nav-item" href="profile.html">マイページ</a>
@@ -250,6 +331,16 @@
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwITrmNEOqPX9Xe59kAN7gEeyz4R3RocqhC4H6P27n66TS5oWsTQdhyCo1-gl8trb5F/exec";
+
+        function toggleMenu() {
+            document.getElementById("hud-menu-btn").classList.toggle("open");
+            document.getElementById("nav-links").classList.toggle("open");
+        }
+
+        function closeMenu() {
+            document.getElementById("hud-menu-btn").classList.remove("open");
+            document.getElementById("nav-links").classList.remove("open");
+        }
 
         async function loadChatPartners() {
             const myEmail = localStorage.getItem("userEmail");
@@ -298,7 +389,6 @@
 
         function openChat(email) {
             localStorage.setItem("chatTarget", email);
-            // 個別のトークルーム画面がある場合はそのファイル名（例: chat.html など）に変えてください
             location.href = 'chat.html';
         }
 
@@ -308,6 +398,8 @@
         }
 
         window.onload = () => {
+            document.getElementById("hud-menu-btn").classList.remove("open");
+            document.getElementById("nav-links").classList.remove("open");
             loadChatPartners();
         };
     </script>

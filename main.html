@@ -32,9 +32,6 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            flex-wrap: wrap;
-            /* 画面が極端に狭い時にロゴとメニューを折り返す */
-            gap: 10px;
         }
 
         .logo {
@@ -44,15 +41,13 @@
             cursor: pointer;
         }
 
-        /* 常に表示されるナビゲーションリンク */
         .nav-links {
             display: flex;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
         }
 
         .nav-item {
+            margin-right: 20px;
             cursor: pointer;
             color: #666;
             font-weight: bold;
@@ -73,6 +68,30 @@
             cursor: pointer;
             color: #ffffff;
             background-color: #ff0000;
+        }
+
+        /* ========================================================
+           🌟 3本線ハンバーガーボタン（アニメーション対応）
+        ======================================================== */
+        .hamburger-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 21px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 110;
+        }
+
+        .hamburger-btn span {
+            width: 100%;
+            height: 3px;
+            background-color: #333;
+            border-radius: 3px;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         /* =====================================
@@ -317,7 +336,9 @@
             margin: 0;
         }
 
-        /* 画面幅が狭いスマホの時はコンテンツを縦並びにするだけの最低限の設定 */
+        /* ========================================================
+           📱 スマホ・縦長画面用の表示切り替え定義（ぼかしバグ完全回避）
+        ======================================================== */
         @media screen and (max-width: 768px) {
             .container {
                 flex-direction: column;
@@ -326,6 +347,68 @@
 
             .sidebar {
                 width: 100%;
+            }
+
+            .hamburger-btn {
+                display: flex !important;
+            }
+
+            /* 🌟初期状態：opacity: 0 と pointer-events: none で、画面上に残さず完璧に隠蔽（出っ放しを完全阻止） */
+            .nav-links {
+                position: fixed !important;
+                top: 56px !important;
+                /* ヘッダーの高さの直下 */
+                left: 0 !important;
+                width: 100% !important;
+                background: rgba(255, 255, 255, 0.98) !important;
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+                flex-direction: column !important;
+                padding: 20px 0 !important;
+                gap: 15px !important;
+                z-index: 99 !important;
+
+                /* アニメーション用の初期設定 */
+                opacity: 0 !important;
+                pointer-events: none !important;
+                transform: translateY(-10px) !important;
+                transition: transform 0.3s ease, opacity 0.3s ease !important;
+            }
+
+            /* 🌟 openクラスがついた時：ふわっとフェードイン＆クリック有効化 */
+            .nav-links.open {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                transform: translateY(0) !important;
+            }
+
+            .nav-item {
+                margin-right: 0 !important;
+                font-size: 18px !important;
+                padding: 10px 0 !important;
+                width: 100% !important;
+                text-align: center !important;
+            }
+
+            .btn-logout {
+                margin-top: 10px !important;
+                width: 80% !important;
+                text-align: center !important;
+                padding: 12px 0 !important;
+                margin: 0 auto !important;
+            }
+
+            /* 🌟 クルッと回る3本線 ➔ ×マークのアニメーション */
+            .hamburger-btn.open span:nth-child(1) {
+                transform: translateY(9px) rotate(45deg) !important;
+            }
+
+            .hamburger-btn.open span:nth-child(2) {
+                opacity: 0 !important;
+                transform: scale(0) !important;
+            }
+
+            .hamburger-btn.open span:nth-child(3) {
+                transform: translateY(-9px) rotate(-45deg) !important;
             }
         }
     </style>
@@ -336,10 +419,16 @@
     <header class="navbar">
         <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
 
-        <!-- メニューは常に横並びで表示（3本線ボタンは削除） -->
-        <nav class="nav-links">
-            <span class="nav-item" id="tab-recruit-btn" onclick="switchTab('recruit')">募集投稿</span>
-            <span class="nav-item active" id="tab-search-btn" onclick="switchTab('search')">ユーザーを探す</span>
+        <!-- 3本線ボタン -->
+        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <nav class="nav-links" id="nav-links">
+            <span class="nav-item" id="tab-recruit-btn" onclick="switchTab('recruit'); closeMenu();">募集投稿</span>
+            <span class="nav-item active" id="tab-search-btn" onclick="switchTab('search'); closeMenu();">ユーザーを探す</span>
             <span class="nav-item" onclick="location.href='messages.html'">メッセージ</span>
             <span class="nav-item" onclick="location.href='profile.html'">マイページ</span>
             <button class="btn-logout" onclick="logout()">ログアウト</button>
@@ -364,7 +453,6 @@
             </div>
         </div>
 
-        <!-- メインコンテンツ -->
         <div class="main-area">
             <section id="recruit-form-area" style="display: none;">
                 <div class="sidebar-form">
@@ -419,7 +507,15 @@
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwITrmNEOqPX9Xe59kAN7gEeyz4R3RocqhC4H6P27n66TS5oWsTQdhyCo1-gl8trb5F/exec";
 
-        // メニューの開閉に関するJS（toggleMenu, closeMenu）はすべて削除
+        function toggleMenu() {
+            document.getElementById("hud-menu-btn").classList.toggle("open");
+            document.getElementById("nav-links").classList.toggle("open");
+        }
+
+        function closeMenu() {
+            document.getElementById("hud-menu-btn").classList.remove("open");
+            document.getElementById("nav-links").classList.remove("open");
+        }
 
         function switchTab(mode) {
             document.getElementById("recruit-form-area").style.display = (mode === 'recruit') ? "block" : "none";
@@ -535,6 +631,9 @@
         }
 
         window.onload = () => {
+            document.getElementById("hud-menu-btn").classList.remove("open");
+            document.getElementById("nav-links").classList.remove("open");
+
             const userName = localStorage.getItem("userName");
             const profileImage = localStorage.getItem("profileImage");
             document.getElementById("mypage-text").innerText = userName || "マイページ";
