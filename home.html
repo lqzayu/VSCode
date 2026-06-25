@@ -5,15 +5,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ホーム - 平工マッチング</title>
-    <link rel="stylesheet" href="home-style.css">
 
     <style>
-        /* ========================================================
-           レスポンシブ & ３本線スタイル（修正安定版）
-        ======================================================== */
+        /* =====================================
+           ページ全体の基本スタイル
+        ===================================== */
+        body {
+            margin: 0;
+            background-color: #f8fafc;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
-        /* 通常時（PC）は3本線ボタンを隠す */
-        .menu-toggle {
+        .navbar {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 10px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1cbdc5;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-item {
+            margin-right: 20px;
+            cursor: pointer;
+            color: #666;
+            font-weight: bold;
+            padding: 5px 0;
+        }
+
+        .nav-item.active {
+            color: #1cbdc5;
+            border-bottom: 2px solid #1cbdc5;
+        }
+
+        .btn-logout {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background: none;
+            cursor: pointer;
+            color: #ffffff;
+            background-color: #ff0000;
+        }
+
+        /* ========================================================
+           ハンバーガーボタン（PCサイズ時は完全に隠す）
+        ======================================================== */
+        .hamburger-btn {
             display: none;
             flex-direction: column;
             justify-content: space-between;
@@ -26,8 +85,7 @@
             z-index: 110;
         }
 
-        /* 3本線の棒のデザイン */
-        .menu-toggle span {
+        .hamburger-btn span {
             width: 100%;
             height: 3px;
             background-color: #333;
@@ -35,9 +93,251 @@
             transition: all 0.3s ease;
         }
 
-        /* デバイスの画面幅が768px以下のスマホ・タブレット等の縦長画面 */
-        @media screen and (max-width: 768px) {
+        /* =====================================
+           レイアウト・コンテンツエリア
+        ===================================== */
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+            flex: 1;
+            width: 100%;
+            box-sizing: border-box;
+        }
 
+        .sidebar {
+            width: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 30px;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        #recruit-form-area .sidebar {
+            width: 100%;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            box-sizing: border-box;
+        }
+
+        #form-title {
+            font-size: 18px;
+            color: #333333;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: bold;
+            border-left: 4px solid #1cbdc5;
+            padding-left: 10px;
+        }
+
+        #rec-grade,
+        #rec-dept,
+        #rec-content {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #333333;
+            background-color: #f8fafc;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        #user-name {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            color: rgb(0, 0, 0);
+            background-color: #e2e8f0;
+            cursor: not-allowed;
+            border-color: #cbd5e1;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        #rec-grade:focus,
+        #rec-dept:focus,
+        #rec-content:focus {
+            border-color: #1cbdc5;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(28, 189, 197, 0.15);
+        }
+
+        #rec-content {
+            resize: vertical;
+            min-height: 120px;
+            line-height: 1.6;
+        }
+
+        .btn-search,
+        #submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #1cbdc5 0%, #17a2b8 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.2);
+            box-sizing: border-box;
+        }
+
+        .btn-search:hover,
+        #submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(28, 189, 197, 0.35);
+        }
+
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .user-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.01);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+        }
+
+        .user-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 24px rgba(28, 189, 197, 0.12);
+        }
+
+        .user-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #e6f9fa;
+            color: #1cbdc5;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .btn-match {
+            background: #1cbdc5;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 20px;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .big-profile-icon {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+            transition: 0.2s;
+        }
+
+        .mypage-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 40px;
+        }
+
+        #mypage-text {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .btn-refresh {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid #000000;
+            background-color: #ffffff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .refresh-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            transition: transform 0.9s ease;
+        }
+
+        .btn-refresh:hover .refresh-icon {
+            transform: rotate(-360deg);
+        }
+
+        .footer {
+            background-color: #ffffff;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 24px 20px;
+            margin-top: auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+        }
+
+        .footer-links a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .copyright {
+            color: #999;
+            font-size: 0.8rem;
+            margin: 0;
+        }
+
+        /* ========================================================
+           📱 スマホ・縦長画面用の表示切り替え定義
+        ======================================================== */
+        @media screen and (max-width: 768px) {
             .container {
                 flex-direction: column !important;
                 display: flex;
@@ -49,64 +349,62 @@
                 margin-bottom: 20px;
             }
 
-            /* メインコンテンツの幅を100%にする */
             div[style*="flex: 3"] {
                 width: 100% !important;
                 flex: none !important;
             }
 
-            /* スマホ画面の時だけ3本線ボタンを表示 */
-            .menu-toggle {
-                display: flex;
+            .hamburger-btn {
+                display: flex !important;
             }
 
-            /* スマホ時のナビゲーションリンク（初期状態は画面の上に隠す） */
+            /* 🌟初期状態：openがついていない時は何が何でも上に完全に隠す */
             .nav-links {
-                position: fixed;
-                top: -100%;
-                left: 0;
-                width: 100%;
-                background: rgba(255, 255, 255, 0.98);
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-                flex-direction: column;
-                padding: 80px 0 30px 0;
-                gap: 20px;
-                transition: top 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-                z-index: 100;
+                position: fixed !important;
+                top: -100% !important;
+                left: 0 !important;
+                width: 100% !important;
+                background: rgba(255, 255, 255, 0.98) !important;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+                flex-direction: column !important;
+                padding: 80px 0 30px 0 !important;
+                gap: 20px !important;
+                transition: top 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
+                z-index: 100 !important;
+                display: flex !important;
             }
 
-            /* メニューが開いた時の設定 */
-            .nav-links.active {
+            /* 🌟重要：openクラスがカチッと付与された時だけ、画面上部へ出す */
+            .nav-links.open {
                 top: 0 !important;
-                /* 強制的に画面上部へスライドイン */
             }
 
             .nav-item {
                 margin-right: 0 !important;
-                font-size: 18px;
-                padding: 10px 0;
-                width: 100%;
-                text-align: center;
+                font-size: 18px !important;
+                padding: 10px 0 !important;
+                width: 100% !important;
+                text-align: center !important;
             }
 
             .btn-logout {
-                margin-top: 10px;
-                width: 80%;
-                text-align: center;
-                padding: 12px 0;
+                margin-top: 10px !important;
+                width: 80% !important;
+                text-align: center !important;
+                padding: 12px 0 !important;
             }
 
-            /* 🌟 スマホ用メディアクエリの中に完全に格納し、active時のみバツ印に変形させる */
-            .menu-toggle.active span:nth-child(1) {
-                transform: translateY(9px) rotate(45deg);
+            /* 🌟open適用時のみ、3本線をクロス(×)に変形させる */
+            .hamburger-btn.open span:nth-child(1) {
+                transform: translateY(9px) rotate(45deg) !important;
             }
 
-            .menu-toggle.active span:nth-child(2) {
-                opacity: 0;
+            .hamburger-btn.open span:nth-child(2) {
+                opacity: 0 !important;
             }
 
-            .menu-toggle.active span:nth-child(3) {
-                transform: translateY(-9px) rotate(-45deg);
+            .hamburger-btn.open span:nth-child(3) {
+                transform: translateY(-9px) rotate(-45deg) !important;
             }
         }
     </style>
@@ -117,7 +415,7 @@
     <header class="navbar">
         <div class="logo" onclick="location.href='home.html'">平工マッチング</div>
 
-        <button class="menu-toggle" id="menu-toggle" onclick="toggleMenu()">
+        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
             <span></span>
             <span></span>
             <span></span>
@@ -133,7 +431,6 @@
     </header>
 
     <main class="container">
-
         <div class="sidebar">
             <div class="mypage-area">
                 <img id="profile-icon" class="big-profile-icon" src="" alt="icon"
@@ -146,15 +443,13 @@
                 <h4
                     style="margin: 0 0 10px 0; color: #333; border-bottom: 2px solid #1cbdc5; padding-bottom: 5px; font-size: 14px;">
                     📢 あなたの現在の募集</h4>
-                <div id="my-post-content" style="font-size: 13px; color: #666;">
-                    投稿している募集はありません。
-                </div>
+                <div id="my-post-content" style="font-size: 13px; color: #666;">投稿している募集はありません。</div>
             </div>
         </div>
 
         <div style="flex: 3;">
             <section id="recruit-form-area" style="display: none;">
-                <div class="sidebar" style="width: 100%;border: 1.5px solid #1cbdc5;">
+                <div class="sidebar" style="width: 100%; border: 1.5px solid #1cbdc5;">
                     <h3 id="form-title">募集を投稿する</h3>
                     <input type="text" id="user-name" placeholder="マイページで名前を設定してください" readonly
                         style="width:80%; border: 1.5px solid #1cbdc5; margin-bottom:10px; padding:8px; background:#eee;" />
@@ -164,7 +459,6 @@
                         <option value="2年">2年</option>
                         <option value="3年">3年</option>
                     </select>
-
                     <select id="rec-dept"
                         style="width:80%; border: 1.5px solid #1cbdc5; margin-bottom:10px; padding:8px;">
                         <option value="機械工学科">機械工学科</option>
@@ -173,7 +467,6 @@
                         <option value="土木環境工学科">土木環境工学科</option>
                         <option value="情報工学科">情報工学科</option>
                     </select>
-
                     <textarea id="rec-content" rows="4" placeholder="募集内容を入力してください"
                         style="width:80%; border: 1.5px solid #1cbdc5; margin-bottom:10px; padding:8px;"></textarea>
                     <button class="btn-search" id="submit-btn" onclick="submitRecruitment()">投稿する</button>
@@ -184,7 +477,7 @@
                 <section id="search-area">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
                         <h2>他ユーザーの募集一覧</h2>
-                        <button onclick="loadRecruitments()" class="btn-refresh" title="">
+                        <button onclick="loadRecruitments()" class="btn-refresh">
                             <img class="refresh-icon"
                                 src="https://kotonohaworks.com/free-icons/wp-content/uploads/kkrn_icon_koushin_17.png"
                                 alt="更新">
@@ -211,13 +504,13 @@
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwITrmNEOqPX9Xe59kAN7gEeyz4R3RocqhC4H6P27n66TS5oWsTQdhyCo1-gl8trb5F/exec";
 
         function toggleMenu() {
-            document.getElementById("menu-toggle").classList.toggle("active");
-            document.getElementById("nav-links").classList.toggle("active");
+            document.getElementById("hud-menu-btn").classList.toggle("open");
+            document.getElementById("nav-links").classList.toggle("open");
         }
 
         function closeMenu() {
-            document.getElementById("menu-toggle").classList.remove("active");
-            document.getElementById("nav-links").classList.remove("active");
+            document.getElementById("hud-menu-btn").classList.remove("open");
+            document.getElementById("nav-links").classList.remove("open");
         }
 
         function switchTab(mode) {
@@ -235,12 +528,7 @@
             const listDiv = document.getElementById("user-list");
             const myPostContentDiv = document.getElementById("my-post-content");
 
-            listDiv.innerHTML = `
-        <div class="loading-box">
-            <div class="spinner"></div>
-            <p>データを更新中...</p>
-        </div>
-    `;
+            listDiv.innerHTML = `<p>データを更新中...</p>`;
             myPostContentDiv.innerHTML = "更新中...";
 
             try {
@@ -250,7 +538,6 @@
                 });
 
                 const result = await res.json();
-
                 listDiv.innerHTML = "";
                 myPostContentDiv.innerHTML = "投稿している募集はありません。";
 
@@ -261,12 +548,12 @@
                 if (myPosts.length > 0) {
                     const myItem = myPosts[0];
                     myPostContentDiv.innerHTML = `
-                <div style="font-weight: bold; margin-bottom: 5px; color:#1cbdc5;">${myItem.grade} | ${myItem.dept}</div>
-                <div style="word-wrap: break-word; line-height: 1.4; margin-bottom: 10px;">${myItem.content}</div>
-                <button onclick="deleteMyRecruitment()" style="width: 100%; background: #ff4d4d; color: white; border: none; padding: 5px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">
-                    ✖ この募集を削除する
-                </button>
-            `;
+                        <div style="font-weight: bold; margin-bottom: 5px; color:#1cbdc5;">${myItem.grade} | ${myItem.dept}</div>
+                        <div style="word-wrap: break-word; line-height: 1.4; margin-bottom: 10px;">${myItem.content}</div>
+                        <button onclick="deleteMyRecruitment()" style="width: 100%; background: #ff4d4d; color: white; border: none; padding: 5px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">
+                            ✖ この募集を削除する
+                        </button>
+                    `;
                 }
 
                 if (otherPosts.length === 0) {
@@ -277,11 +564,11 @@
                         const card = document.createElement("div");
                         card.className = "user-card";
                         card.innerHTML = `
-                    <div class="user-badge">${item.grade} | ${item.dept}</div>
-                    <h3>${item.name}</h3>
-                    <p>${item.content}</p>
-                    <button class="btn-match" onclick="startChat('${item.email}')">チャット</button>
-                `;
+                            <div class="user-badge">${item.grade} | ${item.dept}</div>
+                            <h3>${item.name}</h3>
+                            <p>${item.content}</p>
+                            <button class="btn-match" onclick="startChat('${item.email}')">チャット</button>
+                        `;
                         fragment.appendChild(card);
                     });
                     listDiv.appendChild(fragment);
@@ -339,7 +626,12 @@
             window.location.href = "index.html";
         }
 
+        // 🌟 起動時に強制的に開閉状態（クラス）を初期化する
         window.onload = () => {
+            // クラスを完全に剥ぎ取って初期状態にする
+            document.getElementById("hud-menu-btn").classList.remove("open");
+            document.getElementById("nav-links").classList.remove("open");
+
             const userName = localStorage.getItem("userName");
             const profileImage = localStorage.getItem("profileImage");
             document.getElementById("mypage-text").innerText = userName || "マイページ";

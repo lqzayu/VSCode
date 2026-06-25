@@ -5,13 +5,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>マイページ - 平工マッチング</title>
-    <link rel="stylesheet" href="home-style.css">
-    <style>
-        /* ========================================================
-           レスポンシブ & ハンバーガーメニュー追加スタイル
-        ======================================================== */
 
-        .menu-toggle {
+    <style>
+        /* =====================================
+           ページ全体の基本スタイル
+        ===================================== */
+        body {
+            margin: 0;
+            background-color: #f8fafc;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 10px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1cbdc5;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-item {
+            margin-right: 20px;
+            cursor: pointer;
+            color: #666;
+            font-weight: bold;
+            padding: 5px 0;
+        }
+
+        .nav-item.active {
+            color: #1cbdc5;
+            border-bottom: 2px solid #1cbdc5;
+        }
+
+        .btn-logout {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background: none;
+            cursor: pointer;
+            color: #ffffff;
+            background-color: #ff0000;
+        }
+
+        /* ========================================================
+           ハンバーガーボタンの設定
+        ======================================================== */
+        .hamburger-btn {
             display: none;
             flex-direction: column;
             justify-content: space-between;
@@ -24,7 +85,7 @@
             z-index: 110;
         }
 
-        .menu-toggle span {
+        .hamburger-btn span {
             width: 100%;
             height: 3px;
             background-color: #333;
@@ -32,65 +93,190 @@
             transition: all 0.3s ease;
         }
 
-        /* 画像操作ボタンの共通スタイル（サイズ拡大とフォントバランス調整） */
-        .profile-img-btn {
-            display: inline-flex;
+        /* =====================================
+           マイページ専用コンテンツレイアウト
+        ===================================== */
+        .container {
+            flex: 1;
+            width: 100%;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .profile-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .profile-card h2 {
+            font-size: 28px;
+            margin-top: 0;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .profile-image-group {
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            width: 160px;
-            /* 140px から 160px に拡大 */
-            height: 52px;
-            /* 45px から 52px に拡大し、より押しやすく */
-            border-radius: 8px;
-            /* 大きさに合わせて角丸を少し滑らかに */
-            font-size: 16px;
-            /* 文字サイズを 14px から 16px に上げて視認性を向上 */
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .big-profile-icon {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ボタンを横並びにするためのコンテナ */
+        .image-btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-file-label {
+            background-color: #f1f5f9;
+            color: #475569;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .input-file-label:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* ❌ 画像削除ボタンのスタイル */
+        .btn-delete-image {
+            background-color: #ffe4e6;
+            color: #e11d48;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-delete-image:hover {
+            background-color: #fecdd3;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 16px;
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        .input-large {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
             box-sizing: border-box;
-            transition: all 0.2s ease;
-            text-align: center;
-            margin: 0 8px;
-            /* ボタン間の隙間を少し広げて調整 */
+            outline: none;
+            background-color: #f8fafc;
+            transition: all 0.3s ease;
         }
 
-        /* 画像選択ボタン専用（ミントグリーンの枠線） */
-        .btn-select-label {
-            background-color: #f5f5f5;
-            color: #1cbdc5;
-            border: 2px solid #1cbdc5;
+        .input-large:focus {
+            border-color: #1cbdc5;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(28, 189, 197, 0.15);
         }
 
-        .btn-select-label:hover {
-            background-color: #e6f9fa;
+        .btn-large {
+            width: 100%;
+            padding: 14px 0;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #1cbdc5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.2);
         }
 
-        /* 画像削除ボタン専用（赤色の枠線） */
-        .btn-delete-action {
-            background-color: #f5f5f5;
-            color: #ff4d4d;
-            border: 2px solid #ff4d4d;
+        .btn-large:hover {
+            background-color: #159ea4;
+            transform: translateY(-1px);
         }
 
-        .btn-delete-action:hover {
-            background-color: #fff5f5;
+        .btn-large:active {
+            transform: translateY(0);
         }
 
+        /* =====================================
+           フッターのスタイル
+        ===================================== */
+        .footer {
+            background-color: #ffffff;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 24px 20px;
+            margin-top: auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .copyright {
+            color: #999;
+            font-size: 0.8rem;
+            margin: 0;
+        }
+
+        /* ========================================================
+           📱 スマホ・縦長画面用の表示切り替え定義
+        ======================================================== */
         @media screen and (max-width: 768px) {
             .container {
-                flex-direction: column !important;
-                display: flex;
-                padding: 10px;
-                box-sizing: border-box;
+                margin: 20px auto;
+                padding: 0 15px;
             }
 
-            .menu-toggle {
+            .profile-card {
+                padding: 30px 20px;
+            }
+
+            .hamburger-btn {
                 display: flex;
             }
 
             .nav-links {
                 position: fixed;
-                top: -100%;
+                top: -100% !important;
                 left: 0;
                 width: 100%;
                 background: rgba(255, 255, 255, 0.98);
@@ -102,8 +288,8 @@
                 z-index: 100;
             }
 
-            .nav-links.active {
-                top: 0;
+            .nav-links.open {
+                top: 0 !important;
             }
 
             .nav-item {
@@ -121,65 +307,27 @@
                 padding: 12px 0;
             }
 
-            .menu-toggle.active span:nth-child(1) {
+            .hamburger-btn.open span:nth-child(1) {
                 transform: translateY(9px) rotate(45deg);
             }
 
-            .menu-toggle.active span:nth-child(2) {
+            .hamburger-btn.open span:nth-child(2) {
                 opacity: 0;
             }
 
-            .menu-toggle.active span:nth-child(3) {
+            .hamburger-btn.open span:nth-child(3) {
                 transform: translateY(-9px) rotate(-45deg);
-            }
-
-            .profile-card {
-                margin: 20px auto !important;
-                padding: 40px 20px !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                box-sizing: border-box !important;
-            }
-
-            .input-large {
-                font-size: 16px !important;
-                padding: 12px !important;
-            }
-
-            .btn-large {
-                font-size: 18px !important;
-                padding: 14px 0 !important;
-            }
-
-            .profile-card h2 {
-                font-size: 24px !important;
-                margin-bottom: 25px !important;
-            }
-
-            /* スマホ環境でボタンが画面幅に収まるよう自動調整するコンテナ */
-            .profile-btn-group {
-                display: flex;
-                justify-content: center;
-                width: 100%;
-            }
-
-            /* 横幅が非常に狭いスマホでも並びが崩れないよう調整 */
-            .profile-img-btn {
-                width: 45% !important;
-                /* スマホ時は画面幅に応じた比率に可変 */
-                max-width: 160px;
-                margin: 0 4px;
-                font-size: 15px !important;
             }
         }
     </style>
 </head>
 
 <body>
+
     <header class="navbar">
         <div class="logo" onclick="location.href='home.html'">平工マッチング</div>
 
-        <button class="menu-toggle" id="menu-toggle" onclick="toggleMenu()">
+        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
             <span></span>
             <span></span>
             <span></span>
@@ -188,7 +336,7 @@
         <div class="nav-links" id="nav-links">
             <span class="nav-item" onclick="location.href='home.html'">ホーム</span>
             <span class="nav-item" onclick="location.href='messages.html'">メッセージ</span>
-            <span class="nav-item active">マイページ</span>
+            <span class="nav-item active" onclick="location.href='mypages.html'">マイページ</span>
             <button class="btn-logout" onclick="logout()">ログアウト</button>
         </div>
     </header>
@@ -197,113 +345,98 @@
         <div class="profile-card">
             <h2>プロフィール設定</h2>
 
-            <div class="mypage-area">
-                <label>プロフィール画像</label>
+            <div class="profile-image-group">
+                <img id="profile-icon" class="big-profile-icon"
+                    src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="icon">
 
-                <div style="margin: 20px 0;">
-                    <img id="profile-icon" class="big-profile-icon2" src="" alt="icon"
-                        style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; cursor: pointer; margin: 0 auto; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                <div class="image-btn-group">
+                    <label for="image-input" class="input-file-label">画像を選択</label>
+                    <button type="button" class="btn-delete-image" onclick="deleteImage()">削除</button>
                 </div>
 
-                <div class="profile-btn-group"
-                    style="margin: 25px auto; display: flex; justify-content: center; align-items: center;">
-                    <label for="profile-image" class="profile-img-btn btn-select-label">
-                        画像を選択
-                    </label>
-                    <input type="file" id="profile-image" accept="image/*" style="display: none;"
-                        onchange="autoSaveImage()">
-
-                    <button type="button" class="profile-img-btn btn-delete-action" onclick="clearProfileImage()">
-                        画像を削除
-                    </button>
-                </div>
-
-                <input type="text" id="rec-name" class="input-large" placeholder="名前を入力してください">
-                <button class="btn-large" onclick="saveProfile()">保存する</button>
+                <input type="file" id="image-input" accept="image/*" style="display: none;"
+                    onchange="previewImage(event)">
             </div>
+
+            <div class="form-group">
+                <label for="username-input">表示名</label>
+                <input type="text" id="username-input" class="input-large" placeholder="名前を入力してください">
+            </div>
+
+            <button class="btn-large" onclick="saveProfile()">設定を保存する</button>
         </div>
     </main>
 
     <footer class="footer">
         <div class="footer-container">
-            <div class="footer-links">
-                <a href="home.html">ホーム</a>
-                <a href="messages.html">メッセージ</a>
-                <a href="mypages.html">マイページ</a>
-            </div>
             <p class="copyright">&copy; 2026 平工マッチング. All rights reserved.</p>
         </div>
     </footer>
 
     <script>
+        // 初期アバターのURL
+        const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
         function toggleMenu() {
-            document.getElementById("menu-toggle").classList.toggle("active");
-            document.getElementById("nav-links").classList.toggle("active");
+            document.getElementById("hud-menu-btn").classList.toggle("open");
+            document.getElementById("nav-links").classList.toggle("open");
         }
 
-        window.onload = () => {
-            document.getElementById("rec-name").value = localStorage.getItem("userName") || "";
-
-            const profileImage = localStorage.getItem("profileImage");
-            const profileIconEl = document.getElementById("profile-icon");
-
-            if (profileImage) {
-                profileIconEl.src = profileImage;
-            } else {
-                profileIconEl.src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-            }
-        };
-
-        function autoSaveImage() {
-            const file = document.getElementById("profile-image").files[0];
-
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    localStorage.setItem("profileImage", e.target.result);
-                    document.getElementById("profile-icon").src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
+        function closeMenu() {
+            document.getElementById("hud-menu-btn").classList.remove("open");
+            document.getElementById("nav-links").classList.remove("open");
         }
 
-        function clearProfileImage() {
-            if (!confirm("プロフィール画像を削除して初期アイコンに戻しますか？")) return;
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-            localStorage.removeItem("profileImage");
-            document.getElementById("profile-icon").src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-            document.getElementById("profile-image").value = "";
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("profile-icon").src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
 
-            alert("画像を削除しました。変更を確定するには保存ボタンを押してください。");
+        // ❌ 画像を初期のデフォルト画像に戻す処理
+        function deleteImage() {
+            document.getElementById("profile-icon").src = DEFAULT_AVATAR;
+            document.getElementById("image-input").value = ""; // 選択中ファイルをクリア
         }
 
         function saveProfile() {
-            const name = document.getElementById("rec-name").value;
-            if (!name) return alert("名前を入力してください");
-            localStorage.setItem("userName", name);
+            const name = document.getElementById("username-input").value.trim();
+            const imageSrc = document.getElementById("profile-icon").src;
 
-            const file = document.getElementById("profile-image").files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    localStorage.setItem("profileImage", e.target.result);
-                    finishSave();
-                };
-                reader.readAsDataURL(file);
-            } else {
-                finishSave();
+            if (!name) {
+                alert("表示名を入力してください");
+                return;
             }
-        }
 
-        function finishSave() {
-            alert("保存しました");
-            location.href = 'home.html';
+            localStorage.setItem("userName", name);
+            localStorage.setItem("profileImage", imageSrc);
+            alert("プロフィールを保存しました！");
+            location.href = "home.html";
         }
 
         function logout() {
             localStorage.clear();
             window.location.href = "index.html";
         }
+
+        window.onload = () => {
+            const userName = localStorage.getItem("userName");
+            const profileImage = localStorage.getItem("profileImage");
+
+            if (userName) document.getElementById("username-input").value = userName;
+
+            // 保存されたデータがある、かつ空文字やバグデータでない場合は適用
+            if (profileImage && profileImage !== "null") {
+                document.getElementById("profile-icon").src = profileImage;
+            } else {
+                document.getElementById("profile-icon").src = DEFAULT_AVATAR;
+            }
+        };
     </script>
 </body>
 
