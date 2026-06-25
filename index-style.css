@@ -3,22 +3,32 @@ body {
     margin: 0;
     padding: 0;
     display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    background: linear-gradient(135deg, #eefcfd 0%, #f5fafd 100%);
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+}
+
+.login-container {
+    flex: 1;
+    display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100dvh;
-    /* ビューポートの高さに合わせる */
-    background-color: #f0f2f5;
-    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
-    /* フォントスタイルを追加 */
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 /* ログインカード */
 .login-card {
-    background-color: #ffffff;
-    padding: 30px 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    width: 90%;
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 35px 30px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+    width: 100%;
     max-width: 380px;
     text-align: center;
     box-sizing: border-box;
@@ -66,21 +76,25 @@ body {
     margin-bottom: 10px;
 }
 
+/* 確認用パスワードの外枠（最初はここを隠しておく） */
 .confirm-password-wrapper {
     position: relative;
-    display: flex;
+    display: none;
+    /* ←初期状態の非表示設定をこの外枠に集約しました */
     align-items: center;
     width: 100%;
     box-sizing: border-box;
 }
 
-/* 確認用パスワード入力欄（最初は隠しておく） */
+/* 確認用パスワード入力欄 */
 .confirm-password-input {
     width: 100% !important;
     padding-right: 35px;
-    display: none;
+    box-sizing: border-box;
+    /* 不要な display: none; を削除 */
 }
 
+/* 確認用パスワードの切り替えボタン */
 .toggle-confirm-btn {
     position: absolute;
     right: 10px;
@@ -103,7 +117,7 @@ body {
     /* 行の高さを詰める */
     z-index: 10;
     margin-bottom: 10px;
-    display: none;
+    /* 不要な display: none; を削除 */
 }
 
 h1 {
@@ -111,7 +125,6 @@ h1 {
     margin-bottom: 25px;
     font-size: 1.5rem;
 }
-
 
 input {
     width: 100%;
@@ -177,4 +190,29 @@ button:hover {
 
 button:active {
     transform: scale(0.98);
+}
+
+/* ログイン画面用フッター */
+.footer {
+    background-color: transparent;
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: auto;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.copyright {
+    color: #999;
+    font-size: 0.75rem;
+    margin: 0;
+    font-weight: 500;
+    letter-spacing: 0.03em;
 }

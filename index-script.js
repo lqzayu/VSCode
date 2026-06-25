@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwITrmNEOqPX9Xe59kAN7gEeyz4R3RocqhC4H6P27n66TS5oWsTQdhyCo1-gl8trb5F/exec";
 
 function toggleMode(mode) {
     const title = document.getElementById("form-title");
@@ -48,7 +48,7 @@ async function handleLogin() {
 }
 
 //パスワード表示／非表示
-function togglePasswordVisibility(){        
+function togglePasswordVisibility() {
     // HTMLからパスワード入力欄とボタンの要素を取得
     const passwordInput = document.getElementById('password');
     const toggleButton = document.getElementById('toggle-password');
@@ -63,7 +63,7 @@ function togglePasswordVisibility(){
     }
 }
 
-function toggleconfirmVisibility(){        
+function toggleconfirmVisibility() {
     // HTMLからパスワード入力欄とボタンの要素を取得
     const confirmpasswordInput = document.getElementById('confirm-password');
     const toggleconfirmButton = document.getElementById('toggle-confirm');
@@ -103,11 +103,3 @@ function updateMsg(txt, type) {
     el.innerText = txt;
     el.className = "message " + type;
 }
-
-/*function handleKeyPress(event) {  /*Enterでログインできるようにしたい
-    if (event.key === "Enter") {
-        handleLogin();
-    }
-}*/
-
-localStorage.setItem("userName", name);

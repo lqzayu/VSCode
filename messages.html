@@ -1,30 +1,33 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>メッセージ - 平工マッチング</title>
     <link rel="stylesheet" href="home-style.css">
-    <style> /*css-style*/
+    <style>
+        /*css-style*/
         body {
             background-color: #f0f2f5;
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
+
         .main-container {
             max-width: 600px;
             margin: 0 auto;
             background: #ffffff;
-            height: calc(100vh - 70px);
+            flex: 1;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
         }
 
         /* ========================================================
            📱 🌟【追加】レスポンシブ & ハンバーガーメニュー追加スタイル
         ======================================================== */
-        
+
         /* 🍔 通常時（PC）は3本線ボタンを隠す */
         .menu-toggle {
             display: none;
@@ -36,7 +39,8 @@
             border: none;
             cursor: pointer;
             padding: 0;
-            z-index: 110; /* メニューより前面に */
+            z-index: 110;
+            /* メニューより前面に */
         }
 
         /* 3本線の棒のデザイン */
@@ -52,10 +56,12 @@
         @media screen and (max-width: 768px) {
             .main-container {
                 max-width: 100%;
-                height: calc(100vh - 60px); /* ヘッダー分を除いた全画面 */
+                flex: 1;
             }
+
             .msg {
-                font-size: 16px; /* スマホで読みやすいサイズに拡大 */
+                font-size: 16px;
+                /* スマホで読みやすいサイズに拡大 */
             }
 
             /* 🍔 スマホ画面の時だけ3本線ボタンを表示 */
@@ -66,25 +72,30 @@
             /* 📱 スマホ時のナビゲーションリンクを「隠しバナー」にする */
             .nav-links {
                 position: fixed;
-                top: -100%; /* 初期状態は画面の上に隠しておく */
+                top: -100%;
+                /* 初期状態は画面の上に隠しておく */
                 left: 0;
                 width: 100%;
                 background: rgba(255, 255, 255, 0.98);
-                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
                 flex-direction: column;
-                padding: 80px 0 30px 0; /* ヘッダーと被らないように上をあける */
+                padding: 80px 0 30px 0;
+                /* ヘッダーと被らないように上をあける */
                 gap: 20px;
-                transition: top 0.4s cubic-bezier(0.25, 1, 0.5, 1); /* スッと滑らかに降りてくるモーション */
+                transition: top 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+                /* スッと滑らかに降りてくるモーション */
                 z-index: 100;
             }
 
             /* 🌟 メニューが開いた（activeクラスがついた）時のモーション設定 */
             .nav-links.active {
-                top: 0; /* 画面の一番上まで降りてくる */
+                top: 0;
+                /* 画面の一番上まで降りてくる */
             }
 
             .nav-item {
-                margin-right: 0 !important; /* 横の余白をリセット */
+                margin-right: 0 !important;
+                /* 横の余白をリセット */
                 font-size: 18px;
                 padding: 10px 0;
                 width: 100%;
@@ -95,9 +106,12 @@
             .menu-toggle.active span:nth-child(1) {
                 transform: translateY(9px) rotate(45deg);
             }
+
             .menu-toggle.active span:nth-child(2) {
-                opacity: 0; /* 真ん中の棒を消す */
+                opacity: 0;
+                /* 真ん中の棒を消す */
             }
+
             .menu-toggle.active span:nth-child(3) {
                 transform: translateY(-9px) rotate(-45deg);
             }
@@ -111,11 +125,13 @@
             border-bottom: 1px solid #eee;
             background: #fff;
         }
+
         .partner-list {
             flex: 1;
             overflow-y: auto;
             background: #fff;
         }
+
         .partner-item {
             display: flex;
             align-items: center;
@@ -125,23 +141,28 @@
             gap: 12px;
             transition: background 0.2s;
         }
+
         .partner-item:hover {
             background: #f5f5f5;
         }
+
         .partner-icon {
             width: 45px;
             height: 45px;
             border-radius: 50%;
             object-fit: cover;
         }
+
         .partner-info {
             flex: 1;
         }
+
         .partner-name {
             font-weight: bold;
             font-size: 15px;
             color: #333;
         }
+
         .partner-arrow {
             color: #ccc;
             font-size: 14px;
@@ -152,8 +173,10 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            background: #7494c0; /* LINE風背景色 */
+            background: #7494c0;
+            /* LINE風背景色 */
         }
+
         .chat-header {
             background: #ffffff;
             color: #333333;
@@ -163,12 +186,14 @@
             align-items: center;
             gap: 12px;
         }
+
         .header-icon {
             width: 40px;
             height: 40px;
             border-radius: 50%;
             object-fit: cover;
         }
+
         .header-info {
             flex: 1;
             text-align: left;
@@ -176,17 +201,20 @@
             flex-direction: column;
             gap: 3px;
         }
+
         .header-name {
             font-weight: bold;
             font-size: 16px;
             color: #333;
             line-height: 1.2;
         }
+
         .header-email {
             font-size: 12px;
             color: #888;
             line-height: 1.2;
         }
+
         .btn-back {
             background: #1cbdc5;
             border: none;
@@ -197,6 +225,7 @@
             font-size: 13px;
             font-weight: bold;
         }
+
         .chat-box {
             flex: 1;
             padding: 15px;
@@ -205,31 +234,42 @@
             flex-direction: column;
             gap: 12px;
         }
+
         .msg-wrapper {
             display: flex;
             flex-direction: column;
             max-width: 75%;
         }
-        .msg-wrapper.me { align-self: flex-end; }
-        .msg-wrapper.target { align-self: flex-start; }
+
+        .msg-wrapper.me {
+            align-self: flex-end;
+        }
+
+        .msg-wrapper.target {
+            align-self: flex-start;
+        }
+
         .msg {
             padding: 9px 14px;
             border-radius: 18px;
             font-size: 14px;
             word-wrap: break-word;
             line-height: 1.4;
-            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
         }
+
         .msg-wrapper.me .msg {
             background: #8ee59d;
             color: #000;
             border-top-right-radius: 2px;
         }
+
         .msg-wrapper.target .msg {
             background: #ffffff;
             color: #000;
             border-top-left-radius: 2px;
         }
+
         .chat-input-area {
             display: flex;
             padding: 12px;
@@ -237,6 +277,7 @@
             gap: 10px;
             border-top: 1px solid #eee;
         }
+
         .chat-input-area input {
             flex: 1;
             padding: 10px 15px;
@@ -246,6 +287,7 @@
             font-size: 14px;
             background: #f8f9fa;
         }
+
         .btn-send {
             background: #1cbdc5;
             color: white;
@@ -266,121 +308,136 @@
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
-            white-space: nowrap; /* ボタン内の文字が改行されるのを防ぐ */
+            white-space: nowrap;
+            /* ボタン内の文字が改行されるのを防ぐ */
             opacity: 0.8;
             transition: opacity 0.2s;
         }
+
         .btn-room-delete:hover {
             opacity: 1;
             background: #e60000;
         }
     </style>
 </head>
+
 <body>
 
-<header class="navbar">
-    <div class="logo" onclick="location.href='home.html'">平工マッチング</div>
-    
-    <button class="menu-toggle" id="menu-toggle" onclick="toggleMenu()">
-        <span></span>
-        <span></span>
-        <span></span>
-    </button>
+    <header class="navbar">
+        <div class="logo" onclick="location.href='home.html'">平工マッチング</div>
 
-    <div class="nav-links" id="nav-links">
-        <span class="nav-item" onclick="location.href='home.html'">ホーム</span>
-        <span class="nav-item active" onclick="location.href='messages.html'">メッセージ</span>
-        <span class="nav-item" onclick="location.href='mypages.html'">マイページ</span>
-        <button class="btn-logout" onclick="logout()">ログアウト</button>
-    </div>
-</header>
+        <button class="menu-toggle" id="menu-toggle" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
 
-<div class="main-container">
-    <div id="partner-list-view" style="display: block; height: 100%; display: flex; flex-direction: column;">
-        <div class="list-header">トーク履歴一覧</div>
-        <div class="partner-list" id="partner-list-box">
-            <p style="text-align: center; color: #888; padding: 20px;">読み込み中...</p>
+        <div class="nav-links" id="nav-links">
+            <span class="nav-item" onclick="location.href='home.html'">ホーム</span>
+            <span class="nav-item active" onclick="location.href='messages.html'">メッセージ</span>
+            <span class="nav-item" onclick="location.href='mypages.html'">マイページ</span>
+            <button class="btn-logout" onclick="logout()">ログアウト</button>
         </div>
-    </div>
+    </header>
 
-    <div id="chat-view" class="chat-view" style="display: none;">
-        <div class="chat-header">
-            <img id="target-icon" class="header-icon" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="icon">
-            <div class="header-info">
-                <div id="chat-title" class="header-name">読み込み中...</div>
-                <div id="chat-email" class="header-email">-------</div>
+    <div class="main-container">
+        <div id="partner-list-view" style="display: block; height: 100%; display: flex; flex-direction: column;">
+            <div class="list-header">トーク履歴一覧</div>
+            <div class="partner-list" id="partner-list-box">
+                <p style="text-align: center; color: #888; padding: 20px;">読み込み中...</p>
             </div>
-            <button class="btn-back" onclick="backToPartnerList()">一覧へ戻る</button>
         </div>
-        
-        <div class="chat-box" id="chat-box"></div>
-        
-        <div class="chat-input-area">
-            <input type="text" id="msg-input" placeholder="メッセージを入力..." onkeypress="handleKeyPress(event)">
-            <button class="btn-send" onclick="sendChatMessage()">送信</button>
+
+        <div id="chat-view" class="chat-view" style="display: none;">
+            <div class="chat-header">
+                <img id="target-icon" class="header-icon" src="https://cdn-icons-png.flaticon.com/512/149/149071.png"
+                    alt="icon">
+                <div class="header-info">
+                    <div id="chat-title" class="header-name">読み込み中...</div>
+                    <div id="chat-email" class="header-email">-------</div>
+                </div>
+                <button class="btn-back" onclick="backToPartnerList()">一覧へ戻る</button>
+            </div>
+
+            <div class="chat-box" id="chat-box"></div>
+
+            <div class="chat-input-area">
+                <input type="text" id="msg-input" placeholder="メッセージを入力..." onkeypress="handleKeyPress(event)">
+                <button class="btn-send" onclick="sendChatMessage()">送信</button>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbz6psDpbuHyxG-8bAIkCKOb6g930qiJUSYJzKKyYPsCPPzMcKIp-MTeK6sh58hViEXA/exec";
+    <footer class="footer" id="messages-footer">
+        <div class="footer-container">
+            <div class="footer-links">
+                <a href="home.html">ホーム</a>
+                <a href="messages.html">メッセージ</a>
+                <a href="mypages.html">マイページ</a>
+            </div>
+            <p class="copyright">&copy; 2026 平工マッチング. All rights reserved.</p>
+        </div>
+    </footer>
 
-const myEmail = localStorage.getItem("userEmail");
-let currentTargetEmail = null;
-let chatIntervalId = null;
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwITrmNEOqPX9Xe59kAN7gEeyz4R3RocqhC4H6P27n66TS5oWsTQdhyCo1-gl8trb5F/exec";
 
-/* ========================================================
-   🌟 ハンバーガーメニュー制御JavaScript
-======================================================== */
-function toggleMenu() {
-    document.getElementById("menu-toggle").classList.toggle("active");
-    document.getElementById("nav-links").classList.toggle("active");
-}
+        const myEmail = localStorage.getItem("userEmail");
+        let currentTargetEmail = null;
+        let chatIntervalId = null;
 
-function closeMenu() {
-    document.getElementById("menu-toggle").classList.remove("active");
-    document.getElementById("nav-links").classList.remove("active");
-}
+        /* ========================================================
+           🌟 ハンバーガーメニュー制御JavaScript
+        ======================================================== */
+        function toggleMenu() {
+            document.getElementById("menu-toggle").classList.toggle("active");
+            document.getElementById("nav-links").classList.toggle("active");
+        }
 
-window.onload = () => {
-    if (!myEmail) {
-        alert("ログイン情報が見つかりません。");
-        location.href = "index.html";
-        return;
-    }
+        function closeMenu() {
+            document.getElementById("menu-toggle").classList.remove("active");
+            document.getElementById("nav-links").classList.remove("active");
+        }
 
-    const directTarget = localStorage.getItem("chatTarget");
-    if (directTarget) {
-        localStorage.removeItem("chatTarget");
-        openChat(directTarget, "読み込み中...");
-    } else {
-        loadPartnerList();
-    }
-};
-
-async function loadPartnerList() {
-    try {
-        const res = await fetch(GAS_URL, {
-            method: "POST",
-            body: JSON.stringify({ mode: "getChatPartners", email: myEmail })
-        });
-        const result = await res.json();
-        
-        if (result.status === "success") {
-            const listBox = document.getElementById("partner-list-box");
-            listBox.innerHTML = "";
-
-            if (result.message.length === 0) {
-                listBox.innerHTML = '<p style="text-align: center; color: #888; padding: 40px; font-size: 14px;">過去のチャット履歴はありません。<br>ホーム画面から誰かにチャットを送ってみましょう！</p>';
+        window.onload = () => {
+            if (!myEmail) {
+                alert("ログイン情報が見つかりません。");
+                location.href = "index.html";
                 return;
             }
 
-            result.message.forEach(partner => {
-                const item = document.createElement("div");
-                item.className = "partner-item";
-                item.onclick = () => openChat(partner.email, partner.name);
+            const directTarget = localStorage.getItem("chatTarget");
+            if (directTarget) {
+                localStorage.removeItem("chatTarget");
+                openChat(directTarget, "読み込み中...");
+            } else {
+                loadPartnerList();
+            }
+        };
 
-                item.innerHTML = `
+        async function loadPartnerList() {
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ mode: "getChatPartners", email: myEmail })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    const listBox = document.getElementById("partner-list-box");
+                    listBox.innerHTML = "";
+
+                    if (result.message.length === 0) {
+                        listBox.innerHTML = '<p style="text-align: center; color: #888; padding: 40px; font-size: 14px;">過去のチャット履歴はありません。<br>ホーム画面から誰かにチャットを送ってみましょう！</p>';
+                        return;
+                    }
+
+                    result.message.forEach(partner => {
+                        const item = document.createElement("div");
+                        item.className = "partner-item";
+                        item.onclick = () => openChat(partner.email, partner.name);
+
+                        item.innerHTML = `
                     <img class="partner-icon" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="icon">
                     <div class="partner-info">
                         <div class="partner-name">${partner.name}</div>
@@ -389,163 +446,168 @@ async function loadPartnerList() {
                     <button class="btn-room-delete" onclick="event.stopPropagation(); deleteChatRoom('${partner.email}', '${partner.name}', this.parentElement);">削除</button>
                     <div class="partner-arrow">＞</div>
                 `;
-                listBox.appendChild(item);
-            });
+                        listBox.appendChild(item);
+                    });
+                }
+            } catch (e) {
+                document.getElementById("partner-list-box").innerText = "一覧の読み込みに失敗しました。";
+            }
         }
-    } catch (e) {
-        document.getElementById("partner-list-box").innerText = "一覧の読み込みに失敗しました。";
-    }
-}
 
-async function deleteChatRoom(targetEmail, targetName, itemElement) {
-    if (!confirm(`${targetName} さんとのトークルーム（すべてのメッセージ履歴）を完全に削除しますか？`)) return;
+        async function deleteChatRoom(targetEmail, targetName, itemElement) {
+            if (!confirm(`${targetName} さんとのトークルーム（すべてのメッセージ履歴）を完全に削除しますか？`)) return;
 
-    itemElement.remove();
+            itemElement.remove();
 
-    try {
-        const res = await fetch(GAS_URL, {
-            method: "POST",
-            body: JSON.stringify({
-                mode: "deleteChatRoom",
-                myEmail: myEmail,
-                targetEmail: targetEmail
-            })
-        });
-        const result = await res.json();
-        if (result.status === "success") {
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "deleteChatRoom",
+                        myEmail: myEmail,
+                        targetEmail: targetEmail
+                    })
+                });
+                const result = await res.json();
+                if (result.status === "success") {
+                    loadPartnerList();
+                }
+            } catch (e) {
+                alert("トークルームの削除に失敗しました。電波状況を確認してください。");
+                loadPartnerList();
+            }
+        }
+
+        function openChat(email, name) {
+            currentTargetEmail = email;
+
+            document.getElementById("partner-list-view").style.display = "none";
+            document.getElementById("chat-view").style.display = "flex";
+            const footer = document.getElementById("messages-footer");
+            if (footer) footer.style.display = "none";
+
+            document.getElementById("chat-title").innerText = name;
+            document.getElementById("chat-email").innerText = email;
+
+            fetchRealtimeProfile(email);
+            loadChatMessages();
+
+            if (chatIntervalId) clearInterval(chatIntervalId);
+            chatIntervalId = setInterval(loadChatMessages, 5000);
+        }
+
+        function backToPartnerList() {
+            currentTargetEmail = null;
+            if (chatIntervalId) {
+                clearInterval(chatIntervalId);
+                chatIntervalId = null;
+            }
+            document.getElementById("chat-view").style.display = "none";
+            document.getElementById("partner-list-view").style.display = "flex";
+            const footer = document.getElementById("messages-footer");
+            if (footer) footer.style.display = "block";
+
             loadPartnerList();
         }
-    } catch (e) {
-        alert("トークルームの削除に失敗しました。電波状況を確認してください。");
-        loadPartnerList();
-    }
-}
 
-function openChat(email, name) {
-    currentTargetEmail = email;
-    
-    document.getElementById("partner-list-view").style.display = "none";
-    document.getElementById("chat-view").style.display = "flex";
-    
-    document.getElementById("chat-title").innerText = name;
-    document.getElementById("chat-email").innerText = email;
-    
-    fetchRealtimeProfile(email);
-    loadChatMessages();
-    
-    if (chatIntervalId) clearInterval(chatIntervalId);
-    chatIntervalId = setInterval(loadChatMessages, 5000);
-}
-
-function backToPartnerList() {
-    currentTargetEmail = null;
-    if (chatIntervalId) {
-        clearInterval(chatIntervalId);
-        chatIntervalId = null;
-    }
-    document.getElementById("chat-view").style.display = "none";
-    document.getElementById("partner-list-view").style.display = "flex";
-    
-    loadPartnerList();
-}
-
-async function fetchRealtimeProfile(email) {
-    try {
-        const res = await fetch(GAS_URL, {
-            method: "POST",
-            body: JSON.stringify({ mode: "login", email: email })
-        });
-        const result = await res.json();
-        if (result.status === "success" && currentTargetEmail === email) {
-            document.getElementById("chat-title").innerText = result.message.name;
-        }
-    } catch(e){}
-}
-
-async function loadChatMessages() {
-    if (!currentTargetEmail) return;
-    try {
-        const res = await fetch(GAS_URL, {
-            method: "POST",
-            body: JSON.stringify({
-                mode: "getMessages",
-                user1: myEmail,
-                user2: currentTargetEmail
-            })
-        });
-        const result = await res.json();
-        
-        if (result.status === "success" && currentTargetEmail) {
-            const chatBox = document.getElementById("chat-box");
-            chatBox.innerHTML = "";
-            
-            result.message.forEach(msg => {
-                const wrapper = document.createElement("div");
-                const msgDiv = document.createElement("div");
-                msgDiv.className = "msg";
-                msgDiv.innerText = msg.text;
-                
-                if (msg.from === myEmail) {
-                    wrapper.className = "msg-wrapper me";
-                } else {
-                    wrapper.className = "msg-wrapper target";
+        async function fetchRealtimeProfile(email) {
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ mode: "login", email: email })
+                });
+                const result = await res.json();
+                if (result.status === "success" && currentTargetEmail === email) {
+                    document.getElementById("chat-title").innerText = result.message.name;
                 }
-                
-                wrapper.appendChild(msgDiv);
-                chatBox.appendChild(wrapper);
-            });
+            } catch (e) { }
+        }
+
+        async function loadChatMessages() {
+            if (!currentTargetEmail) return;
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "getMessages",
+                        user1: myEmail,
+                        user2: currentTargetEmail
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success" && currentTargetEmail) {
+                    const chatBox = document.getElementById("chat-box");
+                    chatBox.innerHTML = "";
+
+                    result.message.forEach(msg => {
+                        const wrapper = document.createElement("div");
+                        const msgDiv = document.createElement("div");
+                        msgDiv.className = "msg";
+                        msgDiv.innerText = msg.text;
+
+                        if (msg.from === myEmail) {
+                            wrapper.className = "msg-wrapper me";
+                        } else {
+                            wrapper.className = "msg-wrapper target";
+                        }
+
+                        wrapper.appendChild(msgDiv);
+                        chatBox.appendChild(wrapper);
+                    });
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById("msg-input");
+            const text = input.value.trim();
+            if (!text || !currentTargetEmail) return;
+
+            input.value = "";
+
+            const chatBox = document.getElementById("chat-box");
+            if (chatBox.querySelector("p")) {
+                chatBox.innerHTML = "";
+            }
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "msg-wrapper me";
+            const msgDiv = document.createElement("div");
+            msgDiv.className = "msg";
+            msgDiv.innerText = text;
+
+            wrapper.appendChild(msgDiv);
+            chatBox.appendChild(wrapper);
             chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "sendMessage",
+                        from: myEmail,
+                        to: currentTargetEmail,
+                        text: text
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    loadChatMessages();
+                }
+            } catch (e) {
+                alert("メッセージの送信に失敗しました。電波状況を確認してください。");
+            }
         }
-    } catch (e) { console.error(e); }
-}
 
-async function sendChatMessage() {
-    const input = document.getElementById("msg-input");
-    const text = input.value.trim();
-    if (!text || !currentTargetEmail) return;
-
-    input.value = "";
-
-    const chatBox = document.getElementById("chat-box");
-    if (chatBox.querySelector("p")) {
-        chatBox.innerHTML = "";
-    }
-
-    const wrapper = document.createElement("div");
-    wrapper.className = "msg-wrapper me";
-    const msgDiv = document.createElement("div");
-    msgDiv.className = "msg";
-    msgDiv.innerText = text;
-    
-    wrapper.appendChild(msgDiv);
-    chatBox.appendChild(wrapper);
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    try {
-        const res = await fetch(GAS_URL, {
-            method: "POST",
-            body: JSON.stringify({
-                mode: "sendMessage",
-                from: myEmail,
-                to: currentTargetEmail,
-                text: text
-            })
-        });
-        const result = await res.json();
-        
-        if (result.status === "success") {
-            loadChatMessages();
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                sendChatMessage();
+            }
         }
-    } catch (e) {
-        alert("メッセージの送信に失敗しました。電波状況を確認してください。");
-    }
-}
-
-function handleKeyPress(event) {
-    if (event.key === "Enter") {
-        sendChatMessage();
-    }
-}
-</script>
+    </script>
 </body>
+
 </html>

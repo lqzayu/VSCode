@@ -9,46 +9,32 @@
 
     <style>
         /* スマホでの表示崩れ（左ずれ）修正スタイル */
-
-        /* 画面幅が 480px 以下（一般的なスマホ）の時に適用 */
         @media screen and (max-width: 480px) {
-
-            /* 全体を囲むコンテナの余白を少し狭くして、はみ出しを防止 */
             .login-container {
                 padding: 10px;
                 box-sizing: border-box;
-                /* paddingを横幅の計算に含める設定 */
             }
 
-            /* スマホ時における白いカード自体の設定 */
             .login-card {
                 width: 100% !important;
-                /* 横幅を画面幅いっぱいに指定 */
                 max-width: 100% !important;
                 padding: 30px 20px !important;
-                /* 内側の左右余白をスマホ向けに最適化 */
                 margin: 0 auto !important;
-                /* 左右の余白を自動調整し、完全に中央配置 */
                 box-sizing: border-box !important;
-                /* paddingが外側に飛び出すのを防止 */
                 border-radius: 12px;
             }
 
-            /* タイトルの文字サイズ調整 */
             h1 {
                 font-size: 24px !important;
                 margin-bottom: 25px !important;
             }
 
-            /* 入力欄のデザイン調整 */
             .input-group input {
                 padding: 12px 15px !important;
                 font-size: 16px !important;
-                /* スマホで入力しやすい文字サイズ */
                 border-radius: 8px !important;
             }
 
-            /* ボタンのデザイン調整 */
             .btn-primary,
             .btn-flat {
                 padding: 12px !important;
@@ -73,13 +59,16 @@
                     <button type="button" id="toggle-password" onclick="togglePasswordVisibility()"
                         class="toggle-password-btn">表示</button>
                 </div>
-                <div class="confirm-password-wrapper">
+
+                <div class="confirm-password-wrapper" style="display: none;">
                     <input type="password" id="confirm-password" placeholder="Confirm Password"
                         class="confirm-password-input" onkeypress="handleKeyPress(event)">
                     <button type="button" id="toggle-confirm" onclick="toggleconfirmVisibility()"
                         class="toggle-confirm-btn">表示</button>
                 </div>
+
                 <p id="message" class="message"></p>
+
                 <div class="button-group">
                     <div id="login-section">
                         <button class="btn-primary" onclick="handleLogin()">ログイン</button>
@@ -94,55 +83,142 @@
         </div>
     </div>
 
+    <footer class="footer">
+        <div class="footer-container">
+            <p class="copyright">&copy; 2026 平工マッチング. All rights reserved.</p>
+        </div>
+    </footer>
 
     <script>
-        // これらの関数は通常 index-script.js に記述されますが、
-        // 今回の変更を index.html だけで完結させるため、ここに記述しています。
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwITrmNEOqPX9Xe59kAN7gEeyz4R3RocqhC4H6P27n66TS5oWsTQdhyCo1-gl8trb5F/exec";
 
-        function handleLogin() {
-            // 実際のログイン処理をここに記述します
-            console.log("ログインボタンが押されました (Enterキー)");
-            alert("ログイン処理を実行します。");
-            // 例: ログイン成功後にホーム画面へ遷移
-            // window.location.href = "home.html";
-        }
-
-        function handleRegister() {
-            // 実際のアカウント作成処理をここに記述します
-            console.error("アカウント作成ボタンが押されました (Enterキー)");
-            alert("アカウント作成処理を実行します。");
-            // 例: アカウント作成成功後にログイン画面へ戻る
-            // toggleMode('login');
-        }
-
+        // ログイン画面と新規登録画面の切り替え処理
         function toggleMode(mode) {
-            const formTitle = document.getElementById("form-title");
-            const loginSection = document.getElementById("login-section");
-            const registerSection = document.getElementById("register-section");
-            const confirmPasswordWrapper = document.querySelector(".confirm-password-wrapper");
-            const confirmPasswordInput = document.getElementById("confirm-password");
+            const title = document.getElementById("form-title");
+            const confirmWrapper = document.querySelector(".confirm-password-wrapper");
+            const confirmInput = document.getElementById("confirm-password");
             const toggleConfirmBtn = document.getElementById("toggle-confirm");
+            const loginSec = document.getElementById("login-section");
+            const registerSec = document.getElementById("register-section");
+            const msg = document.getElementById("message");
+
+            msg.innerText = "";
 
             if (mode === 'register') {
-                formTitle.innerText = "新規登録";
-                loginSection.style.display = "none";
-                registerSection.style.display = "block";
-                confirmPasswordWrapper.style.display = "block";
-                confirmPasswordInput.style.display = "block";
+                title.innerText = "新規登録";
+                confirmWrapper.style.display = "flex";
+                confirmInput.style.display = "block";
                 toggleConfirmBtn.style.display = "block";
+
+                loginSec.style.display = "none";
+                registerSec.style.display = "block";
             } else {
-                formTitle.innerText = "ログイン";
-                loginSection.style.display = "block";
-                registerSection.style.display = "none";
-                confirmPasswordWrapper.style.display = "none";
-                confirmPasswordInput.style.display = "none";
+                title.innerText = "ログイン";
+                confirmWrapper.style.display = "none";
+                confirmInput.style.display = "none";
                 toggleConfirmBtn.style.display = "none";
+
+                loginSec.style.display = "block";
+                registerSec.style.display = "none";
+
+                document.getElementById("confirm-password").value = "";
             }
         }
 
+        // ログインボタンを押したときの処理
+        async function handleLogin() {
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+            if (!email || !password) return updateMsg("入力してください", "error");
+
+            try {
+                updateMsg("照合中...", "");
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ mode: "login", email, password })
+                });
+                const result = await res.json();
+
+                // GASの戻り値（status === "success"）を正しく判定
+                if (result.status === "success") {
+                    localStorage.setItem("userEmail", email);
+                    updateMsg("成功！移動します...", "success");
+                    setTimeout(() => { window.location.href = "home.html"; }, 1000);
+                } else {
+                    // エラーメッセージ（文字列）をそのまま表示
+                    updateMsg(result.message, "error");
+                }
+            } catch (e) { updateMsg("通信エラー", "error"); }
+        }
+
+        // パスワードの表示／非表示切り替え
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleButton = document.getElementById('toggle-password');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleButton.textContent = '非表示';
+            } else {
+                passwordInput.type = 'password';
+                toggleButton.textContent = '表示';
+            }
+        }
+
+        // 確認用パスワードの表示／非表示切り替え
+        function toggleconfirmVisibility() {
+            const confirmpasswordInput = document.getElementById('confirm-password');
+            const toggleconfirmButton = document.getElementById('toggle-confirm');
+
+            if (confirmpasswordInput.type === 'password') {
+                confirmpasswordInput.type = 'text';
+                toggleconfirmButton.textContent = '非表示';
+            } else {
+                confirmpasswordInput.type = 'password';
+                toggleconfirmButton.textContent = '表示';
+            }
+        }
+
+        // アカウント作成ボタンを押したときの処理
+        async function handleRegister() {
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const confirm = document.getElementById("confirm-password").value.trim();
+
+            if (!email || !password || !confirm) {
+                return updateMsg("入力してください", "error");
+            }
+            if (password !== confirm) return updateMsg("パスワード不一致", "error");
+
+            try {
+                updateMsg("登録中...", "");
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ mode: "register", email, password })
+                });
+                const result = await res.json();
+
+                // GAS側から正常終了（"success"）が返ってきたら画面を切り替える
+                if (result.status === "success") {
+                    updateMsg("登録完了！", "success");
+                    setTimeout(() => toggleMode('login'), 2000);
+                } else {
+                    updateMsg(result.message, "error");
+                }
+            } catch (e) { updateMsg("通信エラー", "error"); }
+        }
+
+        // 画面上のメッセージ書き換え処理
+        function updateMsg(txt, type) {
+            const el = document.getElementById("message");
+            el.innerText = txt;
+            el.className = "message " + type;
+        }
+
+        // Enterキーが押された時の操作制御
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
-                event.preventDefault(); // Enterキーによるフォームの自動送信を防止
+                event.preventDefault();
 
                 const loginSection = document.getElementById("login-section");
                 const registerSection = document.getElementById("register-section");
@@ -155,7 +231,6 @@
             }
         }
     </script>
-    <script src="index-script.js"></script>
 </body>
 
 </html>
