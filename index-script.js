@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwITrmNEOqPX9Xe59kAN7gEeyz4R3RocqhC4H6P27n66TS5oWsTQdhyCo1-gl8trb5F/exec";
+/*const GAS_URL = "https://script.google.com/macros/s/AKfycbwITrmNEOqPX9Xe59kAN7gEeyz4R3RocqhC4H6P27n66TS5oWsTQdhyCo1-gl8trb5F/exec";
 
 function toggleMode(mode) {
     const title = document.getElementById("form-title");
@@ -102,4 +102,4 @@ function updateMsg(txt, type) {
     const el = document.getElementById("message");
     el.innerText = txt;
     el.className = "message " + type;
-}
+}*/

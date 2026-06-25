@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マイページ - 平工マッチング</title>
+
+    <style>
+        /* =====================================
+           ページ全体の基本スタイル
+        ===================================== */
+        body {
+            margin: 0;
+            background-color: #f8fafc;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 10px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1cbdc5;
+            cursor: pointer;
+        }
+
+        /* 常に表示されるナビゲーションリンク */
+        .nav-links {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            color: #666;
+            font-weight: bold;
+            padding: 5px 0;
+            text-decoration: none;
+        }
+
+        .nav-item.active {
+            color: #1cbdc5;
+            border-bottom: 2px solid #1cbdc5;
+        }
+
+        .btn-logout {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background: none;
+            cursor: pointer;
+            color: #ffffff;
+            background-color: #ff0000;
+        }
+
+        /* =====================================
+           マイページ専用コンテンツレイアウト
+        ===================================== */
+        .container {
+            flex: 1;
+            width: 100%;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .profile-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .profile-card h2 {
+            font-size: 28px;
+            margin-top: 0;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .profile-image-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .big-profile-icon {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-file-label {
+            background-color: #f1f5f9;
+            color: #475569;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .input-file-label:hover {
+            background-color: #e2e8f0;
+        }
+
+        .btn-delete-image {
+            background-color: #ffe4e6;
+            color: #e11d48;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-delete-image:hover {
+            background-color: #fecdd3;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 16px;
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        .input-large {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            box-sizing: border-box;
+            outline: none;
+            background-color: #f8fafc;
+            transition: all 0.3s ease;
+        }
+
+        .input-large:focus {
+            border-color: #1cbdc5;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(28, 189, 197, 0.15);
+        }
+
+        .btn-large {
+            width: 100%;
+            padding: 14px 0;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #1cbdc5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.2);
+        }
+
+        .btn-large:hover {
+            background-color: #159ea4;
+            transform: translateY(-1px);
+        }
+
+        .footer {
+            background-color: #ffffff;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 24px 20px;
+            margin-top: auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .copyright {
+            color: #999;
+            font-size: 0.8rem;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="navbar">
+        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
+
+        <!-- メニューは常に横並びで表示（3本線ボタンは削除） -->
+        <nav class="nav-links">
+            <a class="nav-item" href="main.html">ホーム</a>
+            <a class="nav-item" href="messages.html">メッセージ</a>
+            <a class="nav-item active" href="profile.html">マイページ</a>
+            <button class="btn-logout" onclick="logout()">ログアウト</button>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="profile-card">
+            <h2>プロフィール設定</h2>
+
+            <div class="profile-image-group">
+                <img id="profile-icon" class="big-profile-icon"
+                    src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="icon">
+
+                <div class="image-btn-group">
+                    <label for="image-input" class="input-file-label">画像を選択</label>
+                    <button type="button" class="btn-delete-image" onclick="deleteImage()">削除</button>
+                </div>
+
+                <input type="file" id="image-input" accept="image/*" style="display: none;"
+                    onchange="previewImage(event)">
+            </div>
+
+            <div class="form-group">
+                <label for="username-input">表示名</label>
+                <input type="text" id="username-input" class="input-large" placeholder="名前を入力してください">
+            </div>
+
+            <button class="btn-large" onclick="saveProfile()">設定を保存する</button>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <p class="copyright">&copy; 2026 平工マッチング. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+        // メニューの開閉に関するJS（toggleMenu, closeMenu）はすべて削除
+
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("profile-icon").src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function deleteImage() {
+            document.getElementById("profile-icon").src = DEFAULT_AVATAR;
+            document.getElementById("image-input").value = "";
+        }
+
+        function saveProfile() {
+            const name = document.getElementById("username-input").value.trim();
+            const imageSrc = document.getElementById("profile-icon").src;
+
+            if (!name) {
+                alert("表示名を入力してください");
+                return;
+            }
+
+            localStorage.setItem("userName", name);
+            localStorage.setItem("profileImage", imageSrc);
+            alert("プロフィールを保存しました！");
+            location.href = "main.html";
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+
+        window.onload = () => {
+            const userName = localStorage.getItem("userName");
+            const profileImage = localStorage.getItem("profileImage");
+
+            if (userName) document.getElementById("username-input").value = userName;
+
+            if (profileImage && profileImage !== "null") {
+                document.getElementById("profile-icon").src = profileImage;
+            } else {
+                document.getElementById("profile-icon").src = DEFAULT_AVATAR;
+            }
+        };
+    </script>
+</body>
+
+</html>
