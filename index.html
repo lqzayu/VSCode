@@ -23,7 +23,7 @@
                 border-radius: 12px;
             }
 
-            h1 {
+            #form-title {
                 font-size: 24px !important;
                 margin-bottom: 25px !important;
             }
@@ -129,7 +129,7 @@
             if (!email || !password) return updateMsg("入力してください", "error");
 
             try {
-                updateMsg("照合中...", "");
+                updateMsg("ログイン処理中...", "");
                 const res = await fetch(GAS_URL, {
                     method: "POST",
                     body: JSON.stringify({ mode: "login", email, password })
@@ -138,13 +138,14 @@
 
                 if (result.status === "success") {
                     localStorage.setItem("userEmail", email);
-                    updateMsg("成功！移動します...", "success");
-                    // 新しいファイル名「main.html」へ移動するように修正
-                    setTimeout(() => { window.location.href = "main.html"; }, 1000);
+                    updateMsg("ログイン成功", "success");
+
+                    // 🌟 変更点: setTimeoutを無くして、即座に遷移するように修正
+                    window.location.href = "main.html";
                 } else {
                     updateMsg(result.message, "error");
                 }
-            } catch (e) { updateMsg("通信エラー", "error"); }
+            } catch (e) { updateMsg("通信エラーです。しばらくしてからお試しください。", "error"); }
         }
 
         function togglePasswordVisibility() {
@@ -189,7 +190,8 @@
 
                 if (result.status === "success") {
                     updateMsg("登録完了！", "success");
-                    setTimeout(() => toggleMode('login'), 2000);
+                    // 新規登録成功時は、一瞬ユーザーが確認できるように少しだけ待機を短くした(2秒→0.5秒)か、即移行ならここも変えられます
+                    setTimeout(() => toggleMode('login'), 350);
                 } else {
                     updateMsg(result.message, "error");
                 }
