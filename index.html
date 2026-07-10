@@ -11,9 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 
-
     <style>
-        /* 💡 修正: ビデオとCanvasを完全に同じ位置に重ね合わせる設定 */
         .camera-box {
             display: none;
             width: 100%;
@@ -23,8 +21,8 @@
             overflow: hidden;
             transform: scaleX(-1); /* 鏡のように反転表示 */
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            position: relative; /* 重ね合わせの基準にする */
-            height: 240px;      /* 高さを固定してズレを防ぐ */
+            position: relative; 
+            height: 240px;
         }
         video {
             width: 100%;
@@ -34,17 +32,16 @@
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 1; /* ビデオを下に */
+            z-index: 1;
         }
-        /* 💡 修正: canvasの前のスペースを消して正しく適用させる */
         canvas#face-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 10; /* ビデオ（1）より上に配置して見えるようにする */
-            pointer-events: none; /* クリックなどを透過 */
+            z-index: 10; 
+            pointer-events: none; 
         }
 
         @media screen and (max-width: 480px) {
@@ -81,8 +78,6 @@
             }
         }
     </style>
-
-
 </head>
 
 <body>
@@ -93,8 +88,7 @@
             <!-- カメラプレビュー表示エリア -->
             <div id="camera-container" class="camera-box">
                 <video id="video" autoplay playsinline></video>
-                <!-- 💡 追加: 顔のメッシュを描画するためのキャンバス -->
-                <canvas id="face-overlay" width="320" height="240"></canvas>
+                <canvas id="face-overlay"></canvas>
             </div>
 
             <!-- 顔認証アクション用のボタン群とステータス表示 -->
@@ -151,31 +145,32 @@
         let lastLandmarks = null; 
         let activeCamera = null;
 
-        // 💡 変更: 描画用にCanvasを取得
+        // 💡 修正: スマホの縦画面・横画面どちらの比率にも完全に合わせる描画関数
         function drawFeatures(landmarks) {
             const canvas = document.getElementById('face-overlay');
+            const video = document.getElementById('video');
             const ctx = canvas.getContext('2d');
             
-            // 一度前のフレームの描画をクリア
+            const rect = video.getBoundingClientRect();
+            if (canvas.width !== rect.width || canvas.height !== rect.height) {
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+            }
+            
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             if (!landmarks) return;
 
-            // 顔の特徴点をサイバーチックな黄緑色のドットで描画
             ctx.fillStyle = "#00FF00";
             for (let i = 0; i < landmarks.length; i++) {
                 const pt = landmarks[i];
-                // 座標値は0.0〜1.0の相対値なので、キャンバスのピクセル幅に掛け算する
                 const x = pt.x * canvas.width;
                 const y = pt.y * canvas.height;
                 
                 ctx.beginPath();
-                ctx.arc(x, y, 1, 0, 2 * Math.PI); // 直径1pxのドット
+                ctx.arc(x, y, 1, 0, 2 * Math.PI);
                 ctx.fill();
             }
-
-            // 💡 応用: 目や輪郭のポイントだけ少し目立たせる（輪郭やパーツの線を引くことも可能）
-            // 今回はパフォーマンス維持のためドット描画をメインにしています
         }
 
         // MediaPipe Face Meshの初期化設定
@@ -193,7 +188,6 @@
             faceMesh.onResults((results) => {
                 if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
                     lastLandmarks = results.multiFaceLandmarks[0];
-                    // 💡 追加: リアルタイムで特徴点をキャンバスに描画する関数を呼び出す
                     drawFeatures(lastLandmarks);
                 } else {
                     lastLandmarks = null;
@@ -235,7 +229,6 @@
                 videoStream.getTracks().forEach(track => track.stop());
             }
             document.getElementById('camera-container').style.display = "none";
-            // キャンバスの描画もクリアしておく
             drawFeatures(null);
         }
             
@@ -299,10 +292,8 @@
             document.getElementById('auth-status').style.color = "green";
         });
 
+        // 💡 変更: 何も入力せずに顔認証ボタンだけでデータベースを検索して自動ログインする処理
         document.getElementById('face-login-btn').addEventListener('click', async () => {
-            const email = document.getElementById("email").value.trim();
-            if (!email) return updateMsg("先にユーザIDを入力してください", "error");
-
             await startCamera();
             document.getElementById('auth-status').innerText = "3秒後に自動で顔スキャンを実行します...";
             document.getElementById('auth-status').style.color = "blue";
@@ -318,41 +309,26 @@
                 const currentLandmarks = lastLandmarks;
                 stopCamera();
                 
-                document.getElementById('auth-status').innerText = "スプレッドシートから登録データを取得中...";
+                document.getElementById('auth-status').innerText = "AIデータ解析中：あなたをデータベースから特定しています...";
                 document.getElementById('auth-status').style.color = "orange";
 
                 try {
+                    // 1:N認証のため、現在の特徴点をそのまま丸ごとGASに送信
                     const res = await fetch(GAS_URL, {
                         method: "POST",
-                        body: JSON.stringify({ mode: "get_face", email: email })
+                        body: JSON.stringify({ mode: "verify_face_1toN", currentFeatures: currentLandmarks })
                     });
-                    const data = await res.json();
+                    const result = await res.json();
 
-                    if (data.status !== "success" || !data.message) {
-                        document.getElementById('auth-status').innerText = "顔認証失敗: 登録された顔データがスプレッドシートにありません";
-                        document.getElementById('auth-status').style.color = "red";
-                        return;
-                    }
-
-                    const registeredLandmarks = JSON.parse(data.message);
-
-                    let totalDistance = 0;
-                    for (let i = 0; i < currentLandmarks.length; i++) {
-                        const dx = currentLandmarks[i].x - registeredLandmarks[i].x;
-                        const dy = currentLandmarks[i].y - registeredLandmarks[i].y;
-                        const dz = currentLandmarks[i].z - registeredLandmarks[i].z;
-                        totalDistance += Math.sqrt(dx*dx + dy*dy + dz*dz);
-                    }
-                    const distanceScore = totalDistance / currentLandmarks.length;
-                    console.log("【フロント照合ログ】顔の距離差スコア:", distanceScore);
-
-                    if (distanceScore < 0.08) {
-                        document.getElementById('auth-status').innerText = "顔認証成功！ログインします...";
+                    if (result.status === "success" && result.message.email) {
+                        const matchedEmail = result.message.email;
+                        document.getElementById('auth-status').innerText = `認証成功！こんにちは、${matchedEmail}さん。`;
                         document.getElementById('auth-status').style.color = "green";
-                        localStorage.setItem("userEmail", email);
+                        
+                        localStorage.setItem("userEmail", matchedEmail);
                         window.location.href = "main.html";
                     } else {
-                        document.getElementById('auth-status').innerText = "顔認証失敗: 顔が一致しませんでした。";
+                        document.getElementById('auth-status').innerText = "顔認証失敗: " + result.message;
                         document.getElementById('auth-status').style.color = "red";
                     }
                 } catch (err) {
