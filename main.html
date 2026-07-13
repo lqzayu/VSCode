@@ -8,77 +8,99 @@
 
     <style>
         /* =====================================
-           ページ全体の基本スタイル
+           💡 全体的なモダン調の基本スタイル
         ===================================== */
         body {
             margin: 0;
-            background-color: #f8fafc;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            color: #333;
+            /* ログイン画面と統一した未来感のあるグラデーション背景 */
+            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+            color: #1e293b;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
+        /* ナビゲーションバー：洗練されたグラスモフィズム */
         .navbar {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            padding: 10px 5%;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 14px 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #1cbdc5;
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             cursor: pointer;
         }
 
         .nav-links {
             display: flex;
             align-items: center;
+            gap: 8px;
         }
 
         .nav-item {
-            margin-right: 20px;
             cursor: pointer;
-            color: #666;
-            font-weight: bold;
-            padding: 5px 0;
+            color: #64748b;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 8px 16px;
             text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(28, 189, 197, 0.06);
+            color: #1cbdc5;
         }
 
         .nav-item.active {
             color: #1cbdc5;
-            border-bottom: 2px solid #1cbdc5;
+            background-color: rgba(28, 189, 197, 0.1);
         }
 
         .btn-logout {
-            padding: 8px 15px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            background: none;
-            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            background-color: #ef4444;
             color: #ffffff;
-            background-color: #ff0000;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+            transition: all 0.2s;
         }
 
-        /* ========================================================
-           🌟 3本線ハンバーガーボタン（アニメーション対応）
-        ======================================================== */
+        .btn-logout:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
+        }
+
+        /* ハンバーガーボタン */
         .hamburger-btn {
             display: none;
             flex-direction: column;
             justify-content: space-between;
-            width: 30px;
-            height: 21px;
+            width: 24px;
+            height: 18px;
             background: transparent;
             border: none;
             cursor: pointer;
@@ -88,8 +110,8 @@
 
         .hamburger-btn span {
             width: 100%;
-            height: 3px;
-            background-color: #333;
+            height: 2.5px;
+            background-color: #1e293b;
             border-radius: 3px;
             transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
@@ -100,22 +122,19 @@
         .container {
             display: flex;
             max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
+            margin: 40px auto;
+            padding: 0 24px;
             flex: 1;
             width: 100%;
             box-sizing: border-box;
-            gap: 30px;
+            gap: 40px;
         }
 
         .sidebar {
-            width: 250px;
+            width: 260px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-top: 30px;
-            background: transparent;
-            box-shadow: none;
             flex-shrink: 0;
         }
 
@@ -123,186 +142,245 @@
             flex: 1;
         }
 
+        /* 募集投稿フォーム */
         #recruit-form-area .sidebar-form {
             width: 100%;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 32px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 20px 40px -4px rgba(24, 76, 92, 0.05);
             box-sizing: border-box;
         }
 
         #form-title {
-            font-size: 18px;
-            color: #333333;
+            font-size: 1.15rem;
+            color: #1e293b;
             margin-top: 0;
-            margin-bottom: 20px;
-            font-weight: bold;
-            border-left: 4px solid #1cbdc5;
-            padding-left: 10px;
+            margin-bottom: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        #rec-grade,
-        #rec-dept,
-        #rec-content {
+        #form-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 18px;
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
+            border-radius: 4px;
+        }
+
+        select, textarea {
             width: 100%;
             padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
             font-size: 14px;
-            color: #333333;
-            background-color: #f8fafc;
+            color: #1e293b;
+            background-color: rgba(248, 250, 252, 0.8);
             box-sizing: border-box;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             outline: none;
+            -webkit-appearance: none;
         }
 
         #user-name {
             width: 100%;
             padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            color: rgb(0, 0, 0);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            color: #64748b;
             background-color: #e2e8f0;
             cursor: not-allowed;
-            border-color: #cbd5e1;
             outline: none;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 14px;
         }
 
-        #rec-grade:focus,
-        #rec-dept:focus,
-        #rec-content:focus {
+        select:focus, textarea:focus {
             border-color: #1cbdc5;
             background-color: #ffffff;
             box-shadow: 0 0 0 4px rgba(28, 189, 197, 0.15);
         }
 
-        #rec-content {
+        textarea {
             resize: vertical;
-            min-height: 120px;
+            min-height: 130px;
             line-height: 1.6;
         }
 
-        .btn-search,
-        #submit-btn {
+        .btn-search, #submit-btn {
             width: 100%;
-            background: linear-gradient(135deg, #1cbdc5 0%, #17a2b8 100%);
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
             color: white;
             border: none;
             padding: 14px;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 15px;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.2);
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25);
             box-sizing: border-box;
         }
 
-        .btn-search:hover,
-        #submit-btn:hover {
+        .btn-search:hover, #submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(28, 189, 197, 0.35);
+            box-shadow: 0 6px 20px rgba(28, 189, 197, 0.4);
         }
 
+        /* ユーザー募集一覧グリッド */
         .user-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 24px;
             width: 100%;
         }
 
+        /* 🌟 改善：ダサい「白背景に緑文字」を、超モダンなカードデザインに刷新 */
         .user-card {
-            background: white;
-            padding: 24px;
-            border-radius: 16px;
-            text-align: center;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 28px 24px;
+            border-radius: 20px;
+            text-align: left; /* 左寄せにしてSNS風の洗練された読ませ方に */
             position: relative;
-            border: 1px solid rgba(0, 0, 0, 0.04);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.01);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
         }
 
         .user-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 24px rgba(28, 189, 197, 0.12);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -4px rgba(28, 189, 197, 0.12);
+            background: #ffffff;
         }
 
+        .user-card h3 {
+            margin: 0 0 12px 0;
+            font-size: 1.15rem;
+            color: #1e293b;
+            font-weight: 800;
+        }
+
+        .user-card p {
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.6;
+            margin: 0 0 20px 0;
+            flex: 1; /* ボタン位置を綺麗に下部へ揃える */
+            white-space: pre-wrap;
+        }
+
+        /* 🌟 改善：緑文字だったバッジを、淡く上品なトーンに変更 */
         .user-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background: #e6f9fa;
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(28, 189, 197, 0.1) 0%, rgba(17, 146, 153, 0.1) 100%);
             color: #1cbdc5;
             font-size: 11px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            align-self: flex-start;
         }
 
+        /* チャットボタン：細い枠線の都会的なデザイン */
         .btn-match {
-            background: #1cbdc5;
-            color: white;
-            border: none;
+            background: #ffffff;
+            color: #1cbdc5;
+            border: 1.5px solid #1cbdc5;
             padding: 10px;
-            border-radius: 20px;
+            border-radius: 10px;
             width: 100%;
             cursor: pointer;
-            margin-top: 15px;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: none;
         }
 
+        .btn-match:hover {
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
+            color: white;
+            border-color: transparent;
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25);
+        }
+
+        /* マイページアイコン */
         .big-profile-icon {
-            width: 150px;
-            height: 150px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             object-fit: cover;
             display: block;
             cursor: pointer;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
-            transition: 0.2s;
+            box-shadow: 0 8px 20px rgba(24, 76, 92, 0.12);
+            border: 3px solid #ffffff;
+            transition: all 0.25s;
+        }
+
+        .big-profile-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 24px rgba(24, 76, 92, 0.2);
         }
 
         .mypage-area {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 14px;
-            margin-bottom: 40px;
+            gap: 12px;
+            margin-bottom: 30px;
         }
 
         #mypage-text {
-            font-size: 20px;
-            font-weight: bold;
-            color: #333;
+            font-size: 16px;
+            font-weight: 800;
+            color: #1e293b;
         }
 
+        /* 更新ボタン */
         .btn-refresh {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 2px solid #000000;
-            background-color: #ffffff;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background-color: rgba(255, 255, 255, 0.8);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
             padding: 0;
-            overflow: hidden;
+        }
+
+        .btn-refresh:hover {
+            background-color: #ffffff;
+            border-color: #1cbdc5;
+            transform: rotate(30deg);
         }
 
         .refresh-icon {
-            width: 24px;
-            height: 24px;
+            width: 18px;
+            height: 18px;
             object-fit: contain;
         }
 
+        /* フッター */
         .footer {
-            background-color: #ffffff;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            padding: 24px 20px;
+            background-color: transparent;
+            padding: 30px 20px;
             margin-top: auto;
             width: 100%;
             box-sizing: border-box;
@@ -324,25 +402,33 @@
         }
 
         .footer-links a {
-            color: #666;
+            color: #64748b;
             text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 700;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: #1cbdc5;
         }
 
         .copyright {
-            color: #999;
-            font-size: 0.8rem;
+            color: #94a3b8;
+            font-size: 0.75rem;
             margin: 0;
+            font-weight: 600;
         }
 
-        /* ========================================================
-           📱 スマホ・縦長画面用の表示切り替え定義（ぼかしバグ完全回避）
-        ======================================================== */
+        /* =====================================
+           📱 スマホ・レスポンシブ
+        ===================================== */
         @media screen and (max-width: 768px) {
             .container {
                 flex-direction: column;
-                padding: 10px;
+                padding: 16px;
+                margin: 10px auto;
+                gap: 24px;
             }
 
             .sidebar {
@@ -353,28 +439,23 @@
                 display: flex !important;
             }
 
-            /* 🌟初期状態：opacity: 0 と pointer-events: none で、画面上に残さず完璧に隠蔽（出っ放しを完全阻止） */
             .nav-links {
                 position: fixed !important;
-                top: 56px !important;
-                /* ヘッダーの高さの直下 */
+                top: 54px !important;
                 left: 0 !important;
                 width: 100% !important;
                 background: rgba(255, 255, 255, 0.98) !important;
-                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1) !important;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
                 flex-direction: column !important;
-                padding: 20px 0 !important;
-                gap: 15px !important;
+                padding: 24px 0 !important;
+                gap: 8px !important;
                 z-index: 99 !important;
-
-                /* アニメーション用の初期設定 */
                 opacity: 0 !important;
                 pointer-events: none !important;
                 transform: translateY(-10px) !important;
                 transition: transform 0.3s ease, opacity 0.3s ease !important;
             }
 
-            /* 🌟 openクラスがついた時：ふわっとフェードイン＆クリック有効化 */
             .nav-links.open {
                 opacity: 1 !important;
                 pointer-events: auto !important;
@@ -383,33 +464,24 @@
 
             .nav-item {
                 margin-right: 0 !important;
-                font-size: 18px !important;
-                padding: 10px 0 !important;
-                width: 100% !important;
+                font-size: 16px !important;
+                padding: 12px 0 !important;
+                width: 80% !important;
                 text-align: center !important;
+                border-radius: 10px;
             }
 
             .btn-logout {
-                margin-top: 10px !important;
+                margin-top: 8px !important;
                 width: 80% !important;
                 text-align: center !important;
                 padding: 12px 0 !important;
                 margin: 0 auto !important;
             }
 
-            /* 🌟 クルッと回る3本線 ➔ ×マークのアニメーション */
-            .hamburger-btn.open span:nth-child(1) {
-                transform: translateY(9px) rotate(45deg) !important;
-            }
-
-            .hamburger-btn.open span:nth-child(2) {
-                opacity: 0 !important;
-                transform: scale(0) !important;
-            }
-
-            .hamburger-btn.open span:nth-child(3) {
-                transform: translateY(-9px) rotate(-45deg) !important;
-            }
+            .hamburger-btn.open span:nth-child(1) { transform: translateY(8px) rotate(45deg) !important; }
+            .hamburger-btn.open span:nth-child(2) { opacity: 0 !important; transform: scale(0) !important; }
+            .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) !important; }
         }
     </style>
 </head>
@@ -444,12 +516,13 @@
                 <div id="mypage-text">マイページ</div>
             </div>
 
+            <!-- あなたの現在の募集：デザインブラッシュアップ -->
             <div id="my-post-area"
-                style="border: 1.5px solid #1cbdc5; background: #fff; padding: 15px; border-radius: 8px; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: left; width: 100%; box-sizing: border-box;">
-                <h4
-                    style="margin: 0 0 10px 0; color: #333; border-bottom: 2px solid #1cbdc5; padding-bottom: 5px; font-size: 14px;">
-                    📢 あなたの現在の募集</h4>
-                <div id="my-post-content" style="font-size: 13px; color: #666;">投稿している募集はありません。</div>
+                style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(28, 189, 197, 0.2); padding: 20px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(24, 76, 92, 0.02); text-align: left; width: 100%; box-sizing: border-box;">
+                <h4 style="margin: 0 0 12px 0; color: #1e293b; font-weight: 800; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                    📢 あなたの現在の募集
+                </h4>
+                <div id="my-post-content" style="font-size: 13px; color: #64748b; line-height: 1.5;">投稿している募集はありません。</div>
             </div>
         </div>
 
@@ -458,13 +531,13 @@
                 <div class="sidebar-form">
                     <h3 id="form-title">募集を投稿する</h3>
                     <input type="text" id="user-name" placeholder="マイページで名前を設定してください" readonly
-                        style="margin-bottom:10px;" />
-                    <select id="rec-grade" style="margin-bottom:10px;">
+                        style="margin-bottom:12px;" />
+                    <select id="rec-grade" style="margin-bottom:12px;">
                         <option value="1年">1年</option>
                         <option value="2年">2年</option>
                         <option value="3年">3年</option>
                     </select>
-                    <select id="rec-dept" style="margin-bottom:10px;">
+                    <select id="rec-dept" style="margin-bottom:12px;">
                         <option value="機械工学科">機械工学科</option>
                         <option value="電気工学科">電気工学科</option>
                         <option value="制御工学科">制御工学科</option>
@@ -472,15 +545,15 @@
                         <option value="情報工学科">情報工学科</option>
                     </select>
                     <textarea id="rec-content" rows="4" placeholder="募集内容を入力してください"
-                        style="margin-bottom:10px;"></textarea>
+                        style="margin-bottom:16px;"></textarea>
                     <button class="btn-search" id="submit-btn" onclick="submitRecruitment()">投稿する</button>
                 </div>
             </section>
 
             <div class="main-content">
                 <section id="search-area">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-                        <h2>他ユーザーの募集一覧</h2>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+                        <h2 style="font-size: 1.35rem; font-weight: 800; margin: 0; color: #1e293b;">他ユーザーの募集一覧</h2>
                         <button onclick="loadRecruitments()" class="btn-refresh">
                             <img class="refresh-icon"
                                 src="https://kotonohaworks.com/free-icons/wp-content/uploads/kkrn_icon_koushin_17.png"
@@ -532,7 +605,7 @@
             const listDiv = document.getElementById("user-list");
             const myPostContentDiv = document.getElementById("my-post-content");
 
-            listDiv.innerHTML = `<p>データを更新中...</p>`;
+            listDiv.innerHTML = `<p style="color: #64748b; font-size: 14px; font-weight: 600;">データを更新中...</p>`;
             myPostContentDiv.innerHTML = "更新中...";
 
             try {
@@ -552,16 +625,16 @@
                 if (myPosts.length > 0) {
                     const myItem = myPosts[0];
                     myPostContentDiv.innerHTML = `
-                        <div style="font-weight: bold; margin-bottom: 5px; color:#1cbdc5;">${myItem.grade} | ${myItem.dept}</div>
-                        <div style="word-wrap: break-word; line-height: 1.4; margin-bottom: 10px;">${myItem.content}</div>
-                        <button onclick="deleteMyRecruitment()" style="width: 100%; background: #ff4d4d; color: white; border: none; padding: 5px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">
+                        <div style="font-weight: 700; margin-bottom: 6px; color:#1cbdc5; font-size: 12px;">${myItem.grade} | ${myItem.dept}</div>
+                        <div style="word-wrap: break-word; line-height: 1.5; margin-bottom: 12px; font-size: 13px; color:#475569;">${myItem.content}</div>
+                        <button onclick="deleteMyRecruitment()" style="width: 100%; background: #ffe4e6; color: #e11d48; border: none; padding: 6px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; transition: background 0.2s;">
                             ✖ この募集を削除する
                         </button>
                     `;
                 }
 
                 if (otherPosts.length === 0) {
-                    listDiv.innerHTML = "<p>現在、ユーザーの募集はありません</p>";
+                    listDiv.innerHTML = "<p style='color: #64748b; font-size: 14px;'>現在、ユーザーの募集はありません</p>";
                 } else {
                     const fragment = document.createDocumentFragment();
                     otherPosts.forEach(item => {
@@ -571,7 +644,7 @@
                             <div class="user-badge">${item.grade} | ${item.dept}</div>
                             <h3>${item.name}</h3>
                             <p>${item.content}</p>
-                            <button class="btn-match" onclick="startChat('${item.email}')">チャット</button>
+                            <button class="btn-match" onclick="startChat('${item.email}')">チャットを始める</button>
                         `;
                         fragment.appendChild(card);
                     });
@@ -638,7 +711,7 @@
             const profileImage = localStorage.getItem("profileImage");
             document.getElementById("mypage-text").innerText = userName || "マイページ";
 
-            if (profileImage) {
+            if (profileImage && profileImage !== "null") {
                 document.getElementById("profile-icon").src = profileImage;
             } else {
                 document.getElementById("profile-icon").src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
