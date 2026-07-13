@@ -7,7 +7,7 @@
     <title>ログイン - 平工マッチング</title>
     <link rel="stylesheet" href="index-style.css">
 
-    <!-- ブラウザで直接顔認証を行うためのMediaPipe公式ライブラリ群 -->
+    <!-- MediaPipe公式ライブラリ -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 
@@ -91,12 +91,12 @@
                 <canvas id="face-overlay"></canvas>
             </div>
 
-            <!-- 顔認証アクション用のボタン群とステータス表示 -->
             <div id="face-auth-section" style="margin-bottom: 15px; text-align: center;">
                 <button type="button" id="face-login-btn" class="btn-primary" style="background-color: #1cbdc5; margin-bottom: 5px;">顔認証でログイン</button>
                 <button type="button" id="face-register-btn" class="btn-primary" style="background-color: #e67e22; margin-bottom: 5px; display: none;">顔情報を撮影・登録</button>
                 <p id="auth-status" style="color: gray; font-size: 14px; margin: 5px 0 0 0; min-height: 20px;"></p>
             </div>
+
 
             <div class="input-group">
                 <input type="text" id="email" placeholder="ユーザID" inputmode="email" onkeypress="handleKeyPress(event)">
@@ -119,6 +119,7 @@
 
                 <div class="button-group">
                     <div id="login-section">
+                        
                         <button class="btn-primary" onclick="handleLogin()">ログイン</button>
                         <button class="btn-flat" onclick="toggleMode('register')">新規登録はこちら</button>
                         <p>まだスマホの縦画面では上手く顔認証動作しません！</p>

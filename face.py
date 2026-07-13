@@ -15,15 +15,13 @@ CORS(app)  # 全てのアロケーションを許可
 mp_face_mesh = mp.solutions.face_mesh
 
 def base64_to_cv2(b64_str):
-    """Base64文字列をOpenCVの画像形式(BGR)に変換する関数"""
     if "," in b64_str:
         b64_str = b64_str.split(",")[1]
     img_data = base64.b64decode(b64_str)
     np_arr = np.frombuffer(img_data, np.uint8)
     return cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
 
-def get_face_landmarks(image):
-    """画像から顔の特徴点（主要な20点など）の相対座標リストを抽出する"""
+def get_face_landmarks(image):  #画像から顔の特徴点の相対座標リストを抽出する
     h, w, _ = image.shape
     rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     
@@ -33,7 +31,7 @@ def get_face_landmarks(image):
             return None
         
         landmarks = results.multi_face_landmarks[0].landmark
-        # 顔全体のバランスを測るための代表的な特徴点の相対座標を取得
+        #特徴点の相対座標を取得
         points = []
         for lm in landmarks:
             points.append([lm.x, lm.y, lm.z])
