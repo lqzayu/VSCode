@@ -6,9 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>マイページ - 平工マッチング</title>
 
-    <!-- 💡 追加: 画像切り抜き用ライブラリ Cropper.js の読み込み (CSS & JS) -->
+    <!-- 画像切り抜き用ライブラリ Cropper.js の読み込み (CSS & JS) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" crossorigin="anonymous"></script>
+
+    <!-- 💡 追加: 顔データ更新用の MediaPipe 公式ライブラリ -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 
     <style>
         /* =====================================
@@ -16,8 +20,8 @@
         ===================================== */
         body {
             margin: 0;
-            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+            background: radial-gradient(circle at 50% 50%, #f4f8fa 0%, #e9f2f5 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
             color: #1e293b;
             display: flex;
             flex-direction: column;
@@ -42,59 +46,74 @@
         }
 
         .logo {
-            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .logo:hover {
+            opacity: 0.85;
+        }
+
+        .logo-text {
+            font-size: 1.3rem;
             font-weight: 800;
-            letter-spacing: -0.03em;
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
+            letter-spacing: -0.05em;
+            color: #0f172a;
+        }
+
+        .logo-text span {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            cursor: pointer;
+            font-weight: 900;
         }
 
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
         }
 
         .nav-item {
             cursor: pointer;
-            color: #64748b;
+            color: #475569;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13.5px;
             padding: 8px 16px;
             text-decoration: none;
-            border-radius: 8px;
+            border-radius: 10px;
             transition: all 0.2s ease;
         }
 
         .nav-item:hover {
-            background-color: rgba(28, 189, 197, 0.06);
-            color: #1cbdc5;
+            background-color: rgba(2, 132, 199, 0.05);
+            color: #0284c7;
         }
 
         .nav-item.active {
-            color: #1cbdc5;
-            background-color: rgba(28, 189, 197, 0.1);
+            color: #0284c7;
+            background-color: rgba(2, 132, 199, 0.08);
         }
 
         .btn-logout {
             padding: 8px 16px;
-            border-radius: 8px;
+            border-radius: 10px;
             border: none;
-            background-color: #ef4444;
+            background-color: #f43f5e;
             color: #ffffff;
             font-weight: 700;
             font-size: 13px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+            box-shadow: 0 4px 12px rgba(244, 63, 94, 0.15);
             transition: all 0.2s;
         }
 
         .btn-logout:hover {
-            opacity: 0.9;
             transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
+            box-shadow: 0 6px 16px rgba(244, 63, 94, 0.25);
         }
 
         /* ハンバーガーボタン */
@@ -102,8 +121,8 @@
             display: none;
             flex-direction: column;
             justify-content: space-between;
-            width: 24px;
-            height: 18px;
+            width: 20px;
+            height: 15px;
             background: transparent;
             border: none;
             cursor: pointer;
@@ -113,8 +132,8 @@
 
         .hamburger-btn span {
             width: 100%;
-            height: 2.5px;
-            background-color: #1e293b;
+            height: 2px;
+            background-color: #0f172a;
             border-radius: 3px;
             transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
@@ -132,22 +151,22 @@
         }
 
         .profile-card {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             padding: 40px 32px;
             border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 20px 40px -4px rgba(24, 76, 92, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 20px 40px -4px rgba(15, 23, 42, 0.04);
             text-align: center;
             box-sizing: border-box;
         }
 
         .profile-card h2 {
-            font-size: 1.5rem;
+            font-size: 1.35rem;
             margin-top: 0;
             margin-bottom: 35px;
-            color: #1e293b;
+            color: #0f172a;
             font-weight: 800;
         }
 
@@ -164,7 +183,7 @@
             height: 120px;
             border-radius: 50%;
             object-fit: cover;
-            box-shadow: 0 10px 25px rgba(24, 76, 92, 0.12);
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
             border: 4px solid #ffffff;
             transition: transform 0.25s ease;
         }
@@ -187,7 +206,7 @@
 
         .input-file-label:hover {
             background-color: rgba(0, 0, 0, 0.08);
-            color: #1e293b;
+            color: #0f172a;
         }
 
         .btn-delete-image {
@@ -229,15 +248,15 @@
             border-radius: 12px;
             box-sizing: border-box;
             outline: none;
-            background-color: rgba(248, 250, 252, 0.8);
-            color: #1e293b;
+            background-color: rgba(248, 250, 252, 0.6);
+            color: #0f172a;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .input-large:focus {
-            border-color: #1cbdc5;
+            border-color: #0284c7;
             background-color: #ffffff;
-            box-shadow: 0 0 0 4px rgba(28, 189, 197, 0.15);
+            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.12);
         }
 
         .btn-large {
@@ -245,31 +264,51 @@
             padding: 14px 0;
             font-size: 15px;
             font-weight: 700;
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
             color: white;
             border: none;
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.25s ease;
-            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
         }
 
         .btn-large:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(28, 189, 197, 0.4);
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.35);
         }
 
-        /* ========================================================
-           🌟 追加: クロップ（トリミング）用モーダルウィンドウのUI
-        ======================================================== */
+        /* 💡 追加: 顔認証アップデート用の控えめボタン */
+        .btn-update-face {
+            background-color: transparent;
+            color: #64748b;
+            text-decoration: underline;
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 16px;
+            box-shadow: none;
+            display: inline-block;
+            width: auto;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-update-face:hover {
+            background-color: rgba(2, 132, 199, 0.05);
+            color: #0284c7;
+            transform: none;
+        }
+
+        /* クロップモーダル */
         .crop-modal {
-            display: none; /* 初期状態は隠す */
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: rgba(15, 23, 42, 0.6); /* 背景をダークにぼかす */
+            background-color: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             z-index: 2000;
@@ -297,7 +336,6 @@
             font-weight: 800;
         }
 
-        /* ライブラリが画像を広げるエリアのサイズを適正に制限 */
         .img-container {
             width: 100%;
             max-height: 300px;
@@ -324,8 +362,88 @@
         .btn-crop-cancel:hover { background-color: #e2e8f0; }
 
         .btn-crop-done {
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
             color: white;
+        }
+
+        /* 💡 追加: 顔スキャン用モーダルウィンドウ */
+        .face-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .face-modal-content {
+            background-color: #ffffff;
+            padding: 28px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .face-modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        /* スキャン用カメラボックス（ネオン調の枠線） */
+        .camera-box-mini {
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto 16px auto;
+            border-radius: 16px;
+            overflow: hidden;
+            transform: scaleX(-1);
+            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.15);
+            position: relative; 
+            height: 240px;
+            border: 2px solid rgba(2, 132, 199, 0.3);
+            background-color: #000;
+        }
+
+        .camera-box-mini video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .camera-box-mini canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10; 
+            pointer-events: none; 
+        }
+
+        .face-status-text {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0284c7;
+            margin-bottom: 16px;
+            min-height: 20px;
         }
 
         /* フッター */
@@ -377,7 +495,7 @@
                 left: 0 !important;
                 width: 100% !important;
                 background: rgba(255, 255, 255, 0.98) !important;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+                box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08) !important;
                 flex-direction: column !important;
                 padding: 24px 0 !important;
                 gap: 8px !important;
@@ -396,7 +514,7 @@
 
             .nav-item {
                 margin-right: 0 !important;
-                font-size: 16px !important;
+                font-size: 15px !important;
                 padding: 12px 0 !important;
                 width: 80% !important;
                 text-align: center !important;
@@ -411,9 +529,9 @@
                 margin: 0 auto !important;
             }
 
-            .hamburger-btn.open span:nth-child(1) { transform: translateY(8px) rotate(45deg) !important; }
+            .hamburger-btn.open span:nth-child(1) { transform: translateY(6px) rotate(45deg) !important; }
             .hamburger-btn.open span:nth-child(2) { opacity: 0 !important; transform: scale(0) !important; }
-            .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) !important; }
+            .hamburger-btn.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg) !important; }
         }
     </style>
 </head>
@@ -421,7 +539,9 @@
 <body>
 
     <header class="navbar">
-        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
+        <div class="logo" onclick="location.href='main.html'">
+            <div class="logo-text">平工<span>マッチング</span></div>
+        </div>
 
         <!-- 3本線ボタン -->
         <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
@@ -461,10 +581,13 @@
             </div>
 
             <button class="btn-large" onclick="saveProfile()">設定を保存する</button>
+            
+            <!-- 💡 追加: 顔認証アップデート用ボタン -->
+            <button class="btn-update-face" onclick="startFaceUpdate()">顔認証情報をアップデートする</button>
         </div>
     </main>
 
-    <!-- 💡 追加: 範囲指定トリミング用モーダル画面の配置 -->
+    <!-- 範囲指定トリミング用モーダル -->
     <div id="cropModal" class="crop-modal">
         <div class="crop-modal-content">
             <h3>プロフィールの表示範囲を選択</h3>
@@ -478,6 +601,21 @@
         </div>
     </div>
 
+    <!-- 💡 追加: 顔認証アップデート用カメラモーダル -->
+    <div id="faceModal" class="face-modal">
+        <div class="face-modal-content">
+            <h3>顔データのアップデート</h3>
+            <div class="camera-box-mini">
+                <video id="face-video" autoplay playsinline></video>
+                <canvas id="face-mesh-canvas"></canvas>
+            </div>
+            <div id="face-status" class="face-status-text">カメラを初期化中...</div>
+            <div class="crop-btn-group">
+                <button type="button" class="btn-crop-cancel" style="width: 100%;" onclick="closeFaceModal()">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
     <footer class="footer">
         <div class="footer-container">
             <p class="copyright">&copy; 2026 平工マッチング. All rights reserved.</p>
@@ -486,7 +624,13 @@
 
     <script>
         const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-        let cropper = null; // Cropperインスタンス保持用変数
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwITrmNEOqPX9Xe59kAN7gEeyz4R3RocqhC4H6P27n66TS5oWsTQdhyCo1-gl8trb5F/exec";
+        
+        let cropper = null;
+        let videoStream = null;
+        let faceMesh = null;
+        let lastLandmarks = null; 
+        let activeCamera = null;
 
         function toggleMenu() {
             document.getElementById("hud-menu-btn").classList.toggle("open");
@@ -498,7 +642,6 @@
             document.getElementById("nav-links").classList.remove("open");
         }
 
-        // 💡 変更: 画像が選択されたらすぐプレビューせず、範囲指定用モーダルを起動する
         function previewImage(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -508,46 +651,37 @@
                 const cropImage = document.getElementById("cropImage");
                 cropImage.src = e.target.result;
 
-                // モーダルを表示
                 document.getElementById("cropModal").style.display = "flex";
 
-                // 以前のCropperが残っていれば一度破棄
                 if (cropper) {
                     cropper.destroy();
                 }
 
-                // Cropper.jsの初期化 (正方形 1:1 に固定して綺麗なアイコン枠を作る)
                 cropper = new Cropper(cropImage, {
-                    aspectRatio: 1, // 縦横比を1:1(正方形)に固定
-                    viewMode: 1,    // キャンバス外への切り抜き枠のはみ出しを防ぐ
-                    autoCropArea: 0.8, // 初期選択範囲の大きさ (80%)
-                    background: false  // 背景の格子模様を非表示
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    autoCropArea: 0.8,
+                    background: false
                 });
             };
             reader.readAsDataURL(file);
         }
 
-        // 💡 追加: クロップの確定処理
         function executeCrop() {
             if (!cropper) return;
 
-            // 選択された範囲を 300x300 ピクセルの高画質なBase64画像として抽出
             const canvas = cropper.getCroppedCanvas({
                 width: 300,
                 height: 300
             });
 
-            // 抽出した画像をメイン画面の丸アイコンにセット
             document.getElementById("profile-icon").src = canvas.toDataURL();
-            
-            // 後処理
             closeCropModal();
         }
 
-        // 💡 追加: モーダルを閉じる処理
         function closeCropModal() {
             document.getElementById("cropModal").style.display = "none";
-            document.getElementById("image-input").value = ""; // ファイル選択をリセット
+            document.getElementById("image-input").value = "";
             if (cropper) {
                 cropper.destroy();
                 cropper = null;
@@ -577,6 +711,157 @@
         function logout() {
             localStorage.clear();
             window.location.href = "index.html";
+        }
+
+        /* ========================================================
+           💡 追加: 顔データ更新用のリアルタイム描画とカメラロジック
+        ======================================================== */
+        function drawFaceFeatures(landmarks) {
+            const canvas = document.getElementById('face-mesh-canvas');
+            const video = document.getElementById('face-video');
+            const ctx = canvas.getContext('2d');
+            
+            const rect = video.getBoundingClientRect();
+            if (canvas.width !== rect.width || canvas.height !== rect.height) {
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+            }
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (!landmarks) return;
+
+            ctx.fillStyle = "#00FF00";
+            for (let i = 0; i < landmarks.length; i++) {
+                const pt = landmarks[i];
+                ctx.beginPath();
+                ctx.arc(pt.x * canvas.width, pt.y * canvas.height, 1, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        }
+
+        function initFaceMesh() {
+            if (faceMesh) return;
+            faceMesh = new FaceMesh({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+            });
+            faceMesh.setOptions({
+                maxNumFaces: 1,
+                refineLandmarks: true,
+                minDetectionConfidence: 0.5,
+                minTrackingConfidence: 0.5
+            });
+            faceMesh.onResults((results) => {
+                if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+                    lastLandmarks = results.multiFaceLandmarks[0];
+                    drawFaceFeatures(lastLandmarks);
+                } else {
+                    lastLandmarks = null;
+                    drawFaceFeatures(null);
+                }
+            });
+        }
+
+        // 顔アップデート機能の開始処理
+        async function startFaceUpdate() {
+            const myEmail = localStorage.getItem("userEmail");
+            if (!myEmail) {
+                alert("ログインセッションが見つかりません。一度ログインし直してください。");
+                return;
+            }
+
+            initFaceMesh();
+            document.getElementById('faceModal').style.display = "flex";
+            document.getElementById('face-status').innerText = "カメラを起動中...";
+            document.getElementById('face-status').style.color = "#0284c7";
+
+            const video = document.getElementById('face-video');
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 } });
+                video.srcObject = videoStream;
+                
+                activeCamera = new Camera(video, {
+                    onFrame: async () => {
+                        await faceMesh.send({ image: video });
+                    },
+                    width: 320,
+                    height: 240
+                });
+                activeCamera.start();
+
+                // 3秒間の自動カウントダウン撮影をスタート
+                let seconds = 3;
+                document.getElementById('face-status').innerText = `${seconds}秒後に自動で顔スキャンを実行します...`;
+                
+                const timer = setInterval(async () => {
+                    seconds--;
+                    if (seconds > 0) {
+                        document.getElementById('face-status').innerText = `${seconds}秒後に自動で顔スキャンを実行します...`;
+                    } else {
+                        clearInterval(timer);
+                        await captureAndSaveFace(myEmail);
+                    }
+                }, 1000);
+
+            } catch (err) {
+                document.getElementById('face-status').innerText = "カメラの起動に失敗しました。";
+                document.getElementById('face-status').style.color = "#f43f5e";
+            }
+        }
+
+        // 自動撮影とスプレッドシート書き換え処理
+        async function captureAndSaveFace(email) {
+            if (!lastLandmarks) {
+                document.getElementById('face-status').innerText = "顔が検出されませんでした。もう一度試してください。";
+                document.getElementById('face-status').style.color = "#f43f5e";
+                stopFaceCamera();
+                return;
+            }
+
+            const featuresToSave = JSON.stringify(lastLandmarks);
+            stopFaceCamera();
+
+            document.getElementById('face-status').innerText = "顔の特徴点データを解析・アップデート中...";
+            document.getElementById('face-status').style.color = "#e67e22";
+
+            try {
+                // GASに対して顔データの更新（スプレッドシート書き換え）をPOST送信
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "updateFaceFeatures", // 💡 GAS側で受け取る用のモード名
+                        email: email,
+                        faceFeatures: featuresToSave
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    document.getElementById('face-status').innerText = "顔認証情報のアップデートが完了しました！";
+                    document.getElementById('face-status').style.color = "#10b981";
+                    setTimeout(() => {
+                        closeFaceModal();
+                    }, 1500);
+                } else {
+                    document.getElementById('face-status').innerText = "アップデート失敗: " + result.message;
+                    document.getElementById('face-status').style.color = "#f43f5e";
+                }
+            } catch (err) {
+                document.getElementById('face-status').innerText = "通信エラーが発生しました。";
+                document.getElementById('face-status').style.color = "#f43f5e";
+            }
+        }
+
+        function stopFaceCamera() {
+            if (activeCamera) { activeCamera.stop(); }
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+            }
+            drawFaceFeatures(null);
+        }
+
+        function closeFaceModal() {
+            stopFaceCamera();
+            document.getElementById('faceModal').style.display = "none";
         }
 
         window.onload = () => {
