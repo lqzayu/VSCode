@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>トーク - 平工マッチング</title>
+
+    <style>
+        /* =====================================
+           💡 Instagram DM風 トーク画面
+        ===================================== */
+        body {
+            margin: 0;
+            background-color: #fafafa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #262626;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ナビゲーションバー */
+        .navbar {
+            background: #ffffff;
+            padding: 14px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #dbdbdb;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .logo-text {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            color: #262626;
+        }
+
+        .logo-text span {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            color: #8e8e8e;
+            font-weight: 700;
+            font-size: 13.5px;
+            padding: 8px 14px;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            color: #262626;
+            background-color: #f0f0f0;
+        }
+
+        .nav-item.active {
+            color: #262626;
+            font-weight: 800;
+        }
+
+        .btn-logout {
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: none;
+            background-color: #ed4956;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-logout:hover {
+            opacity: 0.85;
+        }
+
+        .hamburger-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 20px;
+            height: 15px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 110;
+        }
+
+        .hamburger-btn span {
+            width: 100%;
+            height: 2px;
+            background-color: #262626;
+            border-radius: 2px;
+        }
+
+        /* コンテナ */
+        .container {
+            flex: 1;
+            width: 100%;
+            max-width: 650px;
+            margin: 16px auto;
+            padding: 0 16px 16px 16px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 80px);
+            overflow: hidden;
+        }
+
+        .dm-chat-card {
+            background: #ffffff;
+            border: 1px solid #dbdbdb;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            box-sizing: border-box;
+        }
+
+        /* インスタDMヘッダー */
+        .chat-header {
+            padding: 14px 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #efefef;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .btn-back {
+            background: transparent;
+            color: #262626;
+            border: none;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0 8px 0 0;
+            line-height: 1;
+        }
+
+        .partner-info {
+            font-size: 15px;
+            font-weight: 800;
+            color: #262626;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* メッセージ表示エリア */
+        .message-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: #ffffff;
+        }
+
+        /* 🌟 Instagram特有のカプセル型吹き出し (border-radius: 22px) */
+        .message-bubble {
+            max-width: 70%;
+            padding: 11px 16px;
+            border-radius: 22px;
+            font-size: 14px;
+            line-height: 1.45;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            animation: fadeIn 0.15s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 🌟 自分のメッセージ：Instagramの象徴的なマルチカラーグラデーション */
+        .my-message {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #3752e2 0%, #b100ff 50%, #f70068 100%);
+            color: #ffffff;
+            border-bottom-right-radius: 4px; /* 右下だけ少し角を残すインスタの質感 */
+        }
+
+        /* 相手のメッセージ：ソフトグレーのカプセル */
+        .partner-message {
+            align-self: flex-start;
+            background-color: #efefef;
+            color: #262626;
+            border-bottom-left-radius: 4px; /* 左下だけ少し角を残す */
+        }
+
+        /* 🌟 Instagram特有のカプセル型入力バー */
+        .chat-input-area {
+            padding: 12px 16px;
+            background: #ffffff;
+            border-top: 1px solid #efefef;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background-color: #fafafa;
+            border: 1px solid #dbdbdb;
+            border-radius: 24px; /* 完全なカプセル型 */
+            padding: 4px 16px;
+            transition: border-color 0.2s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: #a8a8a8;
+            background-color: #ffffff;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 8px 0;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            outline: none;
+            color: #262626;
+        }
+
+        /* インスタ風の青色テキスト送信ボタン */
+        .btn-send {
+            background: transparent;
+            color: #0095f6; /* インスタプライマリブルー */
+            border: none;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px 12px;
+            transition: opacity 0.2s;
+            flex-shrink: 0;
+        }
+
+        .btn-send:hover {
+            opacity: 0.7;
+        }
+
+        .empty-chat {
+            text-align: center;
+            color: #8e8e8e;
+            font-size: 13px;
+            margin: auto;
+            font-weight: 600;
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 0 8px 8px 8px;
+                margin: 8px auto;
+                height: calc(100vh - 65px);
+            }
+
+            .dm-chat-card {
+                border-radius: 12px;
+            }
+
+            .hamburger-btn {
+                display: flex !important;
+            }
+
+            .nav-links {
+                position: fixed !important;
+                top: 54px !important;
+                left: 0 !important;
+                width: 100% !important;
+                background: #ffffff !important;
+                border-bottom: 1px solid #dbdbdb !important;
+                flex-direction: column !important;
+                padding: 20px 0 !important;
+                gap: 8px !important;
+                z-index: 99 !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+                transform: translateY(-10px) !important;
+                transition: transform 0.3s ease, opacity 0.3s ease !important;
+            }
+
+            .nav-links.open {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                transform: translateY(0) !important;
+            }
+
+            .nav-item {
+                font-size: 15px !important;
+                padding: 10px 0 !important;
+                width: 80% !important;
+                text-align: center !important;
+            }
+
+            .btn-logout {
+                width: 80% !important;
+                padding: 10px 0 !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="navbar">
+        <div class="logo" onclick="location.href='main.html'">
+            <div class="logo-text">平工<span>マッチング</span></div>
+        </div>
+
+        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <nav class="nav-links" id="nav-links">
+            <a class="nav-item" href="main.html">ホーム</a>
+            <a class="nav-item active" href="messages.html">メッセージ</a>
+            <a class="nav-item" href="profile.html">マイページ</a>
+            <button class="btn-logout" onclick="logout()">ログアウト</button>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="dm-chat-card">
+            <div class="chat-header">
+                <button class="btn-back" onclick="goBack()">‹</button>
+                <div id="partner-display" class="partner-info">読み込み中...</div>
+            </div>
+
+            <div class="message-area" id="message-area">
+                <div class="empty-chat">メッセージを読み込んでいます...</div>
+            </div>
+
+            <div class="chat-input-area">
+                <div class="input-wrapper">
+                    <input type="text" id="chat-input" class="chat-input" placeholder="メッセージを入力..." onkeypress="handleKeyPress(event)">
+                </div>
+                <button class="btn-send" onclick="sendMessage()">送信</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwITrmNEOqPX9Xe59kAN7gEeyz4R3RocqhC4H6P27n66TS5oWsTQdhyCo1-gl8trb5F/exec";
+        
+        let myEmail = "";
+        let targetEmail = "";
+        let pollTimer = null;
+
+        function toggleMenu() {
+            document.getElementById("hud-menu-btn").classList.toggle("open");
+            document.getElementById("nav-links").classList.toggle("open");
+        }
+
+        function goBack() {
+            localStorage.removeItem("chatTarget");
+            location.href = 'messages.html';
+        }
+
+        async function fetchMessages() {
+            if (!myEmail || !targetEmail) return;
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "getMessages",
+                        user1: myEmail,
+                        user2: targetEmail
+                    })
+                });
+
+                const result = await res.json();
+                if (result.status === "success") {
+                    renderMessages(result.message);
+                }
+            } catch (e) {
+                console.error("メッセージ取得エラー:", e);
+            }
+        }
+
+        function renderMessages(msgs) {
+            const area = document.getElementById("message-area");
+            
+            if (!msgs || msgs.length === 0) {
+                area.innerHTML = `<div class="empty-chat">メッセージはまだありません。<br>最初のメッセージを送ってみましょう！</div>`;
+                return;
+            }
+
+            const isAtBottom = area.scrollHeight - area.scrollTop <= area.clientHeight + 100;
+
+            area.innerHTML = "";
+            msgs.forEach(msg => {
+                const bubble = document.createElement("div");
+                const isMine = (msg.from === myEmail);
+                
+                bubble.className = `message-bubble ${isMine ? 'my-message' : 'partner-message'}`;
+                bubble.innerText = msg.text;
+                area.appendChild(bubble);
+            });
+
+            if (isAtBottom || area.childElementCount === msgs.length) {
+                area.scrollTop = area.scrollHeight;
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById("chat-input");
+            const text = input.value.trim();
+
+            if (!text) return;
+            input.value = "";
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "sendMessage",
+                        from: myEmail,
+                        to: targetEmail,
+                        text: text
+                    })
+                });
+
+                const result = await res.json();
+                if (result.status === "success") {
+                    fetchMessages();
+                } else {
+                    alert("送信に失敗しました");
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました");
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+
+        window.onload = () => {
+            document.getElementById("hud-menu-btn").classList.remove("open");
+            document.getElementById("nav-links").classList.remove("open");
+
+            myEmail = localStorage.getItem("userEmail");
+            targetEmail = localStorage.getItem("chatTarget");
+
+            if (!myEmail || !targetEmail) {
+                alert("チャット相手が選択されていません");
+                location.href = 'messages.html';
+                return;
+            }
+
+            document.getElementById("partner-display").innerText = targetEmail;
+
+            fetchMessages();
+            pollTimer = setInterval(fetchMessages, 4000);
+        };
+
+        window.onbeforeunload = () => {
+            if (pollTimer) clearInterval(pollTimer);
+        };
+    </script>
+</body>
+
+</html>
