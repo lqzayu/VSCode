@@ -6,40 +6,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>マイページ - 平工マッチング</title>
 
-    <!-- 画像切り抜き用ライブラリ Cropper.js の読み込み (CSS & JS) -->
+    <!-- 画像切り抜き用ライブラリ Cropper.js (CSS & JS) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" crossorigin="anonymous"></script>
 
-    <!-- 💡 追加: 顔データ更新用の MediaPipe 公式ライブラリ -->
+    <!-- 顔データ更新用 MediaPipe 公式ライブラリ -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 
     <style>
         /* =====================================
-           💡 全体的なモダン調の基本スタイル
+           💡 クリーン ＆ モダンUI スタイル
         ===================================== */
         body {
             margin: 0;
-            background: radial-gradient(circle at 50% 50%, #f4f8fa 0%, #e9f2f5 100%);
-            font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
-            color: #1e293b;
+            background-color: #fafafa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #262626;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ナビゲーションバー：洗練されたグラスモフィズム */
+        /* ナビゲーションバー */
         .navbar {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: #ffffff;
             padding: 14px 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+            border-bottom: 1px solid #dbdbdb;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -50,22 +47,17 @@
             align-items: center;
             cursor: pointer;
             user-select: none;
-            transition: opacity 0.2s ease;
-        }
-
-        .logo:hover {
-            opacity: 0.85;
         }
 
         .logo-text {
             font-size: 1.3rem;
             font-weight: 800;
-            letter-spacing: -0.05em;
-            color: #0f172a;
+            letter-spacing: -0.04em;
+            color: #262626;
         }
 
         .logo-text span {
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 900;
@@ -74,49 +66,46 @@
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
 
         .nav-item {
             cursor: pointer;
-            color: #475569;
+            color: #8e8e8e;
             font-weight: 700;
             font-size: 13.5px;
-            padding: 8px 16px;
+            padding: 8px 14px;
             text-decoration: none;
-            border-radius: 10px;
+            border-radius: 8px;
             transition: all 0.2s ease;
         }
 
         .nav-item:hover {
-            background-color: rgba(2, 132, 199, 0.05);
-            color: #0284c7;
+            color: #262626;
+            background-color: #f0f0f0;
         }
 
         .nav-item.active {
-            color: #0284c7;
-            background-color: rgba(2, 132, 199, 0.08);
+            color: #262626;
+            font-weight: 800;
         }
 
         .btn-logout {
-            padding: 8px 16px;
-            border-radius: 10px;
+            padding: 7px 14px;
+            border-radius: 8px;
             border: none;
-            background-color: #f43f5e;
+            background-color: #ed4956;
             color: #ffffff;
             font-weight: 700;
             font-size: 13px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(244, 63, 94, 0.15);
-            transition: all 0.2s;
+            transition: opacity 0.2s;
         }
 
         .btn-logout:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(244, 63, 94, 0.25);
+            opacity: 0.85;
         }
 
-        /* ハンバーガーボタン */
         .hamburger-btn {
             display: none;
             flex-direction: column;
@@ -133,41 +122,37 @@
         .hamburger-btn span {
             width: 100%;
             height: 2px;
-            background-color: #0f172a;
-            border-radius: 3px;
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            background-color: #262626;
+            border-radius: 2px;
         }
 
-        /* =====================================
-           マイページ専用コンテンツレイアウト
-        ===================================== */
+        /* コンテナ */
         .container {
             flex: 1;
             width: 100%;
             max-width: 500px;
-            margin: 40px auto;
-            padding: 0 24px;
+            margin: 30px auto;
+            padding: 0 16px;
             box-sizing: border-box;
         }
 
         .profile-card {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: #ffffff;
+            border: 1px solid #dbdbdb;
+            border-radius: 16px;
             padding: 40px 32px;
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 20px 40px -4px rgba(15, 23, 42, 0.04);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
             text-align: center;
             box-sizing: border-box;
         }
 
         .profile-card h2 {
-            font-size: 1.35rem;
+            font-size: 1.25rem;
             margin-top: 0;
-            margin-bottom: 35px;
-            color: #0f172a;
+            margin-bottom: 30px;
+            color: #262626;
             font-weight: 800;
+            letter-spacing: -0.02em;
         }
 
         .profile-image-group {
@@ -175,7 +160,7 @@
             flex-direction: column;
             align-items: center;
             gap: 16px;
-            margin-bottom: 35px;
+            margin-bottom: 30px;
         }
 
         .big-profile-icon {
@@ -183,8 +168,8 @@
             height: 120px;
             border-radius: 50%;
             object-fit: cover;
-            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
-            border: 4px solid #ffffff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            border: 3px solid #ffffff;
             transition: transform 0.25s ease;
         }
 
@@ -194,10 +179,10 @@
         }
 
         .input-file-label {
-            background-color: rgba(0, 0, 0, 0.04);
-            color: #475569;
+            background-color: #f0f0f0;
+            color: #262626;
             padding: 8px 18px;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
@@ -205,8 +190,7 @@
         }
 
         .input-file-label:hover {
-            background-color: rgba(0, 0, 0, 0.08);
-            color: #0f172a;
+            background-color: #e4e4e4;
         }
 
         .btn-delete-image {
@@ -214,7 +198,7 @@
             color: #e11d48;
             border: none;
             padding: 8px 18px;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
@@ -223,94 +207,91 @@
 
         .btn-delete-image:hover {
             background-color: #fecdd3;
-            transform: translateY(-1px);
         }
 
         .form-group {
             text-align: left;
-            margin-bottom: 30px;
+            margin-bottom: 28px;
         }
 
         .form-group label {
             display: block;
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 700;
-            color: #475569;
-            margin-bottom: 10px;
+            color: #8e8e8e;
+            margin-bottom: 8px;
             padding-left: 2px;
         }
 
         .input-large {
             width: 100%;
-            padding: 14px 16px;
+            padding: 13px 16px;
             font-size: 15px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            border-radius: 12px;
+            border: 1px solid #dbdbdb;
+            border-radius: 10px;
             box-sizing: border-box;
             outline: none;
-            background-color: rgba(248, 250, 252, 0.6);
-            color: #0f172a;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #fafafa;
+            color: #262626;
+            transition: all 0.2s;
         }
 
         .input-large:focus {
-            border-color: #0284c7;
+            border-color: #0095f6;
             background-color: #ffffff;
-            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.12);
+            box-shadow: 0 0 0 3px rgba(0, 149, 246, 0.12);
         }
 
         .btn-large {
             width: 100%;
             padding: 14px 0;
             font-size: 15px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            font-weight: 800;
+            background: linear-gradient(135deg, #0095f6 0%, #0072ff 100%);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.25s ease;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 149, 246, 0.25);
         }
 
         .btn-large:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.35);
+            opacity: 0.92;
+            transform: translateY(-1px);
         }
 
-        /* 💡 追加: 顔認証アップデート用の控えめボタン */
         .btn-update-face {
             background-color: transparent;
-            color: #64748b;
+            color: #8e8e8e;
             text-decoration: underline;
             font-size: 13px;
             font-weight: 700;
-            margin-top: 16px;
-            box-shadow: none;
+            margin-top: 18px;
             display: inline-block;
-            width: auto;
             padding: 6px 12px;
             border-radius: 8px;
             transition: all 0.2s;
+            border: none;
+            cursor: pointer;
         }
 
         .btn-update-face:hover {
-            background-color: rgba(2, 132, 199, 0.05);
-            color: #0284c7;
-            transform: none;
+            color: #262626;
+            background-color: #f0f0f0;
         }
 
-        /* クロップモーダル */
-        .crop-modal {
+        /* モーダル表示 */
+        .crop-modal, .face-modal {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             z-index: 2000;
             justify-content: center;
             align-items: center;
@@ -318,30 +299,31 @@
             box-sizing: border-box;
         }
 
-        .crop-modal-content {
+        .crop-modal-content, .face-modal-content {
             background-color: #ffffff;
             padding: 24px;
-            border-radius: 24px;
+            border-radius: 20px;
             width: 100%;
-            max-width: 450px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            max-width: 420px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             text-align: center;
             box-sizing: border-box;
         }
 
-        .crop-modal-content h3 {
+        .crop-modal-content h3, .face-modal-content h3 {
             margin-top: 0;
             margin-bottom: 16px;
             font-size: 16px;
             font-weight: 800;
+            color: #262626;
         }
 
         .img-container {
             width: 100%;
-            max-height: 300px;
+            max-height: 280px;
             margin-bottom: 20px;
-            background-color: #f1f5f9;
-            border-radius: 12px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
             overflow: hidden;
         }
 
@@ -356,64 +338,38 @@
         }
 
         .btn-crop-cancel {
-            background-color: #f1f5f9;
-            color: #475569;
+            flex: 1;
+            background-color: #f0f0f0;
+            color: #262626;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
         }
-        .btn-crop-cancel:hover { background-color: #e2e8f0; }
+        .btn-crop-cancel:hover { background-color: #e4e4e4; }
 
         .btn-crop-done {
-            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            flex: 1;
+            background: #0095f6;
             color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
         }
 
-        /* 💡 追加: 顔スキャン用モーダルウィンドウ */
-        .face-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .face-modal-content {
-            background-color: #ffffff;
-            padding: 28px;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 380px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            text-align: center;
-            box-sizing: border-box;
-        }
-
-        .face-modal-content h3 {
-            margin-top: 0;
-            margin-bottom: 16px;
-            font-size: 16px;
-            font-weight: 800;
-        }
-
-        /* スキャン用カメラボックス（ネオン調の枠線） */
         .camera-box-mini {
             width: 100%;
             max-width: 320px;
             margin: 0 auto 16px auto;
-            border-radius: 16px;
+            border-radius: 14px;
             overflow: hidden;
             transform: scaleX(-1);
-            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.15);
             position: relative; 
             height: 240px;
-            border: 2px solid rgba(2, 132, 199, 0.3);
+            border: 2px solid #dbdbdb;
             background-color: #000;
         }
 
@@ -441,48 +397,34 @@
         .face-status-text {
             font-size: 13px;
             font-weight: 700;
-            color: #0284c7;
+            color: #0095f6;
             margin-bottom: 16px;
             min-height: 20px;
         }
 
-        /* フッター */
         .footer {
             background-color: transparent;
-            padding: 30px 20px;
+            padding: 24px;
             margin-top: auto;
             width: 100%;
             box-sizing: border-box;
-        }
-
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
+            text-align: center;
         }
 
         .copyright {
-            color: #94a3b8;
+            color: #8e8e8e;
             font-size: 0.75rem;
             margin: 0;
-            font-weight: 600;
         }
 
-        /* =====================================
-           📱 スマホ・レスポンシブ
-        ===================================== */
         @media screen and (max-width: 768px) {
             .container {
-                margin: 20px auto;
-                padding: 0 16px;
+                margin: 16px auto;
+                padding: 0 12px;
             }
 
             .profile-card {
                 padding: 32px 20px;
-                border-radius: 20px;
             }
 
             .hamburger-btn {
@@ -494,10 +436,10 @@
                 top: 54px !important;
                 left: 0 !important;
                 width: 100% !important;
-                background: rgba(255, 255, 255, 0.98) !important;
-                box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08) !important;
+                background: #ffffff !important;
+                border-bottom: 1px solid #dbdbdb !important;
                 flex-direction: column !important;
-                padding: 24px 0 !important;
+                padding: 20px 0 !important;
                 gap: 8px !important;
                 z-index: 99 !important;
                 opacity: 0 !important;
@@ -513,25 +455,16 @@
             }
 
             .nav-item {
-                margin-right: 0 !important;
                 font-size: 15px !important;
-                padding: 12px 0 !important;
+                padding: 10px 0 !important;
                 width: 80% !important;
                 text-align: center !important;
-                border-radius: 10px;
             }
 
             .btn-logout {
-                margin-top: 8px !important;
                 width: 80% !important;
-                text-align: center !important;
-                padding: 12px 0 !important;
-                margin: 0 auto !important;
+                padding: 10px 0 !important;
             }
-
-            .hamburger-btn.open span:nth-child(1) { transform: translateY(6px) rotate(45deg) !important; }
-            .hamburger-btn.open span:nth-child(2) { opacity: 0 !important; transform: scale(0) !important; }
-            .hamburger-btn.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg) !important; }
         }
     </style>
 </head>
@@ -543,7 +476,6 @@
             <div class="logo-text">平工<span>マッチング</span></div>
         </div>
 
-        <!-- 3本線ボタン -->
         <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
             <span></span>
             <span></span>
@@ -571,26 +503,23 @@
                     <button type="button" class="btn-delete-image" onclick="deleteImage()">削除</button>
                 </div>
 
-                <input type="file" id="image-input" accept="image/*" style="display: none;"
-                    onchange="previewImage(event)">
+                <input type="file" id="image-input" accept="image/*" style="display: none;" onchange="previewImage(event)">
             </div>
 
             <div class="form-group">
-                <label for="username-input">表示名</label>
+                <label for="username-input">表示名（ニックネーム）</label>
                 <input type="text" id="username-input" class="input-large" placeholder="名前を入力してください">
             </div>
 
             <button class="btn-large" onclick="saveProfile()">設定を保存する</button>
-            
-            <!-- 💡 追加: 顔認証アップデート用ボタン -->
             <button class="btn-update-face" onclick="startFaceUpdate()">顔認証情報をアップデートする</button>
         </div>
     </main>
 
-    <!-- 範囲指定トリミング用モーダル -->
+    <!-- クロップ用モーダル -->
     <div id="cropModal" class="crop-modal">
         <div class="crop-modal-content">
-            <h3>プロフィールの表示範囲を選択</h3>
+            <h3>表示範囲を選択</h3>
             <div class="img-container">
                 <img id="cropImage" src="" alt="トリミング対象">
             </div>
@@ -601,7 +530,7 @@
         </div>
     </div>
 
-    <!-- 💡 追加: 顔認証アップデート用カメラモーダル -->
+    <!-- 顔認証アップデート用モーダル -->
     <div id="faceModal" class="face-modal">
         <div class="face-modal-content">
             <h3>顔データのアップデート</h3>
@@ -617,9 +546,7 @@
     </div>
 
     <footer class="footer">
-        <div class="footer-container">
-            <p class="copyright">&copy; 2026 平工マッチング. All rights reserved.</p>
-        </div>
+        <p class="copyright">&copy; 2026 平工マッチング. All rights reserved.</p>
     </footer>
 
     <script>
@@ -635,11 +562,6 @@
         function toggleMenu() {
             document.getElementById("hud-menu-btn").classList.toggle("open");
             document.getElementById("nav-links").classList.toggle("open");
-        }
-
-        function closeMenu() {
-            document.getElementById("hud-menu-btn").classList.remove("open");
-            document.getElementById("nav-links").classList.remove("open");
         }
 
         function previewImage(event) {
@@ -693,19 +615,47 @@
             document.getElementById("image-input").value = "";
         }
 
-        function saveProfile() {
+        // 💡 プロフィール保存（スプレッドシートのC列・E列へ反映通信）
+        async function saveProfile() {
             const name = document.getElementById("username-input").value.trim();
             const imageSrc = document.getElementById("profile-icon").src;
+            const email = localStorage.getItem("userEmail");
 
             if (!name) {
                 alert("表示名を入力してください");
                 return;
             }
 
-            localStorage.setItem("userName", name);
-            localStorage.setItem("profileImage", imageSrc);
-            alert("プロフィールを保存しました！");
-            location.href = "main.html";
+            if (!email) {
+                alert("ログイン情報が見つかりません。一度再ログインしてください。");
+                return;
+            }
+
+            try {
+                // スプレッドシートへ上書き保存の非同期通信
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "updateProfile",
+                        email: email,
+                        name: name,
+                        profileImage: imageSrc
+                    })
+                });
+
+                const result = await res.json();
+                if (result.status === "success") {
+                    // 現在の端末の localStorage も同時に更新
+                    localStorage.setItem("userName", name);
+                    localStorage.setItem("profileImage", imageSrc);
+                    alert("プロフィールを保存しました！");
+                    location.href = "main.html";
+                } else {
+                    alert("保存に失敗しました: " + result.message);
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました。");
+            }
         }
 
         function logout() {
@@ -713,9 +663,7 @@
             window.location.href = "index.html";
         }
 
-        /* ========================================================
-           💡 追加: 顔データ更新用のリアルタイム描画とカメラロジック
-        ======================================================== */
+        // 顔検出の描画
         function drawFaceFeatures(landmarks) {
             const canvas = document.getElementById('face-mesh-canvas');
             const video = document.getElementById('face-video');
@@ -761,7 +709,6 @@
             });
         }
 
-        // 顔アップデート機能の開始処理
         async function startFaceUpdate() {
             const myEmail = localStorage.getItem("userEmail");
             if (!myEmail) {
@@ -772,7 +719,7 @@
             initFaceMesh();
             document.getElementById('faceModal').style.display = "flex";
             document.getElementById('face-status').innerText = "カメラを起動中...";
-            document.getElementById('face-status').style.color = "#0284c7";
+            document.getElementById('face-status').style.color = "#0095f6";
 
             const video = document.getElementById('face-video');
             try {
@@ -780,15 +727,11 @@
                 video.srcObject = videoStream;
                 
                 activeCamera = new Camera(video, {
-                    onFrame: async () => {
-                        await faceMesh.send({ image: video });
-                    },
-                    width: 320,
-                    height: 240
+                    onFrame: async () => { await faceMesh.send({ image: video }); },
+                    width: 320, height: 240
                 });
                 activeCamera.start();
 
-                // 3秒間の自動カウントダウン撮影をスタート
                 let seconds = 3;
                 document.getElementById('face-status').innerText = `${seconds}秒後に自動で顔スキャンを実行します...`;
                 
@@ -804,15 +747,14 @@
 
             } catch (err) {
                 document.getElementById('face-status').innerText = "カメラの起動に失敗しました。";
-                document.getElementById('face-status').style.color = "#f43f5e";
+                document.getElementById('face-status').style.color = "#ed4956";
             }
         }
 
-        // 自動撮影とスプレッドシート書き換え処理
         async function captureAndSaveFace(email) {
             if (!lastLandmarks) {
                 document.getElementById('face-status').innerText = "顔が検出されませんでした。もう一度試してください。";
-                document.getElementById('face-status').style.color = "#f43f5e";
+                document.getElementById('face-status').style.color = "#ed4956";
                 stopFaceCamera();
                 return;
             }
@@ -824,11 +766,10 @@
             document.getElementById('face-status').style.color = "#e67e22";
 
             try {
-                // GASに対して顔データの更新（スプレッドシート書き換え）をPOST送信
                 const res = await fetch(GAS_URL, {
                     method: "POST",
                     body: JSON.stringify({
-                        mode: "updateFaceFeatures", // 💡 GAS側で受け取る用のモード名
+                        mode: "updateFaceFeatures",
                         email: email,
                         faceFeatures: featuresToSave
                     })
@@ -838,16 +779,14 @@
                 if (result.status === "success") {
                     document.getElementById('face-status').innerText = "顔認証情報のアップデートが完了しました！";
                     document.getElementById('face-status').style.color = "#10b981";
-                    setTimeout(() => {
-                        closeFaceModal();
-                    }, 1500);
+                    setTimeout(() => { closeFaceModal(); }, 1500);
                 } else {
                     document.getElementById('face-status').innerText = "アップデート失敗: " + result.message;
-                    document.getElementById('face-status').style.color = "#f43f5e";
+                    document.getElementById('face-status').style.color = "#ed4956";
                 }
             } catch (err) {
                 document.getElementById('face-status').innerText = "通信エラーが発生しました。";
-                document.getElementById('face-status').style.color = "#f43f5e";
+                document.getElementById('face-status').style.color = "#ed4956";
             }
         }
 

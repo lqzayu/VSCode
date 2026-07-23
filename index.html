@@ -17,9 +17,8 @@
             display: flex;
             flex-direction: column;
             min-height: 100dvh;
-            /* 背景を少し深みとグラデーションのある未来的な色合いに */
             background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -33,7 +32,6 @@
             box-sizing: border-box;
         }
 
-        /* ログインカード：より洗練されたグラスモフィズムと滑らかなレイヤーシャドウ */
         .login-card {
             background-color: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
@@ -41,7 +39,6 @@
             padding: 40px 32px;
             border-radius: 24px;
             border: 1px solid rgba(255, 255, 255, 0.6);
-            /* より柔らかく、高級感のある多層影 */
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01), 
                         0 20px 40px -4px rgba(24, 76, 92, 0.08);
             width: 100%;
@@ -58,13 +55,11 @@
             letter-spacing: -0.02em;
         }
 
-        /* 入力エリアのグループ */
         .input-group {
             text-align: left;
         }
 
-        /* パスワード入力欄とボタンを包む外枠 */
-        .password-wrapper, .confirm-password-wrapper {
+        .password-wrapper, .confirm-password-wrapper, .name-wrapper {
             position: relative;
             display: flex;
             align-items: center;
@@ -72,11 +67,10 @@
             box-sizing: border-box;
         }
 
-        .confirm-password-wrapper {
+        .confirm-password-wrapper, .name-wrapper {
             display: none;
         }
 
-        /* 入力欄：枠線を細くし、背景に溶け込ませるモダンデザイン */
         input {
             width: 100%;
             padding: 14px 16px;
@@ -102,14 +96,12 @@
             box-shadow: 0 0 0 4px rgba(28, 189, 197, 0.15);
         }
 
-        /* パスワード入力欄そのもの */
         .password-input, .confirm-password-input {
             width: 100% !important;
             padding-right: 45px;
             box-sizing: border-box;
         }
 
-        /* 表示/非表示 切り替えボタン：文字からモダンなアイコン風テキストへ */
         .toggle-password-btn, .toggle-confirm-btn {
             position: absolute;
             right: 14px;
@@ -123,7 +115,7 @@
             font-weight: 600;
             line-height: 1;
             z-index: 10;
-            margin-bottom: 16px; /* inputのmarginと同期 */
+            margin-bottom: 16px;
             transition: color 0.2s;
         }
 
@@ -142,7 +134,6 @@
         .success { color: #10b981; }
         .error { color: #ef4444; }
 
-        /* ボタン：鮮やかなグラデーションとホバー時の浮遊エフェクト */
         button {
             width: 100%;
             padding: 14px;
@@ -156,21 +147,18 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
         }
 
-        /* 通常ログイン（青） */
         .btn-submit-primary {
             background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
             color: white;
             box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
         }
 
-        /* 顔認証（シアン） */
         #face-login-btn {
             background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%) !important;
             box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25) !important;
             color: white;
         }
 
-        /* アカウント作成（オレンジ） */
         #face-register-btn {
             background: linear-gradient(135deg, #e67e22 0%, #d35400 100%) !important;
             box-shadow: 0 4px 12px rgba(230, 126, 34, 0.25) !important;
@@ -183,20 +171,6 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
         }
 
-        .btn-submit-primary:hover {
-            box-shadow: 0 6px 20px rgba(26, 115, 232, 0.35);
-        }
-
-        #face-login-btn:hover {
-            box-shadow: 0 6px 20px rgba(28, 189, 197, 0.4);
-        }
-
-        button:active {
-            transform: translateY(0);
-            scale: 0.98;
-        }
-
-        /* フラットボタン（切り替え用リンク） */
         .btn-flat {
             background-color: transparent;
             color: #64748b;
@@ -211,16 +185,6 @@
             border-radius: 6px;
         }
 
-        .btn-flat:hover {
-            background-color: rgba(0, 0, 0, 0.03);
-            color: #1e293b;
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* ========================================================
-           💡 顔認証カメラ・視覚化用メッシュの構造定義
-        ======================================================== */
         .camera-box {
             display: none;
             width: 100%;
@@ -234,6 +198,7 @@
             height: 240px;
             border: 2px solid rgba(28, 189, 197, 0.3);
         }
+
         video {
             width: 100%;
             height: 100%;
@@ -244,6 +209,7 @@
             left: 0;
             z-index: 1;
         }
+
         canvas#face-overlay {
             position: absolute;
             top: 0;
@@ -261,9 +227,6 @@
             min-height: 20px;
         }
 
-        /* ========================================================
-           🌟 画面遷移用（ページトランジション）スタイル
-        ======================================================== */
         .page-transition-overlay {
             position: fixed;
             top: 0;
@@ -289,7 +252,6 @@
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
-        /* ログイン画面用フッター */
         .footer {
             background-color: transparent;
             padding: 24px;
@@ -311,39 +273,23 @@
             font-size: 0.75rem;
             margin: 0;
             font-weight: 600;
-            letter-spacing: 0.03em;
         }
 
-        /* ========================================================
-           📱 スマホ向けレスポンシブスタイル
-        ======================================================== */
         @media screen and (max-width: 480px) {
-            .login-container {
-                padding: 16px;
-            }
-
-            .login-card {
-                padding: 32px 20px;
-                border-radius: 20px;
-            }
-
-            h1 {
-                font-size: 1.5rem;
-                margin-bottom: 24px;
-            }
+            .login-container { padding: 16px; }
+            .login-card { padding: 32px 20px; border-radius: 20px; }
+            h1 { font-size: 1.5rem; margin-bottom: 24px; }
         }
     </style>
 </head>
 
 <body>
-    <!-- 💡 画面遷移用の白い幕（トランジションレイヤー） -->
     <div id="transition-overlay" class="page-transition-overlay"></div>
 
     <div class="login-container">
         <div class="login-card">
             <h1 id="form-title">ログイン</h1>
 
-            <!-- カメラプレビュー表示エリア -->
             <div id="camera-container" class="camera-box">
                 <video id="video" autoplay playsinline></video>
                 <canvas id="face-overlay"></canvas>
@@ -358,18 +304,19 @@
             <div class="input-group">
                 <input type="text" id="email" placeholder="ユーザID" inputmode="email" onkeypress="handleKeyPress(event)">
 
+                <!-- 💡 新規登録時のみ表示される表示名入力欄 -->
+                <div class="name-wrapper" id="name-wrapper">
+                    <input type="text" id="display-name" placeholder="表示名（ニックネーム）" onkeypress="handleKeyPress(event)">
+                </div>
+
                 <div class="password-wrapper">
-                    <input type="password" id="password" placeholder="パスワード" class="password-input"
-                        onkeypress="handleKeyPress(event)">
-                    <button type="button" id="toggle-password" onclick="togglePasswordVisibility()"
-                        class="toggle-password-btn">表示</button>
+                    <input type="password" id="password" placeholder="パスワード" class="password-input" onkeypress="handleKeyPress(event)">
+                    <button type="button" id="toggle-password" onclick="togglePasswordVisibility()" class="toggle-password-btn">表示</button>
                 </div>
 
                 <div class="confirm-password-wrapper">
-                    <input type="password" id="confirm-password" placeholder="パスワード（確認）" class="confirm-password-input"
-                        onkeypress="handleKeyPress(event)">
-                    <button type="button" id="toggle-confirm" onclick="toggleconfirmVisibility()"
-                        class="toggle-confirm-btn">表示</button>
+                    <input type="password" id="confirm-password" placeholder="パスワード（確認）" class="confirm-password-input" onkeypress="handleKeyPress(event)">
+                    <button type="button" id="toggle-confirm" onclick="toggleconfirmVisibility()" class="toggle-confirm-btn">表示</button>
                 </div>
 
                 <div id="message" class="message"></div>
@@ -395,14 +342,13 @@
     </footer>
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwITrmNEOqPX9Xe59kAN7gEeyz4R3RocqhC4H6P27n66TS5oWsTQdhyCo1-gl8trb5F/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwgAQAPaBr-HNvqToDDrspDfL02s_YN89atcNrZfVGEESNnRLC_9vnqC0vz8hHyvUrS/exec";
         
         let videoStream = null;
         let faceMesh = null;
         let lastLandmarks = null; 
         let activeCamera = null;
 
-        // スマホの縦画面・横画面どちらの比率にも完全に合わせる描画関数
         function drawFeatures(landmarks) {
             const canvas = document.getElementById('face-overlay');
             const video = document.getElementById('video');
@@ -415,22 +361,17 @@
             }
             
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
             if (!landmarks) return;
 
             ctx.fillStyle = "#00FF00";
             for (let i = 0; i < landmarks.length; i++) {
                 const pt = landmarks[i];
-                const x = pt.x * canvas.width;
-                const y = pt.y * canvas.height;
-                
                 ctx.beginPath();
-                ctx.arc(x, y, 1, 0, 2 * Math.PI);
+                ctx.arc(pt.x * canvas.width, pt.y * canvas.height, 1, 0, 2 * Math.PI);
                 ctx.fill();
             }
         }
 
-        // MediaPipe Face Meshの初期化設定
         function initFaceMesh() {
             if (faceMesh) return;
             faceMesh = new FaceMesh({
@@ -453,7 +394,6 @@
             });
         }
 
-        // カメラを起動する関数
         async function startCamera() {
             initFaceMesh();
             const container = document.getElementById('camera-container');
@@ -465,11 +405,8 @@
                 video.srcObject = videoStream;
                 
                 activeCamera = new Camera(video, {
-                    onFrame: async () => {
-                        await faceMesh.send({ image: video });
-                    },
-                    width: 320,
-                    height: 240
+                    onFrame: async () => { await faceMesh.send({ image: video }); },
+                    width: 320, height: 240
                 });
                 activeCamera.start();
                 document.getElementById('auth-status').innerText = "";
@@ -479,7 +416,6 @@
             }
         }
 
-        // カメラストリームを安全に完全停止する関数
         function stopCamera() {
             if (activeCamera) { activeCamera.stop(); }
             if (videoStream) {
@@ -491,13 +427,11 @@
             
         function toggleMode(mode) {
             const title = document.getElementById("form-title");
+            const nameWrapper = document.getElementById("name-wrapper");
             const confirmWrapper = document.querySelector(".confirm-password-wrapper");
-            const confirmInput = document.getElementById("confirm-password");
-            const toggleConfirmBtn = document.getElementById("toggle-confirm");
             const loginSec = document.getElementById("login-section");
             const registerSec = document.getElementById("register-section");
             const msg = document.getElementById("message");
-
             const faceLoginBtn = document.getElementById("face-login-btn");
             const faceRegBtn = document.getElementById("face-register-btn");
             const authStatus = document.getElementById("auth-status");
@@ -507,9 +441,8 @@
 
             if (mode === 'register') {
                 title.innerText = "新規登録";
+                nameWrapper.style.display = "flex";
                 confirmWrapper.style.display = "flex";
-                confirmInput.style.display = "block";
-                toggleConfirmBtn.style.display = "block";
 
                 loginSec.style.display = "none";
                 registerSec.style.display = "block";
@@ -519,14 +452,14 @@
                 startCamera();
             } else {
                 title.innerText = "ログイン";
+                nameWrapper.style.display = "none";
                 confirmWrapper.style.display = "none";
-                confirmInput.style.display = "none";
-                toggleConfirmBtn.style.display = "none";
 
                 loginSec.style.display = "block";
                 registerSec.style.display = "none";
 
                 document.getElementById("confirm-password").value = "";
+                document.getElementById("display-name").value = "";
 
                 faceLoginBtn.style.display = "inline-block";
                 faceRegBtn.style.display = "none";
@@ -549,7 +482,7 @@
             document.getElementById('auth-status').style.color = "#10b981";
         });
 
-        // 1:Nの顔認証ログイン＋オシャレな遷移アニメーション
+        // 1:Nの顔認証ログイン＋情報同期
         document.getElementById('face-login-btn').addEventListener('click', async () => {
             await startCamera();
             document.getElementById('auth-status').innerText = "3秒後に自動で顔スキャンを実行します...";
@@ -557,7 +490,7 @@
 
             setTimeout(async () => {
                 if (!lastLandmarks) {
-                    document.getElementById('auth-status').innerText = "顔を検出できずスキャンに失敗しました。やり直してください。";
+                    document.getElementById('auth-status').innerText = "顔を検出できずスキャンに失敗しました。";
                     document.getElementById('auth-status').style.color = "#ef4444";
                     stopCamera();
                     return;
@@ -566,7 +499,7 @@
                 const currentLandmarks = lastLandmarks;
                 stopCamera();
                 
-                document.getElementById('auth-status').innerText = "AIデータ解析中：あなたをデータベースから特定しています...";
+                document.getElementById('auth-status').innerText = "AIデータ解析中...";
                 document.getElementById('auth-status').style.color = "#e67e22";
 
                 try {
@@ -577,30 +510,31 @@
                     const result = await res.json();
 
                     if (result.status === "success" && result.message.email) {
-                        const matchedEmail = result.message.email;
-                        document.getElementById('auth-status').innerText = `認証成功！こんにちは、${matchedEmail}さん。`;
+                        // 💡 スプレッドシートから届いた情報を端末に同期保存
+                        localStorage.setItem("userEmail", result.message.email);
+                        localStorage.setItem("userName", result.message.name || "ユーザー");
+                        if (result.message.profileImage) {
+                            localStorage.setItem("profileImage", result.message.profileImage);
+                        }
+
+                        document.getElementById('auth-status').innerText = `認証成功！こんにちは、${result.message.name}さん。`;
                         document.getElementById('auth-status').style.color = "#10b981";
                         
-                        localStorage.setItem("userEmail", matchedEmail);
-                        
-                        // 画面遷移アニメーションの実行
                         document.querySelector('.login-card').classList.add('fade-out-exit');
                         document.getElementById('transition-overlay').classList.add('active');
-                        setTimeout(() => {
-                            window.location.href = "main.html";
-                        }, 500);
+                        setTimeout(() => { window.location.href = "main.html"; }, 500);
                     } else {
                         document.getElementById('auth-status').innerText = "顔認証失敗: " + result.message;
                         document.getElementById('auth-status').style.color = "#ef4444";
                     }
                 } catch (err) {
-                    document.getElementById('auth-status').innerText = "通信エラー、またはデータの解析に失敗しました。";
+                    document.getElementById('auth-status').innerText = "通信エラーが発生しました。";
                     document.getElementById('auth-status').style.color = "#ef4444";
                 }
             }, 3000);
         });
 
-        // 通常ログイン＋オシャレな遷移アニメーション
+        // 通常ログイン
         async function handleLogin() {
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value.trim();
@@ -615,69 +549,70 @@
                 const result = await res.json();
 
                 if (result.status === "success") {
-                    localStorage.setItem("userEmail", email);
+                    // 💡 スプレッドシートから受け取った「表示名」「アイコン」を同期
+                    localStorage.setItem("userEmail", result.message.email);
+                    localStorage.setItem("userName", result.message.name || "ユーザー");
+                    if (result.message.profileImage) {
+                        localStorage.setItem("profileImage", result.message.profileImage);
+                    }
+
                     updateMsg("ログイン成功", "success");
                     
-                    // 画面遷移アニメーションの実行
                     document.querySelector('.login-card').classList.add('fade-out-exit');
                     document.getElementById('transition-overlay').classList.add('active');
-                    setTimeout(() => {
-                        window.location.href = "main.html";
-                    }, 500);
+                    setTimeout(() => { window.location.href = "main.html"; }, 500);
                 } else {
                     updateMsg(result.message, "error");
                 }
-            } catch (e) { updateMsg("通信エラーです。しばらくしてからお試しください。", "error"); }
+            } catch (e) { updateMsg("通信エラーが発生しました。", "error"); }
         }
 
-        function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('password');
-            const toggleButton = document.getElementById('toggle-password');
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleButton.textContent = '非表示';
-            } else {
-                passwordInput.type = 'password';
-                toggleButton.textContent = '表示';
-            }
-        }
-
-        function toggleconfirmVisibility() {
-            const confirmpasswordInput = document.getElementById('confirm-password');
-            const toggleconfirmButton = document.getElementById('toggle-confirm');
-            if (confirmpasswordInput.type === 'password') {
-                confirmpasswordInput.type = 'text';
-                toggleconfirmButton.textContent = '非表示';
-            } else {
-                confirmpasswordInput.type = 'password';
-                toggleconfirmButton.textContent = '表示';
-            }
-        }
-
+        // 新規アカウント作成
         async function handleRegister() {
             const email = document.getElementById("email").value.trim();
+            const name = document.getElementById("display-name").value.trim();
             const password = document.getElementById("password").value.trim();
             const confirm = document.getElementById("confirm-password").value.trim();
 
-            if (!email || !password || !confirm) return updateMsg("入力してください", "error");
-            if (password !== confirm) return updateMsg("パスワード不一致", "error");
+            if (!email || !name || !password || !confirm) return updateMsg("全項目を入力してください", "error");
+            if (password !== confirm) return updateMsg("パスワードが一致しません", "error");
 
             try {
                 updateMsg("登録中...", "");
                 const res = await fetch(GAS_URL, {
                     method: "POST",
-                    body: JSON.stringify({ mode: "register", email, password, faceFeatures: savedFeaturesText })
+                    body: JSON.stringify({
+                        mode: "register",
+                        email: email,
+                        name: name, // 💡 表示名を送信
+                        password: password,
+                        faceFeatures: savedFeaturesText
+                    })
                 });
                 const result = await res.json();
 
                 if (result.status === "success") {
-                    updateMsg("登録完了！", "success");
+                    updateMsg("登録完了！ログインしてください", "success");
                     savedFeaturesText = "";
-                    setTimeout(() => toggleMode('login'), 350);
+                    setTimeout(() => toggleMode('login'), 1200);
                 } else {
                     updateMsg(result.message, "error");
                 }
-            } catch (e) { updateMsg("通信エラー", "error"); }
+            } catch (e) { updateMsg("通信エラーが発生しました", "error"); }
+        }
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleButton = document.getElementById('toggle-password');
+            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+            toggleButton.textContent = passwordInput.type === 'password' ? '表示' : '非表示';
+        }
+
+        function toggleconfirmVisibility() {
+            const confirmpasswordInput = document.getElementById('confirm-password');
+            const toggleconfirmButton = document.getElementById('toggle-confirm');
+            confirmpasswordInput.type = confirmpasswordInput.type === 'password' ? 'text' : 'password';
+            toggleconfirmButton.textContent = confirmpasswordInput.type === 'password' ? '表示' : '非表示';
         }
 
         function updateMsg(txt, type) {
@@ -689,8 +624,7 @@
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
-                const loginSection = document.getElementById("login-section");
-                if (loginSection.style.display !== "none") {
+                if (document.getElementById("login-section").style.display !== "none") {
                     handleLogin();
                 } else {
                     handleRegister();
