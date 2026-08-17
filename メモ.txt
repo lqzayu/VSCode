@@ -1,3 +1,9 @@
+フェッチの競合でエラーが出たら下記コードをターミナルで１行ずつ実行。
+1. git merge --abort
+2. git fetch origin
+3. git reset --hard origin/main
+
+
 ーーーー通常googleアカウントログインコードーーーー
 
 <!DOCTYPE html>
