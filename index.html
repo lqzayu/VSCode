@@ -295,7 +295,14 @@
             .login-card { padding: 32px 20px; border-radius: 20px; }
             h1 { font-size: 1.5rem; margin-bottom: 24px; }
         }
+
     </style>
+
+        <link rel="manifest" href = "manifest.json">
+        <meta name = "theme-color" content = "#0284c7">
+        <link rel = "apple-touch-icon" href = "icon-192.png">
+
+
 </head>
 
 <body>
@@ -671,6 +678,14 @@
                 }
             }
         }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('ServiceWorker 登録成功:', reg.scope))
+                    .catch(err => console.log('ServiceWorker 登録失敗:', err));
+            });
+
     </script>
 </body>
 
