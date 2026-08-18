@@ -65,6 +65,7 @@
             text-decoration: none;
             border-radius: 8px;
             transition: all 0.2s ease;
+            position: relative;
         }
 
         .nav-item:hover {
@@ -75,6 +76,24 @@
         .nav-item.active {
             color: #1cbdc5;
             background-color: rgba(28, 189, 197, 0.1);
+        }
+
+        /* 🔴 未読バッジ */
+        .unread-badge {
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 10px;
+            line-height: 1;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+            min-width: 14px;
+            text-align: center;
+            box-sizing: border-box;
         }
 
         .btn-logout {
@@ -394,7 +413,10 @@
 
         <nav class="nav-links" id="nav-links">
             <a class="nav-item" href="main.html">ホーム</a>
-            <a class="nav-item active" href="messages.html">メッセージ</a>
+            <a class="nav-item active" href="messages.html">
+                メッセージ
+                <span id="unread-badge" class="unread-badge" style="display: none;">0</span>
+            </a>
             <a class="nav-item" href="profile.html">マイページ</a>
             <button class="btn-logout" onclick="logout()">ログアウト</button>
         </nav>
@@ -431,7 +453,7 @@
             window.location.href = "index.html";
         }
 
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwITrmNEOqPX9Xe59kAN7gEeyz4R3RocqhC4H6P27n66TS5oWsTQdhyCo1-gl8trb5F/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwgAQAPaBr-HNvqToDDrspDfL02s_YN89atcNrZfVGEESNnRLC_9vnqC0vz8hHyvUrS/exec";
         
         const bgGradients = [
             "linear-gradient(135deg, #1cbdc5 0%, #119299 100%)",
@@ -513,6 +535,33 @@
             }
         }
 
+        // 🔴 未読件数の更新処理
+        async function updateUnreadBadge() {
+            const myEmail = localStorage.getItem("userEmail");
+            const badge = document.getElementById("unread-badge");
+            if (!myEmail || !badge) return;
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ mode: "getUnreadCount", email: myEmail })
+                });
+                const result = await res.json();
+
+                if (result.status === "success" && result.message) {
+                    const count = result.message.unreadCount || 0;
+                    if (count > 0) {
+                        badge.innerText = count > 99 ? "99+" : count;
+                        badge.style.display = "inline-block";
+                    } else {
+                        badge.style.display = "none";
+                    }
+                }
+            } catch (e) {
+                console.error("未読チェックエラー:", e);
+            }
+        }
+
         function openChat(email) {
             localStorage.setItem("chatTarget", email);
             location.href = 'chat.html';
@@ -530,6 +579,10 @@
             localStorage.removeItem("chatTarget");
 
             loadChatPartners();
+            updateUnreadBadge();
+
+            // 3秒おきに未読チェック
+            setInterval(updateUnreadBadge, 3000);
         };
     </script>
 </body>
