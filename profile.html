@@ -8,12 +8,15 @@
 
     <link rel="icon" href="icon-192.png">
 
+    <!-- 画像切り抜き用ライブラリ Cropper.js (CSS & JS) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" crossorigin="anonymous"></script>
 
+    <!-- 顔データ更新用 MediaPipe 公式ライブラリ -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 
+    <!-- 共通カーソル・スタイルスクリプト -->
     <script src="common.js"></script>
 
     <style>
@@ -28,7 +31,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ナビゲーションバー */
         .navbar {
             background: #ffffff;
             padding: 14px 5%;
@@ -90,7 +92,6 @@
             font-weight: 800;
         }
 
-        /* 未読バッジ */
         .unread-badge {
             position: absolute;
             top: 2px;
@@ -144,7 +145,6 @@
             border-radius: 2px;
         }
 
-        /* コンテナ */
         .container {
             flex: 1;
             width: 100%;
@@ -299,7 +299,6 @@
             background-color: #f0f0f0;
         }
 
-        /* モーダル表示 */
         .crop-modal, .face-modal {
             display: none;
             position: fixed;
@@ -355,27 +354,25 @@
             gap: 12px;
         }
 
-        .btn-crop-cancel {
+        .btn-crop-cancel, .btn-crop-done {
             flex: 1;
-            background-color: #f0f0f0;
-            color: #262626;
-            border: none;
             padding: 10px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: 700;
+            border: none;
         }
+
+        .btn-crop-cancel {
+            background-color: #f0f0f0;
+            color: #262626;
+        }
+
         .btn-crop-cancel:hover { background-color: #e4e4e4; }
 
         .btn-crop-done {
-            flex: 1;
             background: #0095f6;
             color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 700;
         }
 
         .camera-box-mini {
@@ -391,26 +388,16 @@
             background-color: #000;
         }
 
-        .camera-box-mini video {
+        .camera-box-mini video, .camera-box-mini canvas {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: block;
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 1;
         }
-
-        .camera-box-mini canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10; 
-            pointer-events: none; 
-        }
+        
+        .camera-box-mini canvas { z-index: 10; pointer-events: none; }
 
         .face-status-text {
             font-size: 13px;
@@ -429,67 +416,26 @@
             text-align: center;
         }
 
-        .copyright {
-            color: #8e8e8e;
-            font-size: 0.75rem;
-            margin: 0;
-        }
+        .copyright { color: #8e8e8e; font-size: 0.75rem; margin: 0; }
 
         @media screen and (max-width: 768px) {
-            .container {
-                margin: 16px auto;
-                padding: 0 12px;
-            }
-
-            .profile-card {
-                padding: 32px 20px;
-            }
-
-            .hamburger-btn {
-                display: flex !important;
-            }
-
+            .container { margin: 16px auto; padding: 0 12px; }
+            .profile-card { padding: 32px 20px; }
+            .hamburger-btn { display: flex !important; }
             .nav-links {
-                position: fixed !important;
-                top: 54px !important;
-                left: 0 !important;
-                width: 100% !important;
-                background: #ffffff !important;
-                border-bottom: 1px solid #dbdbdb !important;
-                flex-direction: column !important;
-                padding: 20px 0 !important;
-                gap: 8px !important;
-                z-index: 99 !important;
-                opacity: 0 !important;
-                pointer-events: none !important;
-                transform: translateY(-10px) !important;
-                transition: transform 0.3s ease, opacity 0.3s ease !important;
+                position: fixed !important; top: 54px !important; left: 0 !important;
+                width: 100% !important; background: #ffffff !important;
+                flex-direction: column !important; padding: 20px 0 !important; gap: 8px !important;
+                z-index: 99 !important; opacity: 0 !important; pointer-events: none !important;
+                transform: translateY(-10px) !important; transition: all 0.3s ease !important;
             }
-
-            .nav-links.open {
-                opacity: 1 !important;
-                pointer-events: auto !important;
-                transform: translateY(0) !important;
-            }
-
-            .nav-item {
-                font-size: 15px !important;
-                padding: 10px 0 !important;
-                width: 80% !important;
-                text-align: center !important;
-            }
-
-            .btn-logout {
-                width: 80% !important;
-                padding: 10px 0 !important;
-            }
+            .nav-links.open { opacity: 1 !important; pointer-events: auto !important; transform: translateY(0) !important; }
+            .nav-item, .btn-logout { width: 80% !important; text-align: center !important; }
         }
     </style>
-    
 </head>
 
 <body class="cur">
-
     <header class="navbar">
         <div class="logo" onclick="location.href='main.html'">
             <div class="logo-text">平工<span>マッチング</span></div>
@@ -538,6 +484,7 @@
         </div>
     </main>
 
+    <!-- クロップ用モーダル -->
     <div id="cropModal" class="crop-modal">
         <div class="crop-modal-content">
             <h3>表示範囲を選択</h3>
@@ -551,6 +498,7 @@
         </div>
     </div>
 
+    <!-- 顔認証アップデート用モーダル -->
     <div id="faceModal" class="face-modal">
         <div class="face-modal-content">
             <h3>顔データのアップデート</h3>
@@ -584,7 +532,6 @@
             document.getElementById("nav-links").classList.toggle("open");
         }
 
-        // 🔴 未読件数の更新処理
         async function updateUnreadBadge() {
             const myEmail = localStorage.getItem("userEmail");
             const badge = document.getElementById("unread-badge");
@@ -622,39 +569,26 @@
 
                 document.getElementById("cropModal").style.display = "flex";
 
-                if (cropper) {
-                    cropper.destroy();
-                }
-
+                if (cropper) { cropper.destroy(); }
                 cropper = new Cropper(cropImage, {
-                    aspectRatio: 1,
-                    viewMode: 1,
-                    autoCropArea: 0.8,
-                    background: false
+                    aspectRatio: 1, viewMode: 1, autoCropArea: 0.8, background: false
                 });
             };
             reader.readAsDataURL(file);
         }
 
+        // 💡 画像を100x100、画質30%に超軽量化してGASへ送信可能にする
         function executeCrop() {
             if (!cropper) return;
-
-            const canvas = cropper.getCroppedCanvas({
-                width: 150,
-                height: 150
-            });
-
-            document.getElementById("profile-icon").src = canvas.toDataURL();
+            const canvas = cropper.getCroppedCanvas({ width: 100, height: 100 });
+            document.getElementById("profile-icon").src = canvas.toDataURL("image/jpeg", 0.3);
             closeCropModal();
         }
 
         function closeCropModal() {
             document.getElementById("cropModal").style.display = "none";
             document.getElementById("image-input").value = "";
-            if (cropper) {
-                cropper.destroy();
-                cropper = null;
-            }
+            if (cropper) { cropper.destroy(); cropper = null; }
         }
 
         function deleteImage() {
@@ -662,25 +596,19 @@
             document.getElementById("image-input").value = "";
         }
 
-        // 💡 プロフィール保存
+        // 💡 プロフィール保存（CORSエラーを回避するヘッダーを指定）
         async function saveProfile() {
             const name = document.getElementById("username-input").value.trim();
             const imageSrc = document.getElementById("profile-icon").src;
             const email = localStorage.getItem("userEmail");
 
-            if (!name) {
-                alert("表示名を入力してください");
-                return;
-            }
-
-            if (!email) {
-                alert("ログイン情報が見つかりません。一度再ログインしてください。");
-                return;
-            }
+            if (!name) { alert("表示名を入力してください"); return; }
+            if (!email) { alert("ログイン情報が見つかりません。一度再ログインしてください。"); return; }
 
             try {
                 const res = await fetch(GAS_URL, {
                     method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify({
                         mode: "updateProfile",
                         email: email,
@@ -700,6 +628,7 @@
                 }
             } catch (e) {
                 alert("通信エラーが発生しました。");
+                console.error(e);
             }
         }
 
@@ -716,8 +645,7 @@
             
             const rect = video.getBoundingClientRect();
             if (canvas.width !== rect.width || canvas.height !== rect.height) {
-                canvas.width = rect.width;
-                canvas.height = rect.height;
+                canvas.width = rect.width; canvas.height = rect.height;
             }
             
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -726,23 +654,14 @@
             ctx.fillStyle = "#00FF00";
             for (let i = 0; i < landmarks.length; i++) {
                 const pt = landmarks[i];
-                ctx.beginPath();
-                ctx.arc(pt.x * canvas.width, pt.y * canvas.height, 1, 0, 2 * Math.PI);
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(pt.x * canvas.width, pt.y * canvas.height, 1, 0, 2 * Math.PI); ctx.fill();
             }
         }
 
         function initFaceMesh() {
             if (faceMesh) return;
-            faceMesh = new FaceMesh({
-                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
-            });
-            faceMesh.setOptions({
-                maxNumFaces: 1,
-                refineLandmarks: true,
-                minDetectionConfidence: 0.5,
-                minTrackingConfidence: 0.5
-            });
+            faceMesh = new FaceMesh({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}` });
+            faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
             faceMesh.onResults((results) => {
                 if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
                     lastLandmarks = results.multiFaceLandmarks[0];
@@ -756,10 +675,7 @@
 
         async function startFaceUpdate() {
             const myEmail = localStorage.getItem("userEmail");
-            if (!myEmail) {
-                alert("ログインセッションが見つかりません。一度ログインし直してください。");
-                return;
-            }
+            if (!myEmail) { alert("ログインセッションが見つかりません。一度ログインし直してください。"); return; }
 
             initFaceMesh();
             document.getElementById('faceModal').style.display = "flex";
@@ -813,6 +729,7 @@
             try {
                 const res = await fetch(GAS_URL, {
                     method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify({
                         mode: "updateFaceFeatures",
                         email: email,
@@ -837,9 +754,7 @@
 
         function stopFaceCamera() {
             if (activeCamera) { activeCamera.stop(); }
-            if (videoStream) {
-                videoStream.getTracks().forEach(track => track.stop());
-            }
+            if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); }
             drawFaceFeatures(null);
         }
 
