@@ -1,83 +1,79 @@
 // ==========================================
-// 🎨 1. 共通CSS（テンプレートリテラルで記述）
+// 🎨 共通カスタムカーソル CSS (チカチカ完全防止版)
 // ==========================================
-const commonStyles = `
-    /* カラー変数や基本スタイル */
-    :root {
-        --ink: currentColor;
-        --ink-2: #FF4FD8;
-        --ink-3: #4FF8FF;
+const cursorStyle = `
+    /* 画面上の全要素でデフォルトカーソルを完全に消去 */
+    html, body, body *, 
+    button, a, input, select, textarea, label, [onclick], .nav-item {
+        cursor: none !important;
     }
 
-    /* 未読バッジなど共通デザイン */
-    .unread-badge {
-        position: absolute;
-        top: 2px;
-        right: 4px;
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        color: #ffffff;
-        font-size: 10px;
-        font-weight: 800;
-        padding: 2px 6px;
-        border-radius: 10px;
-        line-height: 1;
-        box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
-        min-width: 14px;
-        text-align: center;
-    }
-
-    /* カスタムカーソルのスタイル */
-    .cur {
-        --c: var(--ink-2);
-        position: relative;
-        cursor: none;
-        touch-action: none;
-    }
-
-    .cursor {
-        position: absolute;
-        left: var(--x);
-        top: var(--y);
+    /* カスタムカーソル本体（ピンクの丸） */
+    .custom-cursor-dot {
+        position: fixed;
+        top: 0;
+        left: 0;
         width: 12px;
         height: 12px;
+        background-color: #FF4FD8;
         border-radius: 50%;
-        background: var(--c);
-        transform: translate(-50%, -50%);
-        transition: left 0.07s, top 0.07s;
-        pointer-events: none;
+        pointer-events: none; /* マウスイベントを透過してクリックを妨げない */
+        z-index: 999999;
+        transform: translate(-50%, -50%) scale(1);
+        transition: transform 0.15s ease-out, background-color 0.15s ease-out, opacity 0.2s ease;
+        opacity: 0; /* 最初は非表示 */
+        will-change: transform, left, top;
+    }
+
+    /* マウスが動いたら表示 */
+    .custom-cursor-dot.is-active {
+        opacity: 1;
+    }
+
+    /* ボタンやリンクに重なった時の拡大アニメーション */
+    .custom-cursor-dot.is-hover {
+        transform: translate(-50%, -50%) scale(2.2);
+        background-color: #1cbdc5; /* ホバー時にテーマカラーへ変化 */
+        opacity: 0.8;
     }
 `;
 
-// 💡 作成したCSSをHTMLの<head>に自動挿入する処理
+// スタイルを head に追加
 const styleTag = document.createElement("style");
-styleTag.textContent = commonStyles;
+styleTag.textContent = cursorStyle;
 document.head.appendChild(styleTag);
 
-
 // ==========================================
-// ⚡ 2. 共通JavaScript（全画面で動かす処理）
+// ⚡ マウス追従 ＆ ホバー判定処理
 // ==========================================
-
-// カーソルのマウス追従処理
-function bindCursor(box) {
-    let lx = 0, ly = 0, has = false, idle;
-    const set = (p, v) => box.style.setProperty(p, v);
-    
-    box.addEventListener('pointermove', (e) => {
-        const r = box.getBoundingClientRect();
-        const x = e.clientX - r.left, y = e.clientY - r.top;
-        set('--x', x.toFixed(1) + 'px');
-        set('--y', y.toFixed(1) + 'px');
-        box.classList.add('is-active');
-    });
-    
-    box.addEventListener('pointerleave', () => {
-        box.classList.remove('is-active');
-    });
-}
-
-// 画面の読み込みが終わったら共通処理を実行
 window.addEventListener("DOMContentLoaded", () => {
-    // カスタムカーソルの初期化
-    document.querySelectorAll('.cur').forEach(bindCursor);
+    // カーソル要素を作成して body に追加
+    let cursor = document.querySelector(".custom-cursor-dot");
+    if (!cursor) {
+        cursor = document.createElement("div");
+        cursor.className = "custom-cursor-dot";
+        document.body.appendChild(cursor);
+    }
+
+    // マウス移動時の位置更新＆ホバー検知
+    window.addEventListener("pointermove", (e) => {
+        cursor.style.left = e.clientX + "px";
+        cursor.style.top = e.clientY + "px";
+        cursor.classList.add("is-active");
+
+        // ホバー対象（ボタン、リンク、入力欄など）の上にいるか判定
+        const target = e.target;
+        const isHoverable = target.closest("button, a, input, select, textarea, label, .btn-logout, .nav-item, [onclick]");
+
+        if (isHoverable) {
+            cursor.classList.add("is-hover");
+        } else {
+            cursor.classList.remove("is-hover");
+        }
+    });
+
+    // マウスが画面外に出た時
+    document.addEventListener("pointerleave", () => {
+        cursor.classList.remove("is-active");
+    });
 });
