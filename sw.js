@@ -6,15 +6,20 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(clients.claim());
 });
 
-// 💡 GASへの通信はService Workerで干渉させずスルーさせる
+// 💡 GAS（script.google.com）への通信は Service Worker で一切横取りせず直接実行させる
 self.addEventListener('fetch', (event) => {
   if (event.request.url.includes('script.google.com')) {
-    return; // スルーして直接通信
+    return; // respondWith を呼ばずにリターンすることで標準の直接通信になる
   }
 
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
+    fetch(event.request).catch(async () => {
+      const cachedResponse = await caches.match(event.request);
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      // キャッシュもない通信エラー時は代替レスポンスを返してクラッシュを防ぐ
+      return new Response("Network error", { status: 404, statusText: "Network error" });
     })
   );
 });
