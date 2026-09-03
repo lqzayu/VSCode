@@ -6,10 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ログイン - 平工マッチング</title>
 
-    <!-- 💡 favicon 404エラー防止用のダミーアイコン設定 -->
     <link rel="icon" href="icon-192.png">
 
-    <!-- MediaPipe公式ライブラリ -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 
@@ -35,7 +33,6 @@
             box-sizing: border-box;
         }
 
-        /* ログインカード：グラスモフィズム */
         .login-card {
             background-color: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
@@ -89,9 +86,7 @@
             -webkit-appearance: none;
         }
 
-        input::placeholder {
-            color: #94a3b8;
-        }
+        input::placeholder { color: #94a3b8; }
 
         input:focus {
             outline: none;
@@ -123,9 +118,7 @@
             transition: color 0.2s;
         }
 
-        .toggle-password-btn:hover, .toggle-confirm-btn:hover {
-            color: #1cbdc5;
-        }
+        .toggle-password-btn:hover, .toggle-confirm-btn:hover { color: #1cbdc5; }
 
         .message {
             min-height: 20px;
@@ -196,7 +189,6 @@
             box-shadow: none;
         }
 
-        /* カメラプレビュー表示エリア */
         .camera-box {
             display: none;
             width: 100%;
@@ -240,7 +232,6 @@
             min-height: 20px;
         }
 
-        /* 画面遷移用（ページトランジション）スタイル */
         .page-transition-overlay {
             position: fixed;
             top: 0;
@@ -290,23 +281,28 @@
             letter-spacing: 0.03em;
         }
 
+        #verify-section, #forgot-password-section { display: none; }
+
+        .code-hint {
+            font-size: 12.5px;
+            color: #64748b;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
         @media screen and (max-width: 480px) {
             .login-container { padding: 16px; }
             .login-card { padding: 32px 20px; border-radius: 20px; }
             h1 { font-size: 1.5rem; margin-bottom: 24px; }
         }
-
     </style>
 
-        <link rel="manifest" href = "manifest.json">
-        <meta name = "theme-color" content = "#0284c7">
-        <link rel = "apple-touch-icon" href = "icon-192.png">
-
-
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0284c7">
+    <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 
 <body>
-    <!-- 画面遷移用の白い幕 -->
     <div id="transition-overlay" class="page-transition-overlay"></div>
 
     <div class="login-container">
@@ -325,11 +321,13 @@
             </div>
 
             <div class="input-group">
-                <input type="text" id="email" placeholder="ユーザID" inputmode="email" onkeypress="handleKeyPress(event)">
+                <input type="text" id="login-userid" placeholder="ユーザID" onkeypress="handleKeyPress(event)">
 
-                <!-- 💡 新規登録時のみ表示される表示名入力欄 -->
                 <div class="name-wrapper" id="name-wrapper">
-                    <input type="text" id="display-name" placeholder="表示名（ニックネーム）" onkeypress="handleKeyPress(event)">
+                    <input type="text" id="display-name" placeholder="表示名（ニックネーム）">
+                </div>
+                <div class="name-wrapper" id="reg-email-wrapper">
+                    <input type="text" id="reg-email" placeholder="メールアドレス（認証コード送信用）" inputmode="email">
                 </div>
 
                 <div class="password-wrapper">
@@ -338,7 +336,7 @@
                 </div>
 
                 <div class="confirm-password-wrapper">
-                    <input type="password" id="confirm-password" placeholder="パスワード（確認）" class="confirm-password-input" onkeypress="handleKeyPress(event)">
+                    <input type="password" id="confirm-password" placeholder="パスワード（確認）" class="confirm-password-input">
                     <button type="button" id="toggle-confirm" onclick="toggleconfirmVisibility()" class="toggle-confirm-btn">表示</button>
                 </div>
 
@@ -348,10 +346,30 @@
                     <div id="login-section">
                         <button class="btn-submit-primary" onclick="handleLogin()">ログイン</button>
                         <button class="btn-flat" onclick="toggleMode('register')">新規登録はこちら</button>
+                        <br>
+                        <button class="btn-flat" onclick="showForgotPasswordForm()">パスワードを忘れた場合はこちら</button>
                     </div>
+
                     <div id="register-section" style="display: none;">
-                        <button class="btn-submit-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);" onclick="handleRegister()">アカウント作成</button>
+                        <button class="btn-submit-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);" onclick="handleRegister()">認証コードを送信する</button>
                         <button class="btn-flat" onclick="toggleMode('login')">ログインに戻る</button>
+                    </div>
+
+                    <!-- 🔧 追加：認証コード入力画面 -->
+                    <div id="verify-section">
+                        <p class="code-hint">入力されたメールアドレス宛に、6桁の認証コードを送信しました。ご確認のうえ、下に入力してください。（10分間有効）</p>
+                        <input type="text" id="verify-code" placeholder="認証コード（6桁）" inputmode="numeric" maxlength="6">
+                        <button class="btn-submit-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);" onclick="handleVerifyCode()">認証して登録完了</button>
+                        <button class="btn-flat" onclick="resendCode()">コードを再送する</button>
+                        <br>
+                        <button class="btn-flat" onclick="toggleMode('login')">ログインに戻る</button>
+                    </div>
+
+                    <!-- パスワード再設定用の入力エリア -->
+                    <div id="forgot-password-section">
+                        <input type="text" id="forgot-userid" placeholder="登録したユーザID">
+                        <button class="btn-submit-primary" onclick="submitForgotPassword()">再設定メールを送信</button>
+                        <button class="btn-flat" onclick="hideForgotPasswordForm()">キャンセル</button>
                     </div>
                 </div>
             </div>
@@ -366,32 +384,32 @@
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwgAQAPaBr-HNvqToDDrspDfL02s_YN89atcNrZfVGEESNnRLC_9vnqC0vz8hHyvUrS/exec";
-        
+
         let videoStream = null;
         let faceMesh = null;
-        let lastLandmarks = null; 
+        let lastLandmarks = null;
         let activeCamera = null;
+        let savedFeaturesText = "";
+        let isCapturing = false;
+        let pendingUserId = ""; // 🔧 追加：認証待ちのユーザーIDを一時保持
 
-        // 💡 スマホの縦画面（object-fit: cover）でも点がズレない補正計算付き描画処理
         function drawFeatures(landmarks) {
             const canvas = document.getElementById('face-overlay');
             const video = document.getElementById('video');
             const ctx = canvas.getContext('2d');
-            
+
             const rect = video.getBoundingClientRect();
             if (canvas.width !== rect.width || canvas.height !== rect.height) {
                 canvas.width = rect.width;
                 canvas.height = rect.height;
             }
-            
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             if (!landmarks) return;
 
-            // カメラ映像本来の解像度を取得
             const vWidth = video.videoWidth || 320;
             const vHeight = video.videoHeight || 240;
 
-            // object-fit: cover による拡大・トリミングの倍率とオフセット座標を算出
             const scale = Math.max(canvas.width / vWidth, canvas.height / vHeight);
             const renderWidth = vWidth * scale;
             const renderHeight = vHeight * scale;
@@ -401,10 +419,8 @@
             ctx.fillStyle = "#00FF00";
             for (let i = 0; i < landmarks.length; i++) {
                 const pt = landmarks[i];
-                // 拡大と切り抜きオフセットを反映させた正確なCanvas座標を計算
                 const x = pt.x * renderWidth + offsetX;
                 const y = pt.y * renderHeight + offsetY;
-
                 ctx.beginPath();
                 ctx.arc(x, y, 1.5, 0, 2 * Math.PI);
                 ctx.fill();
@@ -433,26 +449,21 @@
             });
         }
 
-        // 💡 スマホのインカメラを確実に指定して起動する処理
         async function startCamera() {
             initFaceMesh();
             const container = document.getElementById('camera-container');
             const video = document.getElementById('video');
             container.style.display = "block";
-            
+
             try {
-                videoStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        width: { ideal: 640 }, 
-                        height: { ideal: 480 },
-                        facingMode: "user"
-                    } 
+                videoStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" }
                 });
                 video.srcObject = videoStream;
-                
+
                 activeCamera = new Camera(video, {
                     onFrame: async () => { await faceMesh.send({ image: video }); },
-                    width: 320, 
+                    width: 320,
                     height: 240
                 });
                 activeCamera.start();
@@ -465,48 +476,62 @@
 
         function stopCamera() {
             if (activeCamera) { activeCamera.stop(); }
-            if (videoStream) {
-                videoStream.getTracks().forEach(track => track.stop());
-            }
+            if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); }
+            videoStream = null;
+            lastLandmarks = null;
             document.getElementById('camera-container').style.display = "none";
             drawFeatures(null);
         }
-            
+
+        // 🔧 変更：登録・認証コード・パスワード忘れ、各画面の切り替えに対応
         function toggleMode(mode) {
             const title = document.getElementById("form-title");
             const nameWrapper = document.getElementById("name-wrapper");
+            const regEmailWrapper = document.getElementById("reg-email-wrapper");
             const confirmWrapper = document.querySelector(".confirm-password-wrapper");
             const loginSec = document.getElementById("login-section");
             const registerSec = document.getElementById("register-section");
+            const verifySec = document.getElementById("verify-section");
+            const forgotSec = document.getElementById("forgot-password-section");
             const msg = document.getElementById("message");
             const faceLoginBtn = document.getElementById("face-login-btn");
             const faceRegBtn = document.getElementById("face-register-btn");
             const authStatus = document.getElementById("auth-status");
+            const loginUserId = document.getElementById("login-userid");
 
             msg.innerText = "";
             authStatus.innerText = "";
+            verifySec.style.display = "none";
+            forgotSec.style.display = "none";
 
             if (mode === 'register') {
                 title.innerText = "新規登録";
                 nameWrapper.style.display = "flex";
+                regEmailWrapper.style.display = "flex";
                 confirmWrapper.style.display = "flex";
 
                 loginSec.style.display = "none";
                 registerSec.style.display = "block";
+                loginUserId.style.display = "block";
 
                 faceLoginBtn.style.display = "none";
                 faceRegBtn.style.display = "inline-block";
-                startCamera();
+
+                authStatus.innerText = "「顔情報を撮影・登録」ボタンを押すとカメラが起動します。";
+                authStatus.style.color = "#64748b";
             } else {
                 title.innerText = "ログイン";
                 nameWrapper.style.display = "none";
+                regEmailWrapper.style.display = "none";
                 confirmWrapper.style.display = "none";
 
                 loginSec.style.display = "block";
                 registerSec.style.display = "none";
+                loginUserId.style.display = "block";
 
                 document.getElementById("confirm-password").value = "";
                 document.getElementById("display-name").value = "";
+                document.getElementById("reg-email").value = "";
 
                 faceLoginBtn.style.display = "inline-block";
                 faceRegBtn.style.display = "none";
@@ -514,22 +539,48 @@
             }
         }
 
-        let savedFeaturesText = ""; 
-        document.getElementById('face-register-btn').addEventListener('click', () => {
-            if (!lastLandmarks) {
-                document.getElementById('auth-status').innerText = "顔が検出されていません。正面を向いてください。";
-                document.getElementById('auth-status').style.color = "#ef4444";
+        document.getElementById('face-register-btn').addEventListener('click', async () => {
+            const authStatus = document.getElementById('auth-status');
+            if (isCapturing) return;
+
+            if (!videoStream) {
+                await startCamera();
+                authStatus.innerText = "カメラが起動しました。正面を向いてもう一度ボタンを押すと撮影されます。";
+                authStatus.style.color = "#1a73e8";
                 return;
             }
-            
-            savedFeaturesText = JSON.stringify(lastLandmarks);
-            stopCamera();
-            
-            document.getElementById('auth-status').innerText = "顔の特徴点を記憶しました。アカウント作成を押すと保存されます。";
-            document.getElementById('auth-status').style.color = "#10b981";
+
+            isCapturing = true;
+            let seconds = 3;
+            authStatus.innerText = `${seconds}秒後に自動で顔スキャンを実行します。正面を向いてください。`;
+            authStatus.style.color = "#e67e22";
+
+            const timer = setInterval(() => {
+                seconds--;
+                if (seconds > 0) {
+                    authStatus.innerText = `${seconds}秒後に自動で顔スキャンを実行します。正面を向いてください。`;
+                } else {
+                    clearInterval(timer);
+                    captureFace();
+                }
+            }, 1000);
         });
 
-        // 1:Nの顔認証ログイン ＋ スプレッドシートからのユーザー情報同期
+        function captureFace() {
+            const authStatus = document.getElementById('auth-status');
+            if (!lastLandmarks) {
+                authStatus.innerText = "顔を検出できずスキャンに失敗しました。もう一度ボタンを押してやり直してください。";
+                authStatus.style.color = "#ef4444";
+                isCapturing = false;
+                return;
+            }
+            savedFeaturesText = JSON.stringify(lastLandmarks);
+            stopCamera();
+            authStatus.innerText = "顔情報の撮影が完了しました。「認証コードを送信する」を押してください。";
+            authStatus.style.color = "#10b981";
+            isCapturing = false;
+        }
+
         document.getElementById('face-login-btn').addEventListener('click', async () => {
             await startCamera();
             document.getElementById('auth-status').innerText = "3秒後に自動で顔スキャンを実行します...";
@@ -545,7 +596,7 @@
 
                 const currentLandmarks = lastLandmarks;
                 stopCamera();
-                
+
                 document.getElementById('auth-status').innerText = "AIデータ解析中...";
                 document.getElementById('auth-status').style.color = "#e67e22";
 
@@ -557,8 +608,7 @@
                     const result = await res.json();
 
                     if (result.status === "success" && result.message.email) {
-                        // 💡 スプレッドシートから取得した表示名・アイコン画像を端末に同期保存
-                        localStorage.setItem("userEmail", result.message.email);
+                        localStorage.setItem("userEmail", result.message.email); // ユーザID
                         localStorage.setItem("userName", result.message.name || "ユーザー");
                         if (result.message.profileImage) {
                             localStorage.setItem("profileImage", result.message.profileImage);
@@ -566,7 +616,7 @@
 
                         document.getElementById('auth-status').innerText = `認証成功！こんにちは、${result.message.name}さん。`;
                         document.getElementById('auth-status').style.color = "#10b981";
-                        
+
                         document.querySelector('.login-card').classList.add('fade-out-exit');
                         document.getElementById('transition-overlay').classList.add('active');
                         setTimeout(() => { window.location.href = "main.html"; }, 500);
@@ -581,22 +631,21 @@
             }, 3000);
         });
 
-        // 通常ログイン ＋ スプレッドシートからのユーザー情報同期
+        // 通常ログイン（ユーザID + パスワード）
         async function handleLogin() {
-            const email = document.getElementById("email").value.trim();
+            const userId = document.getElementById("login-userid").value.trim();
             const password = document.getElementById("password").value.trim();
-            if (!email || !password) return updateMsg("入力してください", "error");
+            if (!userId || !password) return updateMsg("入力してください", "error");
 
             try {
                 updateMsg("ログイン処理中...", "");
                 const res = await fetch(GAS_URL, {
                     method: "POST",
-                    body: JSON.stringify({ mode: "login", email, password })
+                    body: JSON.stringify({ mode: "login", email: userId, password }) // 💡 emailという項目名でユーザIDを送信（他ページとの互換性維持）
                 });
                 const result = await res.json();
 
                 if (result.status === "success") {
-                    // 💡 スプレッドシートから取得した表示名・アイコン画像を端末に同期保存
                     localStorage.setItem("userEmail", result.message.email);
                     localStorage.setItem("userName", result.message.name || "ユーザー");
                     if (result.message.profileImage) {
@@ -604,7 +653,7 @@
                     }
 
                     updateMsg("ログイン成功", "success");
-                    
+
                     document.querySelector('.login-card').classList.add('fade-out-exit');
                     document.getElementById('transition-overlay').classList.add('active');
                     setTimeout(() => { window.location.href = "main.html"; }, 500);
@@ -614,24 +663,27 @@
             } catch (e) { updateMsg("通信エラーが発生しました。", "error"); }
         }
 
-        // 新規アカウント作成
+        // 🔧 変更：新規登録 → 認証コード送信 → 認証コード入力画面へ
         async function handleRegister() {
-            const email = document.getElementById("email").value.trim();
+            const userId = document.getElementById("login-userid").value.trim();
             const name = document.getElementById("display-name").value.trim();
+            const email = document.getElementById("reg-email").value.trim();
             const password = document.getElementById("password").value.trim();
             const confirm = document.getElementById("confirm-password").value.trim();
 
-            if (!email || !name || !password || !confirm) return updateMsg("全項目を入力してください", "error");
+            if (!userId || !name || !email || !password || !confirm) return updateMsg("全項目を入力してください", "error");
             if (password !== confirm) return updateMsg("パスワードが一致しません", "error");
+            if (!email.includes("@")) return updateMsg("メールアドレスの形式が正しくありません", "error");
 
             try {
-                updateMsg("登録中...", "");
+                updateMsg("送信中...", "");
                 const res = await fetch(GAS_URL, {
                     method: "POST",
                     body: JSON.stringify({
                         mode: "register",
-                        email: email,
+                        userId: userId,
                         name: name,
+                        email: email,
                         password: password,
                         faceFeatures: savedFeaturesText
                     })
@@ -639,13 +691,99 @@
                 const result = await res.json();
 
                 if (result.status === "success") {
-                    updateMsg("登録完了！ログインしてください", "success");
-                    savedFeaturesText = "";
-                    setTimeout(() => toggleMode('login'), 1200);
+                    pendingUserId = userId;
+                    document.getElementById("register-section").style.display = "none";
+                    document.getElementById("verify-section").style.display = "block";
+                    document.getElementById("form-title").innerText = "メール認証";
+                    updateMsg("", "");
                 } else {
                     updateMsg(result.message, "error");
                 }
             } catch (e) { updateMsg("通信エラーが発生しました", "error"); }
+        }
+
+        // 🔧 追加：認証コードを送信して本登録を完了させる
+        async function handleVerifyCode() {
+            const code = document.getElementById("verify-code").value.trim();
+            if (!code) return updateMsg("認証コードを入力してください", "error");
+
+            try {
+                updateMsg("確認中...", "");
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ mode: "verifyEmail", userId: pendingUserId, code: code })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    updateMsg("登録が完了しました！ログインしてください", "success");
+                    savedFeaturesText = "";
+                    document.getElementById("verify-code").value = "";
+                    setTimeout(() => toggleMode('login'), 1500);
+                } else {
+                    updateMsg(result.message, "error");
+                }
+            } catch (e) { updateMsg("通信エラーが発生しました", "error"); }
+        }
+
+        // 🔧 追加：認証コードの再送
+        async function resendCode() {
+            if (!pendingUserId) return;
+            try {
+                updateMsg("再送中...", "");
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ mode: "resendVerificationCode", userId: pendingUserId })
+                });
+                const result = await res.json();
+                if (result.status === "success") {
+                    updateMsg("認証コードを再送しました。メールをご確認ください。", "success");
+                } else {
+                    updateMsg(result.message, "error");
+                }
+            } catch (e) { updateMsg("通信エラーが発生しました", "error"); }
+        }
+
+        // パスワードを忘れた場合
+        function showForgotPasswordForm() {
+            document.getElementById("login-section").style.display = "none";
+            document.getElementById("forgot-password-section").style.display = "block";
+
+            const userId = document.getElementById("login-userid").value.trim();
+            if (userId) {
+                document.getElementById("forgot-userid").value = userId;
+            }
+            updateMsg("", "");
+        }
+
+        function hideForgotPasswordForm() {
+            document.getElementById("forgot-password-section").style.display = "none";
+            document.getElementById("login-section").style.display = "block";
+            updateMsg("", "");
+        }
+
+        async function submitForgotPassword() {
+            const targetUserId = document.getElementById("forgot-userid").value.trim();
+            if (!targetUserId) {
+                updateMsg("ユーザIDを入力してください", "error");
+                return;
+            }
+
+            updateMsg("送信中...", "");
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ mode: "forgotPassword", userId: targetUserId })
+                });
+                const result = await res.json();
+                if (result.status === "success") {
+                    updateMsg("登録済みのメールアドレス宛に、再設定用のリンクを送信しました。メールをご確認ください。", "success");
+                } else {
+                    updateMsg(result.message, "error");
+                }
+            } catch (e) {
+                updateMsg("通信エラーが発生しました。", "error");
+            }
         }
 
         function togglePasswordVisibility() {
@@ -673,8 +811,6 @@
                 event.preventDefault();
                 if (document.getElementById("login-section").style.display !== "none") {
                     handleLogin();
-                } else {
-                    handleRegister();
                 }
             }
         }
@@ -686,7 +822,6 @@
                     .catch(err => console.log('ServiceWorker 登録失敗:', err));
             });
         }
-
     </script>
 </body>
 </html>

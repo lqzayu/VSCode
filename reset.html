@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>パスワード再設定 - 平工マッチング</title>
+    <link rel="icon" href="icon-192.png">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100dvh;
+            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+        }
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+        .card {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            padding: 40px 32px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 20px 40px -4px rgba(24, 76, 92, 0.08);
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        h1 { font-size: 1.5rem; font-weight: 800; color: #1e293b; margin-bottom: 24px; }
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            box-sizing: border-box;
+            font-size: 15px;
+            background-color: rgba(248, 250, 252, 0.8);
+            outline: none;
+        }
+        input:focus { border-color: #1cbdc5; background: #fff; }
+        button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
+            color: white;
+        }
+        .message { min-height: 20px; margin-bottom: 16px; font-size: 13px; font-weight: 600; }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        a { color: #1cbdc5; font-size: 13px; font-weight: 600; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>新しいパスワードを設定</h1>
+            <div id="form-area">
+                <input type="password" id="new-password" placeholder="新しいパスワード">
+                <input type="password" id="confirm-password" placeholder="新しいパスワード（確認）">
+                <div id="message" class="message"></div>
+                <button onclick="submitReset()">パスワードを更新する</button>
+            </div>
+            <div id="success-area" style="display:none;">
+                <p style="color:#10b981; font-weight:700;">パスワードを更新しました。</p>
+                <a href="index.html">ログイン画面に戻る</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwgAQAPaBr-HNvqToDDrspDfL02s_YN89atcNrZfVGEESNnRLC_9vnqC0vz8hHyvUrS/exec";
+
+        const params = new URLSearchParams(window.location.search);
+        const userId = params.get("id");
+        const token = params.get("token");
+
+        if (!userId || !token) {
+            document.getElementById("form-area").innerHTML = "<p style='color:#ef4444;'>無効なリンクです。パスワード再設定をやり直してください。</p>";
+        }
+
+        async function submitReset() {
+            const newPassword = document.getElementById("new-password").value.trim();
+            const confirmPassword = document.getElementById("confirm-password").value.trim();
+            const msgEl = document.getElementById("message");
+
+            if (!newPassword || !confirmPassword) {
+                msgEl.textContent = "両方の欄を入力してください";
+                msgEl.className = "message error";
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                msgEl.textContent = "パスワードが一致しません";
+                msgEl.className = "message error";
+                return;
+            }
+
+            msgEl.textContent = "処理中...";
+            msgEl.className = "message";
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ mode: "resetPassword", userId, token, newPassword })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    document.getElementById("form-area").style.display = "none";
+                    document.getElementById("success-area").style.display = "block";
+                } else {
+                    msgEl.textContent = result.message;
+                    msgEl.className = "message error";
+                }
+            } catch (e) {
+                msgEl.textContent = "通信エラーが発生しました。";
+                msgEl.className = "message error";
+            }
+        }
+    </script>
+</body>
+</html>
