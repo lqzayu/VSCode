@@ -36,6 +36,7 @@
         .navbar {
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             padding: 14px 5%;
             display: flex;
             justify-content: space-between;
@@ -68,7 +69,7 @@
             color: #64748b;
             font-weight: 700;
             font-size: 14px;
-            padding: 8px16px;
+            padding: 8px 16px;
             text-decoration: none;
             border-radius: 8px;
             transition: all 0.2s ease;
@@ -260,14 +261,15 @@
             width: 100%;
             padding: 14px 0;
             font-size: 15px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #0095f6 0%, #0072ff 100%);
+            font-weight: 700;
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.25s ease;
-            box-shadow: 0 4px 12px rgba(0, 149, 246, 0.25);
+            box-shadow: 0 4px 12px rgba(28, 189. 197, 0.25);
+            box-sizing: border-box;
         }
 
         .btn-large:hover {
