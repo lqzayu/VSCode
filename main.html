@@ -841,7 +841,7 @@
                 email: localStorage.getItem("userEmail")
             };
             await fetch(GAS_URL, { method: "POST", body: JSON.stringify(data) });
-            alert("投稿しました");
+            alert("投稿しました");  //===================================================================
             switchTab('search');
             loadRecruitments();
             document.getElementById("rec-content").value = "";
