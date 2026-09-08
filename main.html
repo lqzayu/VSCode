@@ -198,7 +198,7 @@
             border-radius: 4px;
         }
 
-        select, textarea {
+        select, textarea, input[type="text"] {
             width: 100%;
             padding: 12px 16px;
             border: 1px solid rgba(0, 0, 0, 0.08);
@@ -226,7 +226,7 @@
             font-size: 14px;
         }
 
-        select:focus, textarea:focus {
+        select:focus, textarea:focus, input[type="text"]:focus {
             border-color: #1cbdc5;
             background-color: #ffffff;
             box-shadow: 0 0 0 4px rgba(28, 189, 197, 0.15);
@@ -256,6 +256,59 @@
         .btn-search:hover, #submit-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(28, 189, 197, 0.4);
+        }
+
+        /* 🔍 検索ボックスの追加スタイル */
+        .search-box-container {
+            margin-bottom: 24px;
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            font-size: 14px;
+            border: 1px solid rgba(28, 189, 197, 0.3);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 20px -4px rgba(24, 76, 92, 0.04);
+            box-sizing: border-box;
+        }
+
+        .search-icon-inside {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: #1cbdc5;
+            pointer-events: none;
+        }
+
+        /* 🏷 タグ（バッジ）のスタイル */
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .tag-badge {
+            background: rgba(28, 189, 197, 0.1);
+            color: #119299;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .tag-badge:hover {
+            background: #1cbdc5;
+            color: #ffffff;
         }
 
         /* ユーザー募集一覧グリッド */
@@ -299,7 +352,7 @@
             font-size: 14px;
             color: #475569;
             line-height: 1.6;
-            margin: 0 0 20px 0;
+            margin: 0 0 16px 0;
             flex: 1;
             white-space: pre-wrap;
         }
@@ -328,6 +381,7 @@
             font-size: 14px;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: none;
+            margin-top: auto;
         }
 
         .btn-match:hover {
@@ -679,14 +733,19 @@
                         <option value="情報工学科">情報工学科</option>
                     </select>
                     <textarea id="rec-content" rows="4" placeholder="募集内容を入力してください"
-                        style="margin-bottom:16px;"></textarea>
+                        style="margin-bottom:12px;"></textarea>
+                    
+                    <!-- 💡 追加：関連タグ入力欄 -->
+                    <input type="text" id="rec-tags" placeholder="関連タグ（例: プログラミング, 初心者歓迎, 部活）" 
+                        style="margin-bottom:16px;" />
+
                     <button class="btn-search" id="submit-btn" onclick="submitRecruitment()">投稿する</button>
                 </div>
             </section>
 
             <div class="main-content">
                 <section id="search-area">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
                         <h2 style="font-size: 1.35rem; font-weight: 800; margin: 0; color: #1e293b;">他ユーザーの募集一覧</h2>
                         <button onclick="loadRecruitments()" class="btn-refresh">
                             <img class="refresh-icon"
@@ -694,6 +753,15 @@
                                 alt="更新">
                         </button>
                     </div>
+
+                    <!-- 🔍 追加：リアルタイム検索ボックス -->
+                    <div class="search-box-container">
+                        <span class="search-icon-inside">🔍</span>
+                        <input type="text" id="search-input" class="search-input" 
+                            placeholder="キーワードやタグで検索（例: プログラミング, 部活, 1年）" 
+                            oninput="renderFilteredRecruitments()">
+                    </div>
+
                     <div class="user-grid" id="user-list">
                         <div class="loading-box">
                             <div class="spinner"></div>
@@ -728,6 +796,7 @@
 
         let lastMessageTime = 0;
         let activeTargetEmail = "";
+        let allOtherPosts = []; // 💡 全他ユーザーの募集データを保持する配列
 
         function toggleMenu() {
             document.getElementById("hud-menu-btn").classList.toggle("open");
@@ -774,41 +843,89 @@
 
                 const items = result.message.reverse();
                 const myPosts = items.filter(item => item.email === myEmail);
-                const otherPosts = items.filter(item => item.email !== myEmail);
+                allOtherPosts = items.filter(item => item.email !== myEmail);
 
+                // 自分の募集を表示
                 if (myPosts.length > 0) {
                     const myItem = myPosts[0];
+                    let myTagsHtml = "";
+                    if (myItem.tags) {
+                        const tagArray = myItem.tags.split(/[,、\s]+/).filter(t => t);
+                        myTagsHtml = `<div class="card-tags" style="margin-top:6px; margin-bottom:10px;">` + 
+                            tagArray.map(t => `<span class="tag-badge">#${t}</span>`).join("") + 
+                            `</div>`;
+                    }
+
                     myPostContentDiv.innerHTML = `
                         <div style="font-weight: 700; margin-bottom: 6px; color:#1cbdc5; font-size: 12px;">${myItem.grade} | ${myItem.dept}</div>
-                        <div style="word-wrap: break-word; line-height: 1.5; margin-bottom: 12px; font-size: 13px; color:#475569;">${myItem.content}</div>
+                        <div style="word-wrap: break-word; line-height: 1.5; margin-bottom: 6px; font-size: 13px; color:#475569;">${myItem.content}</div>
+                        ${myTagsHtml}
                         <button onclick="deleteMyRecruitment()" style="width: 100%; background: #ffe4e6; color: #e11d48; border: none; padding: 6px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; transition: background 0.2s;">
                             ✖ この募集を削除する
                         </button>
                     `;
                 }
 
-                if (otherPosts.length === 0) {
-                    listDiv.innerHTML = "<p style='color: #64748b; font-size: 14px; grid-column: 1 / -1; text-align: center; padding: 40px 0;'>現在、ユーザーの募集はありません</p>";
-                } else {
-                    const fragment = document.createDocumentFragment();
-                    otherPosts.forEach(item => {
-                        const card = document.createElement("div");
-                        card.className = "user-card";
-                        card.innerHTML = `
-                            <div class="user-badge">${item.grade} | ${item.dept}</div>
-                            <h3>${item.name}</h3>
-                            <p>${item.content}</p>
-                            <button class="btn-match" onclick="startChat('${item.email}')">チャットを始める</button>
-                        `;
-                        fragment.appendChild(card);
-                    });
-                    listDiv.appendChild(fragment);
-                }
+                // 絞り込み描画処理を実行
+                renderFilteredRecruitments();
 
             } catch (e) {
                 console.error(e);
                 listDiv.innerHTML = "<p style='color: #ef4444; font-size: 14px; grid-column: 1 / -1; text-align: center; padding: 40px 0;'>読み込みエラーが発生しました。</p>";
             }
+        }
+
+        // 🔍 検索入力に基づくカードのリアルタイム絞り込み描画
+        function renderFilteredRecruitments() {
+            const listDiv = document.getElementById("user-list");
+            const keyword = document.getElementById("search-input").value.trim().toLowerCase();
+
+            listDiv.innerHTML = "";
+
+            const filteredPosts = allOtherPosts.filter(item => {
+                if (!keyword) return true;
+                const searchTarget = `${item.name} ${item.grade} ${item.dept} ${item.content} ${item.tags || ""}`.toLowerCase();
+                return searchTarget.includes(keyword);
+            });
+
+            if (filteredPosts.length === 0) {
+                listDiv.innerHTML = "<p style='color: #64748b; font-size: 14px; grid-column: 1 / -1; text-align: center; padding: 40px 0;'>該当する募集が見つかりませんでした。</p>";
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+            filteredPosts.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "user-card";
+
+                // タグバッジの生成
+                let tagsHtml = "";
+                if (item.tags) {
+                    const tagArray = item.tags.split(/[,、\s]+/).filter(t => t);
+                    if (tagArray.length > 0) {
+                        tagsHtml = `<div class="card-tags">` + 
+                            tagArray.map(t => `<span class="tag-badge" onclick="searchByTag('${t}')">#${t}</span>`).join("") + 
+                            `</div>`;
+                    }
+                }
+
+                card.innerHTML = `
+                    <div class="user-badge">${item.grade} | ${item.dept}</div>
+                    <h3>${item.name}</h3>
+                    <p>${item.content}</p>
+                    ${tagsHtml}
+                    <button class="btn-match" onclick="startChat('${item.email}')">チャットを始める</button>
+                `;
+                fragment.appendChild(card);
+            });
+            listDiv.appendChild(fragment);
+        }
+
+        // 🏷 タグバッジを直接タップした際に検索ボックスへ自動入力して絞り込む
+        function searchByTag(tagName) {
+            const searchInput = document.getElementById("search-input");
+            searchInput.value = tagName;
+            renderFilteredRecruitments();
         }
 
         async function deleteMyRecruitment() {
@@ -832,19 +949,30 @@
         }
 
         async function submitRecruitment() {
+            const content = document.getElementById("rec-content").value.trim();
+            const tags = document.getElementById("rec-tags").value.trim();
+
+            if (!content) {
+                alert("募集内容を入力してください");
+                return;
+            }
+
             const data = {
                 mode: "postRecruitment",
                 name: localStorage.getItem("userName"),
                 grade: document.getElementById("rec-grade").value,
                 dept: document.getElementById("rec-dept").value,
-                content: document.getElementById("rec-content").value,
+                content: content,
+                tags: tags, // 💡 タグ情報を追加送信
                 email: localStorage.getItem("userEmail")
             };
+
             await fetch(GAS_URL, { method: "POST", body: JSON.stringify(data) });
-            alert("投稿しました");  //===================================================================
+            alert("投稿しました");
             switchTab('search');
             loadRecruitments();
             document.getElementById("rec-content").value = "";
+            document.getElementById("rec-tags").value = "";
         }
 
         function startChat(email) {
@@ -902,7 +1030,7 @@
                         lastMessageTime = msg.time;
                         activeTargetEmail = msg.fromEmail;
                         showToast(msg.fromName, msg.text);
-                        updateUnreadBadge(); // 通知が出たタイミングで未読数も更新
+                        updateUnreadBadge();
                     }
                 }
             } catch (e) {
