@@ -186,6 +186,8 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
             border: 3px solid #ffffff;
             transition: transform 0.25s ease;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
         }
 
         .image-btn-group {
@@ -268,7 +270,7 @@
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.25s ease;
-            box-shadow: 0 4px 12px rgba(28, 189. 197, 0.25);
+            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25);
             box-sizing: border-box;
         }
 
@@ -297,7 +299,6 @@
             background-color: #f0f0f0;
         }
 
-        /* 🚨 ユーザー情報削除ボタン */
         .btn-delete-account {
             background-color: transparent;
             color: #e11d48;
@@ -604,10 +605,16 @@
             reader.readAsDataURL(file);
         }
 
+        // 💡 通信エラーを解消する軽量＆高画質設定（300x300 / 圧縮率0.6）
         function executeCrop() {
             if (!cropper) return;
-            const canvas = cropper.getCroppedCanvas({ width: 100, height: 100 });
-            document.getElementById("profile-icon").src = canvas.toDataURL("image/jpeg", 0.3);
+            const canvas = cropper.getCroppedCanvas({
+                width: 300,
+                height: 300,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: "high"
+            });
+            document.getElementById("profile-icon").src = canvas.toDataURL("image/jpeg", 0.6);
             closeCropModal();
         }
 
@@ -657,7 +664,6 @@
             }
         }
 
-        // 🚨 ユーザー情報削除処理
         async function deleteAccount() {
             const isConfirmed = confirm("ユーザー情報を削除すると、現在のユーザーとして平工マッチングにアクセスすることができなくなります。よろしいですか？");
             if (!isConfirmed) return;
@@ -697,7 +703,6 @@
             window.location.href = "index.html";
         }
 
-        // 顔検出の描画
         function drawFaceFeatures(landmarks) {
             const canvas = document.getElementById('face-mesh-canvas');
             const video = document.getElementById('face-video');
