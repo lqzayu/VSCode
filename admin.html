@@ -408,7 +408,16 @@
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwgAQAPaBr-HNvqToDDrspDfL02s_YN89atcNrZfVGEESNnRLC_9vnqC0vz8hHyvUrS/exec";
         const ADMIN_ID = "admin";
 
-        if (localStorage.getItem("userEmail") !== ADMIN_ID) {
+        // 💡 代理ログインからの復帰判定を含むアクセス制限チェック
+        const currentEmail = localStorage.getItem("userEmail");
+        const isImpersonating = localStorage.getItem("isImpersonating");
+
+        if (isImpersonating === "true") {
+            // 代理ログイン中からの復帰時は admin 状態を正しく再セット
+            localStorage.setItem("userEmail", ADMIN_ID);
+            localStorage.setItem("userName", "管理者");
+            localStorage.removeItem("isImpersonating");
+        } else if (currentEmail !== ADMIN_ID) {
             alert("管理者権限が必要です。");
             window.location.href = "main.html";
         }
@@ -493,7 +502,6 @@
                     }
                 }
 
-                // 💡 ユーザーIDをクリック可能にして代理ログイン（impersonateUser）を実行
                 tr.innerHTML = `
                     <td>
                         <strong style="color: #1cbdc5; cursor: pointer; text-decoration: underline;" 
