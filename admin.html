@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理者ダッシュボード - 平工マッチング</title>
+    <link rel="icon" href="icon-192.png">
+
+    <style>
+        body {
+            margin: 0;
+            background: #f1f5f9;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #0f172a;
+            padding: 24px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+            padding: 20px 32px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-reload {
+            background: #0ea5e9;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-reload:hover { background: #0284c7; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            font-size: 1.15rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 12px;
+            color: #334155;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 13.5px;
+        }
+
+        th, td {
+            padding: 12px 8px;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        th {
+            color: #64748b;
+            font-weight: 700;
+            background: #f8fafc;
+        }
+
+        .btn-action-delete {
+            background: #ffe4e6;
+            color: #e11d48;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-action-delete:hover { background: #fecdd3; }
+
+        .btn-action-ban {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-action-ban:hover { background: #dc2626; color: white; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .badge-active { background: #dcfce7; color: #166534; }
+        .badge-inactive { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>🛡️ 管理者ダッシュボード</h1>
+        <button class="btn-reload" onclick="loadOverview()">データを更新</button>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- ユーザー管理パネル -->
+        <div class="panel">
+            <h2>👥 ユーザー管理一覧</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ユーザーID</th>
+                        <th>表示名</th>
+                        <th>ステータス</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="user-table-body">
+                    <tr><td colspan="4" style="text-align:center;">読み込み中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 募集投稿管理パネル -->
+        <div class="panel">
+            <h2>📢 募集投稿一覧（強制削除）</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>投稿者</th>
+                        <th>内容</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="post-table-body">
+                    <tr><td colspan="3" style="text-align:center;">読み込み中...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwgAQAPaBr-HNvqToDDrspDfL02s_YN89atcNrZfVGEESNnRLC_9vnqC0vz8hHyvUrS/exec";
+        const ADMIN_ID = "admin"; // 💡 管理者ID
+
+        async function loadOverview() {
+            const userBody = document.getElementById("user-table-body");
+            const postBody = document.getElementById("post-table-body");
+
+            userBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">読み込み中...</td></tr>`;
+            postBody.innerHTML = `<tr><td colspan="3" style="text-align:center;">読み込み中...</td></tr>`;
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ mode: "adminGetOverview", adminId: ADMIN_ID })
+                });
+
+                const result = await res.json();
+                if (result.status === "success") {
+                    renderUsers(result.message.users);
+                    renderPosts(result.message.posts);
+                } else {
+                    alert("取得失敗: " + result.message);
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました");
+            }
+        }
+
+        function renderUsers(users) {
+            const userBody = document.getElementById("user-table-body");
+            userBody.innerHTML = "";
+
+            if (users.length === 0) {
+                userBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">ユーザーがいません</td></tr>`;
+                return;
+            }
+
+            users.forEach(u => {
+                const tr = document.createElement("tr");
+                const statusBadge = u.isVerified 
+                    ? `<span class="status-badge badge-active">正常</span>` 
+                    : `<span class="status-badge badge-inactive">凍結/未認証</span>`;
+
+                tr.innerHTML = `
+                    <td><strong>${u.userId}</strong></td>
+                    <td>${u.name}</td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        ${u.isVerified && u.userId !== 'admin' ? `<button class="btn-action-ban" onclick="banUser('${u.userId}')">BAN (凍結)</button>` : '-'}
+                    </td>
+                `;
+                userBody.appendChild(tr);
+            });
+        }
+
+        function renderPosts(posts) {
+            const postBody = document.getElementById("post-table-body");
+            postBody.innerHTML = "";
+
+            if (posts.length === 0) {
+                postBody.innerHTML = `<tr><td colspan="3" style="text-align:center;">募集はありません</td></tr>`;
+                return;
+            }
+
+            posts.forEach(p => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><strong>${p.name}</strong><br><small style="color:#64748b;">${p.email}</small></td>
+                    <td>${p.content}</td>
+                    <td>
+                        <button class="btn-action-delete" onclick="deletePost('${p.email}')">強制削除</button>
+                    </td>
+                `;
+                postBody.appendChild(tr);
+            });
+        }
+
+        async function deletePost(targetEmail) {
+            if (!confirm("この投稿を強制削除しますか？")) return;
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ mode: "adminDeletePost", adminId: ADMIN_ID, targetEmail: targetEmail })
+                });
+                const result = await res.json();
+                if (result.status === "success") {
+                    alert("投稿を削除しました");
+                    loadOverview();
+                } else {
+                    alert("削除失敗: " + result.message);
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました");
+            }
+        }
+
+        async function banUser(targetUserId) {
+            if (!confirm(`ユーザー [ ${targetUserId} ] を凍結（BAN）しますか？\n※ログイン不可になり、該当ユーザーの募集も削除されます。`)) return;
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ mode: "adminBanUser", adminId: ADMIN_ID, targetUserId: targetUserId })
+                });
+                const result = await res.json();
+                if (result.status === "success") {
+                    alert("ユーザーを凍結しました");
+                    loadOverview();
+                } else {
+                    alert("BAN処理失敗: " + result.message);
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました");
+            }
+        }
+
+        window.onload = () => {
+            loadOverview();
+        };
+    </script>
+</body>
+
+</html>

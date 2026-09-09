@@ -278,7 +278,7 @@
 
         .search-icon-inside {
             position: absolute;
-            left: 16px;
+            left: 18px;
             top: 50%;
             transform: translateY(-50%);
             font-size: 16px;
@@ -692,6 +692,10 @@
                 <span id="unread-badge" class="unread-badge" style="display: none;">0</span>
             </span>
             <span class="nav-item" onclick="location.href='profile.html'">マイページ</span>
+            
+            <!-- 💡 追加：adminユーザーの時だけ表示される「管理者」タブ -->
+            <span class="nav-item" id="nav-admin-btn" style="display: none; color: #ef4444;" onclick="location.href='admin.html'">管理者</span>
+
             <button class="btn-logout" onclick="logout()">ログアウト</button>
         </nav>
     </header>
@@ -735,7 +739,7 @@
                     <textarea id="rec-content" rows="4" placeholder="募集内容を入力してください"
                         style="margin-bottom:12px;"></textarea>
                     
-                    <!-- 💡 追加：関連タグ入力欄 -->
+                    <!-- 💡 関連タグ入力欄 -->
                     <input type="text" id="rec-tags" placeholder="関連タグ（例: プログラミング, 初心者歓迎, 部活）" 
                         style="margin-bottom:16px;" />
 
@@ -754,9 +758,9 @@
                         </button>
                     </div>
 
-                    <!-- 🔍 追加：リアルタイム検索ボックス -->
+                    <!-- 🔍 リアルタイム検索ボックス (🔍絵文字を追加済み) -->
                     <div class="search-box-container">
-                        <span class="search-icon-inside"></span>
+                        <span class="search-icon-inside">🔍</span>
                         <input type="text" id="search-input" class="search-input" 
                             placeholder="キーワードやタグで検索（例: プログラミング, 部活, 1年）" 
                             oninput="renderFilteredRecruitments()">
@@ -1065,8 +1069,18 @@
             document.getElementById("hud-menu-btn").classList.remove("open");
             document.getElementById("nav-links").classList.remove("open");
 
+            const myEmail = localStorage.getItem("userEmail");
             const userName = localStorage.getItem("userName");
             const profileImage = localStorage.getItem("profileImage");
+
+            // 💡 追記: admin ユーザーの時だけ「管理者」タブを表示
+            if (myEmail === "admin") {
+                const adminBtn = document.getElementById("nav-admin-btn");
+                if (adminBtn) {
+                    adminBtn.style.display = "inline-block";
+                }
+            }
+
             document.getElementById("mypage-text").innerText = userName || "マイページ";
 
             if (profileImage && profileImage !== "null") {
