@@ -257,7 +257,6 @@
 
         .btn-action-ban:hover { background: #dc2626; color: white; }
 
-        /* 💡 BAN解除用のボタン（緑色） */
         .btn-action-unban {
             background: #ecfdf5;
             color: #059669;
@@ -366,7 +365,7 @@
         <div class="dashboard-grid">
             <!-- ユーザー管理パネル -->
             <div class="panel">
-                <h2>👥 ユーザー管理一覧</h2>
+                <h2>👥 ユーザー管理一覧（IDクリックで代理ログイン）</h2>
                 <table>
                     <thead>
                         <tr>
@@ -485,7 +484,6 @@
                     ? `<span class="status-badge badge-active">正常</span>` 
                     : `<span class="status-badge badge-inactive">凍結/未認証</span>`;
 
-                // 💡 BAN状態に応じてボタンの文言とスタイルを動的に変更
                 let actionButton = "-";
                 if (u.userId !== 'admin') {
                     if (u.isVerified) {
@@ -495,14 +493,32 @@
                     }
                 }
 
+                // 💡 ユーザーIDをクリック可能にして代理ログイン（impersonateUser）を実行
                 tr.innerHTML = `
-                    <td><strong>${u.userId}</strong></td>
+                    <td>
+                        <strong style="color: #1cbdc5; cursor: pointer; text-decoration: underline;" 
+                                onclick="impersonateUser('${u.userId}', '${u.name}')" 
+                                title="このユーザーとして代理ログインする">
+                            ${u.userId} 🔗
+                        </strong>
+                    </td>
                     <td>${u.name}</td>
                     <td>${statusBadge}</td>
                     <td>${actionButton}</td>
                 `;
                 userBody.appendChild(tr);
             });
+        }
+
+        function impersonateUser(targetUserId, targetUserName) {
+            if (!confirm(`ユーザー [ ${targetUserId} (${targetUserName}) ] として代理ログインしますか？`)) return;
+
+            localStorage.setItem("userEmail", targetUserId);
+            localStorage.setItem("userName", targetUserName);
+            localStorage.setItem("profileImage", "");
+            localStorage.setItem("isImpersonating", "true");
+
+            window.location.href = "main.html";
         }
 
         function renderPosts(posts) {
@@ -547,7 +563,6 @@
             }
         }
 
-        // 💡 BAN / BAN解除 の実行処理
         async function toggleBanUser(targetUserId, isCurrentVerified) {
             const actionName = isCurrentVerified ? "凍結（BAN）" : "BAN解除";
             const confirmMsg = isCurrentVerified 

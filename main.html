@@ -664,6 +664,14 @@
 
 <body>
 
+    <!-- 💡 代理ログイン中の警告・復帰バー -->
+    <div id="impersonate-bar" style="display: none; background: #fef08a; color: #854d0e; text-align: center; padding: 10px; font-weight: 700; font-size: 13px; border-bottom: 1px solid #fde047; z-index: 1000; position: relative;">
+        ⚠️ 現在 <span id="impersonate-user-id" style="text-decoration: underline;"></span> として代理ログイン中です。
+        <button onclick="exitImpersonation()" style="margin-left: 12px; background: #854d0e; color: #ffffff; border: none; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700;">
+            管理者ダッシュボードに戻る
+        </button>
+    </div>
+
     <!-- 🔔 トースト通知のポップアップ容器 -->
     <div id="toast-notification" class="toast-notification" onclick="clickToast()">
         <div class="toast-icon">💬</div>
@@ -693,7 +701,7 @@
             </span>
             <span class="nav-item" onclick="location.href='profile.html'">マイページ</span>
             
-            <!-- 💡 追加：adminユーザーの時だけ表示される「管理者」タブ -->
+            <!-- adminユーザーの時だけ表示される「管理者」タブ -->
             <span class="nav-item" id="nav-admin-btn" style="display: none; color: #ef4444;" onclick="location.href='admin.html'">管理者</span>
 
             <button class="btn-logout" onclick="logout()">ログアウト</button>
@@ -739,7 +747,6 @@
                     <textarea id="rec-content" rows="4" placeholder="募集内容を入力してください"
                         style="margin-bottom:12px;"></textarea>
                     
-                    <!-- 💡 関連タグ入力欄 -->
                     <input type="text" id="rec-tags" placeholder="関連タグ（例: プログラミング, 初心者歓迎, 部活）" 
                         style="margin-bottom:16px;" />
 
@@ -758,7 +765,6 @@
                         </button>
                     </div>
 
-                    <!-- 🔍 リアルタイム検索ボックス (🔍絵文字を追加済み) -->
                     <div class="search-box-container">
                         <span class="search-icon-inside">🔍</span>
                         <input type="text" id="search-input" class="search-input" 
@@ -800,7 +806,7 @@
 
         let lastMessageTime = 0;
         let activeTargetEmail = "";
-        let allOtherPosts = []; // 💡 全他ユーザーの募集データを保持する配列
+        let allOtherPosts = [];
 
         function toggleMenu() {
             document.getElementById("hud-menu-btn").classList.toggle("open");
@@ -849,7 +855,6 @@
                 const myPosts = items.filter(item => item.email === myEmail);
                 allOtherPosts = items.filter(item => item.email !== myEmail);
 
-                // 自分の募集を表示
                 if (myPosts.length > 0) {
                     const myItem = myPosts[0];
                     let myTagsHtml = "";
@@ -870,7 +875,6 @@
                     `;
                 }
 
-                // 絞り込み描画処理を実行
                 renderFilteredRecruitments();
 
             } catch (e) {
@@ -879,7 +883,6 @@
             }
         }
 
-        // 🔍 検索入力に基づくカードのリアルタイム絞り込み描画
         function renderFilteredRecruitments() {
             const listDiv = document.getElementById("user-list");
             const keyword = document.getElementById("search-input").value.trim().toLowerCase();
@@ -902,7 +905,6 @@
                 const card = document.createElement("div");
                 card.className = "user-card";
 
-                // タグバッジの生成
                 let tagsHtml = "";
                 if (item.tags) {
                     const tagArray = item.tags.split(/[,、\s]+/).filter(t => t);
@@ -925,7 +927,6 @@
             listDiv.appendChild(fragment);
         }
 
-        // 🏷 タグバッジを直接タップした際に検索ボックスへ自動入力して絞り込む
         function searchByTag(tagName) {
             const searchInput = document.getElementById("search-input");
             searchInput.value = tagName;
@@ -967,7 +968,7 @@
                 grade: document.getElementById("rec-grade").value,
                 dept: document.getElementById("rec-dept").value,
                 content: content,
-                tags: tags, // 💡 タグ情報を追加送信
+                tags: tags,
                 email: localStorage.getItem("userEmail")
             };
 
@@ -1010,7 +1011,6 @@
             }
         }
 
-        // 🔔 新着メッセージのトースト通知処理
         async function checkNewIncomingMessage() {
             const myEmail = localStorage.getItem("userEmail");
             if (!myEmail) return;
@@ -1065,6 +1065,14 @@
             window.location.href = "index.html";
         }
 
+        // 💡 代理ログインの解除（管理者アカウントへの復帰）処理
+        function exitImpersonation() {
+            localStorage.setItem("userEmail", "admin");
+            localStorage.setItem("userName", "管理者");
+            localStorage.removeItem("isImpersonating");
+            window.location.href = "admin.html";
+        }
+
         window.onload = () => {
             document.getElementById("hud-menu-btn").classList.remove("open");
             document.getElementById("nav-links").classList.remove("open");
@@ -1072,8 +1080,18 @@
             const myEmail = localStorage.getItem("userEmail");
             const userName = localStorage.getItem("userName");
             const profileImage = localStorage.getItem("profileImage");
+            const isImpersonating = localStorage.getItem("isImpersonating");
 
-            // 💡 追記: admin ユーザーの時だけ「管理者」タブを表示
+            // 💡 代理ログイン中バーの制御
+            if (isImpersonating === "true") {
+                const bar = document.getElementById("impersonate-bar");
+                const idSpan = document.getElementById("impersonate-user-id");
+                if (bar && idSpan) {
+                    idSpan.innerText = `${userName} (${myEmail})`;
+                    bar.style.display = "block";
+                }
+            }
+
             if (myEmail === "admin") {
                 const adminBtn = document.getElementById("nav-admin-btn");
                 if (adminBtn) {
@@ -1092,7 +1110,6 @@
             loadRecruitments();
             updateUnreadBadge();
 
-            // 定期チェック（3秒ごと）
             checkNewIncomingMessage();
             setInterval(() => {
                 checkNewIncomingMessage();
