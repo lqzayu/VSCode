@@ -8,46 +8,183 @@
     <link rel="icon" href="icon-192.png">
 
     <style>
+        /* =====================================
+           💡 ナビゲーションバー (main.htmlと統一)
+        ===================================== */
         body {
             margin: 0;
-            background: #f1f5f9;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            color: #0f172a;
-            padding: 24px;
+            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #1e293b;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .header {
+        .navbar {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 14px 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #ffffff;
-            padding: 20px 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            color: #64748b;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(28, 189, 197, 0.06);
+            color: #1cbdc5;
+        }
+
+        .nav-item.active {
+            color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        .unread-badge {
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 10px;
+            line-height: 1;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+            min-width: 14px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            background-color: #ef4444;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
+        }
+
+        .hamburger-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 24px;
+            height: 18px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 110;
+        }
+
+        .hamburger-btn span {
+            width: 100%;
+            height: 2.5px;
+            background-color: #1e293b;
+            border-radius: 3px;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* =====================================
+           ダッシュボード コンテンツエリア
+        ===================================== */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 24px;
+            flex: 1;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .page-title-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px 28px;
             border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             margin-bottom: 24px;
         }
 
         h1 {
             margin: 0;
-            font-size: 1.5rem;
-            color: #0f172a;
+            font-size: 1.4rem;
+            color: #1e293b;
+            font-weight: 800;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
         .btn-reload {
-            background: #0ea5e9;
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
             color: white;
             border: none;
-            padding: 10px 18px;
+            padding: 10px 20px;
             border-radius: 10px;
             font-weight: 700;
+            font-size: 13.5px;
             cursor: pointer;
             transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25);
         }
 
-        .btn-reload:hover { background: #0284c7; }
+        .btn-reload:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(28, 189, 197, 0.35);
+        }
 
         .dashboard-grid {
             display: grid;
@@ -55,23 +192,24 @@
             gap: 24px;
         }
 
-        @media (max-width: 900px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-        }
-
         .panel {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-sizing: border-box;
         }
 
         .panel h2 {
             margin-top: 0;
             font-size: 1.15rem;
-            border-bottom: 2px solid #e2e8f0;
+            font-weight: 800;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
             padding-bottom: 12px;
-            color: #334155;
+            color: #1e293b;
         }
 
         table {
@@ -82,15 +220,15 @@
         }
 
         th, td {
-            padding: 12px 8px;
+            padding: 12px 10px;
             text-align: left;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         th {
             color: #64748b;
             font-weight: 700;
-            background: #f8fafc;
+            background: rgba(248, 250, 252, 0.6);
         }
 
         .btn-action-delete {
@@ -98,9 +236,10 @@
             color: #e11d48;
             border: none;
             padding: 6px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: 700;
             cursor: pointer;
+            transition: all 0.2s;
         }
 
         .btn-action-delete:hover { background: #fecdd3; }
@@ -110,16 +249,31 @@
             color: #dc2626;
             border: 1px solid #fca5a5;
             padding: 6px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: 700;
             cursor: pointer;
+            transition: all 0.2s;
         }
 
         .btn-action-ban:hover { background: #dc2626; color: white; }
 
+        /* 💡 BAN解除用のボタン（緑色） */
+        .btn-action-unban {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-action-unban:hover { background: #10b981; color: white; }
+
         .status-badge {
             display: inline-block;
-            padding: 2px 8px;
+            padding: 3px 8px;
             border-radius: 6px;
             font-size: 11px;
             font-weight: 700;
@@ -127,56 +281,169 @@
 
         .badge-active { background: #dcfce7; color: #166534; }
         .badge-inactive { background: #fee2e2; color: #991b1b; }
+
+        .footer {
+            background-color: transparent;
+            padding: 24px;
+            margin-top: auto;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .copyright { color: #8e8e8e; font-size: 0.75rem; margin: 0; }
+
+        @media screen and (max-width: 768px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .container { padding: 0 16px; margin: 16px auto; }
+            .hamburger-btn { display: flex !important; }
+
+            .nav-links {
+                position: fixed !important;
+                top: 54px !important;
+                left: 0 !important;
+                width: 100% !important;
+                background: rgba(255, 255, 255, 0.98) !important;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+                flex-direction: column !important;
+                padding: 24px 0 !important;
+                gap: 8px !important;
+                z-index: 99 !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+                transform: translateY(-10px) !important;
+                transition: transform 0.3s ease, opacity 0.3s ease !important;
+            }
+
+            .nav-links.open {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                transform: translateY(0) !important;
+            }
+
+            .nav-item, .btn-logout {
+                width: 80% !important;
+                text-align: center !important;
+            }
+
+            .hamburger-btn.open span:nth-child(1) { transform: translateY(8px) rotate(45deg) !important; }
+            .hamburger-btn.open span:nth-child(2) { opacity: 0 !important; transform: scale(0) !important; }
+            .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) !important; }
+        }
     </style>
 </head>
 
 <body>
 
-    <div class="header">
-        <h1>🛡️ 管理者ダッシュボード</h1>
-        <button class="btn-reload" onclick="loadOverview()">データを更新</button>
-    </div>
+    <header class="navbar">
+        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
 
-    <div class="dashboard-grid">
-        <!-- ユーザー管理パネル -->
-        <div class="panel">
-            <h2>👥 ユーザー管理一覧</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ユーザーID</th>
-                        <th>表示名</th>
-                        <th>ステータス</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody id="user-table-body">
-                    <tr><td colspan="4" style="text-align:center;">読み込み中...</td></tr>
-                </tbody>
-            </table>
+        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <nav class="nav-links" id="nav-links">
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header" class="nav-item">意見箱</a>
+            <a href="main.html" class="nav-item">ホーム</a>
+            <a href="messages.html" class="nav-item">
+                メッセージ
+                <span id="unread-badge" class="unread-badge" style="display: none;">0</span>
+            </a>
+            <a href="profile.html" class="nav-item">マイページ</a>
+            <span class="nav-item active">管理者</span>
+            <button class="btn-logout" onclick="logout()">ログアウト</button>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="page-title-bar">
+            <h1>🛡️ 管理者ダッシュボード</h1>
+            <button class="btn-reload" onclick="loadOverview()">データを更新</button>
         </div>
 
-        <!-- 募集投稿管理パネル -->
-        <div class="panel">
-            <h2>📢 募集投稿一覧（強制削除）</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>投稿者</th>
-                        <th>内容</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody id="post-table-body">
-                    <tr><td colspan="3" style="text-align:center;">読み込み中...</td></tr>
-                </tbody>
-            </table>
+        <div class="dashboard-grid">
+            <!-- ユーザー管理パネル -->
+            <div class="panel">
+                <h2>👥 ユーザー管理一覧</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ユーザーID</th>
+                            <th>表示名</th>
+                            <th>ステータス</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="user-table-body">
+                        <tr><td colspan="4" style="text-align:center;">読み込み中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 募集投稿管理パネル -->
+            <div class="panel">
+                <h2>📢 募集投稿一覧（強制削除）</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>投稿者</th>
+                            <th>内容</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="post-table-body">
+                        <tr><td colspan="3" style="text-align:center;">読み込み中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+    </main>
+
+    <footer class="footer">
+        <p class="copyright">&copy; 2026 平工マッチング. All rights reserved.</p>
+    </footer>
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwgAQAPaBr-HNvqToDDrspDfL02s_YN89atcNrZfVGEESNnRLC_9vnqC0vz8hHyvUrS/exec";
-        const ADMIN_ID = "admin"; // 💡 管理者ID
+        const ADMIN_ID = "admin";
+
+        if (localStorage.getItem("userEmail") !== ADMIN_ID) {
+            alert("管理者権限が必要です。");
+            window.location.href = "main.html";
+        }
+
+        function toggleMenu() {
+            document.getElementById("hud-menu-btn").classList.toggle("open");
+            document.getElementById("nav-links").classList.toggle("open");
+        }
+
+        async function updateUnreadBadge() {
+            const myEmail = localStorage.getItem("userEmail");
+            const badge = document.getElementById("unread-badge");
+            if (!myEmail || !badge) return;
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ mode: "getUnreadCount", email: myEmail })
+                });
+                const result = await res.json();
+
+                if (result.status === "success" && result.message) {
+                    const count = result.message.unreadCount || 0;
+                    if (count > 0) {
+                        badge.innerText = count > 99 ? "99+" : count;
+                        badge.style.display = "inline-block";
+                    } else {
+                        badge.style.display = "none";
+                    }
+                }
+            } catch (e) {
+                console.error("未読チェックエラー:", e);
+            }
+        }
 
         async function loadOverview() {
             const userBody = document.getElementById("user-table-body");
@@ -218,13 +485,21 @@
                     ? `<span class="status-badge badge-active">正常</span>` 
                     : `<span class="status-badge badge-inactive">凍結/未認証</span>`;
 
+                // 💡 BAN状態に応じてボタンの文言とスタイルを動的に変更
+                let actionButton = "-";
+                if (u.userId !== 'admin') {
+                    if (u.isVerified) {
+                        actionButton = `<button class="btn-action-ban" onclick="toggleBanUser('${u.userId}', true)">BAN (凍結)</button>`;
+                    } else {
+                        actionButton = `<button class="btn-action-unban" onclick="toggleBanUser('${u.userId}', false)">BAN 解除</button>`;
+                    }
+                }
+
                 tr.innerHTML = `
                     <td><strong>${u.userId}</strong></td>
                     <td>${u.name}</td>
                     <td>${statusBadge}</td>
-                    <td>
-                        ${u.isVerified && u.userId !== 'admin' ? `<button class="btn-action-ban" onclick="banUser('${u.userId}')">BAN (凍結)</button>` : '-'}
-                    </td>
+                    <td>${actionButton}</td>
                 `;
                 userBody.appendChild(tr);
             });
@@ -272,8 +547,14 @@
             }
         }
 
-        async function banUser(targetUserId) {
-            if (!confirm(`ユーザー [ ${targetUserId} ] を凍結（BAN）しますか？\n※ログイン不可になり、該当ユーザーの募集も削除されます。`)) return;
+        // 💡 BAN / BAN解除 の実行処理
+        async function toggleBanUser(targetUserId, isCurrentVerified) {
+            const actionName = isCurrentVerified ? "凍結（BAN）" : "BAN解除";
+            const confirmMsg = isCurrentVerified 
+                ? `ユーザー [ ${targetUserId} ] を凍結（BAN）しますか？\n※ログイン不可になり、該当ユーザーの募集も削除されます。`
+                : `ユーザー [ ${targetUserId} ] のBANを解除しますか？\n※正常にログインできるようになります。`;
+
+            if (!confirm(confirmMsg)) return;
 
             try {
                 const res = await fetch(GAS_URL, {
@@ -282,18 +563,28 @@
                 });
                 const result = await res.json();
                 if (result.status === "success") {
-                    alert("ユーザーを凍結しました");
+                    alert(`ユーザーの${actionName}が完了しました`);
                     loadOverview();
                 } else {
-                    alert("BAN処理失敗: " + result.message);
+                    alert("処理失敗: " + result.message);
                 }
             } catch (e) {
                 alert("通信エラーが発生しました");
             }
         }
 
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+
         window.onload = () => {
+            document.getElementById("hud-menu-btn").classList.remove("open");
+            document.getElementById("nav-links").classList.remove("open");
+
             loadOverview();
+            updateUnreadBadge();
+            setInterval(updateUnreadBadge, 3000);
         };
     </script>
 </body>
