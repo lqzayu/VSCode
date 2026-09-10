@@ -258,6 +258,13 @@
             box-shadow: 0 6px 20px rgba(28, 189, 197, 0.4);
         }
 
+        #submit-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
         /* 🔍 検索ボックスの追加スタイル */
         .search-box-container {
             margin-bottom: 24px;
@@ -766,7 +773,7 @@
                     </div>
 
                     <div class="search-box-container">
-                        <span class="search-icon-inside">🔍</span>
+                        <!-- <span class="search-icon-inside">🔍</span> -->
                         <input type="text" id="search-input" class="search-input" 
                             placeholder="キーワードやタグで検索（例: プログラミング, 部活, 1年）" 
                             oninput="renderFilteredRecruitments()">
@@ -794,7 +801,7 @@
         </div>
     </footer>
 
-    <!------------------------------------------------------JVASQ------------------------------------------------------------------------------------------------------>
+    <!------------------------------------------------------JAVASCRIPT------------------------------------------------------------------------------------------------------>
 
     <script>
         // 🔒 未ログインガード
@@ -953,13 +960,21 @@
             }
         }
 
+        // 💡 投稿ボタンの連打防止・「投稿中...」切り替え付き投稿処理
         async function submitRecruitment() {
+            const submitBtn = document.getElementById("submit-btn");
             const content = document.getElementById("rec-content").value.trim();
             const tags = document.getElementById("rec-tags").value.trim();
 
             if (!content) {
                 alert("募集内容を入力してください");
                 return;
+            }
+
+            // 送信ボタンを無効化して「投稿中...」に切り替え
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "投稿中...";
             }
 
             const data = {
@@ -972,12 +987,28 @@
                 email: localStorage.getItem("userEmail")
             };
 
-            await fetch(GAS_URL, { method: "POST", body: JSON.stringify(data) });
-            alert("投稿しました");
-            switchTab('search');
-            loadRecruitments();
-            document.getElementById("rec-content").value = "";
-            document.getElementById("rec-tags").value = "";
+            try {
+                const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(data) });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    alert("投稿しました");
+                    switchTab('search');
+                    loadRecruitments();
+                    document.getElementById("rec-content").value = "";
+                    document.getElementById("rec-tags").value = "";
+                } else {
+                    alert("投稿エラー: " + result.message);
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました");
+            } finally {
+                // 処理完了後にボタンを復帰
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "投稿する";
+                }
+            }
         }
 
         function startChat(email) {
