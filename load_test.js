@@ -11,7 +11,7 @@ export const options = {
   maxRedirects: 10,
 };
 
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwgAQAPaBr-HNvqToDDrspDfL02s_YN89atcNrZfVGEESNnRLC_9vnqC0vz8hHyvUrS/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec';
 
 export default function () {
   const payload = JSON.stringify({
