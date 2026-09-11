@@ -3,9 +3,9 @@ import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '30s', target: 20 },  // 30秒かけて20人まで増やす
-    { duration: '1m',  target: 20 },  // 20人で1分間維持
-    { duration: '30s', target: 0 },  // 30秒で0人に減らす
+    { duration: '25s', target: 15 },  // 30秒かけて20人まで増やす
+    { duration: '1m',  target: 15 },  // 20人で1分間維持
+    { duration: '25s', target: 0 },  // 30秒で0人に減らす
   ],
   // 💡 リダイレクトを自動追従させる設定（最大10回まで追従）
   maxRedirects: 10,
