@@ -1,0 +1,105 @@
+<!-- プライバシーポリシー -->
+
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プライバシーポリシー - 平工マッチング</title>
+    <link rel="icon" href="icon-192.png">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f8fafc;
+            color: #334155;
+            line-height: 1.7;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .terms-card {
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        h1 {
+            color: #1cbdc5;
+            font-size: 1.8rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 12px;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            color: #0f172a;
+            margin-top: 24px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .btn-close {
+            display: inline-block;
+            margin-top: 24px;
+            background: #1cbdc5;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="terms-card">
+        <h1>プライバシーポリシー</h1>
+        <p>平工マッチング（以下「当アプリ」）は、ユーザーの個人情報を「課題のレポート」並みに大切に取り扱います。以下に、取得するデータとその利用目的を明記します。</p>
+
+        <h2>第1条（収集する情報）</h2>
+        <p>当アプリは、快適なマッチング機能を提供するために以下の情報を取得します。</p>
+        <ul>
+            <li><strong>アカウント情報：</strong> ユーザーID、お名前（ニックネーム可）、メールアドレス、学年、学科。</li>
+            <li><strong>認証データ：</strong> ハッシュ化されたパスワード（SHA-256でバチバチに暗号化されているため、開発者すら解読できません）。</li>
+            <li><strong>顔認証データ：</strong> 顔の特徴点（数値データ）。<small>※あなたの実際の顔写真画像そのものはサーバーに保存されません。イケメン度や美少女度を数値化して格付けする機能もございません。</small></li>
+            <li><strong>LINE連携データ：</strong> LINE Messaging APIで使用するLINE User ID（通知を届けるためだけに使用します）。</li>
+        </ul>
+
+        <h2>第2条（情報の利用目的）</h2>
+        <p>取得した情報は以下の目的「のみ」に使用されます。</p>
+        <ul>
+            <li>ユーザー同士のメッセージやり取りおよび募集一覧の表示</li>
+            <li>新着チャットが届いた際に「ピコン♪」とLINE通知を飛ばして放課後を彩るため</li>
+            <li>荒らしユーザーを特定して平和な校内マッチング環境を守るため</li>
+        </ul>
+
+        <h2>第3条（第三者への情報提供の禁止）</h2>
+        <p>当アプリは、取得した個人情報を第三者に売却・開示することはありません。ただし、以下の場合は除きます。</p>
+        <ul>
+            <li>ユーザー本人の同意がある場合</li>
+            <li>テストの点数が悪すぎて職員室へ呼び出され、法的かつ強力な権力を行使された場合（冗談です、法令に基づく開示要請があった場合のみです）</li>
+        </ul>
+
+        <h2>第4条（データの管理と安全性）</h2>
+        <p>当アプリのデータベースはGoogleの強力なインフラ（Google Sheets / GAS）の上に構築されており、通信はSSL（HTTPS）で暗号化されています。スプレッドシートの行番号を覗き見しようとしても無駄です。</p>
+
+        <h2>第5条（データの削除）</h2>
+        <p>アカウント削除を行った場合、当アプリに保存されたあなたの投稿、チャット履歴、個人データはスプレッドシートからキレイサッパリ抹消されます。ただし、青春の甘酸っぱい思い出だけは胸に残ります。</p>
+
+        <a href="main.html" class="btn-close">理解したので戻る</a>
+    </div>
+
+</body>
+
+</html>
