@@ -11,8 +11,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 
-    <!------------------------------------------------CSS-------------------------------------------------------------------------------------------------------------->
-
     <style>
         body {
             margin: 0;
@@ -21,7 +19,7 @@
             flex-direction: column;
             min-height: 100dvh;
             background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -275,7 +273,6 @@
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
-        /* 💡 洗練されたフッター＆リンクデザイン */
         .footer {
             background-color: transparent;
             padding: 28px 20px;
@@ -336,83 +333,6 @@
             line-height: 1.6;
         }
 
-        /* 💡 モダンなカスタムポップアップ（モーダル） */
-        .custom-alert-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-            animation: fadeIn 0.15s ease-out;
-        }
-
-        .custom-alert-box {
-            background: #ffffff;
-            border: 1px solid #dbdbdb;
-            border-radius: 16px;
-            padding: 24px;
-            width: 100%;
-            max-width: 360px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-            text-align: center;
-            box-sizing: border-box;
-        }
-
-        .custom-alert-title {
-            font-size: 16px;
-            font-weight: 800;
-            color: #262626;
-            margin-bottom: 10px;
-        }
-
-        .custom-alert-message {
-            font-size: 14px;
-            color: #666666;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            white-space: pre-wrap;
-        }
-
-        .custom-alert-btn-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .custom-alert-btn {
-            flex: 1;
-            padding: 10px 0;
-            font-size: 14px;
-            font-weight: 700;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        .custom-alert-btn-primary {
-            background: #0095f6;
-            color: white;
-        }
-
-        .custom-alert-btn-cancel {
-            background: #f0f0f0;
-            color: #262626;
-        }
-
-        .custom-alert-btn:hover {
-            opacity: 0.85;
-        }
-
         @media screen and (max-width: 480px) {
             .login-container {
                 padding: 16px;
@@ -438,8 +358,6 @@
     <meta name="theme-color" content="#0284c7">
     <link rel="apple-touch-icon" href="icon-192.png">
 </head>
-
-<!-------------------------------------------HTML----------------------------------------------------------------------------------------------->
 
 <body>
     <div id="transition-overlay" class="page-transition-overlay"></div>
@@ -500,7 +418,6 @@
                         <button class="btn-flat" onclick="toggleMode('login')">ログインに戻る</button>
                     </div>
 
-                    <!-- 認証コード入力画面 -->
                     <div id="verify-section">
                         <p class="code-hint">入力されたメールアドレス宛に、6桁の認証コードを送信しました。ご確認のうえ、下に入力してください。（10分間有効）</p>
                         <input type="text" id="verify-code" placeholder="認証コード（6桁）" inputmode="numeric" maxlength="6">
@@ -512,7 +429,6 @@
                         <button class="btn-flat" onclick="toggleMode('login')">ログインに戻る</button>
                     </div>
 
-                    <!-- パスワード再設定用の入力エリア -->
                     <div id="forgot-password-section">
                         <input type="text" id="forgot-userid" placeholder="登録したユーザID">
                         <button class="btn-submit-primary" onclick="submitForgotPassword()">再設定メールを送信</button>
@@ -533,11 +449,8 @@
         </div>
     </footer>
 
-    <!-------------------------------------------------------------------JAVASCRIPT------------------------------------------------------------------------------------->
-
     <script>
-        const GAS_URL =
-            "https://script.google.com/macros/s/AKfycbwgAQAPaBr-HNvqToDDrspDfL02s_YN89atcNrZfVGEESNnRLC_9vnqC0vz8hHyvUrS/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwgAQAPaBr-HNvqToDDrspDfL02s_YN89atcNrZfVGEESNnRLC_9vnqC0vz8hHyvUrS/exec";
 
         let videoStream = null;
         let faceMesh = null;
@@ -612,12 +525,8 @@
             try {
                 videoStream = await navigator.mediaDevices.getUserMedia({
                     video: {
-                        width: {
-                            ideal: 640
-                        },
-                        height: {
-                            ideal: 480
-                        },
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
                         facingMode: "user"
                     }
                 });
@@ -625,9 +534,7 @@
 
                 activeCamera = new Camera(video, {
                     onFrame: async () => {
-                        await faceMesh.send({
-                            image: video
-                        });
+                        await faceMesh.send({ image: video });
                     },
                     width: 320,
                     height: 240
@@ -641,12 +548,8 @@
         }
 
         function stopCamera() {
-            if (activeCamera) {
-                activeCamera.stop();
-            }
-            if (videoStream) {
-                videoStream.getTracks().forEach(track => track.stop());
-            }
+            if (activeCamera) activeCamera.stop();
+            if (videoStream) videoStream.getTracks().forEach(track => track.stop());
             videoStream = null;
             lastLandmarks = null;
             document.getElementById('camera-container').style.display = "none";
@@ -806,7 +709,6 @@
             }, 3000);
         });
 
-        // 通常ログイン（ユーザID + パスワード）
         async function handleLogin() {
             const userId = document.getElementById("login-userid").value.trim();
             const password = document.getElementById("password").value.trim();
