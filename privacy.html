@@ -1,95 +1,49 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>プライバシーポリシー - 平工マッチング</title>
-    <link rel="icon" href="icon-192.png">
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #f8fafc;
-            color: #334155;
-            line-height: 1.7;
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .terms-card {
-            background: #ffffff;
-            padding: 32px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
-        }
-
-        h1 {
-            color: #1cbdc5;
-            font-size: 1.8rem;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 12px;
-        }
-
-        h2 {
-            font-size: 1.2rem;
-            color: #0f172a;
-            margin-top: 24px;
-        }
-
-        ul {
-            padding-left: 20px;
-        }
-
-        li {
-            margin-bottom: 8px;
-        }
-
-        .btn-close {
-            display: inline-block;
-            margin-top: 24px;
-            background: #1cbdc5;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-        }
+        body { font-family: sans-serif; line-height: 1.6; padding: 20px; max-width: 800px; margin: auto; color: #333; }
+        h1 { border-bottom: 2px solid #ccc; padding-bottom: 5px; }
+        h2 { margin-top: 30px; font-size: 1.2em; }
+        p, li { font-size: 0.95em; }
     </style>
 </head>
-
 <body>
+    <h1>プライバシーポリシー</h1>
+    <p>「平工マッチング」（以下、「当サービス」といいます。）は、利用者に関する個人情報を取り扱うにあたり、その重要性を認識し、適切な管理を行います。</p>
 
-    <div class="terms-card">
-        <h1>プライバシーポリシー</h1>
-        <p>平工マッチング（以下「当アプリ」）は、ユーザーの個人情報を「課題のレポート」並みに大切に取り扱います。以下に、取得するデータとその利用目的を明記します。</p>
+    <h2>第1条（収集する個人情報）</h2>
+    <p>当サービスでは、利用登録やサービス利用の際に、以下の情報を収集することがあります。</p>
+    <ul>
+        <li>氏名、ユーザーID、メールアドレス</li>
+        <li>パスワード（安全性を考慮し、ハッシュ化して保存します）</li>
+        <li>顔認証データ（ログイン機能等のために利用する場合）</li>
+        <li>LINEアカウントの連携情報（LINE User ID等）</li>
+        <li>その他、サービス内でユーザーが入力・投稿した情報</li>
+    </ul>
 
-        <h2>第1条（収集する情報）</h2>
-        <p>当アプリは、快適なマッチング機能を提供するために以下の情報を取得します。</p>
-        <ul>
-            <li><strong>アカウント情報：</strong> ユーザーID、お名前（ニックネーム可）、メールアドレス、学年、学科。</li>
-            <li><strong>認証データ：</strong> ハッシュ化されたパスワード（SHA-256で暗号化）。</li>
-            <li><strong>顔認証データ：</strong> 顔の特徴点（数値データのみ）。写真画像自体は保存されません。</li>
-            <li><strong>LINE連携データ：</strong> LINE Messaging APIで使用するLINE User ID（通知を届けるためのみに使用）。</li>
-        </ul>
+    <h2>第2条（個人情報の利用目的）</h2>
+    <p>収集した個人情報は、以下の目的のために利用します。</p>
+    <ul>
+        <li>当サービスの提供・運営のため</li>
+        <li>ユーザーからの問い合わせに対応するため</li>
+        <li>重要なお知らせやアップデート情報などの連絡のため</li>
+        <li>不正利用や規約違反行為を防ぎ、安全性を維持するため</li>
+    </ul>
 
-        <h2>第2条（情報の利用目的）</h2>
-        <ul>
-            <li>ユーザー同士のメッセージやり取りおよび募集一覧の表示</li>
-            <li>新着チャットが届いた際のLINE通知配信</li>
-            <li>荒らしユーザーを特定して平和な校内環境を守るため</li>
-        </ul>
+    <h2>第3条（個人情報の第三者提供）</h2>
+    <p>運営者は、次に掲げる場合を除いて、あらかじめ利用者の同意を得ることなく、第三者に個人情報を提供することはありません。</p>
+    <ul>
+        <li>法令に基づく場合</li>
+        <li>人の生命、身体または財産の保護のために必要がある場合であって、本人の同意を得ることが困難であるとき</li>
+    </ul>
 
-        <h2>第3条（第三者への情報提供の禁止）</h2>
-        <p>取得した個人情報を第三者に売却・開示することはありません。ただし、法令に基づく要請があった場合を除きます。</p>
+    <h2>第4条（個人情報の管理）</h2>
+    <p>当サービスは、個人情報の漏洩、滅失、毀損を防ぐため、適切な安全管理措置を講じます。また、GoogleスプレッドシートやGoogle Apps Script等のクラウド環境を利用してデータを管理する場合においても、不正アクセス防止に努めます。</p>
 
-        <h2>第4条（データの管理と安全性）</h2>
-        <p>当アプリのデータベースはGoogleのインフラ（Google Sheets / GAS）上に構築されており、通信はSSL（HTTPS）で暗号化されています。</p>
-
-        <a href="main.html" class="btn-close">理解したので戻る</a>
-    </div>
-
+    <h2>第5条（プライバシーポリシーの変更）</h2>
+    <p>本ポリシーの内容は、法令その他本ポリシーに別段の定めのある事項を除いて、利用者に通知することなく変更することができるものとします。変更後のプライバシーポリシーは、本サイトに掲載したときから効力を生じるものとします。</p>
 </body>
-
 </html>
