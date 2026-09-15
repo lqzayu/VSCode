@@ -8,7 +8,6 @@
 
     <link rel="icon" href="icon-192.png">
 
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 
     <style>
@@ -208,14 +207,14 @@
         .camera-box {
             display: none;
             width: 100%;
-            max-width: 320px;
+            max-width: 400px;
             margin: 0 auto 20px auto;
             border-radius: 16px;
             overflow: hidden;
             transform: scaleX(-1);
             box-shadow: 0 10px 25px rgba(28, 189, 197, 0.15);
             position: relative;
-            height: 240px;
+            aspect-ratio: 4 / 3;
             border: 2px solid rgba(28, 189, 197, 0.3);
             background-color: #000;
         }
@@ -229,6 +228,7 @@
             top: 0;
             left: 0;
             z-index: 1;
+            background: #000;
         }
 
         canvas#face-overlay {
@@ -368,7 +368,7 @@
             <h1 id="form-title">ログイン</h1>
 
             <div id="camera-container" class="camera-box">
-                <video id="video" autoplay playsinline></video>
+                <video id="video" autoplay playsinline muted></video>
                 <canvas id="face-overlay"></canvas>
             </div>
 
@@ -456,7 +456,14 @@
         let videoStream = null;
         let faceMesh = null;
         let lastLandmarks = null;
-        let activeCamera = null;
+        let faceFrameRequest = null;
+        let faceFrameCallback = null;
+        let faceProcessing = false;
+        let lastFaceCheck = 0;
+        let cameraStartPromise = null;
+        let cameraSession = 0;
+        let lastFaceSeen = 0;
+        const faceCheckInterval = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 100 : 66;
         let savedFeaturesText = "";
         let isCapturing = false;
         let pendingUserId = "";
@@ -467,22 +474,33 @@
             const ctx = canvas.getContext('2d');
 
             const rect = video.getBoundingClientRect();
-            if (canvas.width !== rect.width || canvas.height !== rect.height) {
-                canvas.width = rect.width;
-                canvas.height = rect.height;
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const width = Math.max(1, Math.round(rect.width));
+            const height = Math.max(1, Math.round(rect.height));
+            const pixelWidth = Math.round(width * dpr);
+            const pixelHeight = Math.round(height * dpr);
+
+            if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+                canvas.width = pixelWidth;
+                canvas.height = pixelHeight;
+                canvas.style.width = `${width}px`;
+                canvas.style.height = `${height}px`;
             }
 
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             if (!landmarks) return;
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
             const vWidth = video.videoWidth || 320;
             const vHeight = video.videoHeight || 240;
 
-            const scale = Math.max(canvas.width / vWidth, canvas.height / vHeight);
+            const scale = Math.max(width / vWidth, height / vHeight);
             const renderWidth = vWidth * scale;
             const renderHeight = vHeight * scale;
-            const offsetX = (canvas.width - renderWidth) / 2;
-            const offsetY = (canvas.height - renderHeight) / 2;
+            const offsetX = (width - renderWidth) / 2;
+            const offsetY = (height - renderHeight) / 2;
 
             ctx.fillStyle = "#00FF00";
             for (let i = 0; i < landmarks.length; i++) {
@@ -492,6 +510,59 @@
                 ctx.beginPath();
                 ctx.arc(x, y, 1.5, 0, 2 * Math.PI);
                 ctx.fill();
+            }
+        }
+
+        async function checkFace() {
+            const video = document.getElementById('video');
+            if (!faceMesh || !videoStream || faceProcessing || video.readyState < 2) return;
+
+            const now = performance.now();
+            if (now - lastFaceCheck < faceCheckInterval) return;
+
+            faceProcessing = true;
+            lastFaceCheck = now;
+            try {
+                await faceMesh.send({ image: video });
+            } catch (err) {
+                if (videoStream) {
+                    lastLandmarks = null;
+                    drawFeatures(null);
+                }
+            } finally {
+                faceProcessing = false;
+            }
+        }
+
+        function scheduleFaceFrame(session) {
+            const video = document.getElementById('video');
+            if (!videoStream || session !== cameraSession) return;
+
+            if (typeof video.requestVideoFrameCallback === "function") {
+                faceFrameCallback = video.requestVideoFrameCallback(async () => {
+                    if (session !== cameraSession) return;
+                    await checkFace();
+                    scheduleFaceFrame(session);
+                });
+                return;
+            }
+
+            faceFrameRequest = requestAnimationFrame(async (time) => {
+                if (session !== cameraSession) return;
+                if (time - lastFaceCheck >= faceCheckInterval) await checkFace();
+                scheduleFaceFrame(session);
+            });
+        }
+
+        function stopFaceLoop() {
+            const video = document.getElementById('video');
+            if (faceFrameRequest !== null) {
+                cancelAnimationFrame(faceFrameRequest);
+                faceFrameRequest = null;
+            }
+            if (faceFrameCallback !== null && typeof video.cancelVideoFrameCallback === "function") {
+                video.cancelVideoFrameCallback(faceFrameCallback);
+                faceFrameCallback = null;
             }
         }
 
@@ -509,50 +580,96 @@
             faceMesh.onResults((results) => {
                 if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
                     lastLandmarks = results.multiFaceLandmarks[0];
+                    lastFaceSeen = performance.now();
                     drawFeatures(lastLandmarks);
                 } else {
-                    lastLandmarks = null;
+                    if (performance.now() - lastFaceSeen > 500) lastLandmarks = null;
                     drawFeatures(null);
                 }
             });
         }
 
         async function startCamera() {
+            if (videoStream) return true;
+            if (cameraStartPromise) return cameraStartPromise;
+
+            cameraStartPromise = startCameraInternal();
+            try {
+                return await cameraStartPromise;
+            } finally {
+                cameraStartPromise = null;
+            }
+        }
+
+        async function startCameraInternal() {
             initFaceMesh();
             const container = document.getElementById('camera-container');
             const video = document.getElementById('video');
+            const authStatus = document.getElementById('auth-status');
             container.style.display = "block";
 
             try {
-                videoStream = await navigator.mediaDevices.getUserMedia({
+                const constraints = {
+                    audio: false,
                     video: {
-                        width: { ideal: 640 },
-                        height: { ideal: 480 },
-                        facingMode: "user"
+                        facingMode: { ideal: "user" },
+                        width: { ideal: 1280, max: 1920 },
+                        height: { ideal: 720, max: 1080 },
+                        frameRate: { ideal: 30, max: 30 }
+                    }
+                };
+
+                try {
+                    videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+                } catch (err) {
+                    if (err.name === "NotAllowedError" || err.name === "SecurityError" || err.name === "AbortError") {
+                        throw err;
+                    }
+                    videoStream = await navigator.mediaDevices.getUserMedia({
+                        audio: false,
+                        video: { facingMode: "user" }
+                    });
+                }
+
+                video.srcObject = videoStream;
+                video.muted = true;
+                video.setAttribute("playsinline", "");
+                await new Promise(resolve => {
+                    if (video.readyState >= 1) {
+                        resolve();
+                    } else {
+                        video.addEventListener("loadedmetadata", resolve, { once: true });
                     }
                 });
-                video.srcObject = videoStream;
+                await video.play();
 
-                activeCamera = new Camera(video, {
-                    onFrame: async () => {
-                        await faceMesh.send({ image: video });
-                    },
-                    width: 320,
-                    height: 240
-                });
-                activeCamera.start();
-                document.getElementById('auth-status').innerText = "";
+                cameraSession++;
+                lastFaceCheck = 0;
+                scheduleFaceFrame(cameraSession);
+                authStatus.innerText = "";
+                return true;
             } catch (err) {
-                document.getElementById('auth-status').innerText = "カメラの起動に失敗しました。";
-                document.getElementById('auth-status').style.color = "#ef4444";
+                if (videoStream) {
+                    videoStream.getTracks().forEach(track => track.stop());
+                }
+                videoStream = null;
+                video.srcObject = null;
+                container.style.display = "none";
+                authStatus.innerText = "カメラの起動に失敗しました。ブラウザのカメラ許可も確認してください。";
+                authStatus.style.color = "#ef4444";
+                return false;
             }
         }
 
         function stopCamera() {
-            if (activeCamera) activeCamera.stop();
+            cameraSession++;
+            stopFaceLoop();
             if (videoStream) videoStream.getTracks().forEach(track => track.stop());
             videoStream = null;
+            document.getElementById('video').pause();
+            document.getElementById('video').srcObject = null;
             lastLandmarks = null;
+            lastFaceSeen = 0;
             document.getElementById('camera-container').style.display = "none";
             drawFeatures(null);
         }
@@ -617,7 +734,8 @@
             if (isCapturing) return;
 
             if (!videoStream) {
-                await startCamera();
+                const started = await startCamera();
+                if (!started) return;
                 authStatus.innerText = "カメラが起動しました。正面を向いてもう一度ボタンを押すと撮影されます。";
                 authStatus.style.color = "#1a73e8";
                 return;
@@ -655,7 +773,8 @@
         }
 
         document.getElementById('face-login-btn').addEventListener('click', async () => {
-            await startCamera();
+            const started = await startCamera();
+            if (!started) return;
             document.getElementById('auth-status').innerText = "3秒後に自動で顔スキャンを実行します...";
             document.getElementById('auth-status').style.color = "#1a73e8";
 
