@@ -8,18 +8,18 @@
 
     <link rel="icon" href="icon-192.png">
 
-    <!-- 画像切り抜き用ライブラリ Cropper.js (CSS & JS) -->
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" crossorigin="anonymous"></script>
 
-    <!-- 顔データ更新用 MediaPipe 公式ライブラリ -->
+
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 
-    <!-- 共通カーソル・スタイルスクリプト -->
+
     <script src="common.js"></script>
 
-<!-------------------------------CSS--------------------------------------------------------------------------------------------------------------------->
+
 
     <style>
         body {
@@ -121,7 +121,7 @@
             transform: translateY(-1px);
             box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
         }
-        
+
         .hamburger-btn {
             display: none;
             flex-direction: column;
@@ -402,7 +402,7 @@
             border-radius: 14px;
             overflow: hidden;
             transform: scaleX(-1);
-            position: relative; 
+            position: relative;
             height: 240px;
             border: 2px solid #dbdbdb;
             background-color: #000;
@@ -416,7 +416,7 @@
             top: 0;
             left: 0;
         }
-        
+
         .camera-box-mini canvas { z-index: 10; pointer-events: none; }
 
         .face-status-text {
@@ -454,7 +454,7 @@
         }
     </style>
 
-<!---------------------------------------------------------HTML---------------------------------------------------------------------------->
+
 
     <link rel="stylesheet" href="theme.css?v=20260915b">
 </head>
@@ -516,7 +516,7 @@
         </div>
     </main>
 
-    <!-- クロップ用モーダル -->
+
     <div id="cropModal" class="crop-modal">
         <div class="crop-modal-content">
             <h3>表示範囲を選択</h3>
@@ -530,7 +530,7 @@
         </div>
     </div>
 
-    <!-- 顔認証アップデート用モーダル -->
+
     <div id="faceModal" class="face-modal">
         <div class="face-modal-content">
             <h3>顔データのアップデート</h3>
@@ -549,16 +549,16 @@
         <p class="copyright">&copy; 2026 平工マッチング. All rights reserved.</p>
     </footer>
 
-    <!--------------------------------------------------JAVASQ-------------------------------------------------------------------------------------->
+
 
     <script>
         const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
-        
+
         let cropper = null;
         let videoStream = null;
         let faceMesh = null;
-        let lastLandmarks = null; 
+        let lastLandmarks = null;
         let activeCamera = null;
 
         function toggleMenu() {
@@ -611,7 +611,6 @@
             reader.readAsDataURL(file);
         }
 
-        // 💡 通信エラーを解消する軽量＆高画質設定（300x300 / 圧縮率0.6）
         function executeCrop() {
             if (!cropper) return;
             const canvas = cropper.getCroppedCanvas({
@@ -787,12 +786,12 @@
             const canvas = document.getElementById('face-mesh-canvas');
             const video = document.getElementById('face-video');
             const ctx = canvas.getContext('2d');
-            
+
             const rect = video.getBoundingClientRect();
             if (canvas.width !== rect.width || canvas.height !== rect.height) {
                 canvas.width = rect.width; canvas.height = rect.height;
             }
-            
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             if (!landmarks) return;
 
@@ -831,7 +830,7 @@
             try {
                 videoStream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 } });
                 video.srcObject = videoStream;
-                
+
                 activeCamera = new Camera(video, {
                     onFrame: async () => { await faceMesh.send({ image: video }); },
                     width: 320, height: 240
@@ -840,7 +839,7 @@
 
                 let seconds = 3;
                 document.getElementById('face-status').innerText = `${seconds}秒後に自動で顔スキャンを実行します...`;
-                
+
                 const timer = setInterval(async () => {
                     seconds--;
                     if (seconds > 0) {

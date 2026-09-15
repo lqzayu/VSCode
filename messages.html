@@ -6,10 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>メッセージ - 平工マッチング</title>
 
-    <!-- favicon 404エラー防止用のダミーアイコン設定 -->
     <link rel="icon" href="icon-192.png">
 
-    <!-----------------------------------------CSS-------------------------------------------------------------------------------------------------------------------->
 
     <style>
 
@@ -24,7 +22,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ナビゲーションバー：洗練されたグラスモフィズム */
         .navbar {
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(20px);
@@ -78,7 +75,6 @@
             background-color: rgba(28, 189, 197, 0.1);
         }
 
-        /* 未読バッジ */
         .unread-badge {
             position: absolute;
             top: 2px;
@@ -115,7 +111,6 @@
             box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
         }
 
-        /* ハンバーガーボタン */
         .hamburger-btn {
             display: none;
             flex-direction: column;
@@ -137,9 +132,6 @@
             transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* =====================================
-           レイアウト・メッセージカードエリア
-        ===================================== */
         .container {
             flex: 1;
             width: 100%;
@@ -186,7 +178,6 @@
             border-radius: 4px;
         }
 
-        /* リストアイテム */
         .partner-item {
             display: flex;
             align-items: center;
@@ -201,7 +192,6 @@
             transform: translateX(4px);
         }
 
-        /* アバター枠 */
         .avatar-ring {
             width: 52px;
             height: 52px;
@@ -275,7 +265,6 @@
             font-weight: 600;
         }
 
-        /* 🌟 洗練されたローディングアニメーション */
         .loading-box {
             display: flex;
             flex-direction: column;
@@ -302,7 +291,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* フッター */
         .footer {
             background-color: transparent;
             padding: 30px 20px;
@@ -345,7 +333,6 @@
             font-weight: 600;
         }
 
-        /* 📱 レスポンシブ対応 */
         @media screen and (max-width: 768px) {
             .container {
                 margin: 16px auto;
@@ -399,8 +386,6 @@
         }
     </style>
 
-<!-----------------------------------------HTML--------------------------------------------------------------------------------------->
-    
     <link rel="stylesheet" href="theme.css?v=20260915b">
 </head>
 
@@ -451,17 +436,12 @@
         </div>
     </footer>
 
-
-    <!-----------------------------------------JavaScript-------------------------------------------------------------------------------------------------------------------->
-
     <script>
-        // 🔒 未ログインガード
         if (!localStorage.getItem("userEmail")) {
             window.location.href = "index.html";
         }
 
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
-        
         const bgGradients = [
             "linear-gradient(135deg, #1cbdc5 0%, #119299 100%)",
             "linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)",
@@ -542,7 +522,6 @@
             }
         }
 
-        // 🔴 未読件数の更新処理
         async function updateUnreadBadge() {
             const myEmail = localStorage.getItem("userEmail");
             const badge = document.getElementById("unread-badge");
@@ -588,7 +567,6 @@
             loadChatPartners();
             updateUnreadBadge();
 
-            // 3秒おきに未読チェック
             setInterval(updateUnreadBadge, 3000);
         };
     </script>

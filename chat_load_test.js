@@ -3,9 +3,9 @@ import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '20s', target: 5 },   // 20秒で5人まで増やす
-    { duration: '40s', target: 10 },  // 40秒かけて10人に増やす
-    { duration: '20s', target: 0 },   // 20秒で0人に減らす
+    { duration: '20s', target: 5 },
+    { duration: '40s', target: 10 },
+    { duration: '20s', target: 0 },
   ],
   maxRedirects: 10,
 };
@@ -13,7 +13,6 @@ export const options = {
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec';
 
 export default function () {
-  // 送信テスト用データ
   const payload = JSON.stringify({
     mode: 'sendMessage',
     from: 'test_user_A',
@@ -30,12 +29,10 @@ export default function () {
 
   const res = http.post(GAS_URL, payload, params);
 
-  // 💡 送信成功（200 OK かつ レスポンスが "SENT" または "success" であるか）
   check(res, {
     'status is 200': (r) => r.status === 200,
     'body includes success': (r) => r.body && (r.body.includes('SENT') || r.body.includes('success')),
   });
 
-  // 人間がチャットを打つ間隔（1秒〜3秒待つ）
   sleep(Math.random() * 2 + 1);
 }

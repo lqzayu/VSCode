@@ -8,9 +8,7 @@
     <link rel="icon" href="icon-192.png">
 
     <style>
-        /* =====================================
-           💡 ナビゲーションバー (main.htmlと統一)
-        ===================================== */
+
         body {
             margin: 0;
             background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);
@@ -132,9 +130,7 @@
             transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* =====================================
-           ダッシュボード コンテンツエリア
-        ===================================== */
+
         .container {
             max-width: 1200px;
             margin: 30px auto;
@@ -364,7 +360,7 @@
         </div>
 
         <div class="dashboard-grid">
-            <!-- ユーザー管理パネル -->
+
             <div class="panel">
                 <h2>👥 ユーザー管理一覧（IDクリックで代理ログイン）</h2>
                 <table>
@@ -382,7 +378,7 @@
                 </table>
             </div>
 
-            <!-- 募集投稿管理パネル -->
+
             <div class="panel">
                 <h2>📢 募集投稿一覧（強制削除）</h2>
                 <table>
@@ -399,7 +395,7 @@
                 </table>
             </div>
 
-            <!-- 通報管理パネル -->
+
             <div class="panel">
                 <h2>🚨 通報一覧</h2>
                 <table>
@@ -428,12 +424,10 @@
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
         const ADMIN_ID = "admin";
 
-        // 💡 代理ログインからの復帰判定を含むアクセス制限チェック
         const currentEmail = localStorage.getItem("userEmail");
         const isImpersonating = localStorage.getItem("isImpersonating");
 
         if (isImpersonating === "true") {
-            // 代理ログイン中からの復帰時は admin 状態を正しく再セット
             localStorage.setItem("userEmail", ADMIN_ID);
             localStorage.setItem("userName", "管理者");
             localStorage.removeItem("isImpersonating");
@@ -510,8 +504,8 @@
 
             users.forEach(u => {
                 const tr = document.createElement("tr");
-                const statusBadge = u.isVerified 
-                    ? `<span class="status-badge badge-active">正常</span>` 
+                const statusBadge = u.isVerified
+                    ? `<span class="status-badge badge-active">正常</span>`
                     : `<span class="status-badge badge-inactive">凍結/未認証</span>`;
 
                 let actionButton = "-";
@@ -525,8 +519,8 @@
 
                 tr.innerHTML = `
                     <td>
-                        <strong style="color: #1cbdc5; cursor: pointer; text-decoration: underline;" 
-                                onclick="impersonateUser('${u.userId}', '${u.name}')" 
+                        <strong style="color: #1cbdc5; cursor: pointer; text-decoration: underline;"
+                                onclick="impersonateUser('${u.userId}', '${u.name}')"
                                 title="このユーザーとして代理ログインする">
                             ${u.userId} 🔗
                         </strong>
@@ -684,7 +678,7 @@
 
         async function toggleBanUser(targetUserId, isCurrentVerified) {
             const actionName = isCurrentVerified ? "凍結（BAN）" : "BAN解除";
-            const confirmMsg = isCurrentVerified 
+            const confirmMsg = isCurrentVerified
                 ? `ユーザー [ ${targetUserId} ] を凍結（BAN）しますか？\n※ログイン不可になり、該当ユーザーの募集も削除されます。`
                 : `ユーザー [ ${targetUserId} ] のBANを解除しますか？\n※正常にログインできるようになります。`;
 

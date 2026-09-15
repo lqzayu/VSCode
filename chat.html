@@ -363,8 +363,7 @@
 
                 if (result.status === "success") {
                     const messages = result.message;
-                    
-                    // 仮表示用のバブル（temp-msg）があれば保持したまま描画更新を防止
+
                     const tempMsgs = listDiv.querySelectorAll('.temp-msg');
                     if (messages.length === 0 && tempMsgs.length === 0) {
                         listDiv.innerHTML = `<div style="text-align: center; color: #94a3b8; font-size: 13px;">メッセージ履歴はありません</div>`;
@@ -394,7 +393,6 @@
                         listDiv.appendChild(wrapper);
                     });
 
-                    // 最下部へ自動スクロール
                     listDiv.scrollTop = listDiv.scrollHeight;
                 }
             } catch (e) {
@@ -417,7 +415,6 @@
             }
         }
 
-        // 💡 送信処理（即時画面描画 ＋ 送信中ガード ＋ 完了時非同期同期）
         async function sendMessage() {
             const textInput = document.getElementById("message-input");
             const sendBtn = document.getElementById("send-btn");
@@ -426,14 +423,12 @@
 
             if (!text) return;
 
-            // 1. 入力欄を即座にクリア＆送信ボタンを無効化（二重送信防止）
             textInput.value = "";
             if (sendBtn) {
                 sendBtn.disabled = true;
                 sendBtn.innerText = "送信中...";
             }
 
-            // 2. 画面に送信メッセージを即座に描画（仮反映）
             const tempBubble = document.createElement("div");
             tempBubble.className = "message-bubble msg-my temp-msg";
             tempBubble.innerText = text;
@@ -454,17 +449,15 @@
                 const result = await res.json();
 
                 if (result.status === "success") {
-                    // 通信完了後にサーバーの全メッセージを取得して同期
                     loadMessages();
                 } else {
                     alert("送信エラー: " + result.message);
-                    tempBubble.remove(); // 失敗した場合は仮メッセージを削除
+                    tempBubble.remove();
                 }
             } catch (e) {
                 alert("通信エラーが発生しました");
-                tempBubble.remove(); // 失敗した場合は仮メッセージを削除
+                tempBubble.remove();
             } finally {
-                // 連打防止の1.5秒待機後に送信ボタンを復帰
                 setTimeout(() => {
                     if (sendBtn) {
                         sendBtn.disabled = false;
@@ -477,8 +470,7 @@
         window.onload = () => {
             loadMessages();
             markAsRead();
-            
-            // 定期読み込み（4秒間隔）
+
             setInterval(() => {
                 loadMessages();
                 markAsRead();
