@@ -1217,7 +1217,7 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="theme.css?v=20260915b">
+    <link rel="stylesheet" href="theme.css?v=20260916a">
 </head>
 
 <body data-page="main">
@@ -1248,16 +1248,17 @@
         </button>
 
         <nav class="nav-links" id="nav-links">
+            <button type="button" class="nav-item nav-guide-button" onclick="openUsageGuide(); closeMenu();">使い方</button>
             <a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header" class="nav-item">意見箱</a>
             <span class="nav-item" id="tab-recruit-btn" onclick="switchTab('recruit'); closeMenu();">募集投稿</span>
             <span class="nav-item active" id="tab-search-btn" onclick="switchTab('search'); closeMenu();">ユーザーを探す</span>
-            <span class="nav-item" onclick="location.href='messages.html'">
+            <a class="nav-item" href="messages.html">
                 メッセージ
                 <span id="unread-badge" class="unread-badge" style="display: none;">0</span>
-            </span>
-            <span class="nav-item" onclick="location.href='profile.html'">マイページ</span>
+            </a>
+            <a class="nav-item" href="profile.html">マイページ</a>
             
-            <span class="nav-item" id="nav-admin-btn" style="display: none; color: #ef4444;" onclick="location.href='admin.html'">管理者</span>
+            <a class="nav-item" id="nav-admin-btn" style="display: none; color: #ef4444;" href="admin.html">管理者</a>
 
             <button class="btn-logout" onclick="logout()">ログアウト</button>
         </nav>
@@ -1265,11 +1266,10 @@
 
     <main class="container">
         <div class="sidebar">
-            <div class="mypage-area">
-                <img id="profile-icon" class="big-profile-icon" src="" alt="icon"
-                    onclick="location.href='profile.html'">
+            <a class="mypage-area" href="profile.html" aria-label="マイページを開く" style="text-decoration: none;">
+                <img id="profile-icon" class="big-profile-icon" src="" alt="プロフィール画像">
                 <div id="mypage-text">マイページ</div>
-            </div>
+            </a>
 
             <div id="my-post-area"
                 style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(28, 189, 197, 0.2); padding: 20px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(24, 76, 92, 0.02); text-align: left; width: 100%; box-sizing: border-box;">
@@ -1310,6 +1310,15 @@
 
             <div class="main-content">
                 <section id="search-area">
+                    <div class="usage-intro-card">
+                        <div>
+                            <span class="usage-intro-label">CLASS TRIAL GUIDE</span>
+                            <h1>募集を見つけて、勉強の相談を始めよう。</h1>
+                            <p>投稿、検索、チャット、安全機能まで、初めて使うときの流れをまとめています。</p>
+                        </div>
+                        <button type="button" class="usage-intro-button" onclick="openUsageGuide()">使い方を見る</button>
+                    </div>
+
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
                         <h2 style="font-size: 1.35rem; font-weight: 800; margin: 0; color: #1e293b;">他ユーザーの募集一覧</h2>
                         <button onclick="loadRecruitments()" class="btn-refresh">
@@ -1336,6 +1345,89 @@
             </div>
         </div>
     </main>
+
+    <div id="usage-guide" class="usage-guide" aria-hidden="true">
+        <button type="button" class="usage-guide-backdrop" aria-label="使い方を閉じる" onclick="closeUsageGuide()"></button>
+        <section class="usage-guide-panel" role="dialog" aria-modal="true" aria-labelledby="usage-guide-title">
+            <div class="usage-guide-header">
+                <div>
+                    <span class="usage-guide-kicker">HOW TO USE</span>
+                    <h2 id="usage-guide-title">平工マッチングの使い方</h2>
+                    <p>興味のある募集を見つけ、チャットで勉強の相談や予定の確認をするサービスです。</p>
+                </div>
+                <button type="button" class="usage-guide-close" onclick="closeUsageGuide()" aria-label="使い方を閉じる">×</button>
+            </div>
+
+            <div class="usage-guide-body">
+                <div class="usage-guide-flow" aria-label="基本的な利用手順">
+                    <article class="usage-step-card">
+                        <span class="usage-step-number">01</span>
+                        <h3>プロフィールを確認</h3>
+                        <p>マイページで表示名とプロフィール画像を設定します。募集にはこの表示名が使われます。</p>
+                        <a href="profile.html">マイページを開く</a>
+                    </article>
+                    <article class="usage-step-card">
+                        <span class="usage-step-number">02</span>
+                        <h3>募集する・探す</h3>
+                        <p>勉強したい内容、学年、学科、タグを入力して投稿します。ほかの人の募集はキーワードやタグで検索できます。</p>
+                        <button type="button" onclick="showGuideDestination('recruit')">募集を投稿する</button>
+                    </article>
+                    <article class="usage-step-card">
+                        <span class="usage-step-number">03</span>
+                        <h3>チャットを始める</h3>
+                        <p>気になる募集の「チャットを始める」を押します。質問したい内容や、一緒に勉強できる時間を相談してください。</p>
+                        <button type="button" onclick="showGuideDestination('search')">募集一覧を見る</button>
+                    </article>
+                </div>
+
+                <section class="usage-guide-section">
+                    <div class="usage-guide-section-title">
+                        <span>募集について</span>
+                        <h3>投稿は24時間表示されます</h3>
+                    </div>
+                    <div class="usage-info-grid">
+                        <div><strong>残り時間</strong><p>募集カードのカウントダウンで、表示終了までの時間を確認できます。</p></div>
+                        <div><strong>投稿の更新</strong><p>もう一度投稿すると、自分の現在の募集内容が新しい内容に更新されます。</p></div>
+                        <div><strong>手動削除</strong><p>募集を終了したい場合は、ホーム画面の「あなたの現在の募集」から削除できます。</p></div>
+                    </div>
+                </section>
+
+                <section class="usage-guide-section">
+                    <div class="usage-guide-section-title">
+                        <span>メッセージと通知</span>
+                        <h3>新着メッセージを確認する</h3>
+                    </div>
+                    <div class="usage-guide-note">
+                        <p><strong>アプリ内：</strong>上部の「メッセージ」から会話一覧を開けます。未読がある場合は件数が表示されます。</p>
+                        <p><strong>LINE通知：</strong>LINE公式アカウントへ、自分のユーザーIDまたは登録メールアドレスを送信すると連携できます。</p>
+                    </div>
+                    <a class="usage-guide-primary-link" href="messages.html">メッセージ一覧を開く</a>
+                </section>
+
+                <section class="usage-guide-section usage-safety-section">
+                    <div class="usage-guide-section-title">
+                        <span>安全に使うために</span>
+                        <h3>困ったときは一人で抱え込まない</h3>
+                    </div>
+                    <ul>
+                        <li>住所、電話番号、パスワードなどの個人情報は投稿・送信しないでください。</li>
+                        <li>不快なメッセージや不適切な募集は「通報」を使って運営へ知らせてください。</li>
+                        <li>相手とのやり取りを止めたい場合は「ブロック」を使えます。解除はマイページから行えます。</li>
+                        <li>緊急性がある内容は、サービス内だけで解決せず先生や身近な大人へ相談してください。</li>
+                    </ul>
+                </section>
+
+                <section class="usage-trial-box">
+                    <div>
+                        <span>試験運用への協力</span>
+                        <h3>使いにくい点や不具合を教えてください</h3>
+                        <p>操作で迷った場所、欲しい機能、エラーが起きた状況を意見箱から送ってください。</p>
+                    </div>
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱を開く</a>
+                </section>
+            </div>
+        </section>
+    </div>
 
     <footer class="footer">
         <div class="footer-container">
@@ -1397,6 +1489,36 @@
             document.getElementById("hud-menu-btn").classList.remove("open");
             document.getElementById("nav-links").classList.remove("open");
         }
+
+        function openUsageGuide() {
+            const guide = document.getElementById("usage-guide");
+            if (!guide) return;
+            guide.classList.add("is-open");
+            guide.setAttribute("aria-hidden", "false");
+            document.body.classList.add("guide-open");
+            const panel = guide.querySelector(".usage-guide-panel");
+            if (panel) panel.scrollTop = 0;
+            const closeButton = guide.querySelector(".usage-guide-close");
+            if (closeButton) closeButton.focus();
+        }
+
+        function closeUsageGuide() {
+            const guide = document.getElementById("usage-guide");
+            if (!guide) return;
+            guide.classList.remove("is-open");
+            guide.setAttribute("aria-hidden", "true");
+            document.body.classList.remove("guide-open");
+        }
+
+        function showGuideDestination(mode) {
+            closeUsageGuide();
+            switchTab(mode);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") closeUsageGuide();
+        });
 
         function switchTab(mode) {
             document.getElementById("recruit-form-area").style.display = (mode === 'recruit') ? "block" : "none";
@@ -1856,7 +1978,7 @@
             window.location.href = "admin.html";
         }
 
-        window.onload = () => {
+        document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("hud-menu-btn").classList.remove("open");
             document.getElementById("nav-links").classList.remove("open");
 
@@ -1897,7 +2019,7 @@
                 checkNewIncomingMessage();
                 updateUnreadBadge();
             }, 3000);
-        };
+        });
     </script>
 </body>
 
