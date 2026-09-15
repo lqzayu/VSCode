@@ -380,7 +380,7 @@
             </div>
 
             <div class="input-group">
-                <input type="text" id="login-userid" placeholder="ユーザID" onkeypress="handleKeyPress(event)">
+                <input type="text" id="login-userid" placeholder="ユーザID（顔認証にも使用）" onkeypress="handleKeyPress(event)">
 
                 <div class="name-wrapper" id="name-wrapper">
                     <input type="text" id="display-name" placeholder="表示名（ニックネーム）">
@@ -464,6 +464,10 @@
         let cameraSession = 0;
         let lastFaceSeen = 0;
         const faceCheckInterval = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 100 : 66;
+        let faceSamples = [];
+        let collectingFaceSamples = false;
+        let lastFaceSampleAt = 0;
+        let faceLoginTimer = null;
         let savedFeaturesText = "";
         let isCapturing = false;
         let pendingUserId = "";
@@ -580,7 +584,13 @@
             faceMesh.onResults((results) => {
                 if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
                     lastLandmarks = results.multiFaceLandmarks[0];
-                    lastFaceSeen = performance.now();
+                    const now = performance.now();
+                    lastFaceSeen = now;
+                    if (collectingFaceSamples && now - lastFaceSampleAt >= 350) {
+                        faceSamples.push(lastLandmarks.map(point => ({ x: point.x, y: point.y, z: point.z })));
+                        if (faceSamples.length > 5) faceSamples.shift();
+                        lastFaceSampleAt = now;
+                    }
                     drawFeatures(lastLandmarks);
                 } else {
                     if (performance.now() - lastFaceSeen > 500) lastLandmarks = null;
@@ -664,6 +674,12 @@
         function stopCamera() {
             cameraSession++;
             stopFaceLoop();
+            collectingFaceSamples = false;
+            if (faceLoginTimer !== null) {
+                clearTimeout(faceLoginTimer);
+                faceLoginTimer = null;
+                document.getElementById('face-login-btn').disabled = false;
+            }
             if (videoStream) videoStream.getTracks().forEach(track => track.stop());
             videoStream = null;
             document.getElementById('video').pause();
@@ -773,13 +789,28 @@
         }
 
         document.getElementById('face-login-btn').addEventListener('click', async () => {
+            if (faceLoginTimer !== null) return;
+            const userId = document.getElementById('login-userid').value.trim();
+            const authStatus = document.getElementById('auth-status');
+            if (!userId) {
+                authStatus.innerText = "顔認証前にユーザーIDを入力してください。";
+                authStatus.style.color = "#ef4444";
+                document.getElementById('login-userid').focus();
+                return;
+            }
+
             const started = await startCamera();
             if (!started) return;
-            document.getElementById('auth-status').innerText = "3秒後に自動で顔スキャンを実行します...";
-            document.getElementById('auth-status').style.color = "#1a73e8";
+            faceSamples = [];
+            lastFaceSampleAt = 0;
+            collectingFaceSamples = true;
+            document.getElementById('face-login-btn').disabled = true;
+            authStatus.innerText = "3秒後に顔を確認します。正面を向いてください。";
+            authStatus.style.color = "#1a73e8";
 
-            setTimeout(async () => {
-                if (!lastLandmarks) {
+            faceLoginTimer = setTimeout(async () => {
+                collectingFaceSamples = false;
+                if (!lastLandmarks || faceSamples.length < 2) {
                     document.getElementById('auth-status').innerText = "顔を検出できずスキャンに失敗しました。";
                     document.getElementById('auth-status').style.color = "#ef4444";
                     stopCamera();
@@ -787,6 +818,7 @@
                 }
 
                 const currentLandmarks = lastLandmarks;
+                const currentFeaturesSamples = faceSamples.slice();
                 stopCamera();
 
                 document.getElementById('auth-status').innerText = "AIデータ解析中...";
@@ -796,8 +828,10 @@
                     const res = await fetch(GAS_URL, {
                         method: "POST",
                         body: JSON.stringify({
-                            mode: "verify_face_1toN",
-                            currentFeatures: currentLandmarks
+                            mode: "verify_face_for_user",
+                            userId: userId,
+                            currentFeatures: currentLandmarks,
+                            currentFeaturesSamples: currentFeaturesSamples
                         })
                     });
                     const result = await res.json();
