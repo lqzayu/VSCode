@@ -507,6 +507,11 @@
             <button class="btn-update-face" onclick="startFaceUpdate()">顔認証情報をアップデートする</button>
             <br>
             <button class="btn-delete-account" onclick="deleteAccount()">ユーザー情報を削除する</button>
+
+            <div id="blocked-users-panel" style="margin-top:28px; padding-top:20px; border-top:1px solid rgba(0,0,0,0.08); text-align:left;">
+                <h3 style="margin:0 0 12px; color:#1e293b;">ブロック中のユーザー</h3>
+                <div id="blocked-users-list" style="color:#64748b; font-size:13px;">読み込み中...</div>
+            </div>
         </div>
     </main>
 
@@ -698,6 +703,80 @@
             }
         }
 
+        async function loadBlockedUsers() {
+            const myEmail = localStorage.getItem("userEmail");
+            const list = document.getElementById("blocked-users-list");
+
+            if (!myEmail || !list) return;
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "getBlockedUsers",
+                        blockerId: myEmail
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status !== "success" || !Array.isArray(result.message)) {
+                    list.innerText = "ブロック一覧を取得できませんでした。";
+                    return;
+                }
+
+                if (result.message.length === 0) {
+                    list.innerText = "ブロック中のユーザーはいません。";
+                    return;
+                }
+
+                list.innerHTML = "";
+
+                result.message.forEach(user => {
+                    const row = document.createElement("div");
+                    row.style.cssText = "display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.06);";
+
+                    const name = document.createElement("span");
+                    name.textContent = `${user.name} (${user.userId})`;
+
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.textContent = "解除";
+                    button.style.cssText = "border:none; border-radius:7px; padding:6px 10px; background:#e0f2fe; color:#0369a1; font-weight:700; cursor:pointer;";
+                    button.addEventListener("click", () => unblockUser(user.userId, user.name));
+
+                    row.appendChild(name);
+                    row.appendChild(button);
+                    list.appendChild(row);
+                });
+            } catch (e) {
+                list.innerText = "通信エラーが発生しました。";
+            }
+        }
+
+        async function unblockUser(blockedId, blockedName) {
+            if (!confirm(`「${blockedName}」さんのブロックを解除しますか？`)) return;
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "unblockUser",
+                        blockerId: localStorage.getItem("userEmail"),
+                        blockedId: blockedId
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    loadBlockedUsers();
+                } else {
+                    alert("ブロック解除に失敗しました: " + result.message);
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました。");
+            }
+        }
+
         function logout() {
             localStorage.clear();
             window.location.href = "index.html";
@@ -845,6 +924,7 @@
 
             updateUnreadBadge();
             setInterval(updateUnreadBadge, 3000);
+            loadBlockedUsers();
         };
     </script>
 </body>

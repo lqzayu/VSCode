@@ -302,6 +302,48 @@
             color: #ffffff;
         }
 
+        /* ⏳ カウントダウンバッジ用スタイル */
+        .countdown-badge {
+            font-size: 11px;
+            font-weight: 800;
+            color: #d97706;
+            background: #fef3c7;
+            padding: 4px 10px;
+            border-radius: 8px;
+            margin-left: auto;
+        }
+
+        .card-action-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-card-action {
+            flex: 1;
+            border: none;
+            padding: 8px 6px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-card-action:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-card-block {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .btn-card-report {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
         .user-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -355,7 +397,7 @@
             padding: 6px 12px;
             border-radius: 8px;
             font-weight: 700;
-            margin-bottom: 14px;
+            margin-bottom: 0;
             align-self: flex-start;
         }
 
@@ -792,6 +834,7 @@
         let lastMessageTime = 0;
         let activeTargetEmail = "";
         let allOtherPosts = [];
+        let activeCountdownIntervals = [];
 
         function toggleMenu() {
             document.getElementById("hud-menu-btn").classList.toggle("open");
@@ -872,6 +915,10 @@
             const listDiv = document.getElementById("user-list");
             const keyword = document.getElementById("search-input").value.trim().toLowerCase();
 
+            // 既存タイマーをクリア
+            activeCountdownIntervals.forEach(clearInterval);
+            activeCountdownIntervals = [];
+
             listDiv.innerHTML = "";
 
             const filteredPosts = allOtherPosts.filter(item => {
@@ -886,7 +933,7 @@
             }
 
             const fragment = document.createDocumentFragment();
-            filteredPosts.forEach(item => {
+            filteredPosts.forEach((item, idx) => {
                 const card = document.createElement("div");
                 card.className = "user-card";
 
@@ -900,16 +947,98 @@
                     }
                 }
 
+                const timerId = `cd-timer-${idx}`;
+
                 card.innerHTML = `
-                    <div class="user-badge">${item.grade} | ${item.dept}</div>
+                    <div style="display:flex; align-items:center; margin-bottom:12px;">
+                        <div class="user-badge">${item.grade} | ${item.dept}</div>
+                        <span id="${timerId}" class="countdown-badge">⏳ 計算中...</span>
+                    </div>
                     <h3>${item.name}</h3>
                     <p>${item.content}</p>
                     ${tagsHtml}
                     <button class="btn-match" onclick="startChat('${item.email}')">チャットを始める</button>
+                    <div class="card-action-row">
+                        <button type="button" class="btn-card-action btn-card-block">ブロック</button>
+                        <button type="button" class="btn-card-action btn-card-report">通報</button>
+                    </div>
                 `;
+
+                card.querySelector(".btn-card-block").addEventListener("click", () => {
+                    blockUser(item.email, item.name);
+                });
+
+                card.querySelector(".btn-card-report").addEventListener("click", () => {
+                    reportContent(item.email, "recruitment", item.email, item.content);
+                });
+
                 fragment.appendChild(card);
+
+                // カウントダウン開始
+                if (item.time) {
+                    startCountdownTimer(item.time, timerId);
+                }
             });
             listDiv.appendChild(fragment);
+        }
+
+        function startCountdownTimer(postTimeValue, elementId) {
+            const postTime = new Date(postTimeValue).getTime();
+            const expireTime = postTime + (24 * 60 * 60 * 1000);
+
+            if (Number.isNaN(postTime)) {
+                const el = document.getElementById(elementId);
+                if (el) {
+                    el.innerText = "時刻取得エラー";
+                    el.style.background = "#fee2e2";
+                    el.style.color = "#ef4444";
+                }
+                return;
+            }
+
+            let timer = null;
+
+            const update = () => {
+                const el = document.getElementById(elementId);
+
+                if (!el) {
+                    if (timer) clearInterval(timer);
+                    return;
+                }
+
+                const remainingMilliseconds = expireTime - Date.now();
+
+                if (remainingMilliseconds <= 0) {
+                    if (timer) clearInterval(timer);
+
+                    el.innerText = "⏰ 終了";
+                    el.style.background = "#fee2e2";
+                    el.style.color = "#ef4444";
+
+                    if (!startCountdownTimer.reloadScheduled) {
+                        startCountdownTimer.reloadScheduled = true;
+                        setTimeout(async () => {
+                            await loadRecruitments();
+                            startCountdownTimer.reloadScheduled = false;
+                        }, 500);
+                    }
+                    return;
+                }
+
+                const totalSeconds = Math.ceil(remainingMilliseconds / 1000);
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+
+                el.innerText = `⏳ 残り ${hours}時間${String(minutes).padStart(2, "0")}分${String(seconds).padStart(2, "0")}秒`;
+            };
+
+            update();
+
+            if (Date.now() < expireTime) {
+                timer = setInterval(update, 1000);
+                activeCountdownIntervals.push(timer);
+            }
         }
 
         function searchByTag(tagName) {
@@ -983,6 +1112,101 @@
                     submitBtn.disabled = false;
                     submitBtn.innerText = "投稿する";
                 }
+            }
+        }
+
+        function getReportReason() {
+            const input = prompt(
+                "通報理由を番号で入力してください。\n" +
+                "1: 嫌がらせ・迷惑行為\n" +
+                "2: 不適切な内容\n" +
+                "3: 性的な内容\n" +
+                "4: 脅迫・危険な発言\n" +
+                "5: 個人情報の掲載\n" +
+                "6: なりすまし\n" +
+                "7: スパム\n" +
+                "8: その他"
+            );
+
+            const reasons = {
+                "1": "嫌がらせ・迷惑行為",
+                "2": "不適切な内容",
+                "3": "性的な内容",
+                "4": "脅迫・危険な発言",
+                "5": "個人情報の掲載",
+                "6": "なりすまし",
+                "7": "スパム",
+                "8": "その他"
+            };
+
+            return reasons[(input || "").trim()] || "";
+        }
+
+        async function reportContent(targetUserId, targetType, targetId, targetContent) {
+            const reason = getReportReason();
+            if (!reason) {
+                alert("正しい通報理由を選択してください。");
+                return;
+            }
+
+            const detail = prompt("詳細があれば入力してください（任意）") || "";
+            const reporterId = localStorage.getItem("userEmail");
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "reportContent",
+                        reporterId,
+                        targetUserId,
+                        targetType,
+                        targetId,
+                        targetContent,
+                        reason,
+                        detail
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    alert("通報を受け付けました。確認までお待ちください。");
+                } else {
+                    alert("通報に失敗しました: " + result.message);
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました。");
+            }
+        }
+
+        async function blockUser(targetUserId, targetName) {
+            if (!confirm(
+                `「${targetName}」さんをブロックしますか？\n` +
+                "ブロックすると、相手の募集・チャット・通知が表示されなくなります。"
+            )) {
+                return;
+            }
+
+            const blockerId = localStorage.getItem("userEmail");
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "blockUser",
+                        blockerId,
+                        blockedId: targetUserId
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    alert("ユーザーをブロックしました。");
+                    loadRecruitments();
+                } else {
+                    alert("ブロックに失敗しました: " + result.message);
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました。");
             }
         }
 

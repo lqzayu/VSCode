@@ -397,6 +397,25 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- 通報管理パネル -->
+            <div class="panel">
+                <h2>🚨 通報一覧</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>日時</th>
+                            <th>対象</th>
+                            <th>理由</th>
+                            <th>内容</th>
+                            <th>対応</th>
+                        </tr>
+                    </thead>
+                    <tbody id="report-table-body">
+                        <tr><td colspan="5" style="text-align:center;">読み込み中...</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </main>
 
@@ -470,6 +489,7 @@
                 if (result.status === "success") {
                     renderUsers(result.message.users);
                     renderPosts(result.message.posts);
+                    loadReports();
                 } else {
                     alert("取得失敗: " + result.message);
                 }
@@ -549,6 +569,96 @@
                 `;
                 postBody.appendChild(tr);
             });
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        async function loadReports() {
+            const body = document.getElementById("report-table-body");
+            if (!body) return;
+
+            body.innerHTML = `<tr><td colspan="5" style="text-align:center;">読み込み中...</td></tr>`;
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ mode: "getReports", adminId: ADMIN_ID })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    renderReports(result.message);
+                } else {
+                    body.innerHTML = `<tr><td colspan="5" style="text-align:center;">取得失敗</td></tr>`;
+                }
+            } catch (e) {
+                body.innerHTML = `<tr><td colspan="5" style="text-align:center;">通信エラー</td></tr>`;
+            }
+        }
+
+        function renderReports(reports) {
+            const body = document.getElementById("report-table-body");
+            body.innerHTML = "";
+
+            if (!reports || reports.length === 0) {
+                body.innerHTML = `<tr><td colspan="5" style="text-align:center;">通報はありません</td></tr>`;
+                return;
+            }
+
+            reports.slice().reverse().forEach(report => {
+                const tr = document.createElement("tr");
+                const statuses = ["未対応", "確認中", "対応済み", "却下"];
+                const statusOptions = statuses.map(status =>
+                    `<option value="${status}" ${report.status === status ? "selected" : ""}>${status}</option>`
+                ).join("");
+
+                tr.innerHTML = `
+                    <td>${escapeHtml(report.createdAt)}</td>
+                    <td>${escapeHtml(report.targetUserId)}<br><small>${escapeHtml(report.targetType)}</small></td>
+                    <td>${escapeHtml(report.reason)}</td>
+                    <td style="max-width:260px; white-space:pre-wrap; word-break:break-word;">${escapeHtml(report.targetContent || report.detail || "—")}</td>
+                    <td>
+                        <select onchange="updateReportStatus('${escapeHtml(report.reportId)}', this.value)">
+                            ${statusOptions}
+                        </select>
+                    </td>
+                `;
+
+                body.appendChild(tr);
+            });
+        }
+
+        async function updateReportStatus(reportId, status) {
+            const adminMemo = prompt("管理者メモを入力してください（任意）") || "";
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "updateReportStatus",
+                        adminId: ADMIN_ID,
+                        reportId: reportId,
+                        status: status,
+                        adminMemo: adminMemo
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    loadReports();
+                } else {
+                    alert("通報の更新に失敗しました: " + result.message);
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました。");
+            }
         }
 
         async function deletePost(targetEmail) {

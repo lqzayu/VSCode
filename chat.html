@@ -184,7 +184,13 @@
     </header>
 
     <main class="chat-container">
-        <div class="chat-header" id="chat-title">対話相手: 読み込み中...</div>
+        <div class="chat-header" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+            <span id="chat-title">対話相手: 読み込み中...</span>
+            <div style="display:flex; gap:8px;">
+                <button id="block-user-btn" type="button" style="border:none; border-radius:8px; padding:8px 10px; background:#fef3c7; color:#92400e; font-weight:700; cursor:pointer;">ブロック</button>
+                <button id="report-user-btn" type="button" style="border:none; border-radius:8px; padding:8px 10px; background:#fee2e2; color:#b91c1c; font-weight:700; cursor:pointer;">通報</button>
+            </div>
+        </div>
 
         <div class="chat-messages" id="message-list">
             <div style="text-align: center; color: #64748b; font-size: 13px;">メッセージを読み込んでいます...</div>
@@ -208,6 +214,137 @@
         }
 
         document.getElementById("chat-title").innerText = `💬 対話相手: ${targetEmail}`;
+
+        function getReportReason() {
+            const input = prompt(
+                "通報理由を番号で入力してください。\n" +
+                "1: 嫌がらせ・迷惑行為\n" +
+                "2: 不適切な内容\n" +
+                "3: 性的な内容\n" +
+                "4: 脅迫・危険な発言\n" +
+                "5: 個人情報の掲載\n" +
+                "6: なりすまし\n" +
+                "7: スパム\n" +
+                "8: その他"
+            );
+
+            const reasons = {
+                "1": "嫌がらせ・迷惑行為",
+                "2": "不適切な内容",
+                "3": "性的な内容",
+                "4": "脅迫・危険な発言",
+                "5": "個人情報の掲載",
+                "6": "なりすまし",
+                "7": "スパム",
+                "8": "その他"
+            };
+
+            return reasons[(input || "").trim()] || "";
+        }
+
+        async function reportCurrentUser() {
+            const reason = getReportReason();
+            if (!reason) {
+                alert("正しい通報理由を選択してください。");
+                return;
+            }
+
+            const detail = prompt("詳細があれば入力してください（任意）") || "";
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "reportContent",
+                        reporterId: myEmail,
+                        targetUserId: targetEmail,
+                        targetType: "user",
+                        targetId: targetEmail,
+                        targetContent: "",
+                        reason,
+                        detail
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    alert("通報を受け付けました。");
+                } else {
+                    alert("通報に失敗しました: " + result.message);
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました。");
+            }
+        }
+
+        async function reportMessage(messageText) {
+            const reason = getReportReason();
+            if (!reason) {
+                alert("正しい通報理由を選択してください。");
+                return;
+            }
+
+            const detail = prompt("詳細があれば入力してください（任意）") || "";
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "reportContent",
+                        reporterId: myEmail,
+                        targetUserId: targetEmail,
+                        targetType: "message",
+                        targetId: targetEmail,
+                        targetContent: messageText,
+                        reason,
+                        detail
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    alert("メッセージの通報を受け付けました。");
+                } else {
+                    alert("通報に失敗しました: " + result.message);
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました。");
+            }
+        }
+
+        async function blockCurrentUser() {
+            if (!confirm(
+                `「${targetEmail}」さんをブロックしますか？\n` +
+                "ブロックすると、このチャットと相手からの通知が表示されなくなります。"
+            )) {
+                return;
+            }
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "blockUser",
+                        blockerId: myEmail,
+                        blockedId: targetEmail
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    alert("ユーザーをブロックしました。");
+                    localStorage.removeItem("chatTarget");
+                    window.location.href = "messages.html";
+                } else {
+                    alert("ブロックに失敗しました: " + result.message);
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました。");
+            }
+        }
+
+        document.getElementById("block-user-btn").addEventListener("click", blockCurrentUser);
+        document.getElementById("report-user-btn").addEventListener("click", reportCurrentUser);
 
         async function loadMessages() {
             try {
@@ -236,10 +373,24 @@
                     listDiv.innerHTML = "";
 
                     messages.forEach(msg => {
+                        const wrapper = document.createElement("div");
+                        wrapper.style.cssText = `display:flex; flex-direction:column; align-items:${msg.from === myEmail ? "flex-end" : "flex-start"}; gap:4px;`;
+
                         const bubble = document.createElement("div");
                         bubble.className = `message-bubble ${msg.from === myEmail ? 'msg-my' : 'msg-partner'}`;
                         bubble.innerText = msg.text;
-                        listDiv.appendChild(bubble);
+                        wrapper.appendChild(bubble);
+
+                        if (msg.from !== myEmail) {
+                            const reportButton = document.createElement("button");
+                            reportButton.type = "button";
+                            reportButton.innerText = "このメッセージを通報";
+                            reportButton.style.cssText = "border:none; background:transparent; color:#b91c1c; font-size:11px; cursor:pointer; padding:0 4px;";
+                            reportButton.addEventListener("click", () => reportMessage(msg.text));
+                            wrapper.appendChild(reportButton);
+                        }
+
+                        listDiv.appendChild(wrapper);
                     });
 
                     // 最下部へ自動スクロール
