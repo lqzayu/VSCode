@@ -836,6 +836,32 @@
         let allOtherPosts = [];
         let activeCountdownIntervals = [];
 
+        async function fetchGas(payload, timeoutMs = 15000) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
+                });
+
+                if (!res.ok) {
+                    throw new Error(`GAS通信エラー（HTTP ${res.status}）`);
+                }
+
+                const result = await res.json();
+                if (!result || result.status !== "success") {
+                    throw new Error(result && result.message ? result.message : "GASからエラーが返されました");
+                }
+
+                return result;
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+
         function toggleMenu() {
             document.getElementById("hud-menu-btn").classList.toggle("open");
             document.getElementById("nav-links").classList.toggle("open");
@@ -870,16 +896,15 @@
             myPostContentDiv.innerHTML = "更新中...";
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ mode: "getRecruitments", email: myEmail })
-                });
+                const result = await fetchGas({ mode: "getRecruitments", email: myEmail });
+                if (!Array.isArray(result.message)) {
+                    throw new Error("募集データの形式が正しくありません");
+                }
 
-                const result = await res.json();
                 listDiv.innerHTML = "";
                 myPostContentDiv.innerHTML = "投稿している募集はありません。";
 
-                const items = result.message.reverse();
+                const items = [...result.message].reverse();
                 const myPosts = items.filter(item => item.email === myEmail);
                 allOtherPosts = items.filter(item => item.email !== myEmail);
 
@@ -907,7 +932,10 @@
 
             } catch (e) {
                 console.error(e);
-                listDiv.innerHTML = "<p style='color: #ef4444; font-size: 14px; grid-column: 1 / -1; text-align: center; padding: 40px 0;'>読み込みエラーが発生しました。</p>";
+                const message = e && e.name === "AbortError"
+                    ? "GASの応答が15秒以内にありませんでした。Apps Scriptのデプロイ設定を確認してください。"
+                    : (e && e.message ? e.message : "原因不明のエラー");
+                listDiv.innerHTML = `<p style='color: #ef4444; font-size: 14px; grid-column: 1 / -1; text-align: center; padding: 40px 0;'>読み込みエラーが発生しました。<br><small>${message}</small></p>`;
             }
         }
 
