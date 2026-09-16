@@ -182,6 +182,36 @@
             box-shadow: 0 6px 16px rgba(28, 189, 197, 0.35);
         }
 
+        .online-summary {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+            margin-right: 14px;
+            padding: 9px 14px;
+            border-radius: 12px;
+            background: #ecfdf5;
+            color: #166534;
+        }
+
+        .online-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.14);
+        }
+
+        .online-summary strong {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .online-summary span {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -292,6 +322,8 @@
             .dashboard-grid { grid-template-columns: 1fr; }
             .container { padding: 0 16px; margin: 16px auto; }
             .hamburger-btn { display: flex !important; }
+            .page-title-bar { flex-wrap: wrap; gap: 12px; }
+            .online-summary { order: 3; margin: 0; }
 
             .nav-links {
                 position: fixed !important;
@@ -327,6 +359,7 @@
         }
     </style>
     <link rel="stylesheet" href="theme.css?v=20260916e">
+    <script src="online.js" defer></script>
 </head>
 
 <body data-page="admin">
@@ -356,6 +389,12 @@
     <main class="container">
         <div class="page-title-bar">
             <h1>🛡️ 管理者ダッシュボード</h1>
+            <div class="online-summary" aria-live="polite" title="90秒以内に操作した利用者を表示しています">
+                <span class="online-dot" aria-hidden="true"></span>
+                <span>オンライン</span>
+                <strong id="online-user-count">--</strong>
+                <span>人</span>
+            </div>
             <button class="btn-reload" onclick="loadOverview()">データを更新</button>
         </div>
 
@@ -427,6 +466,7 @@
         const currentEmail = localStorage.getItem("userEmail");
         const currentUserId = localStorage.getItem("userId") || currentEmail;
         const isImpersonating = localStorage.getItem("isImpersonating");
+        let overviewLoading = false;
 
         if (isImpersonating === "true") {
             localStorage.setItem("userEmail", ADMIN_ID);
@@ -469,12 +509,17 @@
             }
         }
 
-        async function loadOverview() {
+        async function loadOverview(silent = false) {
+            if (overviewLoading) return;
+            overviewLoading = true;
+
             const userBody = document.getElementById("user-table-body");
             const postBody = document.getElementById("post-table-body");
 
-            userBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">読み込み中...</td></tr>`;
-            postBody.innerHTML = `<tr><td colspan="3" style="text-align:center;">読み込み中...</td></tr>`;
+            if (!silent) {
+                userBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">読み込み中...</td></tr>`;
+                postBody.innerHTML = `<tr><td colspan="3" style="text-align:center;">読み込み中...</td></tr>`;
+            }
 
             try {
                 const res = await fetch(GAS_URL, {
@@ -486,13 +531,21 @@
                 if (result.status === "success") {
                     renderUsers(result.message.users);
                     renderPosts(result.message.posts);
-                    loadReports();
-                } else {
+                    updateOnlineCount(result.message.onlineCount);
+                    loadReports(silent);
+                } else if (!silent) {
                     alert("取得失敗: " + result.message);
                 }
             } catch (e) {
-                alert("通信エラーが発生しました");
+                if (!silent) alert("通信エラーが発生しました");
+            } finally {
+                overviewLoading = false;
             }
+        }
+
+        function updateOnlineCount(count) {
+            const countEl = document.getElementById("online-user-count");
+            if (countEl) countEl.innerText = Number.isFinite(Number(count)) ? Number(count) : 0;
         }
 
         function renderUsers(users) {
@@ -577,11 +630,13 @@
                 .replace(/'/g, "&#039;");
         }
 
-        async function loadReports() {
+        async function loadReports(silent = false) {
             const body = document.getElementById("report-table-body");
             if (!body) return;
 
-            body.innerHTML = `<tr><td colspan="5" style="text-align:center;">読み込み中...</td></tr>`;
+            if (!silent) {
+                body.innerHTML = `<tr><td colspan="5" style="text-align:center;">読み込み中...</td></tr>`;
+            }
 
             try {
                 const res = await fetch(GAS_URL, {
@@ -715,6 +770,7 @@
             loadOverview();
             updateUnreadBadge();
             setInterval(updateUnreadBadge, 3000);
+            setInterval(() => loadOverview(true), 15000);
         };
     </script>
 </body>

@@ -1222,6 +1222,7 @@
         }
     </style>
     <link rel="stylesheet" href="theme.css?v=20260916e">
+    <script src="online.js" defer></script>
 </head>
 
 <body data-page="main">
@@ -1307,6 +1308,38 @@
 
                     <input type="text" id="rec-tags" placeholder="関連タグ（例: プログラミング, 初心者歓迎, 部活）"
                         style="margin-bottom:16px;" />
+
+                    <label for="rec-duration" style="display:block; margin:0 0 6px; color:#475569; font-size:13px; font-weight:700;">募集を表示する時間</label>
+                    <select id="rec-duration" style="margin-bottom:6px;">
+                        <option value="15">15分</option>
+                        <option value="30">30分</option>
+                        <option value="45">45分</option>
+                        <option value="60">1時間</option>
+                        <option value="120">2時間</option>
+                        <option value="180">3時間</option>
+                        <option value="240">4時間</option>
+                        <option value="300">5時間</option>
+                        <option value="360">6時間</option>
+                        <option value="420">7時間</option>
+                        <option value="480">8時間</option>
+                        <option value="540">9時間</option>
+                        <option value="600">10時間</option>
+                        <option value="660">11時間</option>
+                        <option value="720">12時間</option>
+                        <option value="780">13時間</option>
+                        <option value="840">14時間</option>
+                        <option value="900">15時間</option>
+                        <option value="960">16時間</option>
+                        <option value="1020">17時間</option>
+                        <option value="1080">18時間</option>
+                        <option value="1140">19時間</option>
+                        <option value="1200">20時間</option>
+                        <option value="1260">21時間</option>
+                        <option value="1320">22時間</option>
+                        <option value="1380">23時間</option>
+                        <option value="1440" selected>24時間</option>
+                    </select>
+                    <p style="margin:0 0 16px; color:#64748b; font-size:11px; line-height:1.5;">選んだ時間を過ぎると、募集一覧から自動的に非表示になります。</p>
 
                     <button class="btn-search" id="submit-btn" onclick="submitRecruitment()">投稿する</button>
                 </div>
@@ -1563,6 +1596,7 @@
                 if (myPosts.length > 0) {
                     const myItem = myPosts[0];
                     let myTagsHtml = "";
+                    const durationLabel = formatRecruitmentDuration(myItem.durationMinutes);
                     if (myItem.tags) {
                         const tagArray = myItem.tags.split(/[,、\s]+/).filter(t => t);
                         myTagsHtml = `<div class="card-tags" style="margin-top:6px; margin-bottom:10px;">` +
@@ -1573,6 +1607,7 @@
                     myPostContentDiv.innerHTML = `
                         <div style="font-weight: 700; margin-bottom: 6px; color:#1cbdc5; font-size: 12px;">${myItem.grade} | ${myItem.dept}</div>
                         <div style="word-wrap: break-word; line-height: 1.5; margin-bottom: 6px; font-size: 13px; color:#475569;">${myItem.content}</div>
+                        <div style="margin-bottom:8px; color:#64748b; font-size:11px;">表示期限: ${durationLabel}</div>
                         ${myTagsHtml}
                         <button onclick="deleteMyRecruitment()" style="width: 100%; background: #ffe4e6; color: #e11d48; border: none; padding: 6px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; transition: background 0.2s;">
                             ✖ この募集を削除する
@@ -1654,15 +1689,16 @@
                 fragment.appendChild(card);
 
                 if (item.time) {
-                    startCountdownTimer(item.time, timerId);
+                    startCountdownTimer(item.time, item.durationMinutes, timerId);
                 }
             });
             listDiv.appendChild(fragment);
         }
 
-        function startCountdownTimer(postTimeValue, elementId) {
+        function startCountdownTimer(postTimeValue, durationMinutes, elementId) {
             const postTime = new Date(postTimeValue).getTime();
-            const expireTime = postTime + (24 * 60 * 60 * 1000);
+            const duration = getRecruitmentDurationMinutes(durationMinutes);
+            const expireTime = postTime + (duration * 60 * 1000);
 
             if (Number.isNaN(postTime)) {
                 const el = document.getElementById(elementId);
@@ -1719,6 +1755,17 @@
             }
         }
 
+        function getRecruitmentDurationMinutes(value) {
+            const allowed = [15, 30, 45, 60, 120, 180, 240, 300, 360, 420, 480, 540, 600, 660, 720, 780, 840, 900, 960, 1020, 1080, 1140, 1200, 1260, 1320, 1380, 1440];
+            const minutes = Number(value);
+            return allowed.includes(minutes) ? minutes : 1440;
+        }
+
+        function formatRecruitmentDuration(value) {
+            const minutes = getRecruitmentDurationMinutes(value);
+            return minutes < 60 ? `${minutes}分` : `${minutes / 60}時間`;
+        }
+
         function searchByTag(tagName) {
             const searchInput = document.getElementById("search-input");
             searchInput.value = tagName;
@@ -1749,6 +1796,7 @@
             const submitBtn = document.getElementById("submit-btn");
             const content = document.getElementById("rec-content").value.trim();
             const tags = document.getElementById("rec-tags").value.trim();
+            const durationMinutes = getRecruitmentDurationMinutes(document.getElementById("rec-duration").value);
 
             if (!content) {
                 alert("募集内容を入力してください");
@@ -1767,6 +1815,7 @@
                 dept: document.getElementById("rec-dept").value,
                 content: content,
                 tags: tags,
+                durationMinutes: durationMinutes,
                 email: localStorage.getItem("userEmail")
             };
 
@@ -1775,7 +1824,7 @@
                 const result = await res.json();
 
                 if (result.status === "success") {
-                    alert("投稿しました");
+                    alert(`${formatRecruitmentDuration(durationMinutes)}の募集を投稿しました`);
                     switchTab('search');
                     loadRecruitments();
                     document.getElementById("rec-content").value = "";
