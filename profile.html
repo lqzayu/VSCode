@@ -847,11 +847,21 @@
 
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
+            const videoWidth = video.videoWidth || 320;
+            const videoHeight = video.videoHeight || 240;
+            const scale = Math.max(width / videoWidth, height / videoHeight);
+            const renderWidth = videoWidth * scale;
+            const renderHeight = videoHeight * scale;
+            const offsetX = (width - renderWidth) / 2;
+            const offsetY = (height - renderHeight) / 2;
+
             ctx.fillStyle = "#00FF00";
             for (let i = 0; i < landmarks.length; i++) {
                 const pt = landmarks[i];
+                const x = pt.x * renderWidth + offsetX;
+                const y = pt.y * renderHeight + offsetY;
                 ctx.beginPath();
-                ctx.arc(pt.x * width, pt.y * height, 1, 0, 2 * Math.PI);
+                ctx.arc(x, y, 1.5, 0, 2 * Math.PI);
                 ctx.fill();
             }
         }
