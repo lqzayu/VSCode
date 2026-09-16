@@ -131,7 +131,106 @@
             border: 1px solid rgba(255, 255, 255, 0.6);
             border-top: 1px solid rgba(0, 0, 0, 0.05);
             display: flex;
+            flex-wrap: wrap;
             gap: 12px;
+        }
+
+        .chat-message-input-row {
+            display: flex;
+            flex: 1 1 100%;
+            min-width: 0;
+            gap: 12px;
+        }
+
+        .btn-attach {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            min-width: 58px;
+            padding: 0 12px;
+            border: 1px solid #bae6fd;
+            border-radius: 10px;
+            background: #f0f9ff;
+            color: #0369a1;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .btn-attach:hover {
+            background: #e0f2fe;
+        }
+
+        .attachment-input {
+            display: none;
+        }
+
+        .attachment-preview {
+            display: flex;
+            flex: 1 1 100%;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 0;
+        }
+
+        .attachment-preview:empty {
+            display: none;
+        }
+
+        .attachment-preview-item {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            overflow: hidden;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+
+        .attachment-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .attachment-remove {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            width: 20px;
+            height: 20px;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(15, 23, 42, .78);
+            color: #fff;
+            line-height: 20px;
+            cursor: pointer;
+        }
+
+        .message-attachments {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 6px;
+            width: min(300px, 100%);
+            margin-top: 2px;
+        }
+
+        .message-attachment-image {
+            display: block;
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border: 1px solid rgba(148, 163, 184, .35);
+            border-radius: 10px;
+            background: #f8fafc;
+            transition: transform .15s ease;
+        }
+
+        .message-attachment-image:hover {
+            transform: scale(1.02);
         }
 
         .chat-input {
@@ -248,8 +347,21 @@
                 gap: 8px;
             }
 
+            .chat-message-input-row {
+                gap: 8px;
+            }
+
+            .btn-attach {
+                min-width: 52px;
+                padding: 0 9px;
+            }
+
             .btn-send {
                 padding: 12px 16px;
+            }
+
+            .message-attachments {
+                width: min(240px, 100%);
             }
         }
     </style>
@@ -280,8 +392,13 @@
         </div>
 
         <div class="chat-input-area">
-            <input type="text" id="message-input" class="chat-input" placeholder="メッセージを入力..." onkeydown="if(event.key==='Enter') sendMessage()">
-            <button id="send-btn" class="btn-send" onclick="sendMessage()">送信</button>
+            <div id="attachment-preview" class="attachment-preview" aria-live="polite"></div>
+            <div class="chat-message-input-row">
+                <label class="btn-attach" for="attachment-input">画像</label>
+                <input id="attachment-input" class="attachment-input" type="file" accept="image/*" multiple>
+                <input type="text" id="message-input" class="chat-input" placeholder="メッセージを入力..." onkeydown="if(event.key==='Enter') sendMessage()">
+                <button id="send-btn" class="btn-send" onclick="sendMessage()">送信</button>
+            </div>
         </div>
     </main>
 
@@ -306,6 +423,9 @@
         let messagesRequest = null;
         let lastMessagesSignature = "";
         let chatPollTimer = null;
+        const MAX_ATTACHMENTS = 8;
+        const MAX_ATTACHMENT_BYTES = 360 * 1024;
+        let selectedAttachments = [];
 
         async function postChat(payload, timeoutMs = 12000) {
             const controller = new AbortController();
@@ -449,6 +569,139 @@
             });
         }
 
+        function blobToDataUrl(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        function loadImageFile(file) {
+            return new Promise((resolve, reject) => {
+                const image = new Image();
+                const objectUrl = URL.createObjectURL(file);
+                image.onload = () => {
+                    URL.revokeObjectURL(objectUrl);
+                    resolve(image);
+                };
+                image.onerror = () => {
+                    URL.revokeObjectURL(objectUrl);
+                    reject(new Error("画像を読み込めませんでした"));
+                };
+                image.src = objectUrl;
+            });
+        }
+
+        function canvasToBlob(canvas, quality) {
+            return new Promise((resolve, reject) => {
+                canvas.toBlob(blob => {
+                    if (blob) resolve(blob);
+                    else reject(new Error("画像の圧縮に失敗しました"));
+                }, "image/jpeg", quality);
+            });
+        }
+
+        async function compressImageFile(file) {
+            const image = await loadImageFile(file);
+            const maxDimensions = [1280, 960];
+            let bestBlob = null;
+
+            for (const maxDimension of maxDimensions) {
+                const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+                const canvas = document.createElement("canvas");
+                canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+                canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+                const context = canvas.getContext("2d", { alpha: false });
+                context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+                for (const quality of [0.72, 0.58, 0.45]) {
+                    const blob = await canvasToBlob(canvas, quality);
+                    bestBlob = blob;
+                    if (blob.size <= MAX_ATTACHMENT_BYTES) {
+                        return {
+                            name: (file.name || "image").replace(/\.[^.]+$/, "") || "image",
+                            type: "image/jpeg",
+                            data: await blobToDataUrl(blob),
+                            size: blob.size
+                        };
+                    }
+                }
+            }
+
+            if (!bestBlob) throw new Error("画像の圧縮に失敗しました");
+            return {
+                name: (file.name || "image").replace(/\.[^.]+$/, "") || "image",
+                type: "image/jpeg",
+                data: await blobToDataUrl(bestBlob),
+                size: bestBlob.size
+            };
+        }
+
+        function renderAttachmentPreview() {
+            const preview = document.getElementById("attachment-preview");
+            if (!preview) return;
+            preview.innerHTML = "";
+
+            selectedAttachments.forEach((attachment, index) => {
+                const item = document.createElement("div");
+                item.className = "attachment-preview-item";
+
+                const image = document.createElement("img");
+                image.src = attachment.data;
+                image.alt = "添付予定の画像";
+                item.appendChild(image);
+
+                const removeButton = document.createElement("button");
+                removeButton.type = "button";
+                removeButton.className = "attachment-remove";
+                removeButton.innerText = "×";
+                removeButton.setAttribute("aria-label", "添付画像を削除");
+                removeButton.addEventListener("click", () => {
+                    selectedAttachments.splice(index, 1);
+                    renderAttachmentPreview();
+                });
+                item.appendChild(removeButton);
+                preview.appendChild(item);
+            });
+        }
+
+        async function handleAttachmentChange(event) {
+            const files = Array.from(event.target.files || []);
+            event.target.value = "";
+            if (files.length === 0) return;
+
+            const available = MAX_ATTACHMENTS - selectedAttachments.length;
+            if (available <= 0) {
+                alert("画像は1回の送信につき" + MAX_ATTACHMENTS + "枚まで添付できます。");
+                return;
+            }
+
+            const filesToAdd = files.slice(0, available);
+            if (files.length > available) {
+                alert("添付できる画像は残り" + available + "枚です。");
+            }
+
+            const attachLabel = document.querySelector(".btn-attach");
+            if (attachLabel) attachLabel.classList.add("is-disabled");
+
+            try {
+                for (const file of filesToAdd) {
+                    if (!file.type.startsWith("image/")) continue;
+                    const compressed = await compressImageFile(file);
+                    selectedAttachments.push(compressed);
+                }
+                renderAttachmentPreview();
+            } catch (e) {
+                alert("画像の読み込みに失敗しました。別の画像でお試しください。");
+            } finally {
+                if (attachLabel) attachLabel.classList.remove("is-disabled");
+            }
+        }
+
+        document.getElementById("attachment-input").addEventListener("change", handleAttachmentChange);
+
         async function unsendMessage(messageId, button) {
             if (!messageId) return;
             if (!confirm("このメッセージの送信を取り消しますか？")) return;
@@ -543,6 +796,29 @@
                         bubble.innerText = msg.text;
                         wrapper.appendChild(bubble);
 
+                        if (Array.isArray(msg.attachments) && msg.attachments.length > 0 && !msg.isUnsent) {
+                            const attachments = document.createElement("div");
+                            attachments.className = "message-attachments";
+
+                            msg.attachments.slice(0, MAX_ATTACHMENTS).forEach(url => {
+                                if (typeof url !== "string" || !url.startsWith("http")) return;
+                                const link = document.createElement("a");
+                                link.href = url;
+                                link.target = "_blank";
+                                link.rel = "noopener noreferrer";
+
+                                const image = document.createElement("img");
+                                image.className = "message-attachment-image";
+                                image.src = url;
+                                image.alt = "添付画像";
+                                image.loading = "lazy";
+                                link.appendChild(image);
+                                attachments.appendChild(link);
+                            });
+
+                            if (attachments.childElementCount > 0) wrapper.appendChild(attachments);
+                        }
+
                         const meta = document.createElement("div");
                         meta.className = "message-meta";
                         const time = formatMessageTime(msg.sentAt);
@@ -614,8 +890,13 @@
             const sendBtn = document.getElementById("send-btn");
             const listDiv = document.getElementById("message-list");
             const text = textInput.value.trim();
+            const outgoingAttachments = selectedAttachments.map(attachment => ({
+                name: attachment.name,
+                type: attachment.type,
+                data: attachment.data
+            }));
 
-            if (!text) return;
+            if (!text && outgoingAttachments.length === 0) return;
 
             textInput.value = "";
             if (sendBtn) {
@@ -625,7 +906,7 @@
 
             const tempBubble = document.createElement("div");
             tempBubble.className = "message-bubble msg-my temp-msg";
-            tempBubble.innerText = text;
+            tempBubble.innerText = text || "画像を送信中...";
             listDiv.appendChild(tempBubble);
             listDiv.scrollTop = listDiv.scrollHeight;
 
@@ -634,10 +915,13 @@
                     mode: "sendMessage",
                     from: myEmail,
                     to: targetEmail,
-                    text: text
+                    text: text,
+                    attachments: outgoingAttachments
                 });
 
                 if (result.status === "success") {
+                    selectedAttachments = [];
+                    renderAttachmentPreview();
                     await loadMessages();
                 } else {
                     alert("送信エラー: " + result.message);
