@@ -15,8 +15,9 @@
             color: #1e293b;
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100dvh;
+            height: auto;
+            overflow-x: hidden;
         }
 
         .navbar {
@@ -69,6 +70,7 @@
             padding: 20px;
             box-sizing: border-box;
             overflow: hidden;
+            min-height: calc(100dvh - 170px);
         }
 
         .chat-header {
@@ -282,11 +284,49 @@
         </div>
     </main>
 
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-links">
+                <a href="main.html">ホーム</a>
+                <a href="messages.html">メッセージ</a>
+                <a href="profile.html">マイページ</a>
+                <a href="terms.html">利用規約</a>
+                <a href="privacy.html">プライバシーポリシー</a>
+            </div>
+            <p class="copyright">&copy; 2026 平工マッチング. All rights reserved.</p>
+        </div>
+    </footer>
+
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
 
         const myEmail = localStorage.getItem("userEmail");
         const targetEmail = localStorage.getItem("chatTarget");
+        let messagesRequest = null;
+        let lastMessagesSignature = "";
+        let chatPollTimer = null;
+
+        async function postChat(payload, timeoutMs = 12000) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const result = await res.json();
+                if (!result || result.status !== "success") {
+                    throw new Error(result && result.message ? result.message : "GASからエラーが返されました");
+                }
+                return result;
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
 
         if (!myEmail || !targetEmail) {
             alert("不正なアクセスです");
@@ -332,26 +372,17 @@
             const detail = prompt("詳細があれば入力してください（任意）") || "";
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "reportContent",
-                        reporterId: myEmail,
-                        targetUserId: targetEmail,
-                        targetType: "user",
-                        targetId: targetEmail,
-                        targetContent: "",
-                        reason,
-                        detail
-                    })
+                await postChat({
+                    mode: "reportContent",
+                    reporterId: myEmail,
+                    targetUserId: targetEmail,
+                    targetType: "user",
+                    targetId: targetEmail,
+                    targetContent: "",
+                    reason,
+                    detail
                 });
-                const result = await res.json();
-
-                if (result.status === "success") {
-                    alert("通報を受け付けました。");
-                } else {
-                    alert("通報に失敗しました: " + result.message);
-                }
+                alert("通報を受け付けました。");
             } catch (e) {
                 alert("通信エラーが発生しました。");
             }
@@ -367,26 +398,17 @@
             const detail = prompt("詳細があれば入力してください（任意）") || "";
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "reportContent",
-                        reporterId: myEmail,
-                        targetUserId: targetEmail,
-                        targetType: "message",
-                        targetId: messageId || targetEmail,
-                        targetContent: messageText,
-                        reason,
-                        detail
-                    })
+                await postChat({
+                    mode: "reportContent",
+                    reporterId: myEmail,
+                    targetUserId: targetEmail,
+                    targetType: "message",
+                    targetId: messageId || targetEmail,
+                    targetContent: messageText,
+                    reason,
+                    detail
                 });
-                const result = await res.json();
-
-                if (result.status === "success") {
-                    alert("メッセージの通報を受け付けました。");
-                } else {
-                    alert("通報に失敗しました: " + result.message);
-                }
+                alert("メッセージの通報を受け付けました。");
             } catch (e) {
                 alert("通信エラーが発生しました。");
             }
@@ -401,23 +423,14 @@
             }
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "blockUser",
-                        blockerId: myEmail,
-                        blockedId: targetEmail
-                    })
+                await postChat({
+                    mode: "blockUser",
+                    blockerId: myEmail,
+                    blockedId: targetEmail
                 });
-                const result = await res.json();
-
-                if (result.status === "success") {
-                    alert("ユーザーをブロックしました。");
-                    localStorage.removeItem("chatTarget");
-                    window.location.href = "messages.html";
-                } else {
-                    alert("ブロックに失敗しました: " + result.message);
-                }
+                alert("ユーザーをブロックしました。");
+                localStorage.removeItem("chatTarget");
+                window.location.href = "messages.html";
             } catch (e) {
                 alert("通信エラーが発生しました。");
             }
@@ -446,25 +459,12 @@
             }
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "unsendMessage",
-                        userId: myEmail,
-                        messageId: messageId
-                    })
+                await postChat({
+                    mode: "unsendMessage",
+                    userId: myEmail,
+                    messageId: messageId
                 });
-                const result = await res.json();
-
-                if (result.status === "success") {
-                    await loadMessages();
-                } else {
-                    if (button) {
-                        button.disabled = false;
-                        button.innerText = originalText;
-                    }
-                    alert("送信取り消しに失敗しました: " + result.message);
-                }
+                await loadMessages();
             } catch (e) {
                 if (button) {
                     button.disabled = false;
@@ -484,26 +484,13 @@
             }
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "deleteChatHistory",
-                        userId: myEmail,
-                        targetUserId: targetEmail
-                    })
+                await postChat({
+                    mode: "deleteChatHistory",
+                    userId: myEmail,
+                    targetUserId: targetEmail
                 });
-                const result = await res.json();
-
-                if (result.status === "success") {
-                    localStorage.removeItem("chatTarget");
-                    window.location.href = "messages.html";
-                } else {
-                    if (deleteButton) {
-                        deleteButton.disabled = false;
-                        deleteButton.innerText = "履歴を削除";
-                    }
-                    alert("履歴の削除に失敗しました: " + result.message);
-                }
+                localStorage.removeItem("chatTarget");
+                window.location.href = "messages.html";
             } catch (e) {
                 if (deleteButton) {
                     deleteButton.disabled = false;
@@ -518,23 +505,26 @@
         document.getElementById("delete-history-btn").addEventListener("click", deleteChatHistory);
 
         async function loadMessages() {
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
+            if (messagesRequest) return messagesRequest;
+
+            messagesRequest = (async () => {
+                try {
+                    const result = await postChat({
                         mode: "getMessages",
                         user1: myEmail,
                         user2: targetEmail
-                    })
-                });
+                    });
+                    const listDiv = document.getElementById("message-list");
 
-                const result = await res.json();
-                const listDiv = document.getElementById("message-list");
+                    if (result.status !== "success") return;
 
-                if (result.status === "success") {
-                    const messages = result.message;
-
+                    const messages = Array.isArray(result.message) ? result.message : [];
                     const tempMsgs = listDiv.querySelectorAll('.temp-msg');
+                    const signature = JSON.stringify(messages);
+
+                    if (signature === lastMessagesSignature && tempMsgs.length === 0) return;
+                    lastMessagesSignature = signature;
+
                     if (messages.length === 0 && tempMsgs.length === 0) {
                         listDiv.innerHTML = `<div style="text-align: center; color: #94a3b8; font-size: 13px;">メッセージ履歴はありません</div>`;
                         return;
@@ -596,21 +586,22 @@
                     });
 
                     listDiv.scrollTop = listDiv.scrollHeight;
+                } catch (e) {
+                    console.error("メッセージ取得エラー:", e);
+                } finally {
+                    messagesRequest = null;
                 }
-            } catch (e) {
-                console.error("メッセージ取得エラー:", e);
-            }
+            })();
+
+            return messagesRequest;
         }
 
         async function markAsRead() {
             try {
-                await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "markAsRead",
-                        myEmail: myEmail,
-                        targetEmail: targetEmail
-                    })
+                await postChat({
+                    mode: "markAsRead",
+                    myEmail: myEmail,
+                    targetEmail: targetEmail
                 });
             } catch (e) {
                 console.error("既読処理エラー:", e);
@@ -638,20 +629,15 @@
             listDiv.scrollTop = listDiv.scrollHeight;
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "sendMessage",
-                        from: myEmail,
-                        to: targetEmail,
-                        text: text
-                    })
+                const result = await postChat({
+                    mode: "sendMessage",
+                    from: myEmail,
+                    to: targetEmail,
+                    text: text
                 });
 
-                const result = await res.json();
-
                 if (result.status === "success") {
-                    loadMessages();
+                    await loadMessages();
                 } else {
                     alert("送信エラー: " + result.message);
                     tempBubble.remove();
@@ -660,23 +646,35 @@
                 alert("通信エラーが発生しました");
                 tempBubble.remove();
             } finally {
-                setTimeout(() => {
-                    if (sendBtn) {
-                        sendBtn.disabled = false;
-                        sendBtn.innerText = "送信";
-                    }
-                }, 1500);
+                if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.innerText = "送信";
+                }
             }
         }
 
-        window.onload = () => {
-            loadMessages();
-            markAsRead();
+        function scheduleChatPoll() {
+            clearTimeout(chatPollTimer);
+            chatPollTimer = setTimeout(async () => {
+                if (document.visibilityState === "visible") {
+                    await loadMessages();
+                    await markAsRead();
+                }
+                scheduleChatPoll();
+            }, 4000);
+        }
 
-            setInterval(() => {
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
                 loadMessages();
                 markAsRead();
-            }, 4000);
+            }
+        });
+
+        window.onload = async () => {
+            await loadMessages();
+            await markAsRead();
+            scheduleChatPoll();
         };
     </script>
 </body>

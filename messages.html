@@ -256,6 +256,23 @@
             color: #ffffff;
         }
 
+        .partner-delete-button {
+            flex-shrink: 0;
+            margin-left: 8px;
+            padding: 7px 10px;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            background: #fff1f2;
+            color: #be123c;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .partner-delete-button:hover {
+            background: #ffe4e6;
+        }
+
         .empty-message {
             text-align: center;
             color: #64748b;
@@ -432,6 +449,8 @@
                 <a href="main.html">ホーム</a>
                 <a href="messages.html">メッセージ</a>
                 <a href="profile.html">マイページ</a>
+                <a href="terms.html">利用規約</a>
+                <a href="privacy.html">プライバシーポリシー</a>
             </div>
             <p class="copyright">&copy; 2026 平工マッチング. All rights reserved.</p>
         </div>
@@ -450,6 +469,7 @@
             "linear-gradient(135deg, #0d9488 0%, #115e59 100%)",
             "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)"
         ];
+        let unreadRequest = null;
 
         function toggleMenu() {
             document.getElementById("hud-menu-btn").classList.toggle("open");
@@ -511,6 +531,16 @@
                                 </div>
                                 <div class="arrow-badge">開く ➔</div>
                             `;
+
+                            const deleteButton = document.createElement("button");
+                            deleteButton.type = "button";
+                            deleteButton.className = "partner-delete-button";
+                            deleteButton.innerText = "削除";
+                            deleteButton.addEventListener("click", event => {
+                                event.stopPropagation();
+                                deleteChatPartner(partner.email, deleteButton);
+                            });
+                            item.appendChild(deleteButton);
                             listDiv.appendChild(item);
                         });
                     }
@@ -526,32 +556,70 @@
         async function updateUnreadBadge() {
             const myEmail = localStorage.getItem("userEmail");
             const badge = document.getElementById("unread-badge");
-            if (!myEmail || !badge) return;
+            if (!myEmail || !badge || unreadRequest) return unreadRequest;
 
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ mode: "getUnreadCount", email: myEmail })
-                });
-                const result = await res.json();
+            unreadRequest = (async () => {
+                try {
+                    const res = await fetch(GAS_URL, {
+                        method: "POST",
+                        body: JSON.stringify({ mode: "getUnreadCount", email: myEmail })
+                    });
+                    const result = await res.json();
 
-                if (result.status === "success" && result.message) {
-                    const count = result.message.unreadCount || 0;
-                    if (count > 0) {
-                        badge.innerText = count > 99 ? "99+" : count;
-                        badge.style.display = "inline-block";
-                    } else {
-                        badge.style.display = "none";
+                    if (result.status === "success" && result.message) {
+                        const count = result.message.unreadCount || 0;
+                        if (count > 0) {
+                            badge.innerText = count > 99 ? "99+" : count;
+                            badge.style.display = "inline-block";
+                        } else {
+                            badge.style.display = "none";
+                        }
                     }
+                } catch (e) {
+                    console.error("未読チェックエラー:", e);
+                } finally {
+                    unreadRequest = null;
                 }
-            } catch (e) {
-                console.error("未読チェックエラー:", e);
-            }
+            })();
+
+            return unreadRequest;
         }
 
         function openChat(email) {
             localStorage.setItem("chatTarget", email);
             location.href = 'chat.html';
+        }
+
+        async function deleteChatPartner(email, button) {
+            if (!confirm("この相手とのメッセージ一覧を削除しますか？\n自分の画面から非表示になります。相手の画面には影響しません。")) return;
+
+            const originalText = button.innerText;
+            button.disabled = true;
+            button.innerText = "削除中...";
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "deleteChatHistory",
+                        userId: localStorage.getItem("userEmail"),
+                        targetUserId: email
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    await loadChatPartners();
+                } else {
+                    button.disabled = false;
+                    button.innerText = originalText;
+                    alert("リストの削除に失敗しました: " + result.message);
+                }
+            } catch (e) {
+                button.disabled = false;
+                button.innerText = originalText;
+                alert("通信エラーが発生しました。");
+            }
         }
 
         function logout() {
@@ -568,7 +636,9 @@
             loadChatPartners();
             updateUnreadBadge();
 
-            setInterval(updateUnreadBadge, 3000);
+            setInterval(() => {
+                if (document.visibilityState === "visible") updateUnreadBadge();
+            }, 3000);
         };
     </script>
 </body>

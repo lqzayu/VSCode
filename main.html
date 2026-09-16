@@ -1542,6 +1542,7 @@
         let activeTargetEmail = "";
         let allOtherPosts = [];
         let activeCountdownIntervals = [];
+        let notificationRequest = null;
 
         async function fetchGas(payload, timeoutMs = 15000) {
             const controller = new AbortController();
@@ -2062,61 +2063,36 @@
             location.href = 'chat.html';
         }
 
-        async function updateUnreadBadge() {
+        async function updateNotificationSummary() {
             const myEmail = localStorage.getItem("userEmail");
             const badge = document.getElementById("unread-badge");
-            if (!myEmail || !badge) return;
+            if (!myEmail || !badge || notificationRequest) return notificationRequest;
 
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ mode: "getUnreadCount", email: myEmail })
-                });
-                const result = await res.json();
-
-                if (result.status === "success" && result.message) {
+            notificationRequest = (async () => {
+                try {
+                    const result = await fetchGas({ mode: "getNotificationSummary", email: myEmail }, 10000);
                     const count = result.message.unreadCount || 0;
-                    if (count > 0) {
-                        badge.innerText = count > 99 ? "99+" : count;
-                        badge.style.display = "inline-block";
-                    } else {
-                        badge.style.display = "none";
-                    }
-                }
-            } catch (e) {
-                console.error("未読チェックエラー:", e);
-            }
-        }
+                    badge.innerText = count > 99 ? "99+" : count;
+                    badge.style.display = count > 0 ? "inline-block" : "none";
 
-        async function checkNewIncomingMessage() {
-            const myEmail = localStorage.getItem("userEmail");
-            if (!myEmail) return;
-
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ mode: "getLatestIncomingMessage", email: myEmail })
-                });
-                const result = await res.json();
-
-                if (result.status === "success" && result.message) {
-                    const msg = result.message;
+                    const msg = result.message.latestIncoming;
+                    if (!msg) return;
 
                     if (lastMessageTime === 0) {
                         lastMessageTime = msg.time;
-                        return;
-                    }
-
-                    if (msg.time > lastMessageTime) {
+                    } else if (msg.time > lastMessageTime) {
                         lastMessageTime = msg.time;
                         activeTargetEmail = msg.fromEmail;
                         showToast(msg.fromName, msg.text);
-                        updateUnreadBadge();
                     }
+                } catch (e) {
+                    console.error("通知情報の取得エラー:", e);
+                } finally {
+                    notificationRequest = null;
                 }
-            } catch (e) {
-                console.error("新着メッセージチェックエラー:", e);
-            }
+            })();
+
+            return notificationRequest;
         }
 
         function showToast(senderName, text) {
@@ -2185,12 +2161,9 @@
             }
 
             loadRecruitments();
-            updateUnreadBadge();
-
-            checkNewIncomingMessage();
+            updateNotificationSummary();
             setInterval(() => {
-                checkNewIncomingMessage();
-                updateUnreadBadge();
+                if (document.visibilityState === "visible") updateNotificationSummary();
             }, 3000);
         });
     </script>
