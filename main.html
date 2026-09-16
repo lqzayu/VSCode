@@ -1571,6 +1571,34 @@
             }
         }
 
+        function applyUserProfile(profile) {
+            if (!profile) return;
+
+            const userName = String(profile.name || profile.userId || "").trim();
+            const profileImage = String(profile.profileImage || "").trim();
+            localStorage.setItem("userName", userName);
+            localStorage.setItem("profileImage", profileImage);
+
+            const nameInput = document.getElementById("user-name");
+            const mypageText = document.getElementById("mypage-text");
+            const profileIcon = document.getElementById("profile-icon");
+            if (nameInput) nameInput.value = userName;
+            if (mypageText) mypageText.innerText = userName || "マイページ";
+            if (profileIcon) {
+                profileIcon.src = profileImage || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+            }
+        }
+
+        async function refreshUserProfile(userId) {
+            if (!userId || userId === "admin") return;
+            try {
+                const result = await fetchGas({ mode: "getUserProfile", userId: userId }, 10000);
+                applyUserProfile(result.message);
+            } catch (e) {
+                console.error("プロフィール情報の取得エラー:", e);
+            }
+        }
+
         function toggleMenu() {
             document.getElementById("hud-menu-btn").classList.toggle("open");
             document.getElementById("nav-links").classList.toggle("open");
@@ -2097,8 +2125,8 @@
         }
 
         function showToast(senderName, text) {
-            document.getElementById("toast-sender-name").innerText = senderName;
-            document.getElementById("toast-text-body").innerText = text;
+            document.getElementById("toast-sender-name").innerText = String(senderName || "ユーザー").trim() || "ユーザー";
+            document.getElementById("toast-text-body").innerText = String(text || "");
             const toast = document.getElementById("toast-notification");
 
             toast.classList.add("show");
@@ -2153,7 +2181,7 @@
                 }
             }
 
-            document.getElementById("mypage-text").innerText = userName || "マイページ";
+            document.getElementById("mypage-text").innerText = userName || currentUserId || "マイページ";
 
             if (profileImage && profileImage !== "null") {
                 document.getElementById("profile-icon").src = profileImage;
@@ -2162,6 +2190,7 @@
             }
 
             loadRecruitments();
+            refreshUserProfile(currentUserId);
             updateNotificationSummary();
             setInterval(() => {
                 if (document.visibilityState === "visible") updateNotificationSummary();

@@ -844,10 +844,8 @@
                     if (result.status === "success" && result.message.email) {
                         localStorage.setItem("userEmail", result.message.email);
                         localStorage.setItem("userId", result.message.userId || result.message.email);
-                        localStorage.setItem("userName", result.message.name || "ユーザー");
-                        if (result.message.profileImage) {
-                            localStorage.setItem("profileImage", result.message.profileImage);
-                        }
+                        localStorage.setItem("userName", result.message.name || "");
+                        localStorage.setItem("profileImage", result.message.profileImage || "");
 
                         document.getElementById('auth-status').innerText =
                             `認証成功！こんにちは、${result.message.name}さん。`;
@@ -889,10 +887,8 @@
                 if (result.status === "success") {
                     localStorage.setItem("userEmail", result.message.email);
                     localStorage.setItem("userId", result.message.userId || result.message.email);
-                    localStorage.setItem("userName", result.message.name || "ユーザー");
-                    if (result.message.profileImage) {
-                        localStorage.setItem("profileImage", result.message.profileImage);
-                    }
+                    localStorage.setItem("userName", result.message.name || "");
+                    localStorage.setItem("profileImage", result.message.profileImage || "");
 
                     updateMsg("ログイン成功", "success");
 

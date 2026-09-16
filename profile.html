@@ -582,6 +582,30 @@
             document.getElementById("nav-links").classList.toggle("open");
         }
 
+        async function syncProfileFromServer() {
+            const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
+            if (!userId) return;
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ mode: "getUserProfile", userId: userId })
+                });
+                const result = await res.json();
+                if (result.status !== "success" || !result.message) return;
+
+                const name = String(result.message.name || result.message.userId || "").trim();
+                const image = String(result.message.profileImage || "").trim();
+                localStorage.setItem("userName", name);
+                localStorage.setItem("profileImage", image);
+
+                document.getElementById("username-input").value = name;
+                document.getElementById("profile-icon").src = image || DEFAULT_AVATAR;
+            } catch (e) {
+                console.error("プロフィール情報の同期エラー:", e);
+            }
+        }
+
         async function updateUnreadBadge() {
             const myEmail = localStorage.getItem("userEmail");
             const badge = document.getElementById("unread-badge");
@@ -1042,6 +1066,7 @@
                 document.getElementById("profile-icon").src = DEFAULT_AVATAR;
             }
 
+            syncProfileFromServer();
             updateUnreadBadge();
             setInterval(updateUnreadBadge, 3000);
             loadBlockedUsers();
