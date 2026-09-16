@@ -472,6 +472,22 @@
         ];
         let unreadRequest = null;
 
+        async function postGas(payload, timeoutMs = 12000) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return await res.json();
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+
         function toggleMenu() {
             document.getElementById("hud-menu-btn").classList.toggle("open");
             document.getElementById("nav-links").classList.toggle("open");
@@ -494,11 +510,7 @@
             `;
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ mode: "getChatPartners", email: myEmail })
-                });
-                const result = await res.json();
+                const result = await postGas({ mode: "getChatPartners", email: myEmail });
 
                 if (result.status === "success") {
                     const partners = result.message;
@@ -520,18 +532,28 @@
                             item.className = "partner-item";
                             item.onclick = () => openChat(partner.email);
 
-                            item.innerHTML = `
-                                <div class="avatar-ring">
-                                    <div class="partner-avatar" style="background: ${avatarBg};">
-                                        ${initial}
-                                    </div>
-                                </div>
-                                <div class="partner-content-box">
-                                    <div class="partner-name">${partner.name}</div>
-                                    <div class="partner-email">${partner.email}</div>
-                                </div>
-                                <div class="arrow-badge">開く ➔</div>
-                            `;
+                            const avatarRing = document.createElement("div");
+                            avatarRing.className = "avatar-ring";
+                            const avatar = document.createElement("div");
+                            avatar.className = "partner-avatar";
+                            avatar.style.background = avatarBg;
+                            avatar.textContent = initial;
+                            avatarRing.appendChild(avatar);
+
+                            const contentBox = document.createElement("div");
+                            contentBox.className = "partner-content-box";
+                            const name = document.createElement("div");
+                            name.className = "partner-name";
+                            name.textContent = partner.name;
+                            const email = document.createElement("div");
+                            email.className = "partner-email";
+                            email.textContent = partner.email;
+                            contentBox.append(name, email);
+
+                            const arrow = document.createElement("div");
+                            arrow.className = "arrow-badge";
+                            arrow.textContent = "開く ➔";
+                            item.append(avatarRing, contentBox, arrow);
 
                             const deleteButton = document.createElement("button");
                             deleteButton.type = "button";
@@ -561,11 +583,7 @@
 
             unreadRequest = (async () => {
                 try {
-                    const res = await fetch(GAS_URL, {
-                        method: "POST",
-                        body: JSON.stringify({ mode: "getUnreadCount", email: myEmail })
-                    });
-                    const result = await res.json();
+                    const result = await postGas({ mode: "getUnreadCount", email: myEmail });
 
                     if (result.status === "success" && result.message) {
                         const count = result.message.unreadCount || 0;
@@ -599,15 +617,11 @@
             button.innerText = "削除中...";
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "deleteChatHistory",
-                        userId: localStorage.getItem("userEmail"),
-                        targetUserId: email
-                    })
+                const result = await postGas({
+                    mode: "deleteChatHistory",
+                    userId: localStorage.getItem("userEmail"),
+                    targetUserId: email
                 });
-                const result = await res.json();
 
                 if (result.status === "success") {
                     await loadChatPartners();
@@ -639,7 +653,7 @@
 
             setInterval(() => {
                 if (document.visibilityState === "visible") updateUnreadBadge();
-            }, 3000);
+            }, 8000);
         };
     </script>
 </body>

@@ -381,13 +381,13 @@
             </div>
 
             <div class="input-group">
-                <input type="text" id="login-userid" placeholder="ユーザID（顔認証にも使用）" onkeypress="handleKeyPress(event)">
+                <input type="text" id="login-userid" maxlength="64" placeholder="ユーザID（顔認証にも使用）" onkeypress="handleKeyPress(event)">
 
                 <div class="name-wrapper" id="name-wrapper">
-                    <input type="text" id="display-name" placeholder="表示名（ニックネーム）">
+                    <input type="text" id="display-name" maxlength="50" placeholder="表示名（ニックネーム）">
                 </div>
                 <div class="name-wrapper" id="reg-email-wrapper">
-                    <input type="text" id="reg-email" placeholder="メールアドレス（認証コード送信用）" inputmode="email">
+                    <input type="text" id="reg-email" maxlength="254" placeholder="メールアドレス（認証コード送信用）" inputmode="email">
                 </div>
 
                 <div class="password-wrapper">
@@ -476,6 +476,31 @@
         let savedFeaturesText = "";
         let isCapturing = false;
         let pendingUserId = "";
+
+        function compactFaceLandmarks(landmarks) {
+            if (!Array.isArray(landmarks)) return [];
+            return landmarks.map(point => ({
+                x: Number(Number(point.x || 0).toFixed(5)),
+                y: Number(Number(point.y || 0).toFixed(5)),
+                z: Number(Number(point.z || 0).toFixed(5))
+            }));
+        }
+
+        async function postGas(payload, timeoutMs = 15000) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return await res.json();
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
 
         function drawFeatures(landmarks) {
             const canvas = document.getElementById('face-overlay');
@@ -592,7 +617,7 @@
                     const now = performance.now();
                     lastFaceSeen = now;
                     if (collectingFaceSamples && now - lastFaceSampleAt >= 350) {
-                        faceSamples.push(lastLandmarks.map(point => ({ x: point.x, y: point.y, z: point.z })));
+                        faceSamples.push(compactFaceLandmarks(lastLandmarks));
                         if (faceSamples.length > 5) faceSamples.shift();
                         lastFaceSampleAt = now;
                     }
@@ -786,7 +811,7 @@
                 isCapturing = false;
                 return;
             }
-            savedFeaturesText = JSON.stringify(lastLandmarks);
+            savedFeaturesText = JSON.stringify(compactFaceLandmarks(lastLandmarks));
             stopCamera();
             authStatus.innerText = "顔情報の撮影が完了しました。「認証コードを送信する」を押してください。";
             authStatus.style.color = "#10b981";
@@ -822,7 +847,7 @@
                     return;
                 }
 
-                const currentLandmarks = lastLandmarks;
+                const currentLandmarks = compactFaceLandmarks(lastLandmarks);
                 const currentFeaturesSamples = faceSamples.slice();
                 stopCamera();
 
@@ -830,22 +855,20 @@
                 document.getElementById('auth-status').style.color = "#e67e22";
 
                 try {
-                    const res = await fetch(GAS_URL, {
-                        method: "POST",
-                        body: JSON.stringify({
-                            mode: "verify_face_for_user",
-                            userId: userId,
-                            currentFeatures: currentLandmarks,
-                            currentFeaturesSamples: currentFeaturesSamples
-                        })
+                    const result = await postGas({
+                        mode: "verify_face_for_user",
+                        userId: userId,
+                        currentFeatures: currentLandmarks,
+                        currentFeaturesSamples: currentFeaturesSamples
                     });
-                    const result = await res.json();
 
                     if (result.status === "success" && result.message.email) {
                         localStorage.setItem("userEmail", result.message.email);
                         localStorage.setItem("userId", result.message.userId || result.message.email);
                         localStorage.setItem("userName", result.message.name || "");
                         localStorage.setItem("profileImage", result.message.profileImage || "");
+                        if (result.message.adminToken) localStorage.setItem("adminToken", result.message.adminToken);
+                        else localStorage.removeItem("adminToken");
 
                         document.getElementById('auth-status').innerText =
                             `認証成功！こんにちは、${result.message.name}さん。`;
@@ -874,21 +897,19 @@
 
             try {
                 updateMsg("ログイン処理中...", "");
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "login",
-                        email: userId,
-                        password
-                    })
+                const result = await postGas({
+                    mode: "login",
+                    email: userId,
+                    password
                 });
-                const result = await res.json();
 
                 if (result.status === "success") {
                     localStorage.setItem("userEmail", result.message.email);
                     localStorage.setItem("userId", result.message.userId || result.message.email);
                     localStorage.setItem("userName", result.message.name || "");
                     localStorage.setItem("profileImage", result.message.profileImage || "");
+                    if (result.message.adminToken) localStorage.setItem("adminToken", result.message.adminToken);
+                    else localStorage.removeItem("adminToken");
 
                     updateMsg("ログイン成功", "success");
 
@@ -918,18 +939,14 @@
 
             try {
                 updateMsg("送信中...", "");
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "register",
-                        userId: userId,
-                        name: name,
-                        email: email,
-                        password: password,
-                        faceFeatures: savedFeaturesText
-                    })
-                });
-                const result = await res.json();
+                const result = await postGas({
+                    mode: "register",
+                    userId: userId,
+                    name: name,
+                    email: email,
+                    password: password,
+                    faceFeatures: savedFeaturesText
+                }, 25000);
 
                 if (result.status === "success") {
                     pendingUserId = userId;
@@ -951,15 +968,11 @@
 
             try {
                 updateMsg("確認中...", "");
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "verifyEmail",
-                        userId: pendingUserId,
-                        code: code
-                    })
+                const result = await postGas({
+                    mode: "verifyEmail",
+                    userId: pendingUserId,
+                    code: code
                 });
-                const result = await res.json();
 
                 if (result.status === "success") {
                     updateMsg("登録が完了しました！ログインしてください", "success");
@@ -978,14 +991,10 @@
             if (!pendingUserId) return;
             try {
                 updateMsg("再送中...", "");
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "resendVerificationCode",
-                        userId: pendingUserId
-                    })
-                });
-                const result = await res.json();
+                const result = await postGas({
+                    mode: "resendVerificationCode",
+                    userId: pendingUserId
+                }, 25000);
                 if (result.status === "success") {
                     updateMsg("認証コードを再送しました。メールをご確認ください。", "success");
                 } else {
@@ -1022,14 +1031,10 @@
 
             updateMsg("送信中...", "");
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "forgotPassword",
-                        userId: targetUserId
-                    })
-                });
-                const result = await res.json();
+                const result = await postGas({
+                    mode: "forgotPassword",
+                    userId: targetUserId
+                }, 25000);
                 if (result.status === "success") {
                     updateMsg("登録済みのメールアドレス宛に、再設定用のリンクを送信しました。メールをご確認ください。", "success");
                 } else {

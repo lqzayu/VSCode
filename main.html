@@ -286,8 +286,10 @@
         }
 
         .tag-badge {
+            border: 0;
             background: rgba(28, 189, 197, 0.1);
             color: #119299;
+            font-family: inherit;
             font-size: 11px;
             font-weight: 700;
             padding: 4px 10px;
@@ -1339,7 +1341,7 @@
                         <option value="土木環境工学科">土木環境工学科</option>
                         <option value="情報工学科">情報工学科</option>
                     </select>
-                    <textarea id="rec-content" rows="4" placeholder="募集内容を入力してください"
+                    <textarea id="rec-content" rows="4" maxlength="2000" placeholder="募集内容を入力してください"
                         style="margin-bottom:12px;"></textarea>
 
                     <label for="rec-fixed-tag" style="display:block; margin:0 0 6px; color:#475569; font-size:13px; font-weight:700;">おすすめタグから選ぶ</label>
@@ -1359,7 +1361,7 @@
                         <option value="初心者歓迎">初心者歓迎</option>
                     </select>
 
-                    <input type="text" id="rec-tags" placeholder="関連タグを自由入力（任意・例: 物理, 検定対策）"
+                    <input type="text" id="rec-tags" maxlength="500" placeholder="関連タグを自由入力（任意・例: 物理, 検定対策）"
                         style="margin-bottom:16px;" />
 
                     <label for="rec-duration" style="display:block; margin:0 0 6px; color:#475569; font-size:13px; font-weight:700;">募集を表示する時間</label>
@@ -1542,7 +1544,7 @@
         let lastMessageTime = 0;
         let activeTargetEmail = "";
         let allOtherPosts = [];
-        let activeCountdownIntervals = [];
+        let countdownTimer = null;
         let notificationRequest = null;
 
         async function fetchGas(payload, timeoutMs = 15000) {
@@ -1569,6 +1571,15 @@
             } finally {
                 clearTimeout(timeoutId);
             }
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
 
         function applyUserProfile(profile) {
@@ -1682,13 +1693,13 @@
                     if (myItem.tags) {
                         const tagArray = myItem.tags.split(/[,、\s]+/).filter(t => t);
                         myTagsHtml = `<div class="card-tags" style="margin-top:6px; margin-bottom:10px;">` +
-                            tagArray.map(t => `<span class="tag-badge">#${t}</span>`).join("") +
+                            tagArray.map(t => `<span class="tag-badge">#${escapeHtml(t)}</span>`).join("") +
                             `</div>`;
                     }
 
                     myPostContentDiv.innerHTML = `
-                        <div style="font-weight: 700; margin-bottom: 6px; color:#1cbdc5; font-size: 12px;">${myItem.grade} | ${myItem.dept}</div>
-                        <div style="word-wrap: break-word; line-height: 1.5; margin-bottom: 6px; font-size: 13px; color:#475569;">${myItem.content}</div>
+                        <div style="font-weight: 700; margin-bottom: 6px; color:#1cbdc5; font-size: 12px;">${escapeHtml(myItem.grade)} | ${escapeHtml(myItem.dept)}</div>
+                        <div style="word-wrap: break-word; line-height: 1.5; margin-bottom: 6px; font-size: 13px; color:#475569;">${escapeHtml(myItem.content)}</div>
                         <div style="margin-bottom:8px; color:#64748b; font-size:11px;">表示期限: ${durationLabel}</div>
                         ${myTagsHtml}
                         <button onclick="deleteMyRecruitment()" style="width: 100%; background: #ffe4e6; color: #e11d48; border: none; padding: 6px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; transition: background 0.2s;">
@@ -1704,7 +1715,7 @@
                 const message = e && e.name === "AbortError"
                     ? "GASの応答が15秒以内にありませんでした。Apps Scriptのデプロイ設定を確認してください。"
                     : (e && e.message ? e.message : "原因不明のエラー");
-                listDiv.innerHTML = `<p style='color: #ef4444; font-size: 14px; grid-column: 1 / -1; text-align: center; padding: 40px 0;'>読み込みエラーが発生しました。<br><small>${message}</small></p>`;
+                listDiv.innerHTML = `<p style='color: #ef4444; font-size: 14px; grid-column: 1 / -1; text-align: center; padding: 40px 0;'>読み込みエラーが発生しました。<br><small>${escapeHtml(message)}</small></p>`;
             }
         }
 
@@ -1712,8 +1723,10 @@
             const listDiv = document.getElementById("user-list");
             const keyword = document.getElementById("search-input").value.trim().toLowerCase();
 
-            activeCountdownIntervals.forEach(clearInterval);
-            activeCountdownIntervals = [];
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
 
             listDiv.innerHTML = "";
 
@@ -1738,20 +1751,22 @@
                     const tagArray = item.tags.split(/[,、\s]+/).filter(t => t);
                     if (tagArray.length > 0) {
                         tagsHtml = `<div class="card-tags">` +
-                            tagArray.map(t => `<span class="tag-badge" onclick="searchByTag('${t}')">#${t}</span>`).join("") +
+                            tagArray.map(t => `<button type="button" class="tag-badge js-search-tag" data-tag="${escapeHtml(t)}">#${escapeHtml(t)}</button>`).join("") +
                             `</div>`;
                     }
                 }
 
-                const timerId = `cd-timer-${idx}`;
+                const postTime = new Date(item.time).getTime();
+                const expireTime = postTime + getRecruitmentDurationMinutes(item.durationMinutes) * 60 * 1000;
+                const timerAttribute = Number.isNaN(expireTime) ? "" : `data-expire-time="${expireTime}"`;
 
                 card.innerHTML = `
                     <div style="display:flex; align-items:center; margin-bottom:12px;">
-                        <div class="user-badge">${item.grade} | ${item.dept}</div>
-                        <span id="${timerId}" class="countdown-badge">⏳ 計算中...</span>
+                        <div class="user-badge">${escapeHtml(item.grade)} | ${escapeHtml(item.dept)}</div>
+                        <span class="countdown-badge" ${timerAttribute}>⏳ 計算中...</span>
                     </div>
-                    <h3>${item.name}</h3>
-                    <p>${item.content}</p>
+                    <h3>${escapeHtml(item.name)}</h3>
+                    <p>${escapeHtml(item.content)}</p>
                     ${tagsHtml}
                     <div class="quick-reaction-area">
                         <span class="quick-reaction-label">ワンタップで気持ちを伝える</span>
@@ -1761,7 +1776,7 @@
                             <button type="button" class="btn-quick-reaction" data-reaction="質問したい！">❓ 質問したい！</button>
                         </div>
                     </div>
-                    <button class="btn-match" onclick="startChat('${item.email}')">チャットを始める</button>
+                    <button type="button" class="btn-match">チャットを始める</button>
                     <div class="card-action-row">
                         <button type="button" class="btn-card-action btn-card-block">ブロック</button>
                         <button type="button" class="btn-card-action btn-card-report">通報</button>
@@ -1770,6 +1785,12 @@
 
                 card.querySelector(".btn-card-block").addEventListener("click", () => {
                     blockUser(item.email, item.name);
+                });
+
+                card.querySelector(".btn-match").addEventListener("click", () => startChat(item.email));
+
+                card.querySelectorAll(".js-search-tag").forEach(button => {
+                    button.addEventListener("click", () => searchByTag(button.dataset.tag));
                 });
 
                 card.querySelector(".btn-card-report").addEventListener("click", () => {
@@ -1784,70 +1805,54 @@
 
                 fragment.appendChild(card);
 
-                if (item.time) {
-                    startCountdownTimer(item.time, item.durationMinutes, timerId);
-                }
             });
             listDiv.appendChild(fragment);
+            startCountdownTimer();
         }
 
-        function startCountdownTimer(postTimeValue, durationMinutes, elementId) {
-            const postTime = new Date(postTimeValue).getTime();
-            const duration = getRecruitmentDurationMinutes(durationMinutes);
-            const expireTime = postTime + (duration * 60 * 1000);
-
-            if (Number.isNaN(postTime)) {
-                const el = document.getElementById(elementId);
-                if (el) {
-                    el.innerText = "時刻取得エラー";
-                    el.style.background = "#fee2e2";
-                    el.style.color = "#ef4444";
-                }
-                return;
-            }
-
-            let timer = null;
-
+        function startCountdownTimer() {
+            if (countdownTimer) clearInterval(countdownTimer);
             const update = () => {
-                const el = document.getElementById(elementId);
-
-                if (!el) {
-                    if (timer) clearInterval(timer);
-                    return;
-                }
-
-                const remainingMilliseconds = expireTime - Date.now();
-
-                if (remainingMilliseconds <= 0) {
-                    if (timer) clearInterval(timer);
-
-                    el.innerText = "⏰ 終了";
-                    el.style.background = "#fee2e2";
-                    el.style.color = "#ef4444";
-
-                    if (!startCountdownTimer.reloadScheduled) {
-                        startCountdownTimer.reloadScheduled = true;
-                        setTimeout(async () => {
-                            await loadRecruitments();
-                            startCountdownTimer.reloadScheduled = false;
-                        }, 500);
+                let hasActiveTimer = false;
+                let hasExpiredTimer = false;
+                document.querySelectorAll(".countdown-badge[data-expire-time]").forEach(el => {
+                    const remainingMilliseconds = Number(el.dataset.expireTime) - Date.now();
+                    if (!Number.isFinite(remainingMilliseconds)) {
+                        el.innerText = "時刻取得エラー";
+                        return;
                     }
-                    return;
+                    if (remainingMilliseconds <= 0) {
+                        hasExpiredTimer = true;
+                        el.innerText = "⏰ 終了";
+                        el.style.background = "#fee2e2";
+                        el.style.color = "#ef4444";
+                        return;
+                    }
+
+                    hasActiveTimer = true;
+                    const totalSeconds = Math.ceil(remainingMilliseconds / 1000);
+                    const hours = Math.floor(totalSeconds / 3600);
+                    const minutes = Math.floor((totalSeconds % 3600) / 60);
+                    const seconds = totalSeconds % 60;
+                    el.innerText = `⏳ 残り ${hours}時間${String(minutes).padStart(2, "0")}分${String(seconds).padStart(2, "0")}秒`;
+                });
+
+                if (!hasActiveTimer && countdownTimer) {
+                    clearInterval(countdownTimer);
+                    countdownTimer = null;
                 }
-
-                const totalSeconds = Math.ceil(remainingMilliseconds / 1000);
-                const hours = Math.floor(totalSeconds / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                const seconds = totalSeconds % 60;
-
-                el.innerText = `⏳ 残り ${hours}時間${String(minutes).padStart(2, "0")}分${String(seconds).padStart(2, "0")}秒`;
+                if (hasExpiredTimer && !startCountdownTimer.reloadScheduled) {
+                    startCountdownTimer.reloadScheduled = true;
+                    setTimeout(async () => {
+                        await loadRecruitments();
+                        startCountdownTimer.reloadScheduled = false;
+                    }, 500);
+                }
             };
 
             update();
-
-            if (Date.now() < expireTime) {
-                timer = setInterval(update, 1000);
-                activeCountdownIntervals.push(timer);
+            if (!countdownTimer && document.querySelector(".countdown-badge[data-expire-time]")) {
+                countdownTimer = setInterval(update, 1000);
             }
         }
 
@@ -1887,16 +1892,12 @@
             button.innerText = "送信中...";
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "sendMessage",
-                        from: myUserId,
-                        to: targetUserId,
-                        text: `募集を見て「${reaction}」とリアクションしました。`
-                    })
+                const result = await fetchGas({
+                    mode: "sendMessage",
+                    from: myUserId,
+                    to: targetUserId,
+                    text: `募集を見て「${reaction}」とリアクションしました。`
                 });
-                const result = await res.json();
 
                 if (result.status === "success") {
                     sessionStorage.setItem(cooldownKey, String(Date.now()));
@@ -1924,11 +1925,7 @@
             if (!confirm("本当にこの募集を削除しますか？")) return;
             const myEmail = localStorage.getItem("userEmail");
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ mode: "deleteRecruitment", email: myEmail })
-                });
-                const result = await res.json();
+                const result = await fetchGas({ mode: "deleteRecruitment", email: myEmail });
                 if (result.status === "success") {
                     alert("募集を削除しました。");
                     loadRecruitments();
@@ -1969,8 +1966,7 @@
             };
 
             try {
-                const res = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(data) });
-                const result = await res.json();
+                const result = await fetchGas(data);
 
                 if (result.status === "success") {
                     alert(`${formatRecruitmentDuration(durationMinutes)}の募集を投稿しました`);
@@ -2030,20 +2026,16 @@
             const reporterId = localStorage.getItem("userEmail");
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "reportContent",
-                        reporterId,
-                        targetUserId,
-                        targetType,
-                        targetId,
-                        targetContent,
-                        reason,
-                        detail
-                    })
+                const result = await fetchGas({
+                    mode: "reportContent",
+                    reporterId,
+                    targetUserId,
+                    targetType,
+                    targetId,
+                    targetContent,
+                    reason,
+                    detail
                 });
-                const result = await res.json();
 
                 if (result.status === "success") {
                     alert("通報を受け付けました。確認までお待ちください。");
@@ -2066,15 +2058,11 @@
             const blockerId = localStorage.getItem("userEmail");
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "blockUser",
-                        blockerId,
-                        blockedId: targetUserId
-                    })
+                const result = await fetchGas({
+                    mode: "blockUser",
+                    blockerId,
+                    blockedId: targetUserId
                 });
-                const result = await res.json();
 
                 if (result.status === "success") {
                     alert("ユーザーをブロックしました。");
@@ -2194,7 +2182,7 @@
             updateNotificationSummary();
             setInterval(() => {
                 if (document.visibilityState === "visible") updateNotificationSummary();
-            }, 3000);
+            }, 8000);
         });
     </script>
 </body>

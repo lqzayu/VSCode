@@ -501,7 +501,7 @@
 
             <div class="form-group">
                 <label for="username-input">表示名（ニックネーム）</label>
-                <input type="text" id="username-input" class="input-large" placeholder="名前を入力してください">
+                <input type="text" id="username-input" class="input-large" maxlength="50" placeholder="名前を入力してください">
             </div>
 
             <button class="btn-large" onclick="saveProfile()">設定を保存する</button>
@@ -575,7 +575,49 @@
         let lastFaceCheck = 0;
         let lastFaceSeen = 0;
         let cameraSession = 0;
+        let unreadRequest = null;
         const faceCheckInterval = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 100 : 66;
+
+        function compactFaceLandmarks(landmarks) {
+            if (!Array.isArray(landmarks)) return [];
+            return landmarks.map(point => ({
+                x: Number(Number(point.x || 0).toFixed(5)),
+                y: Number(Number(point.y || 0).toFixed(5)),
+                z: Number(Number(point.z || 0).toFixed(5))
+            }));
+        }
+
+        function makeProfileImage(sourceCanvas) {
+            const sizes = [300, 240, 180];
+            for (const size of sizes) {
+                const canvas = document.createElement("canvas");
+                canvas.width = size;
+                canvas.height = size;
+                const context = canvas.getContext("2d", { alpha: false });
+                context.drawImage(sourceCanvas, 0, 0, size, size);
+                for (const quality of [0.68, 0.55, 0.42]) {
+                    const dataUrl = canvas.toDataURL("image/jpeg", quality);
+                    if (dataUrl.length < 48000) return dataUrl;
+                }
+            }
+            return "";
+        }
+
+        async function postGas(payload, timeoutMs = 12000) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return await res.json();
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
 
         function toggleMenu() {
             document.getElementById("hud-menu-btn").classList.toggle("open");
@@ -587,11 +629,7 @@
             if (!userId) return;
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ mode: "getUserProfile", userId: userId })
-                });
-                const result = await res.json();
+                const result = await postGas({ mode: "getUserProfile", userId: userId });
                 if (result.status !== "success" || !result.message) return;
 
                 const name = String(result.message.name || result.message.userId || "").trim();
@@ -609,27 +647,29 @@
         async function updateUnreadBadge() {
             const myEmail = localStorage.getItem("userEmail");
             const badge = document.getElementById("unread-badge");
-            if (!myEmail || !badge) return;
+            if (!myEmail || !badge || unreadRequest) return unreadRequest;
 
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ mode: "getUnreadCount", email: myEmail })
-                });
-                const result = await res.json();
+            unreadRequest = (async () => {
+                try {
+                    const result = await postGas({ mode: "getUnreadCount", email: myEmail });
 
-                if (result.status === "success" && result.message) {
-                    const count = result.message.unreadCount || 0;
-                    if (count > 0) {
-                        badge.innerText = count > 99 ? "99+" : count;
-                        badge.style.display = "inline-block";
-                    } else {
-                        badge.style.display = "none";
+                    if (result.status === "success" && result.message) {
+                        const count = result.message.unreadCount || 0;
+                        if (count > 0) {
+                            badge.innerText = count > 99 ? "99+" : count;
+                            badge.style.display = "inline-block";
+                        } else {
+                            badge.style.display = "none";
+                        }
                     }
+                } catch (e) {
+                    console.error("未読チェックエラー:", e);
+                } finally {
+                    unreadRequest = null;
                 }
-            } catch (e) {
-                console.error("未読チェックエラー:", e);
-            }
+            })();
+
+            return unreadRequest;
         }
 
         function previewImage(event) {
@@ -659,7 +699,12 @@
                 imageSmoothingEnabled: true,
                 imageSmoothingQuality: "high"
             });
-            document.getElementById("profile-icon").src = canvas.toDataURL("image/jpeg", 0.6);
+            const profileImage = makeProfileImage(canvas);
+            if (!profileImage) {
+                alert("画像を十分に小さくできませんでした。別の画像を選んでください。");
+                return;
+            }
+            document.getElementById("profile-icon").src = profileImage;
             closeCropModal();
         }
 
@@ -683,18 +728,12 @@
             if (!email) { alert("ログイン情報が見つかりません。一度再ログインしてください。"); return; }
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({
-                        mode: "updateProfile",
-                        email: email,
-                        name: name,
-                        profileImage: imageSrc
-                    })
+                const result = await postGas({
+                    mode: "updateProfile",
+                    email: email,
+                    name: name,
+                    profileImage: imageSrc
                 });
-
-                const result = await res.json();
                 if (result.status === "success") {
                     localStorage.setItem("userName", name);
                     localStorage.setItem("profileImage", imageSrc);
@@ -720,16 +759,10 @@
             }
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({
-                        mode: "deleteAccount",
-                        email: email
-                    })
+                const result = await postGas({
+                    mode: "deleteAccount",
+                    email: email
                 });
-
-                const result = await res.json();
                 if (result.status === "success") {
                     alert("ユーザー情報を削除しました。");
                     localStorage.clear();
@@ -750,14 +783,10 @@
             if (!myEmail || !list) return;
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "getBlockedUsers",
-                        blockerId: myEmail
-                    })
+                const result = await postGas({
+                    mode: "getBlockedUsers",
+                    blockerId: myEmail
                 });
-                const result = await res.json();
 
                 if (result.status !== "success" || !Array.isArray(result.message)) {
                     list.innerText = "ブロック一覧を取得できませんでした。";
@@ -797,15 +826,11 @@
             if (!confirm(`「${blockedName}」さんのブロックを解除しますか？`)) return;
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "unblockUser",
-                        blockerId: localStorage.getItem("userEmail"),
-                        blockedId: blockedId
-                    })
+                const result = await postGas({
+                    mode: "unblockUser",
+                    blockerId: localStorage.getItem("userEmail"),
+                    blockedId: blockedId
                 });
-                const result = await res.json();
 
                 if (result.status === "success") {
                     loadBlockedUsers();
@@ -1011,23 +1036,18 @@
                 return;
             }
 
-            const featuresToSave = JSON.stringify(lastLandmarks);
+            const featuresToSave = JSON.stringify(compactFaceLandmarks(lastLandmarks));
             stopFaceCamera();
 
             document.getElementById('face-status').innerText = "顔の特徴点データを解析・アップデート中...";
             document.getElementById('face-status').style.color = "#e67e22";
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({
-                        mode: "updateFaceFeatures",
-                        email: email,
-                        faceFeatures: featuresToSave
-                    })
+                const result = await postGas({
+                    mode: "updateFaceFeatures",
+                    email: email,
+                    faceFeatures: featuresToSave
                 });
-                const result = await res.json();
 
                 if (result.status === "success") {
                     document.getElementById('face-status').innerText = "顔認証情報のアップデートが完了しました！";
@@ -1078,7 +1098,9 @@
 
             syncProfileFromServer();
             updateUnreadBadge();
-            setInterval(updateUnreadBadge, 3000);
+            setInterval(() => {
+                if (document.visibilityState === "visible") updateUnreadBadge();
+            }, 8000);
             loadBlockedUsers();
         };
     </script>

@@ -396,7 +396,7 @@
             <div class="chat-message-input-row">
                 <label class="btn-attach" for="attachment-input">画像</label>
                 <input id="attachment-input" class="attachment-input" type="file" accept="image/*" multiple>
-                <input type="text" id="message-input" class="chat-input" placeholder="メッセージを入力..." onkeydown="if(event.key==='Enter') sendMessage()">
+                <input type="text" id="message-input" class="chat-input" maxlength="2000" placeholder="メッセージを入力...">
                 <button id="send-btn" class="btn-send" onclick="sendMessage()">送信</button>
             </div>
         </div>
@@ -426,6 +426,7 @@
         const MAX_ATTACHMENTS = 8;
         const MAX_ATTACHMENT_BYTES = 360 * 1024;
         let selectedAttachments = [];
+        let isMessageComposing = false;
 
         async function postChat(payload, timeoutMs = 12000) {
             const controller = new AbortController();
@@ -702,6 +703,20 @@
 
         document.getElementById("attachment-input").addEventListener("change", handleAttachmentChange);
 
+        const messageInput = document.getElementById("message-input");
+        messageInput.addEventListener("compositionstart", () => {
+            isMessageComposing = true;
+        });
+        messageInput.addEventListener("compositionend", () => {
+            isMessageComposing = false;
+        });
+        messageInput.addEventListener("keydown", event => {
+            if (event.key !== "Enter") return;
+            if (isMessageComposing || event.isComposing || event.keyCode === 229) return;
+            event.preventDefault();
+            sendMessage();
+        });
+
         async function unsendMessage(messageId, button) {
             if (!messageId) return;
             if (!confirm("このメッセージの送信を取り消しますか？")) return;
@@ -775,6 +790,10 @@
                     const messages = Array.isArray(result.message) ? result.message : [];
                     const tempMsgs = listDiv.querySelectorAll('.temp-msg');
                     const signature = JSON.stringify(messages);
+                    const hasUnreadIncoming = messages.some(msg =>
+                        msg.from !== myEmail && !msg.isRead && !msg.isUnsent
+                    );
+                    if (hasUnreadIncoming) markAsRead();
 
                     if (signature === lastMessagesSignature && tempMsgs.length === 0) return;
                     lastMessagesSignature = signature;
@@ -919,16 +938,11 @@
                     attachments: outgoingAttachments
                 });
 
-                if (result.status === "success") {
-                    selectedAttachments = [];
-                    renderAttachmentPreview();
-                    await loadMessages();
-                } else {
-                    alert("送信エラー: " + result.message);
-                    tempBubble.remove();
-                }
+                selectedAttachments = [];
+                renderAttachmentPreview();
+                await loadMessages();
             } catch (e) {
-                alert("通信エラーが発生しました");
+                alert("送信できませんでした: " + (e.message || "通信エラー"));
                 tempBubble.remove();
             } finally {
                 if (sendBtn) {
@@ -943,22 +957,19 @@
             chatPollTimer = setTimeout(async () => {
                 if (document.visibilityState === "visible") {
                     await loadMessages();
-                    await markAsRead();
                 }
                 scheduleChatPoll();
-            }, 4000);
+            }, 5000);
         }
 
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "visible") {
                 loadMessages();
-                markAsRead();
             }
         });
 
         window.onload = async () => {
             await loadMessages();
-            await markAsRead();
             scheduleChatPoll();
         };
     </script>

@@ -476,16 +476,37 @@
         const currentEmail = localStorage.getItem("userEmail");
         const currentUserId = localStorage.getItem("userId") || currentEmail;
         const isImpersonating = localStorage.getItem("isImpersonating");
+        const adminToken = localStorage.getItem("adminToken") || "";
         let overviewLoading = false;
+        let unreadRequest = null;
+        let adminAccessDenied = false;
+
+        async function postGas(payload, timeoutMs = 12000) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return await res.json();
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
 
         if (isImpersonating === "true") {
             localStorage.setItem("userEmail", ADMIN_ID);
             localStorage.setItem("userId", ADMIN_ID);
             localStorage.setItem("userName", "管理者");
             localStorage.removeItem("isImpersonating");
-        } else if (currentUserId !== ADMIN_ID && currentEmail !== ADMIN_ID) {
+        }
+        if ((currentUserId !== ADMIN_ID && currentEmail !== ADMIN_ID && isImpersonating !== "true") || !adminToken) {
+            adminAccessDenied = true;
             alert("管理者権限が必要です。");
-            window.location.href = "main.html";
+            window.location.replace(currentEmail ? "main.html" : "index.html");
         }
 
         function toggleMenu() {
@@ -496,27 +517,29 @@
         async function updateUnreadBadge() {
             const myEmail = localStorage.getItem("userEmail");
             const badge = document.getElementById("unread-badge");
-            if (!myEmail || !badge) return;
+            if (!myEmail || !badge || unreadRequest) return unreadRequest;
 
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ mode: "getUnreadCount", email: myEmail })
-                });
-                const result = await res.json();
+            unreadRequest = (async () => {
+                try {
+                    const result = await postGas({ mode: "getUnreadCount", email: myEmail });
 
-                if (result.status === "success" && result.message) {
-                    const count = result.message.unreadCount || 0;
-                    if (count > 0) {
-                        badge.innerText = count > 99 ? "99+" : count;
-                        badge.style.display = "inline-block";
-                    } else {
-                        badge.style.display = "none";
+                    if (result.status === "success" && result.message) {
+                        const count = result.message.unreadCount || 0;
+                        if (count > 0) {
+                            badge.innerText = count > 99 ? "99+" : count;
+                            badge.style.display = "inline-block";
+                        } else {
+                            badge.style.display = "none";
+                        }
                     }
+                } catch (e) {
+                    console.error("未読チェックエラー:", e);
+                } finally {
+                    unreadRequest = null;
                 }
-            } catch (e) {
-                console.error("未読チェックエラー:", e);
-            }
+            })();
+
+            return unreadRequest;
         }
 
         async function loadOverview(silent = false) {
@@ -532,12 +555,7 @@
             }
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ mode: "adminGetOverview", adminId: ADMIN_ID })
-                });
-
-                const result = await res.json();
+                const result = await postGas({ mode: "adminGetOverview", adminId: ADMIN_ID, adminToken: adminToken });
                 if (result.status === "success") {
                     renderUsers(result.message.users);
                     renderPosts(result.message.posts);
@@ -569,31 +587,36 @@
 
             users.forEach(u => {
                 const tr = document.createElement("tr");
-                const statusBadge = u.isVerified
-                    ? `<span class="status-badge badge-active">正常</span>`
-                    : `<span class="status-badge badge-inactive">凍結/未認証</span>`;
+                const idCell = document.createElement("td");
+                const idButton = document.createElement("button");
+                idButton.type = "button";
+                idButton.style.cssText = "border:0;background:none;padding:0;color:#1cbdc5;cursor:pointer;text-decoration:underline;font:inherit;font-weight:700;";
+                idButton.title = "このユーザーとして代理ログインする";
+                idButton.textContent = `${u.userId} 🔗`;
+                idButton.addEventListener("click", () => impersonateUser(u.userId, u.name));
+                idCell.appendChild(idButton);
 
-                let actionButton = "-";
-                if (u.userId !== 'admin') {
-                    if (u.isVerified) {
-                        actionButton = `<button class="btn-action-ban" onclick="toggleBanUser('${u.userId}', true)">BAN (凍結)</button>`;
-                    } else {
-                        actionButton = `<button class="btn-action-unban" onclick="toggleBanUser('${u.userId}', false)">BAN 解除</button>`;
-                    }
+                const nameCell = document.createElement("td");
+                nameCell.textContent = u.name;
+
+                const statusCell = document.createElement("td");
+                const statusBadge = document.createElement("span");
+                statusBadge.className = `status-badge ${u.isVerified ? "badge-active" : "badge-inactive"}`;
+                statusBadge.textContent = u.isVerified ? "正常" : "凍結/未認証";
+                statusCell.appendChild(statusBadge);
+
+                const actionCell = document.createElement("td");
+                if (u.userId === ADMIN_ID) {
+                    actionCell.textContent = "-";
+                } else {
+                    const actionButton = document.createElement("button");
+                    actionButton.className = u.isVerified ? "btn-action-ban" : "btn-action-unban";
+                    actionButton.textContent = u.isVerified ? "BAN (凍結)" : "BAN 解除";
+                    actionButton.addEventListener("click", () => toggleBanUser(u.userId, u.isVerified));
+                    actionCell.appendChild(actionButton);
                 }
 
-                tr.innerHTML = `
-                    <td>
-                        <strong style="color: #1cbdc5; cursor: pointer; text-decoration: underline;"
-                                onclick="impersonateUser('${u.userId}', '${u.name}')"
-                                title="このユーザーとして代理ログインする">
-                            ${u.userId} 🔗
-                        </strong>
-                    </td>
-                    <td>${u.name}</td>
-                    <td>${statusBadge}</td>
-                    <td>${actionButton}</td>
-                `;
+                tr.append(idCell, nameCell, statusCell, actionCell);
                 userBody.appendChild(tr);
             });
         }
@@ -602,6 +625,7 @@
             if (!confirm(`ユーザー [ ${targetUserId} (${targetUserName}) ] として代理ログインしますか？`)) return;
 
             localStorage.setItem("userEmail", targetUserId);
+            localStorage.setItem("userId", targetUserId);
             localStorage.setItem("userName", targetUserName);
             localStorage.setItem("profileImage", "");
             localStorage.setItem("isImpersonating", "true");
@@ -620,13 +644,25 @@
 
             posts.forEach(p => {
                 const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td><strong>${p.name}</strong><br><small style="color:#64748b;">${p.email}</small></td>
-                    <td>${p.content}</td>
-                    <td>
-                        <button class="btn-action-delete" onclick="deletePost('${p.email}')">強制削除</button>
-                    </td>
-                `;
+                const userCell = document.createElement("td");
+                const name = document.createElement("strong");
+                name.textContent = p.name;
+                const email = document.createElement("small");
+                email.style.color = "#64748b";
+                email.textContent = p.email;
+                userCell.append(name, document.createElement("br"), email);
+
+                const contentCell = document.createElement("td");
+                contentCell.textContent = p.content;
+
+                const actionCell = document.createElement("td");
+                const deleteButton = document.createElement("button");
+                deleteButton.className = "btn-action-delete";
+                deleteButton.textContent = "強制削除";
+                deleteButton.addEventListener("click", () => deletePost(p.email));
+                actionCell.appendChild(deleteButton);
+
+                tr.append(userCell, contentCell, actionCell);
                 postBody.appendChild(tr);
             });
         }
@@ -649,11 +685,7 @@
             }
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ mode: "getReports", adminId: ADMIN_ID })
-                });
-                const result = await res.json();
+                const result = await postGas({ mode: "getReports", adminId: ADMIN_ID, adminToken: adminToken });
 
                 if (result.status === "success") {
                     renderReports(result.message);
@@ -682,7 +714,7 @@
                 ).join("");
 
                 tr.innerHTML = `
-                    <td>${escapeHtml(report.createdAt)}</td>
+                    <td>${escapeHtml(report.reportedAt)}</td>
                     <td>${escapeHtml(report.targetUserId)}<br><small>${escapeHtml(report.targetType)}</small></td>
                     <td>${escapeHtml(report.reason)}</td>
                     <td style="max-width:260px; white-space:pre-wrap; word-break:break-word;">${escapeHtml(report.targetContent || report.detail || "—")}</td>
@@ -701,17 +733,14 @@
             const adminMemo = prompt("管理者メモを入力してください（任意）") || "";
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        mode: "updateReportStatus",
-                        adminId: ADMIN_ID,
-                        reportId: reportId,
-                        status: status,
-                        adminMemo: adminMemo
-                    })
+                const result = await postGas({
+                    mode: "updateReportStatus",
+                    adminId: ADMIN_ID,
+                    adminToken: adminToken,
+                    reportId: reportId,
+                    status: status,
+                    adminMemo: adminMemo
                 });
-                const result = await res.json();
 
                 if (result.status === "success") {
                     loadReports();
@@ -727,11 +756,7 @@
             if (!confirm("この投稿を強制削除しますか？")) return;
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ mode: "adminDeletePost", adminId: ADMIN_ID, targetEmail: targetEmail })
-                });
-                const result = await res.json();
+                const result = await postGas({ mode: "adminDeletePost", adminId: ADMIN_ID, adminToken: adminToken, targetEmail: targetEmail });
                 if (result.status === "success") {
                     alert("投稿を削除しました");
                     loadOverview();
@@ -752,11 +777,7 @@
             if (!confirm(confirmMsg)) return;
 
             try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ mode: "adminBanUser", adminId: ADMIN_ID, targetUserId: targetUserId })
-                });
-                const result = await res.json();
+                const result = await postGas({ mode: "adminBanUser", adminId: ADMIN_ID, adminToken: adminToken, targetUserId: targetUserId });
                 if (result.status === "success") {
                     alert(`ユーザーの${actionName}が完了しました`);
                     loadOverview();
@@ -774,13 +795,18 @@
         }
 
         window.onload = () => {
+            if (adminAccessDenied) return;
             document.getElementById("hud-menu-btn").classList.remove("open");
             document.getElementById("nav-links").classList.remove("open");
 
             loadOverview();
             updateUnreadBadge();
-            setInterval(updateUnreadBadge, 3000);
-            setInterval(() => loadOverview(true), 15000);
+            setInterval(() => {
+                if (document.visibilityState === "visible") updateUnreadBadge();
+            }, 8000);
+            setInterval(() => {
+                if (document.visibilityState === "visible") loadOverview(true);
+            }, 20000);
         };
     </script>
 </body>
