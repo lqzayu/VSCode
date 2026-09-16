@@ -234,6 +234,67 @@ td,th { border-bottom:1px solid var(--ui-line); }
 .toast-notification { background:var(--ui-paper); border:1px solid var(--ui-line); border-radius:14px; box-shadow:0 12px 32px #243c3215; }
 .toast-icon { background:var(--ui-green); }
 .toast-title { color:var(--ui-green); }
+#ui-notice-root {
+ position:fixed;
+ top:22px;
+ right:22px;
+ z-index:10000;
+ display:flex;
+ flex-direction:column;
+ align-items:flex-end;
+ gap:10px;
+ width:min(390px,calc(100vw - 32px));
+ pointer-events:none;
+}
+.ui-notice {
+ display:flex;
+ align-items:center;
+ gap:12px;
+ width:100%;
+ padding:14px 14px 14px 16px;
+ border:1px solid var(--ui-line);
+ border-radius:14px;
+ background:var(--ui-paper);
+ color:var(--ui-ink);
+ box-shadow:0 16px 34px rgba(36,60,50,.16);
+ opacity:0;
+ transform:translateY(-10px) scale(.98);
+ transition:opacity .22s ease,transform .22s ease;
+ pointer-events:auto;
+}
+.ui-notice.is-visible { opacity:1; transform:translateY(0) scale(1); }
+.ui-notice.is-leaving { opacity:0; transform:translateY(-8px) scale(.98); }
+.ui-notice-icon {
+ display:grid;
+ place-items:center;
+ flex:0 0 26px;
+ width:26px;
+ height:26px;
+ border-radius:50%;
+ background:var(--ui-soft);
+ color:var(--ui-green);
+ font-size:14px;
+ font-weight:800;
+}
+.ui-notice-success { border-color:#c7dfbd; }
+.ui-notice-success .ui-notice-icon { background:#dff1d7; color:#3e7a43; }
+.ui-notice-error { border-color:#e8c7bd; }
+.ui-notice-error .ui-notice-icon { background:#f8e1da; color:var(--ui-danger); }
+.ui-notice-message { flex:1; min-width:0; font-size:13px; line-height:1.55; overflow-wrap:anywhere; }
+.ui-notice-close {
+ flex:0 0 28px;
+ width:28px;
+ height:28px;
+ padding:0;
+ border:0;
+ border-radius:8px;
+ background:transparent;
+ color:var(--ui-muted);
+ font-size:20px;
+ line-height:1;
+ cursor:pointer;
+}
+.ui-notice-close:hover { background:var(--ui-soft); color:var(--ui-ink); }
 @media(max-width:1100px) and (min-width:769px) {
  .navbar { padding:16px 20px; gap:12px; flex-wrap:wrap; }
  .nav-item { padding:8px 9px; font-size:11px; }
@@ -279,6 +340,7 @@ td,th { border-bottom:1px solid var(--ui-line); }
  [data-page="reset"] .card { padding:26px; }
  .footer { padding:24px 16px; }
  .footer-links { gap:8px 12px; }
+ #ui-notice-root { top:14px; right:16px; width:calc(100vw - 32px); }
 }
 @media(prefers-reduced-motion:reduce) {
  *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
