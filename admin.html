@@ -360,7 +360,7 @@
     </style>
     <link rel="stylesheet" href="theme.css?v=20260916f">
     <script src="ui.js"></script>
-    <script src="online.js" defer></script>
+    <script src="online.js?v=20260917b" defer></script>
 </head>
 
 <body data-page="admin">
@@ -621,16 +621,26 @@
             });
         }
 
-        function impersonateUser(targetUserId, targetUserName) {
+        async function impersonateUser(targetUserId, targetUserName) {
             if (!confirm(`ユーザー [ ${targetUserId} (${targetUserName}) ] として代理ログインしますか？`)) return;
 
-            localStorage.setItem("userEmail", targetUserId);
-            localStorage.setItem("userId", targetUserId);
-            localStorage.setItem("userName", targetUserName);
-            localStorage.setItem("profileImage", "");
-            localStorage.setItem("isImpersonating", "true");
+            try {
+                const result = await postGas({ mode: "getUserProfile", userId: targetUserId });
+                if (result.status !== "success" || !result.message) {
+                    alert("ユーザー情報を取得できませんでした。");
+                    return;
+                }
 
-            window.location.href = "main.html";
+                const profile = result.message;
+                localStorage.setItem("userEmail", targetUserId);
+                localStorage.setItem("userId", targetUserId);
+                localStorage.setItem("userName", String(profile.name || targetUserName || targetUserId));
+                localStorage.setItem("profileImage", String(profile.profileImage || ""));
+                localStorage.setItem("isImpersonating", "true");
+                window.location.href = "main.html";
+            } catch (error) {
+                alert("ユーザー情報の取得中に通信エラーが発生しました。");
+            }
         }
 
         function renderPosts(posts) {
