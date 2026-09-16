@@ -1217,7 +1217,7 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="theme.css?v=20260916d">
+    <link rel="stylesheet" href="theme.css?v=20260916e">
 </head>
 
 <body data-page="main">
@@ -1258,9 +1258,9 @@
             </a>
             <a class="nav-item" href="profile.html">マイページ</a>
 
-            <a class="nav-item" id="nav-admin-btn" style="display: none; color: #ef4444;" href="admin.html">管理者</a>
+            <a class="nav-item" id="nav-admin-btn" style="display: none; color: #ef4444;" href="admin.html" aria-label="管理者ページを開く">管理者</a>
 
-            <button class="btn-logout" onclick="logout()">ログアウト</button>
+            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>
         </nav>
     </header>
 
@@ -1971,6 +1971,7 @@
 
         function exitImpersonation() {
             localStorage.setItem("userEmail", "admin");
+            localStorage.setItem("userId", "admin");
             localStorage.setItem("userName", "管理者");
             localStorage.removeItem("isImpersonating");
             window.location.href = "admin.html";
@@ -1981,6 +1982,7 @@
             document.getElementById("nav-links").classList.remove("open");
 
             const myEmail = localStorage.getItem("userEmail");
+            const currentUserId = localStorage.getItem("userId") || myEmail;
             const userName = localStorage.getItem("userName");
             const profileImage = localStorage.getItem("profileImage");
             const isImpersonating = localStorage.getItem("isImpersonating");
@@ -1994,7 +1996,7 @@
                 }
             }
 
-            if (myEmail === "admin") {
+            if (currentUserId === "admin" || myEmail === "admin") {
                 const adminBtn = document.getElementById("nav-admin-btn");
                 if (adminBtn) {
                     adminBtn.style.display = "inline-block";

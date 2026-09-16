@@ -326,7 +326,7 @@
             .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) !important; }
         }
     </style>
-    <link rel="stylesheet" href="theme.css?v=20260916d">
+    <link rel="stylesheet" href="theme.css?v=20260916e">
 </head>
 
 <body data-page="admin">
@@ -425,13 +425,15 @@
         const ADMIN_ID = "admin";
 
         const currentEmail = localStorage.getItem("userEmail");
+        const currentUserId = localStorage.getItem("userId") || currentEmail;
         const isImpersonating = localStorage.getItem("isImpersonating");
 
         if (isImpersonating === "true") {
             localStorage.setItem("userEmail", ADMIN_ID);
+            localStorage.setItem("userId", ADMIN_ID);
             localStorage.setItem("userName", "管理者");
             localStorage.removeItem("isImpersonating");
-        } else if (currentEmail !== ADMIN_ID) {
+        } else if (currentUserId !== ADMIN_ID && currentEmail !== ADMIN_ID) {
             alert("管理者権限が必要です。");
             window.location.href = "main.html";
         }

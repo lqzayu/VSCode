@@ -357,7 +357,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0284c7">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="theme.css?v=20260916d">
+    <link rel="stylesheet" href="theme.css?v=20260916e">
 </head>
 
 <body data-page="index">
@@ -839,6 +839,7 @@
 
                     if (result.status === "success" && result.message.email) {
                         localStorage.setItem("userEmail", result.message.email);
+                        localStorage.setItem("userId", result.message.userId || result.message.email);
                         localStorage.setItem("userName", result.message.name || "ユーザー");
                         if (result.message.profileImage) {
                             localStorage.setItem("profileImage", result.message.profileImage);
@@ -883,6 +884,7 @@
 
                 if (result.status === "success") {
                     localStorage.setItem("userEmail", result.message.email);
+                    localStorage.setItem("userId", result.message.userId || result.message.email);
                     localStorage.setItem("userName", result.message.name || "ユーザー");
                     if (result.message.profileImage) {
                         localStorage.setItem("profileImage", result.message.profileImage);

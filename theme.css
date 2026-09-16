@@ -43,7 +43,14 @@ button:disabled { opacity:.5!important; cursor:wait; transform:none!important; }
  background:var(--ui-lime); box-shadow:5px 0 0 -1px var(--ui-bg),7px 0 0 -1px var(--ui-green);
  transform:rotate(-8deg);
 }
-.nav-links { gap:4px; }
+.nav-links {
+ gap:4px; position:relative; z-index:101; pointer-events:auto;
+}
+.nav-links > a,
+.nav-links > button,
+.nav-links > .nav-item {
+ position:relative; z-index:1; pointer-events:auto;
+}
 .nav-item {
  padding:10px 14px; font-size:12px; font-weight:700; color:var(--ui-muted);
  border-radius:8px; letter-spacing:0; white-space:nowrap;
@@ -208,6 +215,7 @@ td,th { border-bottom:1px solid var(--ui-line); }
  .logo { font-size:16px!important; }
  .hamburger-btn { display:flex!important; }
  .nav-links {
+  z-index:119!important;
   top:64px!important; background:var(--ui-paper)!important; border:1px solid var(--ui-line);
   border-top:0; border-radius:0 0 16px 16px; box-shadow:0 16px 30px rgba(36,60,50,.12);
  }
