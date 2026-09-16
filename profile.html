@@ -13,7 +13,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" crossorigin="anonymous"></script>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 
 
@@ -397,13 +396,13 @@
 
         .camera-box-mini {
             width: 100%;
-            max-width: 320px;
+            max-width: 400px;
             margin: 0 auto 16px auto;
             border-radius: 14px;
             overflow: hidden;
             transform: scaleX(-1);
             position: relative;
-            height: 240px;
+            aspect-ratio: 4 / 3;
             border: 2px solid #dbdbdb;
             background-color: #000;
         }
@@ -456,7 +455,7 @@
 
 
 
-    <link rel="stylesheet" href="theme.css?v=20260916c">
+    <link rel="stylesheet" href="theme.css?v=20260916d">
 </head>
 
 <body class="cur" data-page="profile">
@@ -535,7 +534,7 @@
         <div class="face-modal-content">
             <h3>顔データのアップデート</h3>
             <div class="camera-box-mini">
-                <video id="face-video" autoplay playsinline></video>
+                <video id="face-video" autoplay playsinline muted></video>
                 <canvas id="face-mesh-canvas"></canvas>
             </div>
             <div id="face-status" class="face-status-text">カメラを初期化中...</div>
@@ -559,7 +558,13 @@
         let videoStream = null;
         let faceMesh = null;
         let lastLandmarks = null;
-        let activeCamera = null;
+        let faceFrameRequest = null;
+        let faceFrameCallback = null;
+        let faceProcessing = false;
+        let lastFaceCheck = 0;
+        let lastFaceSeen = 0;
+        let cameraSession = 0;
+        const faceCheckInterval = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 100 : 66;
 
         function toggleMenu() {
             document.getElementById("hud-menu-btn").classList.toggle("open");
@@ -788,17 +793,84 @@
             const ctx = canvas.getContext('2d');
 
             const rect = video.getBoundingClientRect();
-            if (canvas.width !== rect.width || canvas.height !== rect.height) {
-                canvas.width = rect.width; canvas.height = rect.height;
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const width = Math.max(1, Math.round(rect.width));
+            const height = Math.max(1, Math.round(rect.height));
+            const pixelWidth = Math.round(width * dpr);
+            const pixelHeight = Math.round(height * dpr);
+
+            if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+                canvas.width = pixelWidth;
+                canvas.height = pixelHeight;
+                canvas.style.width = `${width}px`;
+                canvas.style.height = `${height}px`;
             }
 
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             if (!landmarks) return;
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
             ctx.fillStyle = "#00FF00";
             for (let i = 0; i < landmarks.length; i++) {
                 const pt = landmarks[i];
-                ctx.beginPath(); ctx.arc(pt.x * canvas.width, pt.y * canvas.height, 1, 0, 2 * Math.PI); ctx.fill();
+                ctx.beginPath();
+                ctx.arc(pt.x * width, pt.y * height, 1, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        }
+
+        async function checkFaceFrame() {
+            const video = document.getElementById('face-video');
+            if (!faceMesh || !videoStream || faceProcessing || video.readyState < 2) return;
+
+            const now = performance.now();
+            if (now - lastFaceCheck < faceCheckInterval) return;
+
+            faceProcessing = true;
+            lastFaceCheck = now;
+            try {
+                await faceMesh.send({ image: video });
+            } catch (err) {
+                if (videoStream) {
+                    lastLandmarks = null;
+                    drawFaceFeatures(null);
+                }
+            } finally {
+                faceProcessing = false;
+            }
+        }
+
+        function scheduleFaceFrame(session) {
+            const video = document.getElementById('face-video');
+            if (!videoStream || session !== cameraSession) return;
+
+            if (typeof video.requestVideoFrameCallback === "function") {
+                faceFrameCallback = video.requestVideoFrameCallback(async () => {
+                    if (session !== cameraSession) return;
+                    await checkFaceFrame();
+                    scheduleFaceFrame(session);
+                });
+                return;
+            }
+
+            faceFrameRequest = requestAnimationFrame(async (time) => {
+                if (session !== cameraSession) return;
+                if (time - lastFaceCheck >= faceCheckInterval) await checkFaceFrame();
+                scheduleFaceFrame(session);
+            });
+        }
+
+        function stopFaceLoop() {
+            const video = document.getElementById('face-video');
+            if (faceFrameRequest !== null) {
+                cancelAnimationFrame(faceFrameRequest);
+                faceFrameRequest = null;
+            }
+            if (faceFrameCallback !== null && typeof video.cancelVideoFrameCallback === "function") {
+                video.cancelVideoFrameCallback(faceFrameCallback);
+                faceFrameCallback = null;
             }
         }
 
@@ -809,9 +881,10 @@
             faceMesh.onResults((results) => {
                 if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
                     lastLandmarks = results.multiFaceLandmarks[0];
+                    lastFaceSeen = performance.now();
                     drawFaceFeatures(lastLandmarks);
                 } else {
-                    lastLandmarks = null;
+                    if (performance.now() - lastFaceSeen > 500) lastLandmarks = null;
                     drawFaceFeatures(null);
                 }
             });
@@ -828,14 +901,40 @@
 
             const video = document.getElementById('face-video');
             try {
-                videoStream = await navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 } });
-                video.srcObject = videoStream;
+                const constraints = {
+                    audio: false,
+                    video: {
+                        facingMode: { ideal: "user" },
+                        width: { ideal: 1280, max: 1920 },
+                        height: { ideal: 720, max: 1080 },
+                        frameRate: { ideal: 30, max: 30 }
+                    }
+                };
 
-                activeCamera = new Camera(video, {
-                    onFrame: async () => { await faceMesh.send({ image: video }); },
-                    width: 320, height: 240
+                try {
+                    videoStream = await navigator.mediaDevices.getUserMedia(constraints);
+                } catch (err) {
+                    if (err.name === "NotAllowedError" || err.name === "SecurityError" || err.name === "AbortError") throw err;
+                    videoStream = await navigator.mediaDevices.getUserMedia({
+                        audio: false,
+                        video: { facingMode: "user" }
+                    });
+                }
+
+                video.srcObject = videoStream;
+                video.muted = true;
+                video.setAttribute("playsinline", "");
+                await new Promise(resolve => {
+                    if (video.readyState >= 1) {
+                        resolve();
+                    } else {
+                        video.addEventListener("loadedmetadata", resolve, { once: true });
+                    }
                 });
-                activeCamera.start();
+                await video.play();
+                cameraSession++;
+                lastFaceCheck = 0;
+                scheduleFaceFrame(cameraSession);
 
                 let seconds = 3;
                 document.getElementById('face-status').innerText = `${seconds}秒後に自動で顔スキャンを実行します...`;
@@ -851,6 +950,9 @@
                 }, 1000);
 
             } catch (err) {
+                if (videoStream) videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+                video.srcObject = null;
                 document.getElementById('face-status').innerText = "カメラの起動に失敗しました。";
                 document.getElementById('face-status').style.color = "#ed4956";
             }
@@ -897,8 +999,15 @@
         }
 
         function stopFaceCamera() {
-            if (activeCamera) { activeCamera.stop(); }
+            cameraSession++;
+            stopFaceLoop();
             if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); }
+            videoStream = null;
+            const video = document.getElementById('face-video');
+            video.pause();
+            video.srcObject = null;
+            lastFaceSeen = 0;
+            lastLandmarks = null;
             drawFaceFeatures(null);
         }
 
