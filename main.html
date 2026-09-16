@@ -424,6 +424,41 @@
             box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25);
         }
 
+        .quick-reaction-area {
+            margin: 12px 0 2px;
+        }
+
+        .quick-reaction-label {
+            display: block;
+            margin-bottom: 6px;
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .quick-reaction-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .btn-quick-reaction {
+            border: 1px solid #dbeafe;
+            border-radius: 999px;
+            padding: 6px 9px;
+            background: #f8fbff;
+            color: #2563eb;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-quick-reaction:hover {
+            border-color: #93c5fd;
+            background: #dbeafe;
+            transform: translateY(-1px);
+        }
+
         .big-profile-icon {
             width: 100px;
             height: 100px;
@@ -1306,7 +1341,24 @@
                     <textarea id="rec-content" rows="4" placeholder="募集内容を入力してください"
                         style="margin-bottom:12px;"></textarea>
 
-                    <input type="text" id="rec-tags" placeholder="関連タグ（例: プログラミング, 初心者歓迎, 部活）"
+                    <label for="rec-fixed-tag" style="display:block; margin:0 0 6px; color:#475569; font-size:13px; font-weight:700;">おすすめタグから選ぶ</label>
+                    <select id="rec-fixed-tag" style="margin-bottom:12px;">
+                        <option value="">タグを1つ選ぶ（任意）</option>
+                        <option value="数学">数学</option>
+                        <option value="英語">英語</option>
+                        <option value="国語">国語</option>
+                        <option value="理科">理科</option>
+                        <option value="社会">社会</option>
+                        <option value="専門科目">専門科目</option>
+                        <option value="プログラミング">プログラミング</option>
+                        <option value="資格">資格</option>
+                        <option value="定期テスト">定期テスト</option>
+                        <option value="課題">課題</option>
+                        <option value="放課後">放課後</option>
+                        <option value="初心者歓迎">初心者歓迎</option>
+                    </select>
+
+                    <input type="text" id="rec-tags" placeholder="関連タグを自由入力（任意・例: 物理, 検定対策）"
                         style="margin-bottom:16px;" />
 
                     <label for="rec-duration" style="display:block; margin:0 0 6px; color:#475569; font-size:13px; font-weight:700;">募集を表示する時間</label>
@@ -1671,6 +1723,14 @@
                     <h3>${item.name}</h3>
                     <p>${item.content}</p>
                     ${tagsHtml}
+                    <div class="quick-reaction-area">
+                        <span class="quick-reaction-label">ワンタップで気持ちを伝える</span>
+                        <div class="quick-reaction-row">
+                            <button type="button" class="btn-quick-reaction" data-reaction="気になる！">👀 気になる！</button>
+                            <button type="button" class="btn-quick-reaction" data-reaction="一緒に勉強したい！">✋ 一緒に勉強したい！</button>
+                            <button type="button" class="btn-quick-reaction" data-reaction="質問したい！">❓ 質問したい！</button>
+                        </div>
+                    </div>
                     <button class="btn-match" onclick="startChat('${item.email}')">チャットを始める</button>
                     <div class="card-action-row">
                         <button type="button" class="btn-card-action btn-card-block">ブロック</button>
@@ -1684,6 +1744,12 @@
 
                 card.querySelector(".btn-card-report").addEventListener("click", () => {
                     reportContent(item.email, "recruitment", item.email, item.content);
+                });
+
+                card.querySelectorAll(".btn-quick-reaction").forEach(button => {
+                    button.addEventListener("click", () => {
+                        sendQuickReaction(item.email, item.name, button.dataset.reaction, button);
+                    });
                 });
 
                 fragment.appendChild(card);
@@ -1766,6 +1832,58 @@
             return minutes < 60 ? `${minutes}分` : `${minutes / 60}時間`;
         }
 
+        function mergeRecruitmentTags(fixedTag, manualTags) {
+            const tags = `${fixedTag || ""},${manualTags || ""}`
+                .split(/[,、\s]+/)
+                .map(tag => tag.replace(/^#/, "").trim())
+                .filter(tag => tag);
+
+            return [...new Set(tags)].join(", ");
+        }
+
+        async function sendQuickReaction(targetUserId, targetName, reaction, button) {
+            const myUserId = localStorage.getItem("userEmail");
+            if (!myUserId || !reaction || !button) return;
+
+            const cooldownKey = `quick-reaction:${myUserId}:${targetUserId}:${reaction}`;
+            const lastSent = Number(sessionStorage.getItem(cooldownKey) || 0);
+            if (Date.now() - lastSent < 10 * 60 * 1000) {
+                alert("同じリアクションは、少し時間をおいてから送れます。");
+                return;
+            }
+
+            const originalText = button.innerText;
+            button.disabled = true;
+            button.innerText = "送信中...";
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "sendMessage",
+                        from: myUserId,
+                        to: targetUserId,
+                        text: `募集を見て「${reaction}」とリアクションしました。`
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    sessionStorage.setItem(cooldownKey, String(Date.now()));
+                    button.innerText = "送信しました ✓";
+                    alert(`${targetName}さんにリアクションを送りました。`);
+                } else {
+                    button.disabled = false;
+                    button.innerText = originalText;
+                    alert("リアクションの送信に失敗しました: " + result.message);
+                }
+            } catch (e) {
+                button.disabled = false;
+                button.innerText = originalText;
+                alert("通信エラーが発生しました。");
+            }
+        }
+
         function searchByTag(tagName) {
             const searchInput = document.getElementById("search-input");
             searchInput.value = tagName;
@@ -1795,7 +1913,8 @@
         async function submitRecruitment() {
             const submitBtn = document.getElementById("submit-btn");
             const content = document.getElementById("rec-content").value.trim();
-            const tags = document.getElementById("rec-tags").value.trim();
+            const fixedTag = document.getElementById("rec-fixed-tag").value;
+            const tags = mergeRecruitmentTags(fixedTag, document.getElementById("rec-tags").value);
             const durationMinutes = getRecruitmentDurationMinutes(document.getElementById("rec-duration").value);
 
             if (!content) {
@@ -1829,6 +1948,7 @@
                     loadRecruitments();
                     document.getElementById("rec-content").value = "";
                     document.getElementById("rec-tags").value = "";
+                    document.getElementById("rec-fixed-tag").value = "";
                 } else {
                     alert("投稿エラー: " + result.message);
                 }
