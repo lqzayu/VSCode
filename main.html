@@ -1258,7 +1258,7 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="theme.css?v=20260916f">
+    <link rel="stylesheet" href="theme.css?v=20260917c">
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
 </head>
@@ -2162,7 +2162,7 @@
                 }
             }
 
-            if (currentUserId === "admin" || myEmail === "admin") {
+            if (isImpersonating !== "true" && (currentUserId === "admin" || myEmail === "admin")) {
                 const adminBtn = document.getElementById("nav-admin-btn");
                 if (adminBtn) {
                     adminBtn.style.display = "inline-block";
@@ -2180,6 +2180,16 @@
             loadRecruitments();
             refreshUserProfile(currentUserId);
             updateNotificationSummary();
+
+            const pageParams = new URLSearchParams(window.location.search);
+            const requestedTab = pageParams.get("tab");
+            if (requestedTab === "recruit" || requestedTab === "search") {
+                switchTab(requestedTab);
+            }
+            if (pageParams.get("guide") === "1") {
+                requestAnimationFrame(openUsageGuide);
+            }
+
             setInterval(() => {
                 if (document.visibilityState === "visible") updateNotificationSummary();
             }, 8000);

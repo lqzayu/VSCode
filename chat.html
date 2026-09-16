@@ -365,7 +365,7 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="theme.css?v=20260916f">
+    <link rel="stylesheet" href="theme.css?v=20260917c">
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
 </head>
@@ -374,7 +374,26 @@
 
     <header class="navbar">
         <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
-        <button class="btn-back" onclick="location.href='messages.html'">メッセージ一覧へ戻る</button>
+
+        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()" aria-label="メニューを開閉">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <nav class="nav-links" id="nav-links">
+            <a class="nav-item" href="main.html?guide=1">使い方</a>
+            <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>
+            <a class="nav-item" href="main.html?tab=recruit">募集投稿</a>
+            <a class="nav-item" href="main.html?tab=search">ユーザーを探す</a>
+            <a class="nav-item active" href="messages.html">
+                メッセージ
+                <span id="unread-badge" class="unread-badge" style="display:none;">0</span>
+            </a>
+            <a class="nav-item" href="profile.html">マイページ</a>
+            <a class="nav-item" id="nav-admin-btn" style="display:none;" href="admin.html">管理者</a>
+            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>
+        </nav>
     </header>
 
     <main class="chat-container">
@@ -427,6 +446,17 @@
         const MAX_ATTACHMENT_BYTES = 360 * 1024;
         let selectedAttachments = [];
         let isMessageComposing = false;
+        let unreadRequest = null;
+
+        function toggleMenu() {
+            document.getElementById("hud-menu-btn").classList.toggle("open");
+            document.getElementById("nav-links").classList.toggle("open");
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
 
         async function postChat(payload, timeoutMs = 12000) {
             const controller = new AbortController();
@@ -904,6 +934,26 @@
             }
         }
 
+        async function updateUnreadBadge() {
+            const badge = document.getElementById("unread-badge");
+            if (!myEmail || !badge || unreadRequest) return unreadRequest;
+
+            unreadRequest = (async () => {
+                try {
+                    const result = await postChat({ mode: "getUnreadCount", email: myEmail });
+                    const count = Number(result.message && result.message.unreadCount) || 0;
+                    badge.textContent = count > 99 ? "99+" : String(count);
+                    badge.style.display = count > 0 ? "inline-block" : "none";
+                } catch (e) {
+                    console.error("未読チェックエラー:", e);
+                } finally {
+                    unreadRequest = null;
+                }
+            })();
+
+            return unreadRequest;
+        }
+
         async function sendMessage() {
             const textInput = document.getElementById("message-input");
             const sendBtn = document.getElementById("send-btn");
@@ -969,8 +1019,21 @@
         });
 
         window.onload = async () => {
+            document.getElementById("hud-menu-btn").classList.remove("open");
+            document.getElementById("nav-links").classList.remove("open");
+
+            const currentUserId = localStorage.getItem("userId") || myEmail;
+            const adminButton = document.getElementById("nav-admin-btn");
+            if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") {
+                adminButton.style.display = "inline-block";
+            }
+
             await loadMessages();
+            updateUnreadBadge();
             scheduleChatPoll();
+            setInterval(() => {
+                if (document.visibilityState === "visible") updateUnreadBadge();
+            }, 8000);
         };
     </script>
 </body>

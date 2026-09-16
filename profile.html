@@ -455,16 +455,14 @@
 
 
 
-    <link rel="stylesheet" href="theme.css?v=20260916f">
+    <link rel="stylesheet" href="theme.css?v=20260917c">
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
 </head>
 
 <body class="cur" data-page="profile">
     <header class="navbar">
-        <div class="logo" onclick="location.href='main.html'">
-            <div class="logo-text">平工<span>マッチング</span></div>
-        </div>
+        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
 
         <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
             <span></span>
@@ -473,13 +471,17 @@
         </button>
 
         <nav class="nav-links" id="nav-links">
-            <a class="nav-item" href="main.html">ホーム</a>
+            <a class="nav-item" href="main.html?guide=1">使い方</a>
+            <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>
+            <a class="nav-item" href="main.html?tab=recruit">募集投稿</a>
+            <a class="nav-item" href="main.html?tab=search">ユーザーを探す</a>
             <a class="nav-item" href="messages.html">
                 メッセージ
                 <span id="unread-badge" class="unread-badge" style="display: none;">0</span>
             </a>
             <a class="nav-item active" href="profile.html">マイページ</a>
-            <button class="btn-logout" onclick="logout()">ログアウト</button>
+            <a class="nav-item" id="nav-admin-btn" style="display:none;" href="admin.html">管理者</a>
+            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>
         </nav>
     </header>
 
@@ -1087,6 +1089,11 @@
 
             const userName = localStorage.getItem("userName");
             const profileImage = localStorage.getItem("profileImage");
+            const currentUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
+            const adminButton = document.getElementById("nav-admin-btn");
+            if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") {
+                adminButton.style.display = "inline-block";
+            }
 
             if (userName) document.getElementById("username-input").value = userName;
 

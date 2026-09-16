@@ -358,7 +358,7 @@
             .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) !important; }
         }
     </style>
-    <link rel="stylesheet" href="theme.css?v=20260916f">
+    <link rel="stylesheet" href="theme.css?v=20260917c">
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
 </head>
@@ -375,15 +375,17 @@
         </button>
 
         <nav class="nav-links" id="nav-links">
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header" class="nav-item">意見箱</a>
-            <a href="main.html" class="nav-item">ホーム</a>
+            <a class="nav-item" href="main.html?guide=1">使い方</a>
+            <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>
+            <a class="nav-item" href="main.html?tab=recruit">募集投稿</a>
+            <a class="nav-item" href="main.html?tab=search">ユーザーを探す</a>
             <a href="messages.html" class="nav-item">
                 メッセージ
                 <span id="unread-badge" class="unread-badge" style="display: none;">0</span>
             </a>
             <a href="profile.html" class="nav-item">マイページ</a>
             <span class="nav-item active">管理者</span>
-            <button class="btn-logout" onclick="logout()">ログアウト</button>
+            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>
         </nav>
     </header>
 
