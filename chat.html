@@ -173,6 +173,83 @@
             transform: none;
             box-shadow: none;
         }
+
+        .chat-header-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .btn-delete-history {
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 8px 10px;
+            background: #fff1f2;
+            color: #be123c;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .message-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #94a3b8;
+            font-size: 10px;
+        }
+
+        .message-tools {
+            display: flex;
+            gap: 8px;
+        }
+
+        .message-tool-button {
+            border: 0;
+            padding: 0 4px;
+            background: transparent;
+            color: #64748b;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .message-tool-button:hover {
+            color: #0f766e;
+            text-decoration: underline;
+        }
+
+        .message-tool-button.unsend {
+            color: #b91c1c;
+        }
+
+        .message-bubble.is-unsent {
+            background: #f1f5f9;
+            color: #94a3b8;
+            border: 1px dashed #cbd5e1;
+            box-shadow: none;
+            font-style: italic;
+        }
+
+        @media screen and (max-width: 600px) {
+            .chat-header {
+                align-items: flex-start !important;
+                flex-direction: column;
+            }
+
+            .chat-header-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .chat-input-area {
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .btn-send {
+                padding: 12px 16px;
+            }
+        }
     </style>
     <link rel="stylesheet" href="theme.css?v=20260916e">
     <script src="online.js" defer></script>
@@ -188,9 +265,10 @@
     <main class="chat-container">
         <div class="chat-header" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
             <span id="chat-title">対話相手: 読み込み中...</span>
-            <div style="display:flex; gap:8px;">
+            <div class="chat-header-actions">
                 <button id="block-user-btn" type="button" style="border:none; border-radius:8px; padding:8px 10px; background:#fef3c7; color:#92400e; font-weight:700; cursor:pointer;">ブロック</button>
                 <button id="report-user-btn" type="button" style="border:none; border-radius:8px; padding:8px 10px; background:#fee2e2; color:#b91c1c; font-weight:700; cursor:pointer;">通報</button>
+                <button id="delete-history-btn" type="button" class="btn-delete-history">履歴を削除</button>
             </div>
         </div>
 
@@ -279,7 +357,7 @@
             }
         }
 
-        async function reportMessage(messageText) {
+        async function reportMessage(messageText, messageId) {
             const reason = getReportReason();
             if (!reason) {
                 alert("正しい通報理由を選択してください。");
@@ -296,7 +374,7 @@
                         reporterId: myEmail,
                         targetUserId: targetEmail,
                         targetType: "message",
-                        targetId: targetEmail,
+                        targetId: messageId || targetEmail,
                         targetContent: messageText,
                         reason,
                         detail
@@ -345,8 +423,99 @@
             }
         }
 
+        function formatMessageTime(value) {
+            if (!value) return "";
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return "";
+            return date.toLocaleString("ja-JP", {
+                month: "numeric",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        }
+
+        async function unsendMessage(messageId, button) {
+            if (!messageId) return;
+            if (!confirm("このメッセージの送信を取り消しますか？")) return;
+
+            const originalText = button ? button.innerText : "送信取り消し";
+            if (button) {
+                button.disabled = true;
+                button.innerText = "処理中...";
+            }
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "unsendMessage",
+                        userId: myEmail,
+                        messageId: messageId
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    await loadMessages();
+                } else {
+                    if (button) {
+                        button.disabled = false;
+                        button.innerText = originalText;
+                    }
+                    alert("送信取り消しに失敗しました: " + result.message);
+                }
+            } catch (e) {
+                if (button) {
+                    button.disabled = false;
+                    button.innerText = originalText;
+                }
+                alert("通信エラーが発生しました。");
+            }
+        }
+
+        async function deleteChatHistory() {
+            if (!confirm("このチャット履歴を削除しますか？\n自分の画面から非表示になります。相手の画面には影響しません。")) return;
+
+            const deleteButton = document.getElementById("delete-history-btn");
+            if (deleteButton) {
+                deleteButton.disabled = true;
+                deleteButton.innerText = "削除中...";
+            }
+
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        mode: "deleteChatHistory",
+                        userId: myEmail,
+                        targetUserId: targetEmail
+                    })
+                });
+                const result = await res.json();
+
+                if (result.status === "success") {
+                    localStorage.removeItem("chatTarget");
+                    window.location.href = "messages.html";
+                } else {
+                    if (deleteButton) {
+                        deleteButton.disabled = false;
+                        deleteButton.innerText = "履歴を削除";
+                    }
+                    alert("履歴の削除に失敗しました: " + result.message);
+                }
+            } catch (e) {
+                if (deleteButton) {
+                    deleteButton.disabled = false;
+                    deleteButton.innerText = "履歴を削除";
+                }
+                alert("通信エラーが発生しました。");
+            }
+        }
+
         document.getElementById("block-user-btn").addEventListener("click", blockCurrentUser);
         document.getElementById("report-user-btn").addEventListener("click", reportCurrentUser);
+        document.getElementById("delete-history-btn").addEventListener("click", deleteChatHistory);
 
         async function loadMessages() {
             try {
@@ -379,17 +548,49 @@
 
                         const bubble = document.createElement("div");
                         bubble.className = `message-bubble ${msg.from === myEmail ? 'msg-my' : 'msg-partner'}`;
+                        if (msg.isUnsent) bubble.classList.add("is-unsent");
                         bubble.innerText = msg.text;
                         wrapper.appendChild(bubble);
 
-                        if (msg.from !== myEmail) {
+                        const meta = document.createElement("div");
+                        meta.className = "message-meta";
+                        const time = formatMessageTime(msg.sentAt);
+                        if (time) {
+                            const timeText = document.createElement("span");
+                            timeText.innerText = time;
+                            meta.appendChild(timeText);
+                        }
+
+                        if (msg.from === myEmail && !msg.isUnsent && msg.isRead) {
+                            const readText = document.createElement("span");
+                            readText.innerText = "既読";
+                            meta.appendChild(readText);
+                        }
+
+                        const tools = document.createElement("div");
+                        tools.className = "message-tools";
+
+                        if (msg.from === myEmail && !msg.isUnsent) {
+                            const unsendButton = document.createElement("button");
+                            unsendButton.type = "button";
+                            unsendButton.className = "message-tool-button unsend";
+                            unsendButton.innerText = "送信取り消し";
+                            unsendButton.addEventListener("click", () => unsendMessage(msg.messageId, unsendButton));
+                            tools.appendChild(unsendButton);
+                        }
+
+                        if (msg.from !== myEmail && !msg.isUnsent) {
                             const reportButton = document.createElement("button");
                             reportButton.type = "button";
                             reportButton.innerText = "このメッセージを通報";
-                            reportButton.style.cssText = "border:none; background:transparent; color:#b91c1c; font-size:11px; cursor:pointer; padding:0 4px;";
-                            reportButton.addEventListener("click", () => reportMessage(msg.text));
-                            wrapper.appendChild(reportButton);
+                            reportButton.className = "message-tool-button";
+                            reportButton.style.color = "#b91c1c";
+                            reportButton.addEventListener("click", () => reportMessage(msg.text, msg.messageId));
+                            tools.appendChild(reportButton);
                         }
+
+                        if (tools.childElementCount > 0) meta.appendChild(tools);
+                        if (meta.childElementCount > 0) wrapper.appendChild(meta);
 
                         listDiv.appendChild(wrapper);
                     });
