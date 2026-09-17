@@ -1250,6 +1250,32 @@
                 padding: 22px;	/* 見た目の設定を指定 */
             }	/* スタイル定義を閉じる */
 
+            .main-tabs {	/* ホーム内のタブ欄を整える */
+                display: flex;	/* タブを横並びにする */
+                gap: 8px;	/* タブの間隔を設定する */
+                margin-bottom: 22px;	/* タブ欄の下に余白を作る */
+                padding: 6px;	/* タブ欄の内側に余白を作る */
+                border: 1px solid var(--line);	/* タブ欄の境界線を設定する */
+                border-radius: 14px;	/* タブ欄の角を丸くする */
+                background: var(--paper);	/* タブ欄の背景を設定する */
+            }	/* ホーム内のタブ欄の設定を閉じる */
+
+            .main-tab {	/* ホーム内のタブを整える */
+                flex: 1;	/* タブを均等な幅にする */
+                min-height: 44px;	/* タブを押しやすくする */
+                border: 0;	/* タブの標準境界線を消す */
+                border-radius: 10px;	/* タブの角を丸くする */
+                background: transparent;	/* 通常時の背景を透明にする */
+                color: var(--muted);	/* 通常時の文字色を設定する */
+                font-weight: 800;	/* タブ文字を見やすくする */
+                cursor: pointer;	/* クリックできることを示す */
+            }	/* ホーム内のタブの設定を閉じる */
+
+            .main-tab.active {	/* 選択中のタブを整える */
+                background: var(--teal);	/* 選択中の背景を設定する */
+                color: var(--paper);	/* 選択中の文字色を設定する */
+            }	/* 選択中のタブの設定を閉じる */
+
             .toast-notification {	/* 対象要素のスタイルを始める */
                 top: 76px;	/* 見た目の設定を指定 */
                 right: 12px;	/* 見た目の設定を指定 */
@@ -1258,7 +1284,7 @@
             }	/* スタイル定義を閉じる */
         }	/* スタイル定義を閉じる */
     </style>
-    <link rel="stylesheet" href="theme.css?v=20260917c">	<!-- 外部ファイルを読み込む -->
+    <link rel="stylesheet" href="theme.css?v=20260918b">	<!-- 外部ファイルを読み込む -->
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
 </head>	<!-- 要素を閉じる -->
@@ -1293,8 +1319,8 @@
         <nav class="nav-links" id="nav-links">	<!-- ナビゲーションを配置 -->
             <button type="button" class="nav-item nav-guide-button" onclick="openUsageGuide(); closeMenu();">使い方</button>	<!-- 操作できる要素を配置 -->
             <a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header" class="nav-item">意見箱</a>	<!-- 操作できる要素を配置 -->
-            <a class="nav-item" href="recruit.html">募集投稿</a>	<!-- 操作できる要素を配置 -->
-            <a class="nav-item active" href="users.html">ユーザーを探す</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" id="nav-recruit-link" href="main.html?tab=recruit">募集投稿</a>	<!-- 募集投稿タブへのリンクを配置する -->
+            <a class="nav-item active" id="nav-search-link" href="main.html?tab=search">ユーザーを探す</a>	<!-- ユーザー検索タブへのリンクを配置する -->
             <a class="nav-item" href="messages.html">	<!-- 操作できる要素を配置 -->
                 メッセージ	<!-- 画面に表示する内容 -->
                 <span id="unread-badge" class="unread-badge" style="display: none;">0</span>	<!-- 画面要素を配置 -->
@@ -1325,6 +1351,10 @@
         </div>	<!-- 要素を閉じる -->
 
         <div class="main-area">	<!-- 画面要素を配置 -->
+            <div class="main-tabs" role="tablist" aria-label="ホーム画面の切り替え">	<!-- 募集機能の切り替え欄を配置する -->
+                <button type="button" id="tab-search-btn" class="main-tab active" role="tab" aria-selected="true" onclick="switchTab('search')">募集を探す</button>	<!-- 募集検索タブを配置する -->
+                <button type="button" id="tab-recruit-btn" class="main-tab" role="tab" aria-selected="false" onclick="switchTab('recruit')">募集を投稿する</button>	<!-- 募集投稿タブを配置する -->
+            </div>	<!-- 募集機能の切り替え欄を閉じる -->
             <section id="recruit-form-area" style="display: none;">	<!-- 画面要素を配置 -->
                 <div class="sidebar-form">	<!-- 画面要素を配置 -->
                     <h3 id="form-title">募集を投稿する</h3>	<!-- 画面要素を配置 -->
@@ -1462,7 +1492,7 @@
                     <article class="usage-step-card">	<!-- 画面要素を配置 -->
                         <span class="usage-step-number">02</span>	<!-- 画面要素を配置 -->
                         <h3>募集する・探す</h3>	<!-- 画面要素を配置 -->
-                        <p>募集投稿とユーザー検索は別ページです。勉強内容、タグ、表示時間を設定して投稿できます。</p>	<!-- 画面要素を配置 -->
+                        <p>募集投稿とユーザー検索はこのページで切り替えられます。勉強内容、タグ、表示時間を設定して投稿できます。</p>	<!-- 画面要素を配置 -->
                         <button type="button" onclick="showGuideDestination('recruit')">募集を投稿する</button>	<!-- 操作できる要素を配置 -->
                     </article>	<!-- 要素を閉じる -->
                     <article class="usage-step-card">	<!-- 画面要素を配置 -->
@@ -1481,10 +1511,10 @@
                     <div class="usage-info-grid">	<!-- 画面要素を配置 -->
                         <div><strong>表示時間</strong><p>15分・30分・45分、1時間以降は1時間刻みで、最大24時間まで選べます。</p></div>	<!-- 画面要素を配置 -->
                         <div><strong>タグ検索</strong><p>おすすめタグと自由入力タグを組み合わせて、募集を見つけやすくできます。タグを押すと絞り込めます。</p></div>	<!-- 画面要素を配置 -->
-                        <div><strong>残り時間と削除</strong><p>募集一覧では残り時間を確認できます。募集投稿ページから自分の募集を手動削除できます。</p></div>	<!-- 画面要素を配置 -->
+                        <div><strong>残り時間と削除</strong><p>募集一覧では残り時間を確認できます。募集投稿タブから自分の募集を手動削除できます。</p></div>	<!-- 画面要素を配置 -->
                     </div>	<!-- 要素を閉じる -->
-                    <a class="usage-guide-primary-link" href="recruit.html">募集投稿ページを開く</a>	<!-- 操作できる要素を配置 -->
-                    <a class="usage-guide-primary-link" href="users.html">ユーザー検索ページを開く</a>	<!-- 操作できる要素を配置 -->
+                    <a class="usage-guide-primary-link" href="main.html?tab=recruit">募集投稿を開く</a>	<!-- 募集投稿タブへのリンクを配置する -->
+                    <a class="usage-guide-primary-link" href="main.html?tab=search">募集検索を開く</a>	<!-- 募集検索タブへのリンクを配置する -->
                 </section>	<!-- 要素を閉じる -->
 
                 <section class="usage-guide-section">	<!-- 画面要素を配置 -->
@@ -1566,8 +1596,8 @@
     <footer class="footer">	<!-- フッターを配置 -->
         <div class="footer-container">	<!-- 画面要素を配置 -->
             <div class="footer-links">	<!-- 画面要素を配置 -->
-                <a href="users.html">ユーザーを探す</a>	<!-- 操作できる要素を配置 -->
-                <a href="recruit.html">募集投稿</a>	<!-- 操作できる要素を配置 -->
+                <a href="main.html?tab=search">ユーザーを探す</a>	<!-- ユーザー検索タブへのリンクを配置する -->
+                <a href="main.html?tab=recruit">募集投稿</a>	<!-- 募集投稿タブへのリンクを配置する -->
                 <a href="messages.html">メッセージ</a>	<!-- 操作できる要素を配置 -->
                 <a href="profile.html">マイページ</a>	<!-- 操作できる要素を配置 -->
                 <a href="ai-study.html">AI学習相談</a>	<!-- 操作できる要素を配置 -->
@@ -1581,11 +1611,6 @@
     <script>
         if (!localStorage.getItem("userEmail")) {	// 端末内の保存情報を扱う
             window.location.href = "index.html";	// 画面表示を更新する
-        }	// 処理のまとまりを閉じる
-
-        const legacyMainParams = new URLSearchParams(window.location.search);	// 定数を定義
-        if (!legacyMainParams.has("guide")) {	// 条件に応じて処理を分ける
-            window.location.replace(legacyMainParams.get("tab") === "recruit" ? "recruit.html" : "users.html");	// 画面表示を更新する
         }	// 処理のまとまりを閉じる
 
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";	// GAS APIの接続先を設定
@@ -1705,7 +1730,7 @@
 
         function showGuideDestination(mode) {	// 関数を定義
             closeUsageGuide();	// 処理を完了する
-            location.href = mode === "recruit" ? "recruit.html" : "users.html";	// 処理を続ける
+            location.href = `main.html?tab=${mode === "recruit" ? "recruit" : "search"}`;	// 処理を続ける
         }	// 処理のまとまりを閉じる
 
         document.addEventListener("keydown", (event) => {	// 操作イベントを登録
@@ -1713,14 +1738,19 @@
         });	// 処理を完了する
 
         function switchTab(mode) {	// 関数を定義
-            if (!document.getElementById("tab-recruit-btn") || !document.getElementById("tab-search-btn")) {	// 条件に応じて処理を分ける
-                location.href = mode === "recruit" ? "recruit.html" : "users.html";	// 処理を続ける
-                return;	// 結果を返す
-            }	// 処理のまとまりを閉じる
-            document.getElementById("recruit-form-area").style.display = (mode === 'recruit') ? "block" : "none";	// 画面表示を更新する
-            document.getElementById("search-area").style.display = (mode === 'search') ? "block" : "none";	// 画面表示を更新する
-            document.getElementById("tab-recruit-btn").classList.toggle("active", mode === 'recruit');	// 画面表示を更新する
-            document.getElementById("tab-search-btn").classList.toggle("active", mode === 'search');	// 画面表示を更新する
+            const isRecruit = mode === "recruit";	// 投稿タブかどうかを確認する
+            const recruitArea = document.getElementById("recruit-form-area");	// 募集投稿欄を取得する
+            const searchArea = document.getElementById("search-area");	// 募集検索欄を取得する
+            const recruitTab = document.getElementById("tab-recruit-btn");	// 募集投稿タブを取得する
+            const searchTab = document.getElementById("tab-search-btn");	// 募集検索タブを取得する
+            const recruitLink = document.getElementById("nav-recruit-link");	// 募集投稿リンクを取得する
+            const searchLink = document.getElementById("nav-search-link");	// 募集検索リンクを取得する
+            if (recruitArea) recruitArea.style.display = isRecruit ? "block" : "none";	// 募集投稿欄を切り替える
+            if (searchArea) searchArea.style.display = isRecruit ? "none" : "block";	// 募集検索欄を切り替える
+            if (recruitTab) { recruitTab.classList.toggle("active", isRecruit); recruitTab.setAttribute("aria-selected", String(isRecruit)); }	// 募集投稿タブの状態を切り替える
+            if (searchTab) { searchTab.classList.toggle("active", !isRecruit); searchTab.setAttribute("aria-selected", String(!isRecruit)); }	// 募集検索タブの状態を切り替える
+            if (recruitLink) recruitLink.classList.toggle("active", isRecruit);	// 募集投稿リンクの状態を切り替える
+            if (searchLink) searchLink.classList.toggle("active", !isRecruit);	// 募集検索リンクの状態を切り替える
             if (mode === 'recruit') {	// 条件に応じて処理を分ける
                 document.getElementById("user-name").value = localStorage.getItem("userName") || "";	// 端末内の保存情報を扱う
             }	// 処理のまとまりを閉じる
@@ -2249,9 +2279,7 @@
 
             const pageParams = new URLSearchParams(window.location.search);	// 定数を定義
             const requestedTab = pageParams.get("tab");	// 定数を定義
-            if (requestedTab === "recruit" || requestedTab === "search") {	// 条件に応じて処理を分ける
-                switchTab(requestedTab);	// 処理を完了する
-            }	// 処理のまとまりを閉じる
+            switchTab(requestedTab === "recruit" ? "recruit" : "search");	// URLに応じて表示タブを初期化する
             if (pageParams.get("guide") === "1") {	// 条件に応じて処理を分ける
                 requestAnimationFrame(openUsageGuide);	// 処理を完了する
             }	// 処理のまとまりを閉じる

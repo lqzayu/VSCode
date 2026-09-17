@@ -454,7 +454,7 @@
 
 
 
-    <link rel="stylesheet" href="theme.css?v=20260917c">	<!-- 外部ファイルを読み込む -->
+    <link rel="stylesheet" href="theme.css?v=20260918b">	<!-- 外部ファイルを読み込む -->
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
 </head>	<!-- 要素を閉じる -->
@@ -472,8 +472,8 @@
         <nav class="nav-links" id="nav-links">	<!-- ナビゲーションを配置 -->
             <a class="nav-item" href="main.html?guide=1">使い方</a>	<!-- 操作できる要素を配置 -->
             <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>	<!-- 操作できる要素を配置 -->
-            <a class="nav-item" href="recruit.html">募集投稿</a>	<!-- 操作できる要素を配置 -->
-            <a class="nav-item" href="users.html">ユーザーを探す</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="main.html?tab=recruit">募集投稿</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="main.html?tab=search">ユーザーを探す</a>	<!-- 操作できる要素を配置 -->
             <a class="nav-item" href="messages.html">	<!-- 操作できる要素を配置 -->
                 メッセージ	<!-- 画面に表示する内容 -->
                 <span id="unread-badge" class="unread-badge" style="display: none;">0</span>	<!-- 画面要素を配置 -->
@@ -507,6 +507,17 @@
             </div>	<!-- 要素を閉じる -->
 
             <button class="btn-large" onclick="saveProfile()">設定を保存する</button>	<!-- 操作できる要素を配置 -->
+
+            <section class="appearance-settings" aria-labelledby="appearance-settings-title">	<!-- 外観設定のまとまりを配置 -->
+                <h3 id="appearance-settings-title">外観設定</h3>	<!-- 外観設定の見出しを表示する -->
+                <p>端末の設定に合わせるか、ライトモード・ダークモードを固定できます。</p>	<!-- 外観設定の説明を表示する -->
+                <label for="theme-preference">表示テーマ</label>	<!-- 外観設定の選択欄に名前を付ける -->
+                <select id="theme-preference" onchange="applyThemePreference(this.value)">	<!-- 外観設定の選択欄を配置する -->
+                    <option value="auto">自動（端末設定に合わせる）</option>	<!-- 端末設定を使う選択肢を表示する -->
+                    <option value="light">ライトモード</option>	<!-- 明るい画面を選ぶ選択肢を表示する -->
+                    <option value="dark">ダークモード</option>	<!-- 暗い画面を選ぶ選択肢を表示する -->
+                </select>	<!-- 外観設定の選択欄を閉じる -->
+            </section>	<!-- 外観設定のまとまりを閉じる -->
             <br>	<!-- 画面要素を配置 -->
             <button class="btn-update-face" onclick="startFaceUpdate()">顔認証情報をアップデートする</button>	<!-- 操作できる要素を配置 -->
             <br>	<!-- 画面要素を配置 -->

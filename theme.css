@@ -6,6 +6,87 @@
  --surface:var(--ui-bg); --paper:var(--ui-paper); --teal:var(--ui-green);	/* 見た目の設定を指定 */
  --teal-dark:var(--ui-green); --navy:var(--ui-green); --coral:#cc9e74;	/* 見た目の設定を指定 */
 }	/* スタイル定義を閉じる */
+
+.appearance-settings {	/* 外観設定欄の見た目を整える */
+ margin-top:28px; padding:20px; border:1px solid var(--ui-line); border-radius:14px; background:var(--ui-soft); text-align:left;	/* 外観設定欄を配置する */
+}	/* 外観設定欄の設定を閉じる */
+.appearance-settings h3 {	/* 外観設定の見出しを整える */
+ margin:0 0 6px; color:var(--ui-ink); font-size:15px;	/* 見出しの色と大きさを設定する */
+}	/* 外観設定見出しの設定を閉じる */
+.appearance-settings p {	/* 外観設定の説明文を整える */
+ margin:0 0 14px; color:var(--ui-muted); font-size:12px; line-height:1.7;	/* 説明文を読みやすくする */
+}	/* 外観設定説明の設定を閉じる */
+.appearance-settings label {	/* 外観設定のラベルを整える */
+ display:block; margin-bottom:6px; color:var(--ui-muted); font-size:12px; font-weight:700;	/* ラベルを表示する */
+}	/* 外観設定ラベルの設定を閉じる */
+.appearance-settings select {	/* 外観設定の選択欄を整える */
+ width:100%; min-height:44px;	/* 選択欄の大きさを設定する */
+}	/* 外観設定選択欄の設定を閉じる */
+
+:root[data-theme="light"] {	/* 手動ライトモードの配色を設定する */
+ color-scheme:light;	/* フォーム部品を明色表示にする */
+ --ui-bg:#f5f4ee; --ui-paper:#fffefb; --ui-ink:#243c32; --ui-muted:#66736a; --ui-line:#dfe3d9; --ui-green:#254f3d; --ui-lime:#d8ef99; --ui-soft:#edf1e7; --ui-danger:#a84738;	/* 明色用の配色をまとめて設定する */
+ --ink:var(--ui-ink); --muted:var(--ui-muted); --line:var(--ui-line); --surface:var(--ui-bg); --paper:var(--ui-paper); --teal:var(--ui-green); --teal-dark:var(--ui-green); --navy:var(--ui-green);	/* 旧配色変数を明色へ合わせる */
+}	/* 手動ライトモードの配色を閉じる */
+:root[data-theme="dark"] {	/* 手動ダークモードの配色を設定する */
+ color-scheme:dark;	/* フォーム部品を暗色表示にする */
+ --ui-bg:#141a17; --ui-paper:#202a24; --ui-ink:#edf4ed; --ui-muted:#aebdb2; --ui-line:#3a4a40; --ui-green:#8bc99d; --ui-lime:#cbe994; --ui-soft:#2b3a31; --ui-danger:#f09b87;	/* 暗色用の配色をまとめて設定する */
+ --ink:var(--ui-ink); --muted:var(--ui-muted); --line:var(--ui-line); --surface:var(--ui-bg); --paper:var(--ui-paper); --teal:var(--ui-green); --teal-dark:var(--ui-green); --navy:var(--ui-green);	/* 旧配色変数を暗色へ合わせる */
+}	/* 手動ダークモードの配色を閉じる */
+html[data-theme="dark"] body {	/* 手動ダークモードの背景を設定する */
+ background:radial-gradient(circle at 8% 0%,rgba(139,201,157,.14),transparent 30rem),radial-gradient(circle at 96% 12%,rgba(203,233,148,.08),transparent 26rem),var(--ui-bg)!important; color:var(--ui-ink)!important;	/* 暗色背景と文字色を適用する */
+}	/* 手動ダークモード背景の設定を閉じる */
+html[data-theme="dark"] .navbar,html[data-theme="dark"] .footer {	/* 手動ダークモードの共通領域を設定する */
+ background:var(--ui-bg)!important; border-color:var(--ui-line)!important;	/* 共通領域を暗色表示にする */
+}	/* 手動ダークモード共通領域の設定を閉じる */
+html[data-theme="dark"] .logo,html[data-theme="dark"] .logo-text,html[data-theme="dark"] .logo-text span {	/* 手動ダークモードのロゴを設定する */
+ color:var(--ui-ink)!important; -webkit-text-fill-color:var(--ui-ink)!important;	/* ロゴを暗色背景に合わせる */
+}	/* 手動ダークモードロゴの設定を閉じる */
+html[data-theme="dark"] input:not([type="file"]),html[data-theme="dark"] select,html[data-theme="dark"] textarea {	/* 手動ダークモードの入力欄を設定する */
+ background:var(--ui-paper)!important; color:var(--ui-ink)!important; border-color:var(--ui-line)!important;	/* 入力欄を暗色表示にする */
+}	/* 手動ダークモード入力欄の設定を閉じる */
+html[data-theme="dark"] .card,html[data-theme="dark"] .panel,html[data-theme="dark"] .dm-card,html[data-theme="dark"] .sidebar-form,html[data-theme="dark"] .login-card,html[data-theme="dark"] .search-panel,html[data-theme="dark"] .my-post-card,html[data-theme="dark"] .post-card,html[data-theme="dark"] .ai-profile,html[data-theme="dark"] .ai-chat-card,html[data-theme="dark"] .chat-header,html[data-theme="dark"] .chat-input-area {	/* 手動ダークモードのカードを設定する */
+ background:var(--ui-paper)!important; color:var(--ui-ink); border-color:var(--ui-line)!important;	/* カードを暗色表示にする */
+}	/* 手動ダークモードカードの設定を閉じる */
+html[data-theme="dark"] .profile-card {	/* 手動ダークモードのプロフィール欄を設定する */
+ background:var(--ui-paper)!important; color:var(--ui-ink)!important;	/* プロフィール欄を暗色表示にする */
+}	/* 手動ダークモードプロフィール欄の設定を閉じる */
+html[data-theme="dark"] body[data-page="users"] .profile-card {	/* ユーザー検索のプロフィール欄を緑色で保つ */
+ background:linear-gradient(135deg,var(--ui-green),#47755b)!important; color:#fff!important;	/* 上部と同じ緑色を適用する */
+}	/* ユーザー検索プロフィール欄の設定を閉じる */
+html[data-theme="dark"] body[data-page="users"] .profile-card strong,html[data-theme="dark"] body[data-page="users"] #mypage-text {	/* ユーザー検索の表示名を見やすくする */
+ color:#fff!important; -webkit-text-fill-color:#fff!important;	/* 緑背景用の文字色を適用する */
+}	/* ユーザー検索表示名の設定を閉じる */
+html[data-theme="dark"] .msg-partner,html[data-theme="dark"] .message-bubble:not(.msg-my),html[data-theme="dark"] .partner-item:hover {	/* 手動ダークモードの相手側表示を設定する */
+ background:var(--ui-paper)!important; color:var(--ui-ink)!important;	/* 相手側表示を暗色表示にする */
+}	/* 手動ダークモード相手側表示の設定を閉じる */
+html[data-theme="dark"] .ai-messages {	/* 手動ダークモードのAI履歴を設定する */
+ background:rgba(43,58,49,.72)!important;	/* AI履歴を暗色表示にする */
+}	/* 手動ダークモードAI履歴の設定を閉じる */
+html[data-theme="dark"] .usage-guide-header {	/* 手動ダークモードの使い方見出しを設定する */
+ background:rgba(20,26,23,.96)!important;	/* 使い方見出しを暗色表示にする */
+}	/* 手動ダークモード使い方見出しの設定を閉じる */
+
+@media (prefers-color-scheme: dark) {	/* 端末が暗色設定の場合に処理する */
+ html[data-theme="light"] body {	/* 手動ライトモードの背景を優先する */
+  background:radial-gradient(circle at 10% 20%,rgba(238,252,253,1) 0%,rgba(218,241,245,1) 90%)!important; color:var(--ui-ink)!important;	/* 明色背景へ戻す */
+ }	/* 手動ライトモード背景の設定を閉じる */
+ html[data-theme="light"] .navbar,html[data-theme="light"] .footer {	/* 手動ライトモードの共通領域を優先する */
+  background:var(--ui-bg)!important; border-color:var(--ui-line)!important;	/* 共通領域を明色表示にする */
+ }	/* 手動ライトモード共通領域の設定を閉じる */
+ html[data-theme="light"] .logo,html[data-theme="light"] .logo-text,html[data-theme="light"] .logo-text span {	/* 手動ライトモードのロゴを優先する */
+  color:var(--ui-ink)!important; -webkit-text-fill-color:var(--ui-ink)!important;	/* ロゴを明色背景に合わせる */
+ }	/* 手動ライトモードロゴの設定を閉じる */
+ html[data-theme="light"] .usage-guide-header {	/* 手動ライトモードの使い方見出しを優先する */
+  background:rgba(255,254,251,.96)!important;	/* 使い方見出しを明色表示にする */
+ }	/* 手動ライトモード使い方見出しの設定を閉じる */
+ html[data-theme="light"] .usage-safety-section ul {	/* 手動ライトモードの安全案内を優先する */
+  background:#f7f0e5!important;	/* 安全案内を明色表示にする */
+ }	/* 手動ライトモード安全案内の設定を閉じる */
+ html[data-theme="light"] .usage-safety-section li {	/* 手動ライトモードの安全案内文字を優先する */
+  color:#5e5142!important;	/* 安全案内文字を読みやすくする */
+ }	/* 手動ライトモード安全案内文字の設定を閉じる */
+}	/* 端末が暗色設定の場合の補正を閉じる */
 * { box-sizing:border-box; }	/* 見た目の設定を指定 */
 body {	/* 対象要素のスタイルを始める */
  margin:0; min-height:100dvh;	/* 見た目の設定を指定 */
@@ -354,6 +435,106 @@ td,th { border-bottom:1px solid var(--ui-line); }	/* 見た目の設定を指定
  .footer-links { gap:8px 12px; }	/* 見た目の設定を指定 */
  #ui-notice-root { top:14px; right:16px; width:calc(100vw - 32px); }	/* 見た目の設定を指定 */
 }	/* スタイル定義を閉じる */
+
+@media (prefers-color-scheme: dark) {	/* ユーザーのダークモード設定を反映 */
+ :root {	/* 暗色用の配色を設定 */
+  color-scheme:dark;	/* フォーム部品を暗色表示にする */
+  --ui-bg:#141a17;	/* ページ背景を設定 */
+  --ui-paper:#202a24;	/* カード背景を設定 */
+  --ui-ink:#edf4ed;	/* 基本文字色を設定 */
+  --ui-muted:#aebdb2;	/* 補助文字色を設定 */
+  --ui-line:#3a4a40;	/* 境界線の色を設定 */
+  --ui-green:#8bc99d;	/* 暗色用の緑色を設定 */
+  --ui-lime:#cbe994;	/* 強調色を設定 */
+  --ui-soft:#2b3a31;	/* 薄い背景色を設定 */
+  --ui-danger:#f09b87;	/* 警告色を設定 */
+  --ink:var(--ui-ink);	/* 旧変数へ文字色を渡す */
+  --muted:var(--ui-muted);	/* 旧変数へ補助文字色を渡す */
+  --line:var(--ui-line);	/* 旧変数へ境界線色を渡す */
+  --surface:var(--ui-bg);	/* 旧変数へ背景色を渡す */
+  --paper:var(--ui-paper);	/* 旧変数へカード色を渡す */
+  --teal:var(--ui-green);	/* 旧変数へアクセント色を渡す */
+  --teal-dark:var(--ui-green);	/* 旧変数へ濃色を渡す */
+  --navy:var(--ui-green);	/* 旧変数へ見出し色を渡す */
+ }	/* 配色変数の設定を閉じる */
+
+ body {	/* ページ全体の暗色背景を設定 */
+  background:radial-gradient(circle at 8% 0%,rgba(139,201,157,.14),transparent 30rem),radial-gradient(circle at 96% 12%,rgba(203,233,148,.08),transparent 26rem),var(--ui-bg)!important;	/* 暗色背景を表示 */
+  color:var(--ui-ink)!important;	/* 暗色用文字色を適用 */
+ }	/* ページ全体の設定を閉じる */
+
+ .navbar,.footer {	/* 共通領域の背景を設定 */
+  background:var(--ui-bg)!important;	/* 暗色背景を適用 */
+  border-color:var(--ui-line)!important;	/* 暗色用境界線を適用 */
+ }	/* 共通領域の設定を閉じる */
+ .logo,.logo-text,.logo-text span {	/* ロゴ文字の色を設定 */
+  color:var(--ui-ink)!important;	/* 暗色用文字色を適用 */
+  -webkit-text-fill-color:var(--ui-ink)!important;	/* Safariの文字色を適用 */
+ }	/* ロゴ文字の設定を閉じる */
+ .logo::before {	/* ロゴ記号の色を調整 */
+  box-shadow:5px 0 0 -1px var(--ui-bg),7px 0 0 -1px var(--ui-green);	/* 背景に合わせて影を調整 */
+ }	/* ロゴ記号の設定を閉じる */
+ .nav-item:hover,.nav-item.active,.footer-links a:hover {	/* 選択中のリンクを調整 */
+  background:var(--ui-soft)!important;	/* 暗色用選択背景を適用 */
+  color:var(--ui-green)!important;	/* 暗色用リンク色を適用 */
+ }	/* リンクの設定を閉じる */
+ .btn-logout,.btn-back,.btn-refresh,.usage-guide-close {	/* 共通ボタンを調整 */
+  background:var(--ui-paper)!important;	/* 暗色用ボタン背景を適用 */
+  color:var(--ui-green)!important;	/* 暗色用ボタン文字を適用 */
+  border-color:var(--ui-line)!important;	/* 暗色用境界線を適用 */
+ }	/* 共通ボタンの設定を閉じる */
+ input:not([type="file"]),select,textarea {	/* 入力欄を暗色表示にする */
+  background:var(--ui-paper)!important;	/* 暗色用入力背景を適用 */
+  color:var(--ui-ink)!important;	/* 暗色用入力文字を適用 */
+  border-color:var(--ui-line)!important;	/* 暗色用入力境界線を適用 */
+ }	/* 入力欄の設定を閉じる */
+ input::placeholder,textarea::placeholder {	/* 入力欄のヒントを調整 */
+  color:#85988b!important;	/* 暗色用ヒント色を適用 */
+ }	/* 入力欄のヒント設定を閉じる */
+ .card,.panel,.dm-card,.sidebar-form,.login-card,.search-panel,.my-post-card,.post-card,.ai-profile,.ai-chat-card,.chat-header,.chat-input-area,.usage-step-card,.usage-guide-note {	/* 共通カードを暗色表示にする */
+  background:var(--ui-paper)!important;	/* 暗色用カード背景を適用 */
+  color:var(--ui-ink);	/* 暗色用カード文字を適用 */
+  border-color:var(--ui-line)!important;	/* 暗色用カード境界線を適用 */
+ }	/* 共通カードの設定を閉じる */
+ .profile-card {	/* プロフィール編集カードを調整 */
+  background:var(--ui-paper)!important;	/* 暗色用プロフィール背景を適用 */
+  color:var(--ui-ink)!important;	/* 暗色用プロフィール文字を適用 */
+ }	/* プロフィール編集カードの設定を閉じる */
+ body[data-page="users"] .profile-card {	/* ユーザー検索のプロフィール領域を調整 */
+  background:linear-gradient(135deg,var(--ui-green),#47755b)!important;	/* 上部と同じ緑色を適用 */
+  color:#fff!important;	/* 緑背景用の文字色を適用 */
+ }	/* ユーザー検索のプロフィール設定を閉じる */
+ body[data-page="users"] .profile-card strong,body[data-page="users"] #mypage-text {	/* ユーザー名を見やすくする */
+  color:#fff!important;	/* 緑背景用の名前色を適用 */
+  -webkit-text-fill-color:#fff!important;	/* Safariの名前色を適用 */
+ }	/* ユーザー名の設定を閉じる */
+ .user-card,.message-bubble,.partner-item {	/* 一覧要素を暗色表示にする */
+  border-color:var(--ui-line)!important;	/* 暗色用境界線を適用 */
+ }	/* 一覧要素の設定を閉じる */
+ .msg-partner,.message-bubble:not(.msg-my),.partner-item:hover {	/* 相手側の表示を調整 */
+  background:var(--ui-paper)!important;	/* 暗色用相手背景を適用 */
+  color:var(--ui-ink)!important;	/* 暗色用相手文字を適用 */
+ }	/* 相手側表示の設定を閉じる */
+ .ai-messages {	/* AI相談の履歴背景を調整 */
+  background:rgba(43,58,49,.72)!important;	/* 暗色用履歴背景を適用 */
+ }	/* AI相談履歴の設定を閉じる */
+ .countdown-badge {	/* 残り時間表示を調整 */
+  background:#4a3d22!important;	/* 暗色用時間背景を適用 */
+  color:#f2d48f!important;	/* 暗色用時間文字を適用 */
+ }	/* 残り時間表示の設定を閉じる */
+ .usage-guide-header {	/* 使い方の見出しを調整 */
+  background:rgba(20,26,23,.96)!important;	/* 暗色用見出し背景を適用 */
+ }	/* 使い方見出しの設定を閉じる */
+ .usage-safety-section ul {	/* 安全案内の背景を調整 */
+  background:#3b3329!important;	/* 暗色用安全案内背景を適用 */
+ }	/* 安全案内の設定を閉じる */
+ .usage-safety-section li {	/* 安全案内の文字を調整 */
+  color:#e7d8c2!important;	/* 暗色用安全案内文字を適用 */
+ }	/* 安全案内文字の設定を閉じる */
+ .usage-intro-button:hover,.usage-trial-box a:hover {	/* 強調ボタンの操作時色を調整 */
+  background:#e2f5b0!important;	/* 暗色でも見やすい強調色を適用 */
+ }	/* 強調ボタンの設定を閉じる */
+}	/* ダークモード設定を閉じる */
 @media(prefers-reduced-motion:reduce) {	/* 表示条件を設定 */
  *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }	/* 見た目の設定を指定 */
 }	/* スタイル定義を閉じる */
@@ -455,6 +636,28 @@ body.guide-open { overflow:hidden; }	/* 見た目の設定を指定 */
  flex:0 0 auto; padding:11px 16px; border-radius:9px; background:var(--ui-lime);	/* 見た目の設定を指定 */
  color:var(--ui-green); font-size:12px; font-weight:800; text-decoration:none;	/* 見た目の設定を指定 */
 }	/* スタイル定義を閉じる */
+
+@media (prefers-color-scheme: dark) {	/* ユーザーのダークモード設定を反映 */
+ .btn-attach { background:#203a46!important; color:#9fddf4!important; border-color:#37677a!important; }	/* 添付ボタンを暗色表示にする */
+ .btn-attach:hover { background:#2b4d5b!important; }	/* 添付ボタンの操作色を調整する */
+ .attachment-preview-item,.message-attachment-image { background:var(--ui-soft)!important; border-color:var(--ui-line)!important; }	/* 添付画像の枠を暗色表示にする */
+ .attachment-remove { background:rgba(8,14,11,.86)!important; }	/* 添付削除ボタンを見やすくする */
+ .btn-delete-history { background:#432936!important; color:#ffb4c1!important; border-color:#704452!important; }	/* 履歴削除ボタンを暗色表示にする */
+ .message-meta,.message-tool-button { color:var(--ui-muted)!important; }	/* メッセージ補助文字を調整する */
+ .message-tool-button:hover { color:var(--ui-green)!important; }	/* メッセージ操作色を調整する */
+ .message-tool-button.unsend { color:#ff9d9d!important; }	/* 送信取り消し色を調整する */
+ .message-bubble.is-unsent { background:#29322e!important; color:#aebdb2!important; border-color:#526257!important; }	/* 取り消し済み表示を暗色表示にする */
+ .impersonate-bar { background:#4a4020!important; border-color:#74652a!important; color:#f8e7a6!important; }	/* 代理ログイン表示を暗色表示にする */
+ .impersonate-bar button { background:#f0d36c!important; color:#332b14!important; }	/* 代理ログイン解除ボタンを調整する */
+ #user-name { background:var(--ui-soft)!important; color:var(--ui-muted)!important; border-color:var(--ui-line)!important; }	/* ユーザー名欄を暗色表示にする */
+ #form-title { color:var(--ui-ink)!important; }	/* 募集フォーム見出しを調整する */
+ .profile-image-group { background:var(--ui-soft)!important; }	/* プロフィール画像欄を暗色表示にする */
+ .btn-delete-image,.btn-delete-account { background:#432936!important; color:#ffb4c1!important; }	/* 危険操作ボタンを暗色表示にする */
+ .success { color:#8fe3b0!important; }	/* 成功メッセージを見やすくする */
+ .error { color:#ff9d9d!important; }	/* エラーメッセージを見やすくする */
+ body[data-page="terms"] h2,body[data-page="privacy"] h2 { background:var(--ui-soft)!important; color:var(--ui-ink)!important; border-left-color:var(--ui-green)!important; }	/* 規約見出しを暗色表示にする */
+ body[data-page="terms"] a[style],body[data-page="privacy"] a[style] { background:var(--ui-paper)!important; color:var(--ui-green)!important; }	/* 規約の戻るボタンを暗色表示にする */
+}	/* ダークモード補正を閉じる */
 @media(max-width:768px) {	/* 表示条件を設定 */
  .usage-intro-card { align-items:flex-start; flex-direction:column; padding:24px; }	/* 見た目の設定を指定 */
  .usage-intro-button { width:100%; }	/* 見た目の設定を指定 */

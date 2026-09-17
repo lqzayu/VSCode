@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">	<!-- 表示環境を設定 -->
     <title>募集投稿 - 平工マッチング</title>	<!-- ページタイトルを設定 -->
     <link rel="icon" href="icon-192.png">	<!-- 外部ファイルを読み込む -->
-    <link rel="stylesheet" href="theme.css?v=20260917c">	<!-- 外部ファイルを読み込む -->
+    <link rel="stylesheet" href="theme.css?v=20260918b">	<!-- 外部ファイルを読み込む -->
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
     <style>
@@ -38,12 +38,12 @@
 
 <body data-page="recruit">	<!-- 画面要素を配置 -->
     <header class="navbar">	<!-- ヘッダーを配置 -->
-        <div class="logo" onclick="location.href='users.html'">平工マッチング</div>	<!-- 画面要素を配置 -->
+        <div class="logo" onclick="location.href='main.html?tab=search'">平工マッチング</div>	<!-- 画面要素を配置 -->
         <button class="hamburger-btn" id="hud-menu-btn" type="button" onclick="toggleMenu()" aria-label="メニューを開く"><span></span><span></span><span></span></button>	<!-- 操作できる要素を配置 -->
         <nav class="nav-links" id="nav-links">	<!-- ナビゲーションを配置 -->
             <a class="nav-item" href="main.html?guide=1">使い方</a>	<!-- 操作できる要素を配置 -->
-            <a class="nav-item active" href="recruit.html">募集投稿</a>	<!-- 操作できる要素を配置 -->
-            <a class="nav-item" href="users.html">ユーザーを探す</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item active" href="main.html?tab=recruit">募集投稿</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="main.html?tab=search">ユーザーを探す</a>	<!-- 操作できる要素を配置 -->
             <a class="nav-item" href="messages.html">メッセージ <span id="unread-badge" class="unread-badge" style="display:none;">0</span></a>	<!-- 操作できる要素を配置 -->
             <a class="nav-item" href="profile.html">マイページ</a>	<!-- 操作できる要素を配置 -->
             <a class="nav-item" href="ai-study.html">AI学習相談</a>	<!-- 操作できる要素を配置 -->
@@ -78,9 +78,9 @@
                 <div id="my-post-content" class="my-post-empty">読み込み中...</div>	<!-- 画面要素を配置 -->
             </aside>	<!-- 要素を閉じる -->
         </div>	<!-- 要素を閉じる -->
-        <div class="page-links"><a href="users.html">募集一覧を見る</a><a href="messages.html">メッセージを確認する</a></div>	<!-- 画面要素を配置 -->
+        <div class="page-links"><a href="main.html?tab=search">募集一覧を見る</a><a href="messages.html">メッセージを確認する</a></div>	<!-- 画面要素を配置 -->
     </main>	<!-- 要素を閉じる -->
-    <footer class="footer"><div class="footer-container"><div class="footer-links"><a href="recruit.html">募集投稿</a><a href="users.html">ユーザーを探す</a><a href="messages.html">メッセージ</a><a href="profile.html">マイページ</a><a href="terms.html">利用規約</a><a href="privacy.html">プライバシーポリシー</a></div><p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p></div></footer>	<!-- フッターを配置 -->
+    <footer class="footer"><div class="footer-container"><div class="footer-links"><a href="main.html?tab=recruit">募集投稿</a><a href="main.html?tab=search">ユーザーを探す</a><a href="messages.html">メッセージ</a><a href="profile.html">マイページ</a><a href="terms.html">利用規約</a><a href="privacy.html">プライバシーポリシー</a></div><p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p></div></footer>	<!-- フッターを配置 -->
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";	// GAS APIの接続先を設定

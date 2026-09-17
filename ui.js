@@ -1,3 +1,44 @@
+const THEME_STORAGE_KEY = "heikoThemePreference";	// 外観設定の保存名を決める
+
+function normalizeThemePreference(value) {	// 外観設定の値を確認する
+    return value === "light" || value === "dark" ? value : "auto";	// 使用できる外観設定だけを返す
+}	// 処理のまとまりを閉じる
+
+function readThemePreference() {	// 保存済みの外観設定を読み込む
+    try {	// 保存情報の読み込みを試す
+        return normalizeThemePreference(localStorage.getItem(THEME_STORAGE_KEY));	// 保存値を整えて返す
+    } catch (error) {	// 保存情報を読めない場合に処理する
+        return "auto";	// 端末設定を初期値にする
+    }	// 処理のまとまりを閉じる
+}	// 処理のまとまりを閉じる
+
+function applyThemePreference(value, save = true) {	// 外観設定を画面へ反映する
+    const preference = normalizeThemePreference(value);	// 外観設定の値を整える
+    if (preference === "auto") {	// 端末設定を使う場合に処理する
+        document.documentElement.removeAttribute("data-theme");	// 手動設定を解除する
+    } else {	// 手動設定を使う場合に処理する
+        document.documentElement.setAttribute("data-theme", preference);	// 選択した外観を設定する
+    }	// 処理のまとまりを閉じる
+    if (save) {	// 保存が必要な場合に処理する
+        try {	// 外観設定の保存を試す
+            localStorage.setItem(THEME_STORAGE_KEY, preference);	// 選択した外観を保存する
+        } catch (error) {	// 保存できない場合に処理する
+            console.warn("外観設定を保存できませんでした。", error);	// 保存失敗を記録する
+        }	// 処理のまとまりを閉じる
+    }	// 処理のまとまりを閉じる
+    const selector = document.getElementById("theme-preference");	// 外観設定の選択欄を取得する
+    if (selector) selector.value = preference;	// 選択欄へ現在値を表示する
+    return preference;	// 適用した外観設定を返す
+}	// 処理のまとまりを閉じる
+
+applyThemePreference(readThemePreference(), false);	// ページ表示前に外観設定を反映する
+window.applyThemePreference = applyThemePreference;	// ページ側から外観設定を変更できるようにする
+window.getThemePreference = readThemePreference;	// ページ側から外観設定を確認できるようにする
+document.addEventListener("DOMContentLoaded", () => {	// 画面の読み込み完了後に処理する
+    const selector = document.getElementById("theme-preference");	// 外観設定の選択欄を取得する
+    if (selector) selector.value = readThemePreference();	// 保存済みの外観設定を選択欄へ表示する
+});	// 読み込み完了時の処理を登録する
+
 (function () {	// 処理のまとまりを始める
     function getNoticeType(message) {	// 関数を定義
         const text = String(message || "");	// 定数を定義
