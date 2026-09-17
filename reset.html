@@ -78,8 +78,11 @@
         <div class="card">
             <h1>新しいパスワードを設定</h1>
             <div id="form-area">
-                <input type="password" id="new-password" placeholder="新しいパスワード">
-                <input type="password" id="confirm-password" placeholder="新しいパスワード（確認）">
+                <input type="password" id="new-password" placeholder="新しいパスワード" maxlength="128" autocomplete="new-password">
+                <input type="password" id="confirm-password" placeholder="新しいパスワード（確認）" maxlength="128" autocomplete="new-password">
+                <p style="margin:-4px 2px 14px; color:#64748b; font-size:12px; line-height:1.65; text-align:left;">
+                    半角4文字以上で、英大文字・英小文字・数字・記号を各1文字以上含めてください。同じ数字4桁の繰り返しや、1234・4321のような4桁の連番は使用できません。
+                </p>
                 <div id="message" class="message"></div>
                 <button onclick="submitReset()">パスワードを更新する</button>
             </div>
@@ -116,13 +119,45 @@
             document.getElementById("form-area").innerHTML = "<p style='color:#ef4444;'>無効なリンクです。パスワード再設定をやり直してください。</p>";
         }
 
+        function hasWeakNumberSequence(password) {
+            const numberRuns = String(password).match(/\d{4,}/g) || [];
+            return numberRuns.some(run => {
+                for (let i = 0; i <= run.length - 4; i++) {
+                    const digits = run.slice(i, i + 4).split("").map(Number);
+                    const same = digits.every(digit => digit === digits[0]);
+                    const ascending = digits.slice(1).every((digit, index) => digit === (digits[index] + 1) % 10);
+                    const descending = digits.slice(1).every((digit, index) => digit === (digits[index] + 9) % 10);
+                    if (same || ascending || descending) return true;
+                }
+                return false;
+            });
+        }
+
+        function validatePassword(password) {
+            if (password.length < 4) return "パスワードは4文字以上で入力してください";
+            if (password.length > 128) return "パスワードは128文字以内で入力してください";
+            if (!/^[\x21-\x7E]+$/.test(password)) return "パスワードは半角英数字・記号のみ使用できます";
+            if (!/[A-Z]/.test(password)) return "パスワードに英大文字を1文字以上含めてください";
+            if (!/[a-z]/.test(password)) return "パスワードに英小文字を1文字以上含めてください";
+            if (!/[0-9]/.test(password)) return "パスワードに数字を1文字以上含めてください";
+            if (!/[^A-Za-z0-9]/.test(password)) return "パスワードに記号を1文字以上含めてください";
+            if (hasWeakNumberSequence(password)) return "同じ数字4桁の繰り返しや、1234・4321のような4桁の連番は使用できません";
+            return "";
+        }
+
         async function submitReset() {
-            const newPassword = document.getElementById("new-password").value.trim();
-            const confirmPassword = document.getElementById("confirm-password").value.trim();
+            const newPassword = document.getElementById("new-password").value;
+            const confirmPassword = document.getElementById("confirm-password").value;
             const msgEl = document.getElementById("message");
 
             if (!newPassword || !confirmPassword) {
                 msgEl.textContent = "両方の欄を入力してください";
+                msgEl.className = "message error";
+                return;
+            }
+            const passwordError = validatePassword(newPassword);
+            if (passwordError) {
+                msgEl.textContent = passwordError;
                 msgEl.className = "message error";
                 return;
             }
