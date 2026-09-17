@@ -139,10 +139,57 @@
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
         const currentUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";
-        const sessionId = (crypto.randomUUID ? crypto.randomUUID() : "ai-" + Date.now());
+        const stateKey = "ai-study-state:" + currentUserId;
+        let sessionId = (crypto.randomUUID ? crypto.randomUUID() : "ai-" + Date.now());
         const history = [];
+        const conversation = [];
         let waiting = false;
         let consultationCompleted = false;
+        let pendingRequest = null;
+
+        function createId() {
+            return crypto.randomUUID ? crypto.randomUUID() : "ai-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+        }
+
+        function currentDateKey() {
+            return new Date().toLocaleDateString("sv-SE");
+        }
+
+        function getProfile() {
+            return {
+                subject: document.getElementById("ai-subject").value,
+                goal: document.getElementById("ai-goal").value.trim(),
+                challenge: document.getElementById("ai-challenge").value.trim(),
+                minutes: document.getElementById("ai-minutes").value,
+                preference: document.getElementById("ai-preference").value
+            };
+        }
+
+        function setProfile(profile) {
+            if (!profile) return;
+            if (profile.subject) document.getElementById("ai-subject").value = profile.subject;
+            if (profile.goal) document.getElementById("ai-goal").value = profile.goal;
+            if (profile.challenge) document.getElementById("ai-challenge").value = profile.challenge;
+            if (profile.minutes) document.getElementById("ai-minutes").value = profile.minutes;
+            if (profile.preference) document.getElementById("ai-preference").value = profile.preference;
+        }
+
+        function saveState() {
+            if (!currentUserId) return;
+            try {
+                localStorage.setItem(stateKey, JSON.stringify({
+                    dateKey: currentDateKey(),
+                    sessionId,
+                    history,
+                    conversation,
+                    profile: getProfile(),
+                    consultationCompleted,
+                    pendingRequest
+                }));
+            } catch (error) {
+                console.debug("AI相談の状態を保存できませんでした。", error);
+            }
+        }
 
         function toggleMenu() {
             const nav = document.getElementById("nav-links");
@@ -187,15 +234,96 @@
             return bubble;
         }
 
-        async function postGas(payload, timeoutMs) {
-            const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), timeoutMs || 30000);
+        function wait(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function postGas(payload, timeoutMs, attempts) {
+            let lastError;
+            for (let attempt = 0; attempt < (attempts || 2); attempt++) {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), timeoutMs || 45000);
+                try {
+                    const response = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload), signal: controller.signal });
+                    if (!response.ok) throw new Error("HTTP " + response.status);
+                    return await response.json();
+                } catch (error) {
+                    lastError = error;
+                    if (attempt + 1 < (attempts || 2)) await wait(1500 * (attempt + 1));
+                } finally {
+                    clearTimeout(timer);
+                }
+            }
+            throw lastError || new Error("通信に失敗しました");
+        }
+
+        function lockCompletedConsultation() {
+            consultationCompleted = true;
+            const input = document.getElementById("ai-input");
+            input.disabled = true;
+            input.placeholder = "今回のAI相談は完了しました";
+            document.getElementById("ai-send").textContent = "相談完了";
+            document.getElementById("ai-status").textContent = "おすすめ表示まで完了";
+            saveState();
+        }
+
+        async function requestAi(request, existingLoading) {
+            if (waiting || !request) return;
+            waiting = true;
+            pendingRequest = request;
+            saveState();
+            const sendButton = document.getElementById("ai-send");
+            const status = document.getElementById("ai-status");
+            sendButton.disabled = true;
+            status.textContent = "回答を取得中…";
+            const loading = existingLoading || addBubble("あなたに合う方法を考えています…", "model loading");
+            let result;
+
             try {
-                const response = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload), signal: controller.signal });
-                if (!response.ok) throw new Error("HTTP " + response.status);
-                return await response.json();
+                for (let poll = 0; poll < 6; poll++) {
+                    result = await postGas({
+                        mode: "aiStudyChat",
+                        userId: currentUserId,
+                        sessionId: request.sessionId,
+                        requestId: request.requestId,
+                        profile: request.profile,
+                        message: request.message,
+                        history: request.history
+                    }, 45000, 2);
+                    if (result.status === "success" && result.message && result.message.pending) {
+                        status.textContent = "回答を仕上げています…";
+                        await wait(2500);
+                        continue;
+                    }
+                    break;
+                }
+
+                loading.remove();
+                if (!result || result.status !== "success" || !result.message || !result.message.reply) {
+                    throw new Error(result && result.message ? String(result.message) : "回答を取得できませんでした");
+                }
+
+                pendingRequest = null;
+                addBubble(result.message.reply, "model", result.message.responseId);
+                history.push({ role: "model", text: result.message.reply });
+                conversation.push({ type: "model", text: result.message.reply, responseId: result.message.responseId || "" });
+                if (result.message.completed) {
+                    lockCompletedConsultation();
+                    showNotice("おすすめの表示が完了しました。回答を評価してください", "success");
+                } else {
+                    document.getElementById("ai-input").placeholder = "AIの追加質問に答えてください…";
+                    status.textContent = "追加質問 1 / 1";
+                    saveState();
+                }
+            } catch (error) {
+                loading.remove();
+                saveState();
+                document.getElementById("ai-send").textContent = "回答を再取得";
+                showNotice(error.name === "AbortError" ? "通信に時間がかかっています。回答を再取得してください" : (error.message || "AIとの通信に失敗しました"), "error");
             } finally {
-                clearTimeout(timer);
+                waiting = false;
+                if (!consultationCompleted) sendButton.disabled = false;
+                if (!consultationCompleted && pendingRequest) status.textContent = "通信が不安定です。再取得できます";
             }
         }
 
@@ -206,50 +334,28 @@
                 location.href = "index.html";
                 return;
             }
+            if (pendingRequest) {
+                requestAi(pendingRequest);
+                return;
+            }
             const input = document.getElementById("ai-input");
             const message = input.value.trim();
             if (!message) return showNotice("相談内容を入力してください", "error");
 
-            const profile = {
-                subject: document.getElementById("ai-subject").value,
-                goal: document.getElementById("ai-goal").value.trim(),
-                challenge: document.getElementById("ai-challenge").value.trim(),
-                minutes: document.getElementById("ai-minutes").value,
-                preference: document.getElementById("ai-preference").value
+            const request = {
+                requestId: createId(),
+                sessionId,
+                profile: getProfile(),
+                message,
+                history: history.slice(-8)
             };
             addBubble(message, "user");
+            conversation.push({ type: "user", text: message });
             history.push({ role: "user", text: message });
             input.value = "";
-            waiting = true;
-            document.getElementById("ai-send").disabled = true;
-            document.getElementById("ai-status").textContent = "考え中…";
-            const loading = addBubble("あなたに合う方法を考えています…", "model loading");
-
-            try {
-                const result = await postGas({ mode: "aiStudyChat", userId: currentUserId, sessionId, profile, message, history });
-                loading.remove();
-                if (result.status !== "success" || !result.message || !result.message.reply) throw new Error(result.message || "回答を取得できませんでした");
-                addBubble(result.message.reply, "model", result.message.responseId);
-                history.push({ role: "model", text: result.message.reply });
-                if (result.message.completed) {
-                    consultationCompleted = true;
-                    input.disabled = true;
-                    input.placeholder = "今回のAI相談は完了しました";
-                    document.getElementById("ai-send").textContent = "相談完了";
-                    document.getElementById("ai-status").textContent = "おすすめ表示まで完了";
-                    showNotice("おすすめの表示が完了しました。回答を評価してください", "success");
-                } else {
-                    input.placeholder = "AIの追加質問に答えてください…";
-                    document.getElementById("ai-status").textContent = "追加質問 1 / 1";
-                }
-            } catch (error) {
-                loading.remove();
-                showNotice(error.name === "AbortError" ? "回答に時間がかかっています。もう一度お試しください" : (error.message || "AIとの通信に失敗しました"), "error");
-            } finally {
-                waiting = false;
-                document.getElementById("ai-send").disabled = false;
-                document.getElementById("ai-status").textContent = "";
-            }
+            pendingRequest = request;
+            saveState();
+            requestAi(request);
         }
 
         async function sendFeedback(responseId, rating, container) {
@@ -277,8 +383,41 @@
             }
         });
 
+        function restoreState() {
+            if (!currentUserId) return;
+            try {
+                const saved = JSON.parse(localStorage.getItem(stateKey) || "null");
+                if (!saved) return;
+                if (saved.dateKey !== currentDateKey()) {
+                    localStorage.removeItem(stateKey);
+                    return;
+                }
+                if (saved.sessionId) sessionId = saved.sessionId;
+                setProfile(saved.profile);
+                if (Array.isArray(saved.history)) history.push(...saved.history);
+                if (Array.isArray(saved.conversation)) {
+                    saved.conversation.forEach(item => {
+                        if (!item || !item.text) return;
+                        conversation.push(item);
+                        addBubble(item.text, item.type === "model" ? "model" : "user", item.responseId || "");
+                    });
+                }
+                consultationCompleted = saved.consultationCompleted === true;
+                pendingRequest = saved.pendingRequest || null;
+                if (consultationCompleted) lockCompletedConsultation();
+                if (pendingRequest && !consultationCompleted) {
+                    document.getElementById("ai-send").textContent = "回答を再取得";
+                    setTimeout(() => requestAi(pendingRequest), 400);
+                }
+            } catch (error) {
+                localStorage.removeItem(stateKey);
+            }
+        }
+
         if (!currentUserId) {
             showNotice("ログインしてから利用してください", "error");
+        } else {
+            restoreState();
         }
     </script>
 </body>
