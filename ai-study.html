@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI学習相談 - 平工マッチング</title>
+    <link rel="icon" href="icon-192.png">
+    <link rel="stylesheet" href="theme.css?v=20260917c">
+    <script src="ui.js"></script>
+    <script src="common.js"></script>
+    <script src="online.js?v=20260917b" defer></script>
+    <style>
+        .ai-page { max-width: 1080px; margin: 0 auto; padding: 46px 24px 80px; }
+        .ai-hero { display:grid; grid-template-columns:1.1fr .9fr; gap:24px; align-items:stretch; margin-bottom:24px; }
+        .ai-hero-copy, .ai-profile, .ai-chat-card { background:var(--ui-paper); border:1px solid var(--ui-line); border-radius:20px; box-shadow:0 12px 30px rgba(36,60,50,.06); }
+        .ai-hero-copy { padding:30px; background:linear-gradient(135deg, var(--ui-green), #47755b); color:#fff; overflow:hidden; position:relative; }
+        .ai-hero-copy::after { content:""; position:absolute; width:220px; height:220px; right:-70px; top:-80px; border-radius:50%; background:var(--ui-lime); opacity:.22; }
+        .ai-kicker { margin:0 0 10px; font-size:11px; letter-spacing:.18em; font-weight:800; opacity:.8; }
+        .ai-hero-copy h1 { margin:0; font-size:clamp(28px,4vw,46px); line-height:1.2; letter-spacing:-.06em; position:relative; z-index:1; }
+        .ai-hero-copy p { margin:16px 0 0; max-width:560px; color:rgba(255,255,255,.82); position:relative; z-index:1; }
+        .ai-profile { padding:22px; }
+        .ai-profile h2, .ai-chat-header h2 { margin:0 0 16px; font-size:17px; letter-spacing:-.03em; }
+        .ai-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+        .ai-field { display:flex; flex-direction:column; gap:5px; }
+        .ai-field.full { grid-column:1 / -1; }
+        .ai-field label { color:var(--ui-muted); font-size:12px; font-weight:700; }
+        .ai-field input, .ai-field select { width:100%; min-height:44px; padding:9px 11px; }
+        .ai-chat-card { overflow:hidden; }
+        .ai-chat-header { padding:22px 24px; border-bottom:1px solid var(--ui-line); display:flex; justify-content:space-between; gap:16px; align-items:center; }
+        .ai-chat-header h2 { margin:0; }
+        .ai-chat-header p { margin:0; color:var(--ui-muted); font-size:12px; }
+        .ai-messages { min-height:360px; max-height:560px; overflow:auto; padding:22px; display:flex; flex-direction:column; gap:14px; background:rgba(237,241,231,.38); }
+        .ai-empty { margin:auto; max-width:430px; color:var(--ui-muted); text-align:center; font-size:14px; }
+        .ai-bubble { max-width:min(780px, 92%); padding:14px 16px; border-radius:16px; white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.75; font-size:14px; }
+        .ai-bubble.user { align-self:flex-end; color:#fff; background:var(--ui-green); border-bottom-right-radius:5px; }
+        .ai-bubble.model { align-self:flex-start; color:var(--ui-ink); background:var(--ui-paper); border:1px solid var(--ui-line); border-bottom-left-radius:5px; }
+        .ai-bubble.loading { color:var(--ui-muted); font-size:13px; }
+        .ai-feedback { display:flex; gap:7px; margin-top:10px; }
+        .ai-feedback button { padding:6px 9px; border:1px solid var(--ui-line); border-radius:8px; background:var(--ui-paper); color:var(--ui-muted); font-size:11px; cursor:pointer; }
+        .ai-feedback button:hover { border-color:#8cae59; color:var(--ui-green); }
+        .ai-compose { padding:18px 22px 22px; border-top:1px solid var(--ui-line); }
+        .ai-compose-row { display:flex; gap:10px; align-items:flex-end; }
+        .ai-compose textarea { flex:1; min-height:54px; max-height:150px; resize:vertical; padding:12px; }
+        .ai-send { min-height:54px; padding:0 20px; border:0; border-radius:10px; background:var(--ui-green); color:#fff; font-weight:800; cursor:pointer; }
+        .ai-send:hover { background:#37674b; }
+        .ai-send:disabled { cursor:wait; }
+        .ai-note { margin:10px 0 0; color:var(--ui-muted); font-size:11px; }
+        @media (max-width:760px) {
+            .ai-page { padding:28px 14px 60px; }
+            .ai-hero { grid-template-columns:1fr; }
+            .ai-hero-copy { padding:24px; }
+            .ai-form-grid { grid-template-columns:1fr; }
+            .ai-field.full { grid-column:auto; }
+            .ai-chat-header { align-items:flex-start; flex-direction:column; }
+            .ai-compose-row { flex-direction:column; align-items:stretch; }
+            .ai-send { width:100%; }
+        }
+    </style>
+</head>
+
+<body data-page="ai-study">
+    <header class="navbar">
+        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
+        <button class="hamburger-btn" id="hud-menu-btn" type="button" onclick="toggleMenu()" aria-label="メニューを開く">
+            <span></span><span></span><span></span>
+        </button>
+        <nav class="nav-links" id="nav-links">
+            <a class="nav-item" href="main.html?guide=1">使い方</a>
+            <a class="nav-item" href="main.html?tab=recruit">募集投稿</a>
+            <a class="nav-item" href="main.html?tab=search">ユーザーを探す</a>
+            <a class="nav-item" href="messages.html">メッセージ</a>
+            <a class="nav-item" href="profile.html">マイページ</a>
+            <a class="nav-item active" href="ai-study.html">AI学習相談</a>
+            <a class="nav-item" id="nav-admin-btn" style="display:none;color:#a84738;" href="admin.html">管理者</a>
+            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>
+        </nav>
+    </header>
+
+    <main class="ai-page">
+        <section class="ai-hero">
+            <div class="ai-hero-copy">
+                <p class="ai-kicker">STUDY ADVISOR</p>
+                <h1>自分に合う勉強法を、AIと一緒に見つける。</h1>
+                <p>今の悩みや勉強できる時間をもとに、今日から実行できる方法を一緒に考えます。回答への評価は、今後の推薦方法の改善にも使われます。</p>
+            </div>
+            <section class="ai-profile">
+                <h2>まずはあなたの状況を教えてください</h2>
+                <div class="ai-form-grid">
+                    <div class="ai-field">
+                        <label for="ai-subject">教科</label>
+                        <select id="ai-subject">
+                            <option value="未指定">まだ決まっていない</option>
+                            <option>数学</option><option>英語</option><option>国語</option><option>理科</option><option>社会</option><option>専門科目</option><option>その他</option>
+                        </select>
+                    </div>
+                    <div class="ai-field">
+                        <label for="ai-minutes">1日に勉強できる時間</label>
+                        <select id="ai-minutes">
+                            <option>15分</option><option>30分</option><option>45分</option><option>1時間</option><option>2時間以上</option><option>日によって違う</option>
+                        </select>
+                    </div>
+                    <div class="ai-field full">
+                        <label for="ai-goal">達成したいこと</label>
+                        <input id="ai-goal" maxlength="300" placeholder="例：次のテストで平均点を超えたい">
+                    </div>
+                    <div class="ai-field full">
+                        <label for="ai-challenge">困っていること</label>
+                        <input id="ai-challenge" maxlength="300" placeholder="例：勉強を始めても集中が続かない">
+                    </div>
+                    <div class="ai-field full">
+                        <label for="ai-preference">やりやすい方法</label>
+                        <select id="ai-preference">
+                            <option>特に決まっていない</option><option>動画や図を見る</option><option>声に出して説明する</option><option>問題を解いて覚える</option><option>友達と一緒に進める</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <section class="ai-chat-card">
+            <div class="ai-chat-header">
+                <div><h2>AI学習相談</h2><p>相談内容を具体的に書くほど、提案があなた向けになります。</p></div>
+                <span id="ai-status" class="ai-note" aria-live="polite"></span>
+            </div>
+            <div id="ai-messages" class="ai-messages" aria-live="polite">
+                <p class="ai-empty" id="ai-empty">「数学の勉強を始めてもすぐスマホを見てしまう」のように、今困っていることを入力してください。</p>
+            </div>
+            <div class="ai-compose">
+                <div class="ai-compose-row">
+                    <textarea id="ai-input" maxlength="1500" placeholder="AIに相談する内容を入力…"></textarea>
+                    <button id="ai-send" class="ai-send" type="button" onclick="sendStudyMessage()">相談する</button>
+                </div>
+                <p class="ai-note">入力内容はAI回答の生成と推薦方法の研究・改善に使用します。個人情報やパスワードは入力しないでください。</p>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
+        const currentUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";
+        const sessionId = (crypto.randomUUID ? crypto.randomUUID() : "ai-" + Date.now());
+        const history = [];
+        let waiting = false;
+
+        function toggleMenu() {
+            const nav = document.getElementById("nav-links");
+            const button = document.getElementById("hud-menu-btn");
+            nav.classList.toggle("open");
+            button.classList.toggle("open");
+        }
+
+        function closeMenu() {
+            document.getElementById("nav-links").classList.remove("open");
+            document.getElementById("hud-menu-btn").classList.remove("open");
+        }
+
+        function logout() {
+            ["userId", "userEmail", "userName", "profileImage", "adminToken", "isImpersonating"].forEach(key => localStorage.removeItem(key));
+            location.href = "index.html";
+        }
+
+        function addBubble(text, type, responseId) {
+            const empty = document.getElementById("ai-empty");
+            if (empty) empty.remove();
+            const bubble = document.createElement("div");
+            bubble.className = "ai-bubble " + type;
+            bubble.textContent = text;
+            if (type === "model" && responseId) {
+                const feedback = document.createElement("div");
+                feedback.className = "ai-feedback";
+                const helpful = document.createElement("button");
+                helpful.type = "button";
+                helpful.textContent = "役に立った";
+                helpful.onclick = () => sendFeedback(responseId, "helpful", feedback);
+                const notHelpful = document.createElement("button");
+                notHelpful.type = "button";
+                notHelpful.textContent = "もう少し合う方法がいい";
+                notHelpful.onclick = () => sendFeedback(responseId, "not_helpful", feedback);
+                feedback.append(helpful, notHelpful);
+                bubble.appendChild(feedback);
+            }
+            const messages = document.getElementById("ai-messages");
+            messages.appendChild(bubble);
+            messages.scrollTop = messages.scrollHeight;
+            return bubble;
+        }
+
+        async function postGas(payload, timeoutMs) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs || 30000);
+            try {
+                const response = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload), signal: controller.signal });
+                if (!response.ok) throw new Error("HTTP " + response.status);
+                return await response.json();
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
+        async function sendStudyMessage() {
+            if (waiting) return;
+            if (!currentUserId) {
+                showNotice("ログインしてから利用してください", "error");
+                location.href = "index.html";
+                return;
+            }
+            const input = document.getElementById("ai-input");
+            const message = input.value.trim();
+            if (!message) return showNotice("相談内容を入力してください", "error");
+
+            const profile = {
+                subject: document.getElementById("ai-subject").value,
+                goal: document.getElementById("ai-goal").value.trim(),
+                challenge: document.getElementById("ai-challenge").value.trim(),
+                minutes: document.getElementById("ai-minutes").value,
+                preference: document.getElementById("ai-preference").value
+            };
+            addBubble(message, "user");
+            history.push({ role: "user", text: message });
+            input.value = "";
+            waiting = true;
+            document.getElementById("ai-send").disabled = true;
+            document.getElementById("ai-status").textContent = "考え中…";
+            const loading = addBubble("あなたに合う方法を考えています…", "model loading");
+
+            try {
+                const result = await postGas({ mode: "aiStudyChat", userId: currentUserId, sessionId, profile, message, history });
+                loading.remove();
+                if (result.status !== "success" || !result.message || !result.message.reply) throw new Error(result.message || "回答を取得できませんでした");
+                addBubble(result.message.reply, "model", result.message.responseId);
+                history.push({ role: "model", text: result.message.reply });
+            } catch (error) {
+                loading.remove();
+                showNotice(error.name === "AbortError" ? "回答に時間がかかっています。もう一度お試しください" : (error.message || "AIとの通信に失敗しました"), "error");
+            } finally {
+                waiting = false;
+                document.getElementById("ai-send").disabled = false;
+                document.getElementById("ai-status").textContent = "";
+            }
+        }
+
+        async function sendFeedback(responseId, rating, container) {
+            if (!container || container.dataset.saved) return;
+            container.dataset.saved = "true";
+            try {
+                const result = await postGas({ mode: "aiStudyFeedback", userId: currentUserId, responseId, rating });
+                if (result.status === "success") {
+                    container.textContent = "評価を保存しました";
+                    showNotice("評価を保存しました", "success");
+                } else {
+                    delete container.dataset.saved;
+                    showNotice(result.message || "評価を保存できませんでした", "error");
+                }
+            } catch (error) {
+                delete container.dataset.saved;
+                showNotice("評価を保存できませんでした", "error");
+            }
+        }
+
+        document.getElementById("ai-input").addEventListener("keydown", event => {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendStudyMessage();
+            }
+        });
+
+        if (!currentUserId) {
+            showNotice("ログインしてから利用してください", "error");
+        }
+    </script>
+</body>
+</html>
