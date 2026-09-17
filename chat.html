@@ -459,7 +459,7 @@
             window.location.href = "index.html";
         }
 
-        async function postChat(payload, timeoutMs = 12000) {
+        async function postChat(payload, timeoutMs = (Array.isArray(payload.attachments) && payload.attachments.length > 0 ? 45000 : 12000)) {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
