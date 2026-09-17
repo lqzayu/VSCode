@@ -142,6 +142,7 @@
         const sessionId = (crypto.randomUUID ? crypto.randomUUID() : "ai-" + Date.now());
         const history = [];
         let waiting = false;
+        let consultationCompleted = false;
 
         function toggleMenu() {
             const nav = document.getElementById("nav-links");
@@ -199,7 +200,7 @@
         }
 
         async function sendStudyMessage() {
-            if (waiting) return;
+            if (waiting || consultationCompleted) return;
             if (!currentUserId) {
                 showNotice("ログインしてから利用してください", "error");
                 location.href = "index.html";
@@ -230,6 +231,17 @@
                 if (result.status !== "success" || !result.message || !result.message.reply) throw new Error(result.message || "回答を取得できませんでした");
                 addBubble(result.message.reply, "model", result.message.responseId);
                 history.push({ role: "model", text: result.message.reply });
+                if (result.message.completed) {
+                    consultationCompleted = true;
+                    input.disabled = true;
+                    input.placeholder = "今回のAI相談は完了しました";
+                    document.getElementById("ai-send").textContent = "相談完了";
+                    document.getElementById("ai-status").textContent = "おすすめ表示まで完了";
+                    showNotice("おすすめの表示が完了しました。回答を評価してください", "success");
+                } else {
+                    input.placeholder = "AIの追加質問に答えてください…";
+                    document.getElementById("ai-status").textContent = "追加質問 1 / 1";
+                }
             } catch (error) {
                 loading.remove();
                 showNotice(error.name === "AbortError" ? "回答に時間がかかっています。もう一度お試しください" : (error.message || "AIとの通信に失敗しました"), "error");
