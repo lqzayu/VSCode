@@ -1,15 +1,15 @@
-<!DOCTYPE html>
-<html lang="ja">
+<!DOCTYPE html>	<!-- HTML文書として宣言 -->
+<html lang="ja">	<!-- 画面要素を配置 -->
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>マイページ - 平工マッチング</title>
+<head>	<!-- 画面要素を配置 -->
+    <meta charset="UTF-8">	<!-- 表示環境を設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">	<!-- 表示環境を設定 -->
+    <title>マイページ - 平工マッチング</title>	<!-- ページタイトルを設定 -->
 
-    <link rel="icon" href="icon-192.png">
+    <link rel="icon" href="icon-192.png">	<!-- 外部ファイルを読み込む -->
 
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" crossorigin="anonymous" />	<!-- 外部ファイルを読み込む -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" crossorigin="anonymous"></script>
 
 
@@ -20,1097 +20,1097 @@
 
 
     <style>
-        body {
-            margin: 0;
-            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            color: #1e293b;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-        }
+        body {	/* 対象要素のスタイルを始める */
+            margin: 0;	/* 見た目の設定を指定 */
+            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);	/* 見た目の設定を指定 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            min-height: 100vh;	/* 見た目の設定を指定 */
+            -webkit-font-smoothing: antialiased;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .navbar {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 14px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+        .navbar {	/* 対象要素のスタイルを始める */
+            background: rgba(255, 255, 255, 0.75);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            -webkit-backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            padding: 14px 5%;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            justify-content: space-between;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);	/* 見た目の設定を指定 */
+            position: sticky;	/* 見た目の設定を指定 */
+            top: 0;	/* 見た目の設定を指定 */
+            z-index: 100;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            cursor: pointer;
-        }
+        .logo {	/* 対象要素のスタイルを始める */
+            font-size: 1.4rem;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            letter-spacing: -0.03em;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            -webkit-background-clip: text;	/* 見た目の設定を指定 */
+            -webkit-text-fill-color: transparent;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .nav-links {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            gap: 8px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .nav-item {
-            cursor: pointer;
-            color: #64748b;
-            font-weight: 700;
-            font-size: 14px;
-            padding: 8px 16px;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            position: relative;
-        }
+        .nav-item {	/* 対象要素のスタイルを始める */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            color: #64748b;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            font-size: 14px;	/* 見た目の設定を指定 */
+            padding: 8px 16px;	/* 見た目の設定を指定 */
+            text-decoration: none;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            transition: all 0.2s ease;	/* 見た目の設定を指定 */
+            position: relative;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .nav-item:hover {
-            background-color: rgba(28, 189, 197, 0.06);
-            color: #1cbdc5;
-        }
+        .nav-item:hover {	/* 対象要素のスタイルを始める */
+            background-color: rgba(28, 189, 197, 0.06);	/* 見た目の設定を指定 */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .nav-item.active {
-           color: #1cbdc5;
-           background-color: rgba(28, 189, 197, 0.1);
-        }
+        .nav-item.active {	/* 対象要素のスタイルを始める */
+           color: #1cbdc5;	/* 見た目の設定を指定 */
+           background-color: rgba(28, 189, 197, 0.1);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .unread-badge {
-            position: absolute;
-            top: 2px;
-            right: 4px;
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: #ffffff;
-            font-size: 10px;
-            font-weight: 800;
-            padding: 2px 6px;
-            border-radius: 10px;
-            line-height: 1;
-            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
-            min-width: 14px;
-            text-align: center;
-            box-sizing: border-box;
-        }
+        .unread-badge {	/* 対象要素のスタイルを始める */
+            position: absolute;	/* 見た目の設定を指定 */
+            top: 2px;	/* 見た目の設定を指定 */
+            right: 4px;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);	/* 見た目の設定を指定 */
+            color: #ffffff;	/* 見た目の設定を指定 */
+            font-size: 10px;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            padding: 2px 6px;	/* 見た目の設定を指定 */
+            border-radius: 10px;	/* 見た目の設定を指定 */
+            line-height: 1;	/* 見た目の設定を指定 */
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);	/* 見た目の設定を指定 */
+            min-width: 14px;	/* 見た目の設定を指定 */
+            text-align: center;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-logout {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: none;
-            background-color: #ef4444;
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
-            transition: all 0.2s;
-        }
+        .btn-logout {	/* 対象要素のスタイルを始める */
+            padding: 8px 16px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            background-color: #ef4444;	/* 見た目の設定を指定 */
+            color: #ffffff;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-logout:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
-        }
+        .btn-logout:hover {	/* 対象要素のスタイルを始める */
+            opacity: 0.9;	/* 見た目の設定を指定 */
+            transform: translateY(-1px);	/* 見た目の設定を指定 */
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .hamburger-btn {
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 20px;
-            height: 15px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            z-index: 110;
-        }
+        .hamburger-btn {	/* 対象要素のスタイルを始める */
+            display: none;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            justify-content: space-between;	/* 見た目の設定を指定 */
+            width: 20px;	/* 見た目の設定を指定 */
+            height: 15px;	/* 見た目の設定を指定 */
+            background: transparent;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            padding: 0;	/* 見た目の設定を指定 */
+            z-index: 110;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .hamburger-btn span {
-            width: 100%;
-            height: 2px;
-            background-color: #262626;
-            border-radius: 2px;
-        }
+        .hamburger-btn span {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            height: 2px;	/* 見た目の設定を指定 */
+            background-color: #262626;	/* 見た目の設定を指定 */
+            border-radius: 2px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .container {
-            flex: 1;
-            width: 100%;
-            max-width: 500px;
-            margin: 30px auto;
-            padding: 0 16px;
-            box-sizing: border-box;
-        }
+        .container {	/* 対象要素のスタイルを始める */
+            flex: 1;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            max-width: 500px;	/* 見た目の設定を指定 */
+            margin: 30px auto;	/* 見た目の設定を指定 */
+            padding: 0 16px;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .profile-card {
-            background: #ffffff;
-            border: 1px solid #dbdbdb;
-            border-radius: 16px;
-            padding: 40px 32px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-            text-align: center;
-            box-sizing: border-box;
-        }
+        .profile-card {	/* 対象要素のスタイルを始める */
+            background: #ffffff;	/* 見た目の設定を指定 */
+            border: 1px solid #dbdbdb;	/* 見た目の設定を指定 */
+            border-radius: 16px;	/* 見た目の設定を指定 */
+            padding: 40px 32px;	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);	/* 見た目の設定を指定 */
+            text-align: center;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .profile-card h2 {
-            font-size: 1.25rem;
-            margin-top: 0;
-            margin-bottom: 30px;
-            color: #262626;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-        }
+        .profile-card h2 {	/* 対象要素のスタイルを始める */
+            font-size: 1.25rem;	/* 見た目の設定を指定 */
+            margin-top: 0;	/* 見た目の設定を指定 */
+            margin-bottom: 30px;	/* 見た目の設定を指定 */
+            color: #262626;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            letter-spacing: -0.02em;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .profile-image-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 30px;
-        }
+        .profile-image-group {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            gap: 16px;	/* 見た目の設定を指定 */
+            margin-bottom: 30px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .big-profile-icon {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-            border: 3px solid #ffffff;
-            transition: transform 0.25s ease;
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: crisp-edges;
-        }
+        .big-profile-icon {	/* 対象要素のスタイルを始める */
+            width: 120px;	/* 見た目の設定を指定 */
+            height: 120px;	/* 見た目の設定を指定 */
+            border-radius: 50%;	/* 見た目の設定を指定 */
+            object-fit: cover;	/* 見た目の設定を指定 */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);	/* 見た目の設定を指定 */
+            border: 3px solid #ffffff;	/* 見た目の設定を指定 */
+            transition: transform 0.25s ease;	/* 見た目の設定を指定 */
+            image-rendering: -webkit-optimize-contrast;	/* 見た目の設定を指定 */
+            image-rendering: crisp-edges;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .image-btn-group {
-            display: flex;
-            gap: 10px;
-        }
+        .image-btn-group {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            gap: 10px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .input-file-label {
-            background-color: #f0f0f0;
-            color: #262626;
-            padding: 8px 18px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        .input-file-label {	/* 対象要素のスタイルを始める */
+            background-color: #f0f0f0;	/* 見た目の設定を指定 */
+            color: #262626;	/* 見た目の設定を指定 */
+            padding: 8px 18px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .input-file-label:hover {
-            background-color: #e4e4e4;
-        }
+        .input-file-label:hover {	/* 対象要素のスタイルを始める */
+            background-color: #e4e4e4;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-delete-image {
-            background-color: #ffe4e6;
-            color: #e11d48;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        .btn-delete-image {	/* 対象要素のスタイルを始める */
+            background-color: #ffe4e6;	/* 見た目の設定を指定 */
+            color: #e11d48;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            padding: 8px 18px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-delete-image:hover {
-            background-color: #fecdd3;
-        }
+        .btn-delete-image:hover {	/* 対象要素のスタイルを始める */
+            background-color: #fecdd3;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .form-group {
-            text-align: left;
-            margin-bottom: 28px;
-        }
+        .form-group {	/* 対象要素のスタイルを始める */
+            text-align: left;	/* 見た目の設定を指定 */
+            margin-bottom: 28px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .form-group label {
-            display: block;
-            font-size: 13.5px;
-            font-weight: 700;
-            color: #8e8e8e;
-            margin-bottom: 8px;
-            padding-left: 2px;
-        }
+        .form-group label {	/* 対象要素のスタイルを始める */
+            display: block;	/* 見た目の設定を指定 */
+            font-size: 13.5px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            color: #8e8e8e;	/* 見た目の設定を指定 */
+            margin-bottom: 8px;	/* 見た目の設定を指定 */
+            padding-left: 2px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .input-large {
-            width: 100%;
-            padding: 13px 16px;
-            font-size: 15px;
-            border: 1px solid #dbdbdb;
-            border-radius: 10px;
-            box-sizing: border-box;
-            outline: none;
-            background-color: #fafafa;
-            color: #262626;
-            transition: all 0.2s;
-        }
+        .input-large {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            padding: 13px 16px;	/* 見た目の設定を指定 */
+            font-size: 15px;	/* 見た目の設定を指定 */
+            border: 1px solid #dbdbdb;	/* 見た目の設定を指定 */
+            border-radius: 10px;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+            outline: none;	/* 見た目の設定を指定 */
+            background-color: #fafafa;	/* 見た目の設定を指定 */
+            color: #262626;	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .input-large:focus {
-            border-color: #0095f6;
-            background-color: #ffffff;
-            box-shadow: 0 0 0 3px rgba(0, 149, 246, 0.12);
-        }
+        .input-large:focus {	/* 対象要素のスタイルを始める */
+            border-color: #0095f6;	/* 見た目の設定を指定 */
+            background-color: #ffffff;	/* 見た目の設定を指定 */
+            box-shadow: 0 0 0 3px rgba(0, 149, 246, 0.12);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-large {
-            width: 100%;
-            padding: 14px 0;
-            font-size: 15px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25);
-            box-sizing: border-box;
-        }
+        .btn-large {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            padding: 14px 0;	/* 見た目の設定を指定 */
+            font-size: 15px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            color: white;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            border-radius: 12px;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            transition: all 0.25s ease;	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25);	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-large:hover {
-            opacity: 0.92;
-            transform: translateY(-1px);
-        }
+        .btn-large:hover {	/* 対象要素のスタイルを始める */
+            opacity: 0.92;	/* 見た目の設定を指定 */
+            transform: translateY(-1px);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-update-face {
-            background-color: transparent;
-            color: #8e8e8e;
-            text-decoration: underline;
-            font-size: 13px;
-            font-weight: 700;
-            margin-top: 18px;
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 8px;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-        }
+        .btn-update-face {	/* 対象要素のスタイルを始める */
+            background-color: transparent;	/* 見た目の設定を指定 */
+            color: #8e8e8e;	/* 見た目の設定を指定 */
+            text-decoration: underline;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            margin-top: 18px;	/* 見た目の設定を指定 */
+            display: inline-block;	/* 見た目の設定を指定 */
+            padding: 6px 12px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-update-face:hover {
-            color: #262626;
-            background-color: #f0f0f0;
-        }
+        .btn-update-face:hover {	/* 対象要素のスタイルを始める */
+            color: #262626;	/* 見た目の設定を指定 */
+            background-color: #f0f0f0;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-delete-account {
-            background-color: transparent;
-            color: #e11d48;
-            text-decoration: underline;
-            font-size: 13px;
-            font-weight: 700;
-            margin-top: 10px;
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 8px;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-        }
+        .btn-delete-account {	/* 対象要素のスタイルを始める */
+            background-color: transparent;	/* 見た目の設定を指定 */
+            color: #e11d48;	/* 見た目の設定を指定 */
+            text-decoration: underline;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            margin-top: 10px;	/* 見た目の設定を指定 */
+            display: inline-block;	/* 見た目の設定を指定 */
+            padding: 6px 12px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-delete-account:hover {
-            color: #be123c;
-            background-color: #ffe4e6;
-        }
+        .btn-delete-account:hover {	/* 対象要素のスタイルを始める */
+            color: #be123c;	/* 見た目の設定を指定 */
+            background-color: #ffe4e6;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .crop-modal, .face-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
+        .crop-modal, .face-modal {	/* 対象要素のスタイルを始める */
+            display: none;	/* 見た目の設定を指定 */
+            position: fixed;	/* 見た目の設定を指定 */
+            top: 0;	/* 見た目の設定を指定 */
+            left: 0;	/* 見た目の設定を指定 */
+            width: 100vw;	/* 見た目の設定を指定 */
+            height: 100vh;	/* 見た目の設定を指定 */
+            background-color: rgba(0, 0, 0, 0.6);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(4px);	/* 見た目の設定を指定 */
+            -webkit-backdrop-filter: blur(4px);	/* 見た目の設定を指定 */
+            z-index: 2000;	/* 見た目の設定を指定 */
+            justify-content: center;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            padding: 20px;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .crop-modal-content, .face-modal-content {
-            background-color: #ffffff;
-            padding: 24px;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            box-sizing: border-box;
-        }
+        .crop-modal-content, .face-modal-content {	/* 対象要素のスタイルを始める */
+            background-color: #ffffff;	/* 見た目の設定を指定 */
+            padding: 24px;	/* 見た目の設定を指定 */
+            border-radius: 20px;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            max-width: 420px;	/* 見た目の設定を指定 */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);	/* 見た目の設定を指定 */
+            text-align: center;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .crop-modal-content h3, .face-modal-content h3 {
-            margin-top: 0;
-            margin-bottom: 16px;
-            font-size: 16px;
-            font-weight: 800;
-            color: #262626;
-        }
+        .crop-modal-content h3, .face-modal-content h3 {	/* 対象要素のスタイルを始める */
+            margin-top: 0;	/* 見た目の設定を指定 */
+            margin-bottom: 16px;	/* 見た目の設定を指定 */
+            font-size: 16px;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            color: #262626;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .img-container {
-            width: 100%;
-            max-height: 280px;
-            margin-bottom: 20px;
-            background-color: #f0f0f0;
-            border-radius: 10px;
-            overflow: hidden;
-        }
+        .img-container {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            max-height: 280px;	/* 見た目の設定を指定 */
+            margin-bottom: 20px;	/* 見た目の設定を指定 */
+            background-color: #f0f0f0;	/* 見た目の設定を指定 */
+            border-radius: 10px;	/* 見た目の設定を指定 */
+            overflow: hidden;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .img-container img {
-            max-width: 100%;
-            display: block;
-        }
+        .img-container img {	/* 対象要素のスタイルを始める */
+            max-width: 100%;	/* 見た目の設定を指定 */
+            display: block;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .crop-btn-group {
-            display: flex;
-            gap: 12px;
-        }
+        .crop-btn-group {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            gap: 12px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-crop-cancel, .btn-crop-done {
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 700;
-            border: none;
-        }
+        .btn-crop-cancel, .btn-crop-done {	/* 対象要素のスタイルを始める */
+            flex: 1;	/* 見た目の設定を指定 */
+            padding: 10px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-crop-cancel {
-            background-color: #f0f0f0;
-            color: #262626;
-        }
+        .btn-crop-cancel {	/* 対象要素のスタイルを始める */
+            background-color: #f0f0f0;	/* 見た目の設定を指定 */
+            color: #262626;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-crop-cancel:hover { background-color: #e4e4e4; }
+        .btn-crop-cancel:hover { background-color: #e4e4e4; }	/* 見た目の設定を指定 */
 
-        .btn-crop-done {
-            background: #0095f6;
-            color: white;
-        }
+        .btn-crop-done {	/* 対象要素のスタイルを始める */
+            background: #0095f6;	/* 見た目の設定を指定 */
+            color: white;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .camera-box-mini {
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto 16px auto;
-            border-radius: 14px;
-            overflow: hidden;
-            transform: scaleX(-1);
-            position: relative;
-            aspect-ratio: 4 / 3;
-            border: 2px solid #dbdbdb;
-            background-color: #000;
-        }
+        .camera-box-mini {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            max-width: 400px;	/* 見た目の設定を指定 */
+            margin: 0 auto 16px auto;	/* 見た目の設定を指定 */
+            border-radius: 14px;	/* 見た目の設定を指定 */
+            overflow: hidden;	/* 見た目の設定を指定 */
+            transform: scaleX(-1);	/* 見た目の設定を指定 */
+            position: relative;	/* 見た目の設定を指定 */
+            aspect-ratio: 4 / 3;	/* 見た目の設定を指定 */
+            border: 2px solid #dbdbdb;	/* 見た目の設定を指定 */
+            background-color: #000;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .camera-box-mini video, .camera-box-mini canvas {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
+        .camera-box-mini video, .camera-box-mini canvas {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            height: 100%;	/* 見た目の設定を指定 */
+            object-fit: cover;	/* 見た目の設定を指定 */
+            position: absolute;	/* 見た目の設定を指定 */
+            top: 0;	/* 見た目の設定を指定 */
+            left: 0;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .camera-box-mini canvas { z-index: 10; pointer-events: none; }
+        .camera-box-mini canvas { z-index: 10; pointer-events: none; }	/* 見た目の設定を指定 */
 
-        .face-status-text {
-            font-size: 13px;
-            font-weight: 700;
-            color: #0095f6;
-            margin-bottom: 16px;
-            min-height: 20px;
-        }
+        .face-status-text {	/* 対象要素のスタイルを始める */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            color: #0095f6;	/* 見た目の設定を指定 */
+            margin-bottom: 16px;	/* 見た目の設定を指定 */
+            min-height: 20px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .footer {
-            background-color: transparent;
-            padding: 24px;
-            margin-top: auto;
-            width: 100%;
-            box-sizing: border-box;
-            text-align: center;
-        }
+        .footer {	/* 対象要素のスタイルを始める */
+            background-color: transparent;	/* 見た目の設定を指定 */
+            padding: 24px;	/* 見た目の設定を指定 */
+            margin-top: auto;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+            text-align: center;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .copyright { color: #8e8e8e; font-size: 0.75rem; margin: 0; }
+        .copyright { color: #8e8e8e; font-size: 0.75rem; margin: 0; }	/* 見た目の設定を指定 */
 
-        @media screen and (max-width: 768px) {
-            .container { margin: 16px auto; padding: 0 12px; }
-            .profile-card { padding: 32px 20px; }
-            .hamburger-btn { display: flex !important; }
-            .nav-links {
-                position: fixed !important; top: 54px !important; left: 0 !important;
-                width: 100% !important; background: #ffffff !important;
-                flex-direction: column !important; padding: 20px 0 !important; gap: 8px !important;
-                z-index: 99 !important; opacity: 0 !important; pointer-events: none !important;
-                transform: translateY(-10px) !important; transition: all 0.3s ease !important;
-            }
-            .nav-links.open { opacity: 1 !important; pointer-events: auto !important; transform: translateY(0) !important; }
-            .nav-item, .btn-logout { width: 80% !important; text-align: center !important; }
-        }
+        @media screen and (max-width: 768px) {	/* 表示条件を設定 */
+            .container { margin: 16px auto; padding: 0 12px; }	/* 見た目の設定を指定 */
+            .profile-card { padding: 32px 20px; }	/* 見た目の設定を指定 */
+            .hamburger-btn { display: flex !important; }	/* 見た目の設定を指定 */
+            .nav-links {	/* 対象要素のスタイルを始める */
+                position: fixed !important; top: 54px !important; left: 0 !important;	/* 見た目の設定を指定 */
+                width: 100% !important; background: #ffffff !important;	/* 見た目の設定を指定 */
+                flex-direction: column !important; padding: 20px 0 !important; gap: 8px !important;	/* 見た目の設定を指定 */
+                z-index: 99 !important; opacity: 0 !important; pointer-events: none !important;	/* 見た目の設定を指定 */
+                transform: translateY(-10px) !important; transition: all 0.3s ease !important;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+            .nav-links.open { opacity: 1 !important; pointer-events: auto !important; transform: translateY(0) !important; }	/* 見た目の設定を指定 */
+            .nav-item, .btn-logout { width: 80% !important; text-align: center !important; }	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
     </style>
 
 
 
-    <link rel="stylesheet" href="theme.css?v=20260917c">
+    <link rel="stylesheet" href="theme.css?v=20260917c">	<!-- 外部ファイルを読み込む -->
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
-</head>
+</head>	<!-- 要素を閉じる -->
 
-<body class="cur" data-page="profile">
-    <header class="navbar">
-        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
+<body class="cur" data-page="profile">	<!-- 画面要素を配置 -->
+    <header class="navbar">	<!-- ヘッダーを配置 -->
+        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>	<!-- 画面要素を配置 -->
 
-        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
+        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">	<!-- 操作できる要素を配置 -->
+            <span></span>	<!-- 画面要素を配置 -->
+            <span></span>	<!-- 画面要素を配置 -->
+            <span></span>	<!-- 画面要素を配置 -->
+        </button>	<!-- 要素を閉じる -->
 
-        <nav class="nav-links" id="nav-links">
-            <a class="nav-item" href="main.html?guide=1">使い方</a>
-            <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>
-            <a class="nav-item" href="recruit.html">募集投稿</a>
-            <a class="nav-item" href="users.html">ユーザーを探す</a>
-            <a class="nav-item" href="messages.html">
-                メッセージ
-                <span id="unread-badge" class="unread-badge" style="display: none;">0</span>
-            </a>
-            <a class="nav-item active" href="profile.html">マイページ</a>
-            <a class="nav-item" href="ai-study.html">AI学習相談</a>
-            <a class="nav-item" id="nav-admin-btn" style="display:none;" href="admin.html">管理者</a>
-            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>
-        </nav>
-    </header>
+        <nav class="nav-links" id="nav-links">	<!-- ナビゲーションを配置 -->
+            <a class="nav-item" href="main.html?guide=1">使い方</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="recruit.html">募集投稿</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="users.html">ユーザーを探す</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="messages.html">	<!-- 操作できる要素を配置 -->
+                メッセージ	<!-- 画面に表示する内容 -->
+                <span id="unread-badge" class="unread-badge" style="display: none;">0</span>	<!-- 画面要素を配置 -->
+            </a>	<!-- 要素を閉じる -->
+            <a class="nav-item active" href="profile.html">マイページ</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="ai-study.html">AI学習相談</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" id="nav-admin-btn" style="display:none;" href="admin.html">管理者</a>	<!-- 操作できる要素を配置 -->
+            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>	<!-- 操作できる要素を配置 -->
+        </nav>	<!-- 要素を閉じる -->
+    </header>	<!-- 要素を閉じる -->
 
-    <main class="container">
-        <div class="profile-card">
-            <h2>プロフィール設定</h2>
+    <main class="container">	<!-- ページの主内容を配置 -->
+        <div class="profile-card">	<!-- 画面要素を配置 -->
+            <h2>プロフィール設定</h2>	<!-- 画面要素を配置 -->
 
-            <div class="profile-image-group">
+            <div class="profile-image-group">	<!-- 画面要素を配置 -->
                 <img id="profile-icon" class="big-profile-icon"
                     src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="icon">
 
-                <div class="image-btn-group">
-                    <label for="image-input" class="input-file-label">画像を選択</label>
-                    <button type="button" class="btn-delete-image" onclick="deleteImage()">削除</button>
-                </div>
+                <div class="image-btn-group">	<!-- 画面要素を配置 -->
+                    <label for="image-input" class="input-file-label">画像を選択</label>	<!-- 画面要素を配置 -->
+                    <button type="button" class="btn-delete-image" onclick="deleteImage()">削除</button>	<!-- 操作できる要素を配置 -->
+                </div>	<!-- 要素を閉じる -->
 
-                <input type="file" id="image-input" accept="image/*" style="display: none;" onchange="previewImage(event)">
-            </div>
+                <input type="file" id="image-input" accept="image/*" style="display: none;" onchange="previewImage(event)">	<!-- 入力要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
 
-            <div class="form-group">
-                <label for="username-input">表示名（ニックネーム）</label>
-                <input type="text" id="username-input" class="input-large" maxlength="50" placeholder="名前を入力してください">
-            </div>
+            <div class="form-group">	<!-- 画面要素を配置 -->
+                <label for="username-input">表示名（ニックネーム）</label>	<!-- 画面要素を配置 -->
+                <input type="text" id="username-input" class="input-large" maxlength="50" placeholder="名前を入力してください">	<!-- 入力要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
 
-            <button class="btn-large" onclick="saveProfile()">設定を保存する</button>
-            <br>
-            <button class="btn-update-face" onclick="startFaceUpdate()">顔認証情報をアップデートする</button>
-            <br>
-            <button class="btn-delete-account" onclick="deleteAccount()">ユーザー情報を削除する</button>
+            <button class="btn-large" onclick="saveProfile()">設定を保存する</button>	<!-- 操作できる要素を配置 -->
+            <br>	<!-- 画面要素を配置 -->
+            <button class="btn-update-face" onclick="startFaceUpdate()">顔認証情報をアップデートする</button>	<!-- 操作できる要素を配置 -->
+            <br>	<!-- 画面要素を配置 -->
+            <button class="btn-delete-account" onclick="deleteAccount()">ユーザー情報を削除する</button>	<!-- 操作できる要素を配置 -->
 
-            <div id="blocked-users-panel" style="margin-top:28px; padding-top:20px; border-top:1px solid rgba(0,0,0,0.08); text-align:left;">
-                <h3 style="margin:0 0 12px; color:#1e293b;">ブロック中のユーザー</h3>
-                <div id="blocked-users-list" style="color:#64748b; font-size:13px;">読み込み中...</div>
-            </div>
-        </div>
-    </main>
-
-
-    <div id="cropModal" class="crop-modal">
-        <div class="crop-modal-content">
-            <h3>表示範囲を選択</h3>
-            <div class="img-container">
-                <img id="cropImage" src="" alt="トリミング対象">
-            </div>
-            <div class="crop-btn-group">
-                <button type="button" class="btn-crop-cancel" onclick="closeCropModal()">キャンセル</button>
-                <button type="button" class="btn-crop-done" onclick="executeCrop()">確定する</button>
-            </div>
-        </div>
-    </div>
+            <div id="blocked-users-panel" style="margin-top:28px; padding-top:20px; border-top:1px solid rgba(0,0,0,0.08); text-align:left;">	<!-- 画面要素を配置 -->
+                <h3 style="margin:0 0 12px; color:#1e293b;">ブロック中のユーザー</h3>	<!-- 画面要素を配置 -->
+                <div id="blocked-users-list" style="color:#64748b; font-size:13px;">読み込み中...</div>	<!-- 画面要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+        </div>	<!-- 要素を閉じる -->
+    </main>	<!-- 要素を閉じる -->
 
 
-    <div id="faceModal" class="face-modal">
-        <div class="face-modal-content">
-            <h3>顔データのアップデート</h3>
-            <div class="camera-box-mini">
-                <video id="face-video" autoplay playsinline muted></video>
-                <canvas id="face-mesh-canvas"></canvas>
-            </div>
-            <div id="face-status" class="face-status-text">カメラを初期化中...</div>
-            <div class="crop-btn-group">
-                <button type="button" class="btn-crop-cancel" style="width: 100%;" onclick="closeFaceModal()">キャンセル</button>
-            </div>
-        </div>
-    </div>
+    <div id="cropModal" class="crop-modal">	<!-- 画面要素を配置 -->
+        <div class="crop-modal-content">	<!-- 画面要素を配置 -->
+            <h3>表示範囲を選択</h3>	<!-- 画面要素を配置 -->
+            <div class="img-container">	<!-- 画面要素を配置 -->
+                <img id="cropImage" src="" alt="トリミング対象">	<!-- 画面要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+            <div class="crop-btn-group">	<!-- 画面要素を配置 -->
+                <button type="button" class="btn-crop-cancel" onclick="closeCropModal()">キャンセル</button>	<!-- 操作できる要素を配置 -->
+                <button type="button" class="btn-crop-done" onclick="executeCrop()">確定する</button>	<!-- 操作できる要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+        </div>	<!-- 要素を閉じる -->
+    </div>	<!-- 要素を閉じる -->
 
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-links">
-                <a href="main.html">ホーム</a>
-                <a href="messages.html">メッセージ</a>
-                <a href="profile.html">マイページ</a>
-                <a href="terms.html">利用規約</a>
-                <a href="privacy.html">プライバシーポリシー</a>
-            </div>
-            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>
-        </div>
-    </footer>
+
+    <div id="faceModal" class="face-modal">	<!-- 画面要素を配置 -->
+        <div class="face-modal-content">	<!-- 画面要素を配置 -->
+            <h3>顔データのアップデート</h3>	<!-- 画面要素を配置 -->
+            <div class="camera-box-mini">	<!-- 画面要素を配置 -->
+                <video id="face-video" autoplay playsinline muted></video>	<!-- 画面要素を配置 -->
+                <canvas id="face-mesh-canvas"></canvas>	<!-- 画面要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+            <div id="face-status" class="face-status-text">カメラを初期化中...</div>	<!-- 画面要素を配置 -->
+            <div class="crop-btn-group">	<!-- 画面要素を配置 -->
+                <button type="button" class="btn-crop-cancel" style="width: 100%;" onclick="closeFaceModal()">キャンセル</button>	<!-- 操作できる要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+        </div>	<!-- 要素を閉じる -->
+    </div>	<!-- 要素を閉じる -->
+
+    <footer class="footer">	<!-- フッターを配置 -->
+        <div class="footer-container">	<!-- 画面要素を配置 -->
+            <div class="footer-links">	<!-- 画面要素を配置 -->
+                <a href="main.html">ホーム</a>	<!-- 操作できる要素を配置 -->
+                <a href="messages.html">メッセージ</a>	<!-- 操作できる要素を配置 -->
+                <a href="profile.html">マイページ</a>	<!-- 操作できる要素を配置 -->
+                <a href="terms.html">利用規約</a>	<!-- 操作できる要素を配置 -->
+                <a href="privacy.html">プライバシーポリシー</a>	<!-- 操作できる要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>	<!-- 画面要素を配置 -->
+        </div>	<!-- 要素を閉じる -->
+    </footer>	<!-- 要素を閉じる -->
 
 
 
     <script>
-        const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
-
-        let cropper = null;
-        let videoStream = null;
-        let faceMesh = null;
-        let lastLandmarks = null;
-        let faceFrameRequest = null;
-        let faceFrameCallback = null;
-        let faceProcessing = false;
-        let lastFaceCheck = 0;
-        let lastFaceSeen = 0;
-        let cameraSession = 0;
-        let unreadRequest = null;
-        const faceCheckInterval = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 100 : 66;
-
-        function compactFaceLandmarks(landmarks) {
-            if (!Array.isArray(landmarks)) return [];
-            return landmarks.map(point => ({
-                x: Number(Number(point.x || 0).toFixed(5)),
-                y: Number(Number(point.y || 0).toFixed(5)),
-                z: Number(Number(point.z || 0).toFixed(5))
-            }));
-        }
-
-        function makeProfileImage(sourceCanvas) {
-            const sizes = [300, 240, 180];
-            for (const size of sizes) {
-                const canvas = document.createElement("canvas");
-                canvas.width = size;
-                canvas.height = size;
-                const context = canvas.getContext("2d", { alpha: false });
-                context.drawImage(sourceCanvas, 0, 0, size, size);
-                for (const quality of [0.68, 0.55, 0.42]) {
-                    const dataUrl = canvas.toDataURL("image/jpeg", quality);
-                    if (dataUrl.length < 48000) return dataUrl;
-                }
-            }
-            return "";
-        }
-
-        async function postGas(payload, timeoutMs = 12000) {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify(payload),
-                    signal: controller.signal
-                });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                return await res.json();
-            } finally {
-                clearTimeout(timeoutId);
-            }
-        }
-
-        function toggleMenu() {
-            document.getElementById("hud-menu-btn").classList.toggle("open");
-            document.getElementById("nav-links").classList.toggle("open");
-        }
-
-        async function syncProfileFromServer() {
-            const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
-            if (!userId) return;
-
-            try {
-                const result = await postGas({ mode: "getUserProfile", userId: userId });
-                if (result.status !== "success" || !result.message) return;
-
-                const name = String(result.message.name || result.message.userId || "").trim();
-                const image = String(result.message.profileImage || "").trim();
-                localStorage.setItem("userName", name);
-                localStorage.setItem("profileImage", image);
-
-                document.getElementById("username-input").value = name;
-                document.getElementById("profile-icon").src = image || DEFAULT_AVATAR;
-            } catch (e) {
-                console.error("プロフィール情報の同期エラー:", e);
-            }
-        }
-
-        async function updateUnreadBadge() {
-            const myEmail = localStorage.getItem("userEmail");
-            const badge = document.getElementById("unread-badge");
-            if (!myEmail || !badge || unreadRequest) return unreadRequest;
-
-            unreadRequest = (async () => {
-                try {
-                    const result = await postGas({ mode: "getUnreadCount", email: myEmail });
-
-                    if (result.status === "success" && result.message) {
-                        const count = result.message.unreadCount || 0;
-                        if (count > 0) {
-                            badge.innerText = count > 99 ? "99+" : count;
-                            badge.style.display = "inline-block";
-                        } else {
-                            badge.style.display = "none";
-                        }
-                    }
-                } catch (e) {
-                    console.error("未読チェックエラー:", e);
-                } finally {
-                    unreadRequest = null;
-                }
-            })();
-
-            return unreadRequest;
-        }
-
-        function previewImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const cropImage = document.getElementById("cropImage");
-                cropImage.src = e.target.result;
-
-                document.getElementById("cropModal").style.display = "flex";
-
-                if (cropper) { cropper.destroy(); }
-                cropper = new Cropper(cropImage, {
-                    aspectRatio: 1, viewMode: 1, autoCropArea: 0.8, background: false
-                });
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function executeCrop() {
-            if (!cropper) return;
-            const canvas = cropper.getCroppedCanvas({
-                width: 300,
-                height: 300,
-                imageSmoothingEnabled: true,
-                imageSmoothingQuality: "high"
-            });
-            const profileImage = makeProfileImage(canvas);
-            if (!profileImage) {
-                alert("画像を十分に小さくできませんでした。別の画像を選んでください。");
-                return;
-            }
-            document.getElementById("profile-icon").src = profileImage;
-            closeCropModal();
-        }
-
-        function closeCropModal() {
-            document.getElementById("cropModal").style.display = "none";
-            document.getElementById("image-input").value = "";
-            if (cropper) { cropper.destroy(); cropper = null; }
-        }
-
-        function deleteImage() {
-            document.getElementById("profile-icon").src = DEFAULT_AVATAR;
-            document.getElementById("image-input").value = "";
-        }
-
-        async function saveProfile() {
-            const name = document.getElementById("username-input").value.trim();
-            const imageSrc = document.getElementById("profile-icon").src;
-            const email = localStorage.getItem("userEmail");
-
-            if (!name) { alert("表示名を入力してください"); return; }
-            if (!email) { alert("ログイン情報が見つかりません。一度再ログインしてください。"); return; }
-
-            try {
-                const result = await postGas({
-                    mode: "updateProfile",
-                    email: email,
-                    name: name,
-                    profileImage: imageSrc
-                });
-                if (result.status === "success") {
-                    localStorage.setItem("userName", name);
-                    localStorage.setItem("profileImage", imageSrc);
-                    alert("プロフィールを保存しました！");
-                    location.href = "main.html";
-                } else {
-                    alert("保存に失敗しました: " + result.message);
-                }
-            } catch (e) {
-                alert("通信エラーが発生しました。");
-                console.error(e);
-            }
-        }
-
-        async function deleteAccount() {
-            const isConfirmed = confirm("ユーザー情報を削除すると、現在のユーザーとして平工マッチングにアクセスすることができなくなります。よろしいですか？");
-            if (!isConfirmed) return;
-
-            const email = localStorage.getItem("userEmail");
-            if (!email) {
-                alert("ログイン情報が見つかりません。");
-                return;
-            }
-
-            try {
-                const result = await postGas({
-                    mode: "deleteAccount",
-                    email: email
-                });
-                if (result.status === "success") {
-                    alert("ユーザー情報を削除しました。");
-                    localStorage.clear();
-                    window.location.href = "index.html";
-                } else {
-                    alert("削除に失敗しました: " + result.message);
-                }
-            } catch (e) {
-                alert("通信エラーが発生しました。");
-                console.error(e);
-            }
-        }
-
-        async function loadBlockedUsers() {
-            const myEmail = localStorage.getItem("userEmail");
-            const list = document.getElementById("blocked-users-list");
-
-            if (!myEmail || !list) return;
-
-            try {
-                const result = await postGas({
-                    mode: "getBlockedUsers",
-                    blockerId: myEmail
-                });
-
-                if (result.status !== "success" || !Array.isArray(result.message)) {
-                    list.innerText = "ブロック一覧を取得できませんでした。";
-                    return;
-                }
-
-                if (result.message.length === 0) {
-                    list.innerText = "ブロック中のユーザーはいません。";
-                    return;
-                }
-
-                list.innerHTML = "";
-
-                result.message.forEach(user => {
-                    const row = document.createElement("div");
-                    row.style.cssText = "display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.06);";
-
-                    const name = document.createElement("span");
-                    name.textContent = `${user.name} (${user.userId})`;
-
-                    const button = document.createElement("button");
-                    button.type = "button";
-                    button.textContent = "解除";
-                    button.style.cssText = "border:none; border-radius:7px; padding:6px 10px; background:#e0f2fe; color:#0369a1; font-weight:700; cursor:pointer;";
-                    button.addEventListener("click", () => unblockUser(user.userId, user.name));
-
-                    row.appendChild(name);
-                    row.appendChild(button);
-                    list.appendChild(row);
-                });
-            } catch (e) {
-                list.innerText = "通信エラーが発生しました。";
-            }
-        }
-
-        async function unblockUser(blockedId, blockedName) {
-            if (!confirm(`「${blockedName}」さんのブロックを解除しますか？`)) return;
-
-            try {
-                const result = await postGas({
-                    mode: "unblockUser",
-                    blockerId: localStorage.getItem("userEmail"),
-                    blockedId: blockedId
-                });
-
-                if (result.status === "success") {
-                    loadBlockedUsers();
-                } else {
-                    alert("ブロック解除に失敗しました: " + result.message);
-                }
-            } catch (e) {
-                alert("通信エラーが発生しました。");
-            }
-        }
-
-        function logout() {
-            localStorage.clear();
-            window.location.href = "index.html";
-        }
-
-        function drawFaceFeatures(landmarks) {
-            const canvas = document.getElementById('face-mesh-canvas');
-            const video = document.getElementById('face-video');
-            const ctx = canvas.getContext('2d');
-
-            const rect = video.getBoundingClientRect();
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            const width = Math.max(1, Math.round(rect.width));
-            const height = Math.max(1, Math.round(rect.height));
-            const pixelWidth = Math.round(width * dpr);
-            const pixelHeight = Math.round(height * dpr);
-
-            if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
-                canvas.width = pixelWidth;
-                canvas.height = pixelHeight;
-                canvas.style.width = `${width}px`;
-                canvas.style.height = `${height}px`;
-            }
-
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (!landmarks) return;
-
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-            const videoWidth = video.videoWidth || 320;
-            const videoHeight = video.videoHeight || 240;
-            const scale = Math.max(width / videoWidth, height / videoHeight);
-            const renderWidth = videoWidth * scale;
-            const renderHeight = videoHeight * scale;
-            const offsetX = (width - renderWidth) / 2;
-            const offsetY = (height - renderHeight) / 2;
-
-            ctx.fillStyle = "#00FF00";
-            for (let i = 0; i < landmarks.length; i++) {
-                const pt = landmarks[i];
-                const x = pt.x * renderWidth + offsetX;
-                const y = pt.y * renderHeight + offsetY;
-                ctx.beginPath();
-                ctx.arc(x, y, 1.5, 0, 2 * Math.PI);
-                ctx.fill();
-            }
-        }
-
-        async function checkFaceFrame() {
-            const video = document.getElementById('face-video');
-            if (!faceMesh || !videoStream || faceProcessing || video.readyState < 2) return;
-
-            const now = performance.now();
-            if (now - lastFaceCheck < faceCheckInterval) return;
-
-            faceProcessing = true;
-            lastFaceCheck = now;
-            try {
-                await faceMesh.send({ image: video });
-            } catch (err) {
-                if (videoStream) {
-                    lastLandmarks = null;
-                    drawFaceFeatures(null);
-                }
-            } finally {
-                faceProcessing = false;
-            }
-        }
-
-        function scheduleFaceFrame(session) {
-            const video = document.getElementById('face-video');
-            if (!videoStream || session !== cameraSession) return;
-
-            if (typeof video.requestVideoFrameCallback === "function") {
-                faceFrameCallback = video.requestVideoFrameCallback(async () => {
-                    if (session !== cameraSession) return;
-                    await checkFaceFrame();
-                    scheduleFaceFrame(session);
-                });
-                return;
-            }
-
-            faceFrameRequest = requestAnimationFrame(async (time) => {
-                if (session !== cameraSession) return;
-                if (time - lastFaceCheck >= faceCheckInterval) await checkFaceFrame();
-                scheduleFaceFrame(session);
-            });
-        }
-
-        function stopFaceLoop() {
-            const video = document.getElementById('face-video');
-            if (faceFrameRequest !== null) {
-                cancelAnimationFrame(faceFrameRequest);
-                faceFrameRequest = null;
-            }
-            if (faceFrameCallback !== null && typeof video.cancelVideoFrameCallback === "function") {
-                video.cancelVideoFrameCallback(faceFrameCallback);
-                faceFrameCallback = null;
-            }
-        }
-
-        function initFaceMesh() {
-            if (faceMesh) return;
-            faceMesh = new FaceMesh({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}` });
-            faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
-            faceMesh.onResults((results) => {
-                if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
-                    lastLandmarks = results.multiFaceLandmarks[0];
-                    lastFaceSeen = performance.now();
-                    drawFaceFeatures(lastLandmarks);
-                } else {
-                    if (performance.now() - lastFaceSeen > 500) lastLandmarks = null;
-                    drawFaceFeatures(null);
-                }
-            });
-        }
-
-        async function startFaceUpdate() {
-            const myEmail = localStorage.getItem("userEmail");
-            if (!myEmail) { alert("ログインセッションが見つかりません。一度ログインし直してください。"); return; }
-
-            initFaceMesh();
-            document.getElementById('faceModal').style.display = "flex";
-            document.getElementById('face-status').innerText = "カメラを起動中...";
-            document.getElementById('face-status').style.color = "#0095f6";
-
-            const video = document.getElementById('face-video');
-            try {
-                const constraints = {
-                    audio: false,
-                    video: {
-                        facingMode: { ideal: "user" },
-                        width: { ideal: 1280, max: 1920 },
-                        height: { ideal: 720, max: 1080 },
-                        frameRate: { ideal: 30, max: 30 }
-                    }
-                };
-
-                try {
-                    videoStream = await navigator.mediaDevices.getUserMedia(constraints);
-                } catch (err) {
-                    if (err.name === "NotAllowedError" || err.name === "SecurityError" || err.name === "AbortError") throw err;
-                    videoStream = await navigator.mediaDevices.getUserMedia({
-                        audio: false,
-                        video: { facingMode: "user" }
-                    });
-                }
-
-                video.srcObject = videoStream;
-                video.muted = true;
-                video.setAttribute("playsinline", "");
-                await new Promise(resolve => {
-                    if (video.readyState >= 1) {
-                        resolve();
-                    } else {
-                        video.addEventListener("loadedmetadata", resolve, { once: true });
-                    }
-                });
-                await video.play();
-                cameraSession++;
-                lastFaceCheck = 0;
-                scheduleFaceFrame(cameraSession);
-
-                let seconds = 3;
-                document.getElementById('face-status').innerText = `${seconds}秒後に自動で顔スキャンを実行します...`;
-
-                const timer = setInterval(async () => {
-                    seconds--;
-                    if (seconds > 0) {
-                        document.getElementById('face-status').innerText = `${seconds}秒後に自動で顔スキャンを実行します...`;
-                    } else {
-                        clearInterval(timer);
-                        await captureAndSaveFace(myEmail);
-                    }
-                }, 1000);
-
-            } catch (err) {
-                if (videoStream) videoStream.getTracks().forEach(track => track.stop());
-                videoStream = null;
-                video.srcObject = null;
-                document.getElementById('face-status').innerText = "カメラの起動に失敗しました。";
-                document.getElementById('face-status').style.color = "#ed4956";
-            }
-        }
-
-        async function captureAndSaveFace(email) {
-            if (!lastLandmarks) {
-                document.getElementById('face-status').innerText = "顔が検出されませんでした。もう一度試してください。";
-                document.getElementById('face-status').style.color = "#ed4956";
-                stopFaceCamera();
-                return;
-            }
-
-            const featuresToSave = JSON.stringify(compactFaceLandmarks(lastLandmarks));
-            stopFaceCamera();
-
-            document.getElementById('face-status').innerText = "顔の特徴点データを解析・アップデート中...";
-            document.getElementById('face-status').style.color = "#e67e22";
-
-            try {
-                const result = await postGas({
-                    mode: "updateFaceFeatures",
-                    email: email,
-                    faceFeatures: featuresToSave
-                });
-
-                if (result.status === "success") {
-                    document.getElementById('face-status').innerText = "顔認証情報のアップデートが完了しました！";
-                    document.getElementById('face-status').style.color = "#10b981";
-                    setTimeout(() => { closeFaceModal(); }, 1500);
-                } else {
-                    document.getElementById('face-status').innerText = "アップデート失敗: " + result.message;
-                    document.getElementById('face-status').style.color = "#ed4956";
-                }
-            } catch (err) {
-                document.getElementById('face-status').innerText = "通信エラーが発生しました。";
-                document.getElementById('face-status').style.color = "#ed4956";
-            }
-        }
-
-        function stopFaceCamera() {
-            cameraSession++;
-            stopFaceLoop();
-            if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); }
-            videoStream = null;
-            const video = document.getElementById('face-video');
-            video.pause();
-            video.srcObject = null;
-            lastFaceSeen = 0;
-            lastLandmarks = null;
-            drawFaceFeatures(null);
-        }
-
-        function closeFaceModal() {
-            stopFaceCamera();
-            document.getElementById('faceModal').style.display = "none";
-        }
-
-        window.onload = () => {
-            document.getElementById("hud-menu-btn").classList.remove("open");
-            document.getElementById("nav-links").classList.remove("open");
-
-            const userName = localStorage.getItem("userName");
-            const profileImage = localStorage.getItem("profileImage");
-            const currentUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
-            const adminButton = document.getElementById("nav-admin-btn");
-            if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") {
-                adminButton.style.display = "inline-block";
-            }
-
-            if (userName) document.getElementById("username-input").value = userName;
-
-            if (profileImage && profileImage !== "null") {
-                document.getElementById("profile-icon").src = profileImage;
-            } else {
-                document.getElementById("profile-icon").src = DEFAULT_AVATAR;
-            }
-
-            syncProfileFromServer();
-            updateUnreadBadge();
-            setInterval(() => {
-                if (document.visibilityState === "visible") updateUnreadBadge();
-            }, 8000);
-            loadBlockedUsers();
-        };
+        const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/149/149071.png";	// 定数を定義
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";	// GAS APIの接続先を設定
+
+        let cropper = null;	// 状態を保持
+        let videoStream = null;	// 状態を保持
+        let faceMesh = null;	// 状態を保持
+        let lastLandmarks = null;	// 状態を保持
+        let faceFrameRequest = null;	// 状態を保持
+        let faceFrameCallback = null;	// 状態を保持
+        let faceProcessing = false;	// 状態を保持
+        let lastFaceCheck = 0;	// 状態を保持
+        let lastFaceSeen = 0;	// 状態を保持
+        let cameraSession = 0;	// 状態を保持
+        let unreadRequest = null;	// 状態を保持
+        const faceCheckInterval = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 100 : 66;	// 定数を定義
+
+        function compactFaceLandmarks(landmarks) {	// 関数を定義
+            if (!Array.isArray(landmarks)) return [];	// 条件に応じて処理を分ける
+            return landmarks.map(point => ({	// 結果を返す
+                x: Number(Number(point.x || 0).toFixed(5)),	// 処理を続ける
+                y: Number(Number(point.y || 0).toFixed(5)),	// 処理を続ける
+                z: Number(Number(point.z || 0).toFixed(5))	// 処理を続ける
+            }));	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        function makeProfileImage(sourceCanvas) {	// 関数を定義
+            const sizes = [300, 240, 180];	// 定数を定義
+            for (const size of sizes) {	// 対象を順番に処理する
+                const canvas = document.createElement("canvas");	// 定数を定義
+                canvas.width = size;	// 処理を続ける
+                canvas.height = size;	// 処理を続ける
+                const context = canvas.getContext("2d", { alpha: false });	// 定数を定義
+                context.drawImage(sourceCanvas, 0, 0, size, size);	// 処理を完了する
+                for (const quality of [0.68, 0.55, 0.42]) {	// 対象を順番に処理する
+                    const dataUrl = canvas.toDataURL("image/jpeg", quality);	// 定数を定義
+                    if (dataUrl.length < 48000) return dataUrl;	// 条件に応じて処理を分ける
+                }	// 処理のまとまりを閉じる
+            }	// 処理のまとまりを閉じる
+            return "";	// 結果を返す
+        }	// 処理のまとまりを閉じる
+
+        async function postGas(payload, timeoutMs = 12000) {	// 関数を定義
+            const controller = new AbortController();	// 定数を定義
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);	// 定数を定義
+            try {	// 失敗に備えて処理を始める
+                const res = await fetch(GAS_URL, {	// 定数を定義
+                    method: "POST",	// 処理を続ける
+                    body: JSON.stringify(payload),	// 処理を続ける
+                    signal: controller.signal	// 処理を続ける
+                });	// 処理を完了する
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);	// 条件に応じて処理を分ける
+                return await res.json();	// 結果を返す
+            } finally {	// 処理のまとまりを始める
+                clearTimeout(timeoutId);	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        function toggleMenu() {	// 関数を定義
+            document.getElementById("hud-menu-btn").classList.toggle("open");	// 画面表示を更新する
+            document.getElementById("nav-links").classList.toggle("open");	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
+
+        async function syncProfileFromServer() {	// 関数を定義
+            const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail");	// 定数を定義
+            if (!userId) return;	// 条件に応じて処理を分ける
+
+            try {	// 失敗に備えて処理を始める
+                const result = await postGas({ mode: "getUserProfile", userId: userId });	// 定数を定義
+                if (result.status !== "success" || !result.message) return;	// 条件に応じて処理を分ける
+
+                const name = String(result.message.name || result.message.userId || "").trim();	// 定数を定義
+                const image = String(result.message.profileImage || "").trim();	// 定数を定義
+                localStorage.setItem("userName", name);	// 端末内の保存情報を扱う
+                localStorage.setItem("profileImage", image);	// 端末内の保存情報を扱う
+
+                document.getElementById("username-input").value = name;	// 処理を続ける
+                document.getElementById("profile-icon").src = image || DEFAULT_AVATAR;	// 処理を続ける
+            } catch (e) {	// 処理のまとまりを始める
+                console.error("プロフィール情報の同期エラー:", e);	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function updateUnreadBadge() {	// 関数を定義
+            const myEmail = localStorage.getItem("userEmail");	// 定数を定義
+            const badge = document.getElementById("unread-badge");	// 定数を定義
+            if (!myEmail || !badge || unreadRequest) return unreadRequest;	// 条件に応じて処理を分ける
+
+            unreadRequest = (async () => {	// 処理のまとまりを始める
+                try {	// 失敗に備えて処理を始める
+                    const result = await postGas({ mode: "getUnreadCount", email: myEmail });	// 定数を定義
+
+                    if (result.status === "success" && result.message) {	// 条件に応じて処理を分ける
+                        const count = result.message.unreadCount || 0;	// 定数を定義
+                        if (count > 0) {	// 条件に応じて処理を分ける
+                            badge.innerText = count > 99 ? "99+" : count;	// 処理を続ける
+                            badge.style.display = "inline-block";	// 処理を続ける
+                        } else {	// 処理のまとまりを始める
+                            badge.style.display = "none";	// 処理を続ける
+                        }	// 処理のまとまりを閉じる
+                    }	// 処理のまとまりを閉じる
+                } catch (e) {	// 処理のまとまりを始める
+                    console.error("未読チェックエラー:", e);	// 処理を完了する
+                } finally {	// 処理のまとまりを始める
+                    unreadRequest = null;	// 処理を続ける
+                }	// 処理のまとまりを閉じる
+            })();	// 処理を完了する
+
+            return unreadRequest;	// 結果を返す
+        }	// 処理のまとまりを閉じる
+
+        function previewImage(event) {	// 関数を定義
+            const file = event.target.files[0];	// 定数を定義
+            if (!file) return;	// 条件に応じて処理を分ける
+
+            const reader = new FileReader();	// 定数を定義
+            reader.onload = function (e) {	// 処理のまとまりを始める
+                const cropImage = document.getElementById("cropImage");	// 定数を定義
+                cropImage.src = e.target.result;	// 処理を続ける
+
+                document.getElementById("cropModal").style.display = "flex";	// 画面表示を更新する
+
+                if (cropper) { cropper.destroy(); }	// 条件に応じて処理を分ける
+                cropper = new Cropper(cropImage, {	// 処理のまとまりを始める
+                    aspectRatio: 1, viewMode: 1, autoCropArea: 0.8, background: false	// 処理を続ける
+                });	// 処理を完了する
+            };	// 処理のまとまりを閉じる
+            reader.readAsDataURL(file);	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        function executeCrop() {	// 関数を定義
+            if (!cropper) return;	// 条件に応じて処理を分ける
+            const canvas = cropper.getCroppedCanvas({	// 定数を定義
+                width: 300,	// 処理を続ける
+                height: 300,	// 処理を続ける
+                imageSmoothingEnabled: true,	// 処理を続ける
+                imageSmoothingQuality: "high"	// 処理を続ける
+            });	// 処理を完了する
+            const profileImage = makeProfileImage(canvas);	// 定数を定義
+            if (!profileImage) {	// 条件に応じて処理を分ける
+                alert("画像を十分に小さくできませんでした。別の画像を選んでください。");	// 処理結果を知らせる
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+            document.getElementById("profile-icon").src = profileImage;	// 処理を続ける
+            closeCropModal();	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        function closeCropModal() {	// 関数を定義
+            document.getElementById("cropModal").style.display = "none";	// 画面表示を更新する
+            document.getElementById("image-input").value = "";	// 処理を続ける
+            if (cropper) { cropper.destroy(); cropper = null; }	// 条件に応じて処理を分ける
+        }	// 処理のまとまりを閉じる
+
+        function deleteImage() {	// 関数を定義
+            document.getElementById("profile-icon").src = DEFAULT_AVATAR;	// 処理を続ける
+            document.getElementById("image-input").value = "";	// 処理を続ける
+        }	// 処理のまとまりを閉じる
+
+        async function saveProfile() {	// 関数を定義
+            const name = document.getElementById("username-input").value.trim();	// 定数を定義
+            const imageSrc = document.getElementById("profile-icon").src;	// 定数を定義
+            const email = localStorage.getItem("userEmail");	// 定数を定義
+
+            if (!name) { alert("表示名を入力してください"); return; }	// 条件に応じて処理を分ける
+            if (!email) { alert("ログイン情報が見つかりません。一度再ログインしてください。"); return; }	// 条件に応じて処理を分ける
+
+            try {	// 失敗に備えて処理を始める
+                const result = await postGas({	// 定数を定義
+                    mode: "updateProfile",	// 処理を続ける
+                    email: email,	// 処理を続ける
+                    name: name,	// 処理を続ける
+                    profileImage: imageSrc	// 処理を続ける
+                });	// 処理を完了する
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    localStorage.setItem("userName", name);	// 端末内の保存情報を扱う
+                    localStorage.setItem("profileImage", imageSrc);	// 端末内の保存情報を扱う
+                    alert("プロフィールを保存しました！");	// 処理結果を知らせる
+                    location.href = "main.html";	// 処理を続ける
+                } else {	// 処理のまとまりを始める
+                    alert("保存に失敗しました: " + result.message);	// 処理結果を知らせる
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                alert("通信エラーが発生しました。");	// 処理結果を知らせる
+                console.error(e);	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function deleteAccount() {	// 関数を定義
+            const isConfirmed = confirm("ユーザー情報を削除すると、現在のユーザーとして平工マッチングにアクセスすることができなくなります。よろしいですか？");	// 定数を定義
+            if (!isConfirmed) return;	// 条件に応じて処理を分ける
+
+            const email = localStorage.getItem("userEmail");	// 定数を定義
+            if (!email) {	// 条件に応じて処理を分ける
+                alert("ログイン情報が見つかりません。");	// 処理結果を知らせる
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+
+            try {	// 失敗に備えて処理を始める
+                const result = await postGas({	// 定数を定義
+                    mode: "deleteAccount",	// 処理を続ける
+                    email: email	// 処理を続ける
+                });	// 処理を完了する
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    alert("ユーザー情報を削除しました。");	// 処理結果を知らせる
+                    localStorage.clear();	// 端末内の保存情報を扱う
+                    window.location.href = "index.html";	// 画面表示を更新する
+                } else {	// 処理のまとまりを始める
+                    alert("削除に失敗しました: " + result.message);	// 処理結果を知らせる
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                alert("通信エラーが発生しました。");	// 処理結果を知らせる
+                console.error(e);	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function loadBlockedUsers() {	// 関数を定義
+            const myEmail = localStorage.getItem("userEmail");	// 定数を定義
+            const list = document.getElementById("blocked-users-list");	// 定数を定義
+
+            if (!myEmail || !list) return;	// 条件に応じて処理を分ける
+
+            try {	// 失敗に備えて処理を始める
+                const result = await postGas({	// 定数を定義
+                    mode: "getBlockedUsers",	// 処理を続ける
+                    blockerId: myEmail	// 処理を続ける
+                });	// 処理を完了する
+
+                if (result.status !== "success" || !Array.isArray(result.message)) {	// 条件に応じて処理を分ける
+                    list.innerText = "ブロック一覧を取得できませんでした。";	// 処理を続ける
+                    return;	// 結果を返す
+                }	// 処理のまとまりを閉じる
+
+                if (result.message.length === 0) {	// 条件に応じて処理を分ける
+                    list.innerText = "ブロック中のユーザーはいません。";	// 処理を続ける
+                    return;	// 結果を返す
+                }	// 処理のまとまりを閉じる
+
+                list.innerHTML = "";	// 処理を続ける
+
+                result.message.forEach(user => {	// 処理のまとまりを始める
+                    const row = document.createElement("div");	// 定数を定義
+                    row.style.cssText = "display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid rgba(0,0,0,0.06);";	// 処理を続ける
+
+                    const name = document.createElement("span");	// 定数を定義
+                    name.textContent = `${user.name} (${user.userId})`;	// 処理を続ける
+
+                    const button = document.createElement("button");	// 定数を定義
+                    button.type = "button";	// 処理を続ける
+                    button.textContent = "解除";	// 処理を続ける
+                    button.style.cssText = "border:none; border-radius:7px; padding:6px 10px; background:#e0f2fe; color:#0369a1; font-weight:700; cursor:pointer;";	// 処理を続ける
+                    button.addEventListener("click", () => unblockUser(user.userId, user.name));	// 操作イベントを登録
+
+                    row.appendChild(name);	// 処理を完了する
+                    row.appendChild(button);	// 処理を完了する
+                    list.appendChild(row);	// 処理を完了する
+                });	// 処理を完了する
+            } catch (e) {	// 処理のまとまりを始める
+                list.innerText = "通信エラーが発生しました。";	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function unblockUser(blockedId, blockedName) {	// 関数を定義
+            if (!confirm(`「${blockedName}」さんのブロックを解除しますか？`)) return;	// 条件に応じて処理を分ける
+
+            try {	// 失敗に備えて処理を始める
+                const result = await postGas({	// 定数を定義
+                    mode: "unblockUser",	// 処理を続ける
+                    blockerId: localStorage.getItem("userEmail"),	// 端末内の保存情報を扱う
+                    blockedId: blockedId	// 処理を続ける
+                });	// 処理を完了する
+
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    loadBlockedUsers();	// 処理を完了する
+                } else {	// 処理のまとまりを始める
+                    alert("ブロック解除に失敗しました: " + result.message);	// 処理結果を知らせる
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                alert("通信エラーが発生しました。");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        function logout() {	// 関数を定義
+            localStorage.clear();	// 端末内の保存情報を扱う
+            window.location.href = "index.html";	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
+
+        function drawFaceFeatures(landmarks) {	// 関数を定義
+            const canvas = document.getElementById('face-mesh-canvas');	// 定数を定義
+            const video = document.getElementById('face-video');	// 定数を定義
+            const ctx = canvas.getContext('2d');	// 定数を定義
+
+            const rect = video.getBoundingClientRect();	// 定数を定義
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);	// 定数を定義
+            const width = Math.max(1, Math.round(rect.width));	// 定数を定義
+            const height = Math.max(1, Math.round(rect.height));	// 定数を定義
+            const pixelWidth = Math.round(width * dpr);	// 定数を定義
+            const pixelHeight = Math.round(height * dpr);	// 定数を定義
+
+            if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {	// 条件に応じて処理を分ける
+                canvas.width = pixelWidth;	// 処理を続ける
+                canvas.height = pixelHeight;	// 処理を続ける
+                canvas.style.width = `${width}px`;	// 処理を続ける
+                canvas.style.height = `${height}px`;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+
+            ctx.setTransform(1, 0, 0, 1, 0, 0);	// 処理を完了する
+            ctx.clearRect(0, 0, canvas.width, canvas.height);	// 処理を完了する
+            if (!landmarks) return;	// 条件に応じて処理を分ける
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);	// 処理を完了する
+
+            const videoWidth = video.videoWidth || 320;	// 定数を定義
+            const videoHeight = video.videoHeight || 240;	// 定数を定義
+            const scale = Math.max(width / videoWidth, height / videoHeight);	// 定数を定義
+            const renderWidth = videoWidth * scale;	// 定数を定義
+            const renderHeight = videoHeight * scale;	// 定数を定義
+            const offsetX = (width - renderWidth) / 2;	// 定数を定義
+            const offsetY = (height - renderHeight) / 2;	// 定数を定義
+
+            ctx.fillStyle = "#00FF00";	// 処理を続ける
+            for (let i = 0; i < landmarks.length; i++) {	// 対象を順番に処理する
+                const pt = landmarks[i];	// 定数を定義
+                const x = pt.x * renderWidth + offsetX;	// 定数を定義
+                const y = pt.y * renderHeight + offsetY;	// 定数を定義
+                ctx.beginPath();	// 処理を完了する
+                ctx.arc(x, y, 1.5, 0, 2 * Math.PI);	// 処理を完了する
+                ctx.fill();	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function checkFaceFrame() {	// 関数を定義
+            const video = document.getElementById('face-video');	// 定数を定義
+            if (!faceMesh || !videoStream || faceProcessing || video.readyState < 2) return;	// 条件に応じて処理を分ける
+
+            const now = performance.now();	// 定数を定義
+            if (now - lastFaceCheck < faceCheckInterval) return;	// 条件に応じて処理を分ける
+
+            faceProcessing = true;	// 処理を続ける
+            lastFaceCheck = now;	// 処理を続ける
+            try {	// 失敗に備えて処理を始める
+                await faceMesh.send({ image: video });	// 処理を完了する
+            } catch (err) {	// 処理のまとまりを始める
+                if (videoStream) {	// 条件に応じて処理を分ける
+                    lastLandmarks = null;	// 処理を続ける
+                    drawFaceFeatures(null);	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+            } finally {	// 処理のまとまりを始める
+                faceProcessing = false;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        function scheduleFaceFrame(session) {	// 関数を定義
+            const video = document.getElementById('face-video');	// 定数を定義
+            if (!videoStream || session !== cameraSession) return;	// 条件に応じて処理を分ける
+
+            if (typeof video.requestVideoFrameCallback === "function") {	// 条件に応じて処理を分ける
+                faceFrameCallback = video.requestVideoFrameCallback(async () => {	// 処理のまとまりを始める
+                    if (session !== cameraSession) return;	// 条件に応じて処理を分ける
+                    await checkFaceFrame();	// 処理を完了する
+                    scheduleFaceFrame(session);	// 処理を完了する
+                });	// 処理を完了する
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+
+            faceFrameRequest = requestAnimationFrame(async (time) => {	// 処理のまとまりを始める
+                if (session !== cameraSession) return;	// 条件に応じて処理を分ける
+                if (time - lastFaceCheck >= faceCheckInterval) await checkFaceFrame();	// 条件に応じて処理を分ける
+                scheduleFaceFrame(session);	// 処理を完了する
+            });	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        function stopFaceLoop() {	// 関数を定義
+            const video = document.getElementById('face-video');	// 定数を定義
+            if (faceFrameRequest !== null) {	// 条件に応じて処理を分ける
+                cancelAnimationFrame(faceFrameRequest);	// 処理を完了する
+                faceFrameRequest = null;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+            if (faceFrameCallback !== null && typeof video.cancelVideoFrameCallback === "function") {	// 条件に応じて処理を分ける
+                video.cancelVideoFrameCallback(faceFrameCallback);	// 処理を完了する
+                faceFrameCallback = null;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        function initFaceMesh() {	// 関数を定義
+            if (faceMesh) return;	// 条件に応じて処理を分ける
+            faceMesh = new FaceMesh({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}` });	// 処理を完了する
+            faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });	// 処理を完了する
+            faceMesh.onResults((results) => {	// 処理のまとまりを始める
+                if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {	// 条件に応じて処理を分ける
+                    lastLandmarks = results.multiFaceLandmarks[0];	// 処理を続ける
+                    lastFaceSeen = performance.now();	// 処理を完了する
+                    drawFaceFeatures(lastLandmarks);	// 処理を完了する
+                } else {	// 処理のまとまりを始める
+                    if (performance.now() - lastFaceSeen > 500) lastLandmarks = null;	// 条件に応じて処理を分ける
+                    drawFaceFeatures(null);	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+            });	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        async function startFaceUpdate() {	// 関数を定義
+            const myEmail = localStorage.getItem("userEmail");	// 定数を定義
+            if (!myEmail) { alert("ログインセッションが見つかりません。一度ログインし直してください。"); return; }	// 条件に応じて処理を分ける
+
+            initFaceMesh();	// 処理を完了する
+            document.getElementById('faceModal').style.display = "flex";	// 画面表示を更新する
+            document.getElementById('face-status').innerText = "カメラを起動中...";	// 処理を続ける
+            document.getElementById('face-status').style.color = "#0095f6";	// 画面表示を更新する
+
+            const video = document.getElementById('face-video');	// 定数を定義
+            try {	// 失敗に備えて処理を始める
+                const constraints = {	// 定数を定義
+                    audio: false,	// 処理を続ける
+                    video: {	// 処理のまとまりを始める
+                        facingMode: { ideal: "user" },	// 処理を続ける
+                        width: { ideal: 1280, max: 1920 },	// 処理を続ける
+                        height: { ideal: 720, max: 1080 },	// 処理を続ける
+                        frameRate: { ideal: 30, max: 30 }	// 処理を完了する
+                    }	// 処理のまとまりを閉じる
+                };	// 処理のまとまりを閉じる
+
+                try {	// 失敗に備えて処理を始める
+                    videoStream = await navigator.mediaDevices.getUserMedia(constraints);	// 処理を完了する
+                } catch (err) {	// 処理のまとまりを始める
+                    if (err.name === "NotAllowedError" || err.name === "SecurityError" || err.name === "AbortError") throw err;	// 条件に応じて処理を分ける
+                    videoStream = await navigator.mediaDevices.getUserMedia({	// 処理のまとまりを始める
+                        audio: false,	// 処理を続ける
+                        video: { facingMode: "user" }	// 処理を完了する
+                    });	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+
+                video.srcObject = videoStream;	// 処理を続ける
+                video.muted = true;	// 処理を続ける
+                video.setAttribute("playsinline", "");	// 処理を完了する
+                await new Promise(resolve => {	// 処理のまとまりを始める
+                    if (video.readyState >= 1) {	// 条件に応じて処理を分ける
+                        resolve();	// 処理を完了する
+                    } else {	// 処理のまとまりを始める
+                        video.addEventListener("loadedmetadata", resolve, { once: true });	// 操作イベントを登録
+                    }	// 処理のまとまりを閉じる
+                });	// 処理を完了する
+                await video.play();	// 処理を完了する
+                cameraSession++;	// 処理を続ける
+                lastFaceCheck = 0;	// 処理を続ける
+                scheduleFaceFrame(cameraSession);	// 処理を完了する
+
+                let seconds = 3;	// 状態を保持
+                document.getElementById('face-status').innerText = `${seconds}秒後に自動で顔スキャンを実行します...`;	// 処理を続ける
+
+                const timer = setInterval(async () => {	// 定数を定義
+                    seconds--;	// 処理を続ける
+                    if (seconds > 0) {	// 条件に応じて処理を分ける
+                        document.getElementById('face-status').innerText = `${seconds}秒後に自動で顔スキャンを実行します...`;	// 処理を続ける
+                    } else {	// 処理のまとまりを始める
+                        clearInterval(timer);	// 処理を完了する
+                        await captureAndSaveFace(myEmail);	// 処理を完了する
+                    }	// 処理のまとまりを閉じる
+                }, 1000);	// 処理を完了する
+
+            } catch (err) {	// 処理のまとまりを始める
+                if (videoStream) videoStream.getTracks().forEach(track => track.stop());	// 条件に応じて処理を分ける
+                videoStream = null;	// 処理を続ける
+                video.srcObject = null;	// 処理を続ける
+                document.getElementById('face-status').innerText = "カメラの起動に失敗しました。";	// 処理を続ける
+                document.getElementById('face-status').style.color = "#ed4956";	// 画面表示を更新する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function captureAndSaveFace(email) {	// 関数を定義
+            if (!lastLandmarks) {	// 条件に応じて処理を分ける
+                document.getElementById('face-status').innerText = "顔が検出されませんでした。もう一度試してください。";	// 処理を続ける
+                document.getElementById('face-status').style.color = "#ed4956";	// 画面表示を更新する
+                stopFaceCamera();	// 処理を完了する
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+
+            const featuresToSave = JSON.stringify(compactFaceLandmarks(lastLandmarks));	// 定数を定義
+            stopFaceCamera();	// 処理を完了する
+
+            document.getElementById('face-status').innerText = "顔の特徴点データを解析・アップデート中...";	// 処理を続ける
+            document.getElementById('face-status').style.color = "#e67e22";	// 画面表示を更新する
+
+            try {	// 失敗に備えて処理を始める
+                const result = await postGas({	// 定数を定義
+                    mode: "updateFaceFeatures",	// 処理を続ける
+                    email: email,	// 処理を続ける
+                    faceFeatures: featuresToSave	// 処理を続ける
+                });	// 処理を完了する
+
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    document.getElementById('face-status').innerText = "顔認証情報のアップデートが完了しました！";	// 処理を続ける
+                    document.getElementById('face-status').style.color = "#10b981";	// 画面表示を更新する
+                    setTimeout(() => { closeFaceModal(); }, 1500);	// 時間を置いて処理する
+                } else {	// 処理のまとまりを始める
+                    document.getElementById('face-status').innerText = "アップデート失敗: " + result.message;	// 処理を続ける
+                    document.getElementById('face-status').style.color = "#ed4956";	// 画面表示を更新する
+                }	// 処理のまとまりを閉じる
+            } catch (err) {	// 処理のまとまりを始める
+                document.getElementById('face-status').innerText = "通信エラーが発生しました。";	// 処理を続ける
+                document.getElementById('face-status').style.color = "#ed4956";	// 画面表示を更新する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        function stopFaceCamera() {	// 関数を定義
+            cameraSession++;	// 処理を続ける
+            stopFaceLoop();	// 処理を完了する
+            if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); }	// 条件に応じて処理を分ける
+            videoStream = null;	// 処理を続ける
+            const video = document.getElementById('face-video');	// 定数を定義
+            video.pause();	// 処理を完了する
+            video.srcObject = null;	// 処理を続ける
+            lastFaceSeen = 0;	// 処理を続ける
+            lastLandmarks = null;	// 処理を続ける
+            drawFaceFeatures(null);	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        function closeFaceModal() {	// 関数を定義
+            stopFaceCamera();	// 処理を完了する
+            document.getElementById('faceModal').style.display = "none";	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
+
+        window.onload = () => {	// 処理のまとまりを始める
+            document.getElementById("hud-menu-btn").classList.remove("open");	// 画面表示を更新する
+            document.getElementById("nav-links").classList.remove("open");	// 画面表示を更新する
+
+            const userName = localStorage.getItem("userName");	// 定数を定義
+            const profileImage = localStorage.getItem("profileImage");	// 定数を定義
+            const currentUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail");	// 定数を定義
+            const adminButton = document.getElementById("nav-admin-btn");	// 定数を定義
+            if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") {	// 端末内の保存情報を扱う
+                adminButton.style.display = "inline-block";	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+
+            if (userName) document.getElementById("username-input").value = userName;	// 条件に応じて処理を分ける
+
+            if (profileImage && profileImage !== "null") {	// 条件に応じて処理を分ける
+                document.getElementById("profile-icon").src = profileImage;	// 処理を続ける
+            } else {	// 処理のまとまりを始める
+                document.getElementById("profile-icon").src = DEFAULT_AVATAR;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+
+            syncProfileFromServer();	// 処理を完了する
+            updateUnreadBadge();	// 処理を完了する
+            setInterval(() => {	// 時間を置いて処理する
+                if (document.visibilityState === "visible") updateUnreadBadge();	// 条件に応じて処理を分ける
+            }, 8000);	// 処理を完了する
+            loadBlockedUsers();	// 処理を完了する
+        };	// 処理のまとまりを閉じる
     </script>
-</body>
+</body>	<!-- 要素を閉じる -->
 
-</html>
+</html>	<!-- 要素を閉じる -->

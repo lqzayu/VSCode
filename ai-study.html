@@ -1,445 +1,445 @@
-<!DOCTYPE html>
-<html lang="ja">
+<!DOCTYPE html>	<!-- HTML文書として宣言 -->
+<html lang="ja">	<!-- 画面要素を配置 -->
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI学習相談 - 平工マッチング</title>
-    <link rel="icon" href="icon-192.png">
-    <link rel="stylesheet" href="theme.css?v=20260917c">
+<head>	<!-- 画面要素を配置 -->
+    <meta charset="UTF-8">	<!-- 表示環境を設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">	<!-- 表示環境を設定 -->
+    <title>AI学習相談 - 平工マッチング</title>	<!-- ページタイトルを設定 -->
+    <link rel="icon" href="icon-192.png">	<!-- 外部ファイルを読み込む -->
+    <link rel="stylesheet" href="theme.css?v=20260917c">	<!-- 外部ファイルを読み込む -->
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
     <style>
-        .ai-page { max-width: 1080px; margin: 0 auto; padding: 46px 24px 80px; }
-        .ai-hero { display:grid; grid-template-columns:1.1fr .9fr; gap:24px; align-items:stretch; margin-bottom:24px; }
-        .ai-hero-copy, .ai-profile, .ai-chat-card { background:var(--ui-paper); border:1px solid var(--ui-line); border-radius:20px; box-shadow:0 12px 30px rgba(36,60,50,.06); }
-        .ai-hero-copy { padding:30px; background:linear-gradient(135deg, var(--ui-green), #47755b); color:#fff; overflow:hidden; position:relative; }
-        .ai-hero-copy::after { content:""; position:absolute; width:220px; height:220px; right:-70px; top:-80px; border-radius:50%; background:var(--ui-lime); opacity:.22; }
-        .ai-kicker { margin:0 0 10px; font-size:11px; letter-spacing:.18em; font-weight:800; opacity:.8; }
-        .ai-hero-copy h1 { margin:0; font-size:clamp(28px,4vw,46px); line-height:1.2; letter-spacing:-.06em; position:relative; z-index:1; }
-        .ai-hero-copy p { margin:16px 0 0; max-width:560px; color:rgba(255,255,255,.82); position:relative; z-index:1; }
-        .ai-profile { padding:22px; }
-        .ai-profile h2, .ai-chat-header h2 { margin:0 0 16px; font-size:17px; letter-spacing:-.03em; }
-        .ai-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-        .ai-field { display:flex; flex-direction:column; gap:5px; }
-        .ai-field.full { grid-column:1 / -1; }
-        .ai-field label { color:var(--ui-muted); font-size:12px; font-weight:700; }
-        .ai-field input, .ai-field select { width:100%; min-height:44px; padding:9px 11px; }
-        .ai-chat-card { overflow:hidden; }
-        .ai-chat-header { padding:22px 24px; border-bottom:1px solid var(--ui-line); display:flex; justify-content:space-between; gap:16px; align-items:center; }
-        .ai-chat-header h2 { margin:0; }
-        .ai-chat-header p { margin:0; color:var(--ui-muted); font-size:12px; }
-        .ai-messages { min-height:360px; max-height:560px; overflow:auto; padding:22px; display:flex; flex-direction:column; gap:14px; background:rgba(237,241,231,.38); }
-        .ai-empty { margin:auto; max-width:430px; color:var(--ui-muted); text-align:center; font-size:14px; }
-        .ai-bubble { max-width:min(780px, 92%); padding:14px 16px; border-radius:16px; white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.75; font-size:14px; }
-        .ai-bubble.user { align-self:flex-end; color:#fff; background:var(--ui-green); border-bottom-right-radius:5px; }
-        .ai-bubble.model { align-self:flex-start; color:var(--ui-ink); background:var(--ui-paper); border:1px solid var(--ui-line); border-bottom-left-radius:5px; }
-        .ai-bubble.loading { color:var(--ui-muted); font-size:13px; }
-        .ai-feedback { display:flex; gap:7px; margin-top:10px; }
-        .ai-feedback button { padding:6px 9px; border:1px solid var(--ui-line); border-radius:8px; background:var(--ui-paper); color:var(--ui-muted); font-size:11px; cursor:pointer; }
-        .ai-feedback button:hover { border-color:#8cae59; color:var(--ui-green); }
-        .ai-compose { padding:18px 22px 22px; border-top:1px solid var(--ui-line); }
-        .ai-compose-row { display:flex; gap:10px; align-items:flex-end; }
-        .ai-compose textarea { flex:1; min-height:54px; max-height:150px; resize:vertical; padding:12px; }
-        .ai-send { min-height:54px; padding:0 20px; border:0; border-radius:10px; background:var(--ui-green); color:#fff; font-weight:800; cursor:pointer; }
-        .ai-send:hover { background:#37674b; }
-        .ai-send:disabled { cursor:wait; }
-        .ai-note { margin:10px 0 0; color:var(--ui-muted); font-size:11px; }
-        @media (max-width:760px) {
-            .ai-page { padding:28px 14px 60px; }
-            .ai-hero { grid-template-columns:1fr; }
-            .ai-hero-copy { padding:24px; }
-            .ai-form-grid { grid-template-columns:1fr; }
-            .ai-field.full { grid-column:auto; }
-            .ai-chat-header { align-items:flex-start; flex-direction:column; }
-            .ai-compose-row { flex-direction:column; align-items:stretch; }
-            .ai-send { width:100%; }
-        }
+        .ai-page { max-width: 1080px; margin: 0 auto; padding: 46px 24px 80px; }	/* 見た目の設定を指定 */
+        .ai-hero { display:grid; grid-template-columns:1.1fr .9fr; gap:24px; align-items:stretch; margin-bottom:24px; }	/* 見た目の設定を指定 */
+        .ai-hero-copy, .ai-profile, .ai-chat-card { background:var(--ui-paper); border:1px solid var(--ui-line); border-radius:20px; box-shadow:0 12px 30px rgba(36,60,50,.06); }	/* 見た目の設定を指定 */
+        .ai-hero-copy { padding:30px; background:linear-gradient(135deg, var(--ui-green), #47755b); color:#fff; overflow:hidden; position:relative; }	/* 見た目の設定を指定 */
+        .ai-hero-copy::after { content:""; position:absolute; width:220px; height:220px; right:-70px; top:-80px; border-radius:50%; background:var(--ui-lime); opacity:.22; }	/* 見た目の設定を指定 */
+        .ai-kicker { margin:0 0 10px; font-size:11px; letter-spacing:.18em; font-weight:800; opacity:.8; }	/* 見た目の設定を指定 */
+        .ai-hero-copy h1 { margin:0; font-size:clamp(28px,4vw,46px); line-height:1.2; letter-spacing:-.06em; position:relative; z-index:1; }	/* 見た目の設定を指定 */
+        .ai-hero-copy p { margin:16px 0 0; max-width:560px; color:rgba(255,255,255,.82); position:relative; z-index:1; }	/* 見た目の設定を指定 */
+        .ai-profile { padding:22px; }	/* 見た目の設定を指定 */
+        .ai-profile h2, .ai-chat-header h2 { margin:0 0 16px; font-size:17px; letter-spacing:-.03em; }	/* 見た目の設定を指定 */
+        .ai-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }	/* 見た目の設定を指定 */
+        .ai-field { display:flex; flex-direction:column; gap:5px; }	/* 見た目の設定を指定 */
+        .ai-field.full { grid-column:1 / -1; }	/* 見た目の設定を指定 */
+        .ai-field label { color:var(--ui-muted); font-size:12px; font-weight:700; }	/* 見た目の設定を指定 */
+        .ai-field input, .ai-field select { width:100%; min-height:44px; padding:9px 11px; }	/* 見た目の設定を指定 */
+        .ai-chat-card { overflow:hidden; }	/* 見た目の設定を指定 */
+        .ai-chat-header { padding:22px 24px; border-bottom:1px solid var(--ui-line); display:flex; justify-content:space-between; gap:16px; align-items:center; }	/* 見た目の設定を指定 */
+        .ai-chat-header h2 { margin:0; }	/* 見た目の設定を指定 */
+        .ai-chat-header p { margin:0; color:var(--ui-muted); font-size:12px; }	/* 見た目の設定を指定 */
+        .ai-messages { min-height:360px; max-height:560px; overflow:auto; padding:22px; display:flex; flex-direction:column; gap:14px; background:rgba(237,241,231,.38); }	/* 見た目の設定を指定 */
+        .ai-empty { margin:auto; max-width:430px; color:var(--ui-muted); text-align:center; font-size:14px; }	/* 見た目の設定を指定 */
+        .ai-bubble { max-width:min(780px, 92%); padding:14px 16px; border-radius:16px; white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.75; font-size:14px; }	/* 見た目の設定を指定 */
+        .ai-bubble.user { align-self:flex-end; color:#fff; background:var(--ui-green); border-bottom-right-radius:5px; }	/* 見た目の設定を指定 */
+        .ai-bubble.model { align-self:flex-start; color:var(--ui-ink); background:var(--ui-paper); border:1px solid var(--ui-line); border-bottom-left-radius:5px; }	/* 見た目の設定を指定 */
+        .ai-bubble.loading { color:var(--ui-muted); font-size:13px; }	/* 見た目の設定を指定 */
+        .ai-feedback { display:flex; gap:7px; margin-top:10px; }	/* 見た目の設定を指定 */
+        .ai-feedback button { padding:6px 9px; border:1px solid var(--ui-line); border-radius:8px; background:var(--ui-paper); color:var(--ui-muted); font-size:11px; cursor:pointer; }	/* 見た目の設定を指定 */
+        .ai-feedback button:hover { border-color:#8cae59; color:var(--ui-green); }	/* 見た目の設定を指定 */
+        .ai-compose { padding:18px 22px 22px; border-top:1px solid var(--ui-line); }	/* 見た目の設定を指定 */
+        .ai-compose-row { display:flex; gap:10px; align-items:flex-end; }	/* 見た目の設定を指定 */
+        .ai-compose textarea { flex:1; min-height:54px; max-height:150px; resize:vertical; padding:12px; }	/* 見た目の設定を指定 */
+        .ai-send { min-height:54px; padding:0 20px; border:0; border-radius:10px; background:var(--ui-green); color:#fff; font-weight:800; cursor:pointer; }	/* 見た目の設定を指定 */
+        .ai-send:hover { background:#37674b; }	/* 見た目の設定を指定 */
+        .ai-send:disabled { cursor:wait; }	/* 見た目の設定を指定 */
+        .ai-note { margin:10px 0 0; color:var(--ui-muted); font-size:11px; }	/* 見た目の設定を指定 */
+        @media (max-width:760px) {	/* 表示条件を設定 */
+            .ai-page { padding:28px 14px 60px; }	/* 見た目の設定を指定 */
+            .ai-hero { grid-template-columns:1fr; }	/* 見た目の設定を指定 */
+            .ai-hero-copy { padding:24px; }	/* 見た目の設定を指定 */
+            .ai-form-grid { grid-template-columns:1fr; }	/* 見た目の設定を指定 */
+            .ai-field.full { grid-column:auto; }	/* 見た目の設定を指定 */
+            .ai-chat-header { align-items:flex-start; flex-direction:column; }	/* 見た目の設定を指定 */
+            .ai-compose-row { flex-direction:column; align-items:stretch; }	/* 見た目の設定を指定 */
+            .ai-send { width:100%; }	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
     </style>
-</head>
+</head>	<!-- 要素を閉じる -->
 
-<body data-page="ai-study">
-    <header class="navbar">
-        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
-        <button class="hamburger-btn" id="hud-menu-btn" type="button" onclick="toggleMenu()" aria-label="メニューを開く">
-            <span></span><span></span><span></span>
-        </button>
-        <nav class="nav-links" id="nav-links">
-            <a class="nav-item" href="main.html?guide=1">使い方</a>
-            <a class="nav-item" href="recruit.html">募集投稿</a>
-            <a class="nav-item" href="users.html">ユーザーを探す</a>
-            <a class="nav-item" href="messages.html">メッセージ</a>
-            <a class="nav-item" href="profile.html">マイページ</a>
-            <a class="nav-item active" href="ai-study.html">AI学習相談</a>
-            <a class="nav-item" id="nav-admin-btn" style="display:none;color:#a84738;" href="admin.html">管理者</a>
-            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>
-        </nav>
-    </header>
+<body data-page="ai-study">	<!-- 画面要素を配置 -->
+    <header class="navbar">	<!-- ヘッダーを配置 -->
+        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>	<!-- 画面要素を配置 -->
+        <button class="hamburger-btn" id="hud-menu-btn" type="button" onclick="toggleMenu()" aria-label="メニューを開く">	<!-- 操作できる要素を配置 -->
+            <span></span><span></span><span></span>	<!-- 画面要素を配置 -->
+        </button>	<!-- 要素を閉じる -->
+        <nav class="nav-links" id="nav-links">	<!-- ナビゲーションを配置 -->
+            <a class="nav-item" href="main.html?guide=1">使い方</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="recruit.html">募集投稿</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="users.html">ユーザーを探す</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="messages.html">メッセージ</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="profile.html">マイページ</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item active" href="ai-study.html">AI学習相談</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" id="nav-admin-btn" style="display:none;color:#a84738;" href="admin.html">管理者</a>	<!-- 操作できる要素を配置 -->
+            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>	<!-- 操作できる要素を配置 -->
+        </nav>	<!-- 要素を閉じる -->
+    </header>	<!-- 要素を閉じる -->
 
-    <main class="ai-page">
-        <section class="ai-hero">
-            <div class="ai-hero-copy">
-                <p class="ai-kicker">STUDY ADVISOR</p>
-                <h1>自分に合う勉強法を、AIと一緒に見つける。</h1>
-                <p>今の悩みや勉強できる時間をもとに、今日から実行できる方法を一緒に考えます。回答への評価は、今後の推薦方法の改善にも使われます。</p>
-            </div>
-            <section class="ai-profile">
-                <h2>まずはあなたの状況を教えてください</h2>
-                <div class="ai-form-grid">
-                    <div class="ai-field">
-                        <label for="ai-subject">教科</label>
-                        <select id="ai-subject">
-                            <option value="未指定">まだ決まっていない</option>
-                            <option>数学</option><option>英語</option><option>国語</option><option>理科</option><option>社会</option><option>専門科目</option><option>その他</option>
-                        </select>
-                    </div>
-                    <div class="ai-field">
-                        <label for="ai-minutes">1日に勉強できる時間</label>
-                        <select id="ai-minutes">
-                            <option>15分</option><option>30分</option><option>45分</option><option>1時間</option><option>2時間以上</option><option>日によって違う</option>
-                        </select>
-                    </div>
-                    <div class="ai-field full">
-                        <label for="ai-goal">達成したいこと</label>
-                        <input id="ai-goal" maxlength="300" placeholder="例：次のテストで平均点を超えたい">
-                    </div>
-                    <div class="ai-field full">
-                        <label for="ai-challenge">困っていること</label>
-                        <input id="ai-challenge" maxlength="300" placeholder="例：勉強を始めても集中が続かない">
-                    </div>
-                    <div class="ai-field full">
-                        <label for="ai-preference">やりやすい方法</label>
-                        <select id="ai-preference">
-                            <option>特に決まっていない</option><option>動画や図を見る</option><option>声に出して説明する</option><option>問題を解いて覚える</option><option>友達と一緒に進める</option>
-                        </select>
-                    </div>
-                </div>
-            </section>
-        </section>
+    <main class="ai-page">	<!-- ページの主内容を配置 -->
+        <section class="ai-hero">	<!-- 画面要素を配置 -->
+            <div class="ai-hero-copy">	<!-- 画面要素を配置 -->
+                <p class="ai-kicker">STUDY ADVISOR</p>	<!-- 画面要素を配置 -->
+                <h1>自分に合う勉強法を、AIと一緒に見つける。</h1>	<!-- 画面要素を配置 -->
+                <p>今の悩みや勉強できる時間をもとに、今日から実行できる方法を一緒に考えます。回答への評価は、今後の推薦方法の改善にも使われます。</p>	<!-- 画面要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+            <section class="ai-profile">	<!-- 画面要素を配置 -->
+                <h2>まずはあなたの状況を教えてください</h2>	<!-- 画面要素を配置 -->
+                <div class="ai-form-grid">	<!-- 画面要素を配置 -->
+                    <div class="ai-field">	<!-- 画面要素を配置 -->
+                        <label for="ai-subject">教科</label>	<!-- 画面要素を配置 -->
+                        <select id="ai-subject">	<!-- 入力要素を配置 -->
+                            <option value="未指定">まだ決まっていない</option>	<!-- 入力要素を配置 -->
+                            <option>数学</option><option>英語</option><option>国語</option><option>理科</option><option>社会</option><option>専門科目</option><option>その他</option>	<!-- 入力要素を配置 -->
+                        </select>	<!-- 要素を閉じる -->
+                    </div>	<!-- 要素を閉じる -->
+                    <div class="ai-field">	<!-- 画面要素を配置 -->
+                        <label for="ai-minutes">1日に勉強できる時間</label>	<!-- 画面要素を配置 -->
+                        <select id="ai-minutes">	<!-- 入力要素を配置 -->
+                            <option>15分</option><option>30分</option><option>45分</option><option>1時間</option><option>2時間以上</option><option>日によって違う</option>	<!-- 入力要素を配置 -->
+                        </select>	<!-- 要素を閉じる -->
+                    </div>	<!-- 要素を閉じる -->
+                    <div class="ai-field full">	<!-- 画面要素を配置 -->
+                        <label for="ai-goal">達成したいこと</label>	<!-- 画面要素を配置 -->
+                        <input id="ai-goal" maxlength="300" placeholder="例：次のテストで平均点を超えたい">	<!-- 入力要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
+                    <div class="ai-field full">	<!-- 画面要素を配置 -->
+                        <label for="ai-challenge">困っていること</label>	<!-- 画面要素を配置 -->
+                        <input id="ai-challenge" maxlength="300" placeholder="例：勉強を始めても集中が続かない">	<!-- 入力要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
+                    <div class="ai-field full">	<!-- 画面要素を配置 -->
+                        <label for="ai-preference">やりやすい方法</label>	<!-- 画面要素を配置 -->
+                        <select id="ai-preference">	<!-- 入力要素を配置 -->
+                            <option>特に決まっていない</option><option>動画や図を見る</option><option>声に出して説明する</option><option>問題を解いて覚える</option><option>友達と一緒に進める</option>	<!-- 入力要素を配置 -->
+                        </select>	<!-- 要素を閉じる -->
+                    </div>	<!-- 要素を閉じる -->
+                </div>	<!-- 要素を閉じる -->
+            </section>	<!-- 要素を閉じる -->
+        </section>	<!-- 要素を閉じる -->
 
-        <section class="ai-chat-card">
-            <div class="ai-chat-header">
-                <div><h2>AI学習相談</h2><p>相談内容を具体的に書くほど、提案があなた向けになります。</p></div>
-                <span id="ai-status" class="ai-note" aria-live="polite"></span>
-            </div>
-            <div id="ai-messages" class="ai-messages" aria-live="polite">
-                <p class="ai-empty" id="ai-empty">「数学の勉強を始めてもすぐスマホを見てしまう」のように、今困っていることを入力してください。</p>
-            </div>
-            <div class="ai-compose">
-                <div class="ai-compose-row">
-                    <textarea id="ai-input" maxlength="1500" placeholder="AIに相談する内容を入力…"></textarea>
-                    <button id="ai-send" class="ai-send" type="button" onclick="sendStudyMessage()">相談する</button>
-                </div>
-                <p class="ai-note">入力内容はAI回答の生成と推薦方法の研究・改善に使用します。個人情報やパスワードは入力しないでください。</p>
-            </div>
-        </section>
-    </main>
+        <section class="ai-chat-card">	<!-- 画面要素を配置 -->
+            <div class="ai-chat-header">	<!-- 画面要素を配置 -->
+                <div><h2>AI学習相談</h2><p>相談内容を具体的に書くほど、提案があなた向けになります。</p></div>	<!-- 画面要素を配置 -->
+                <span id="ai-status" class="ai-note" aria-live="polite"></span>	<!-- 画面要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+            <div id="ai-messages" class="ai-messages" aria-live="polite">	<!-- 画面要素を配置 -->
+                <p class="ai-empty" id="ai-empty">「数学の勉強を始めてもすぐスマホを見てしまう」のように、今困っていることを入力してください。</p>	<!-- 画面要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+            <div class="ai-compose">	<!-- 画面要素を配置 -->
+                <div class="ai-compose-row">	<!-- 画面要素を配置 -->
+                    <textarea id="ai-input" maxlength="1500" placeholder="AIに相談する内容を入力…"></textarea>	<!-- 入力要素を配置 -->
+                    <button id="ai-send" class="ai-send" type="button" onclick="sendStudyMessage()">相談する</button>	<!-- 操作できる要素を配置 -->
+                </div>	<!-- 要素を閉じる -->
+                <p class="ai-note">入力内容はAI回答の生成と推薦方法の研究・改善に使用します。個人情報やパスワードは入力しないでください。</p>	<!-- 画面要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+        </section>	<!-- 要素を閉じる -->
+    </main>	<!-- 要素を閉じる -->
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
-        const currentUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";
-        const adminButton = document.getElementById("nav-admin-btn");
-        if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") {
-            adminButton.style.display = "inline-block";
-        }
-        const stateKey = "ai-study-state:" + currentUserId;
-        let sessionId = (crypto.randomUUID ? crypto.randomUUID() : "ai-" + Date.now());
-        const history = [];
-        const conversation = [];
-        let waiting = false;
-        let consultationCompleted = false;
-        let pendingRequest = null;
-        let aiComposing = false;
-        let aiEnterArmed = false;
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";	// GAS APIの接続先を設定
+        const currentUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";	// 定数を定義
+        const adminButton = document.getElementById("nav-admin-btn");	// 定数を定義
+        if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") {	// 端末内の保存情報を扱う
+            adminButton.style.display = "inline-block";	// 処理を続ける
+        }	// 処理のまとまりを閉じる
+        const stateKey = "ai-study-state:" + currentUserId;	// 定数を定義
+        let sessionId = (crypto.randomUUID ? crypto.randomUUID() : "ai-" + Date.now());	// 状態を保持
+        const history = [];	// 定数を定義
+        const conversation = [];	// 定数を定義
+        let waiting = false;	// 状態を保持
+        let consultationCompleted = false;	// 状態を保持
+        let pendingRequest = null;	// 状態を保持
+        let aiComposing = false;	// 状態を保持
+        let aiEnterArmed = false;	// 状態を保持
 
-        function createId() {
-            return crypto.randomUUID ? crypto.randomUUID() : "ai-" + Date.now() + "-" + Math.random().toString(16).slice(2);
-        }
+        function createId() {	// 関数を定義
+            return crypto.randomUUID ? crypto.randomUUID() : "ai-" + Date.now() + "-" + Math.random().toString(16).slice(2);	// 結果を返す
+        }	// 処理のまとまりを閉じる
 
-        function currentDateKey() {
-            return new Date().toLocaleDateString("sv-SE");
-        }
+        function currentDateKey() {	// 関数を定義
+            return new Date().toLocaleDateString("sv-SE");	// 結果を返す
+        }	// 処理のまとまりを閉じる
 
-        function getProfile() {
-            return {
-                subject: document.getElementById("ai-subject").value,
-                goal: document.getElementById("ai-goal").value.trim(),
-                challenge: document.getElementById("ai-challenge").value.trim(),
-                minutes: document.getElementById("ai-minutes").value,
-                preference: document.getElementById("ai-preference").value
-            };
-        }
+        function getProfile() {	// 関数を定義
+            return {	// 結果を返す
+                subject: document.getElementById("ai-subject").value,	// 処理を続ける
+                goal: document.getElementById("ai-goal").value.trim(),	// 処理を続ける
+                challenge: document.getElementById("ai-challenge").value.trim(),	// 処理を続ける
+                minutes: document.getElementById("ai-minutes").value,	// 処理を続ける
+                preference: document.getElementById("ai-preference").value	// 処理を続ける
+            };	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        function setProfile(profile) {
-            if (!profile) return;
-            if (profile.subject) document.getElementById("ai-subject").value = profile.subject;
-            if (profile.goal) document.getElementById("ai-goal").value = profile.goal;
-            if (profile.challenge) document.getElementById("ai-challenge").value = profile.challenge;
-            if (profile.minutes) document.getElementById("ai-minutes").value = profile.minutes;
-            if (profile.preference) document.getElementById("ai-preference").value = profile.preference;
-        }
+        function setProfile(profile) {	// 関数を定義
+            if (!profile) return;	// 条件に応じて処理を分ける
+            if (profile.subject) document.getElementById("ai-subject").value = profile.subject;	// 条件に応じて処理を分ける
+            if (profile.goal) document.getElementById("ai-goal").value = profile.goal;	// 条件に応じて処理を分ける
+            if (profile.challenge) document.getElementById("ai-challenge").value = profile.challenge;	// 条件に応じて処理を分ける
+            if (profile.minutes) document.getElementById("ai-minutes").value = profile.minutes;	// 条件に応じて処理を分ける
+            if (profile.preference) document.getElementById("ai-preference").value = profile.preference;	// 条件に応じて処理を分ける
+        }	// 処理のまとまりを閉じる
 
-        function saveState() {
-            if (!currentUserId) return;
-            try {
-                localStorage.setItem(stateKey, JSON.stringify({
-                    dateKey: currentDateKey(),
-                    sessionId,
-                    history,
-                    conversation,
-                    profile: getProfile(),
-                    consultationCompleted,
-                    pendingRequest
-                }));
-            } catch (error) {
-                console.debug("AI相談の状態を保存できませんでした。", error);
-            }
-        }
+        function saveState() {	// 関数を定義
+            if (!currentUserId) return;	// 条件に応じて処理を分ける
+            try {	// 失敗に備えて処理を始める
+                localStorage.setItem(stateKey, JSON.stringify({	// 端末内の保存情報を扱う
+                    dateKey: currentDateKey(),	// 処理を続ける
+                    sessionId,	// 処理を続ける
+                    history,	// 処理を続ける
+                    conversation,	// 処理を続ける
+                    profile: getProfile(),	// 処理を続ける
+                    consultationCompleted,	// 処理を続ける
+                    pendingRequest	// 処理を続ける
+                }));	// 処理を完了する
+            } catch (error) {	// 処理のまとまりを始める
+                console.debug("AI相談の状態を保存できませんでした。", error);	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        function toggleMenu() {
-            const nav = document.getElementById("nav-links");
-            const button = document.getElementById("hud-menu-btn");
-            nav.classList.toggle("open");
-            button.classList.toggle("open");
-        }
+        function toggleMenu() {	// 関数を定義
+            const nav = document.getElementById("nav-links");	// 定数を定義
+            const button = document.getElementById("hud-menu-btn");	// 定数を定義
+            nav.classList.toggle("open");	// 処理を完了する
+            button.classList.toggle("open");	// 処理を完了する
+        }	// 処理のまとまりを閉じる
 
-        function closeMenu() {
-            document.getElementById("nav-links").classList.remove("open");
-            document.getElementById("hud-menu-btn").classList.remove("open");
-        }
+        function closeMenu() {	// 関数を定義
+            document.getElementById("nav-links").classList.remove("open");	// 画面表示を更新する
+            document.getElementById("hud-menu-btn").classList.remove("open");	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
 
-        function logout() {
-            ["userId", "userEmail", "userName", "profileImage", "adminToken", "isImpersonating"].forEach(key => localStorage.removeItem(key));
-            location.href = "index.html";
-        }
+        function logout() {	// 関数を定義
+            ["userId", "userEmail", "userName", "profileImage", "adminToken", "isImpersonating"].forEach(key => localStorage.removeItem(key));	// 端末内の保存情報を扱う
+            location.href = "index.html";	// 処理を続ける
+        }	// 処理のまとまりを閉じる
 
-        function addBubble(text, type, responseId) {
-            const empty = document.getElementById("ai-empty");
-            if (empty) empty.remove();
-            const bubble = document.createElement("div");
-            bubble.className = "ai-bubble " + type;
-            bubble.textContent = text;
-            if (type === "model" && responseId) {
-                const feedback = document.createElement("div");
-                feedback.className = "ai-feedback";
-                const helpful = document.createElement("button");
-                helpful.type = "button";
-                helpful.textContent = "役に立った";
-                helpful.onclick = () => sendFeedback(responseId, "helpful", feedback);
-                const notHelpful = document.createElement("button");
-                notHelpful.type = "button";
-                notHelpful.textContent = "もう少し合う方法がいい";
-                notHelpful.onclick = () => sendFeedback(responseId, "not_helpful", feedback);
-                feedback.append(helpful, notHelpful);
-                bubble.appendChild(feedback);
-            }
-            const messages = document.getElementById("ai-messages");
-            messages.appendChild(bubble);
-            messages.scrollTop = messages.scrollHeight;
-            return bubble;
-        }
+        function addBubble(text, type, responseId) {	// 関数を定義
+            const empty = document.getElementById("ai-empty");	// 定数を定義
+            if (empty) empty.remove();	// 条件に応じて処理を分ける
+            const bubble = document.createElement("div");	// 定数を定義
+            bubble.className = "ai-bubble " + type;	// 処理を続ける
+            bubble.textContent = text;	// 処理を続ける
+            if (type === "model" && responseId) {	// 条件に応じて処理を分ける
+                const feedback = document.createElement("div");	// 定数を定義
+                feedback.className = "ai-feedback";	// 処理を続ける
+                const helpful = document.createElement("button");	// 定数を定義
+                helpful.type = "button";	// 処理を続ける
+                helpful.textContent = "役に立った";	// 処理を続ける
+                helpful.onclick = () => sendFeedback(responseId, "helpful", feedback);	// 処理を完了する
+                const notHelpful = document.createElement("button");	// 定数を定義
+                notHelpful.type = "button";	// 処理を続ける
+                notHelpful.textContent = "もう少し合う方法がいい";	// 処理を続ける
+                notHelpful.onclick = () => sendFeedback(responseId, "not_helpful", feedback);	// 処理を完了する
+                feedback.append(helpful, notHelpful);	// 処理を完了する
+                bubble.appendChild(feedback);	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+            const messages = document.getElementById("ai-messages");	// 定数を定義
+            messages.appendChild(bubble);	// 処理を完了する
+            messages.scrollTop = messages.scrollHeight;	// 処理を続ける
+            return bubble;	// 結果を返す
+        }	// 処理のまとまりを閉じる
 
-        function wait(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
+        function wait(ms) {	// 関数を定義
+            return new Promise(resolve => setTimeout(resolve, ms));	// 時間を置いて処理する
+        }	// 処理のまとまりを閉じる
 
-        async function postGas(payload, timeoutMs, attempts) {
-            let lastError;
-            for (let attempt = 0; attempt < (attempts || 2); attempt++) {
-                const controller = new AbortController();
-                const timer = setTimeout(() => controller.abort(), timeoutMs || 45000);
-                try {
-                    const response = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload), signal: controller.signal });
-                    if (!response.ok) throw new Error("HTTP " + response.status);
-                    return await response.json();
-                } catch (error) {
-                    lastError = error;
-                    if (attempt + 1 < (attempts || 2)) await wait(1500 * (attempt + 1));
-                } finally {
-                    clearTimeout(timer);
-                }
-            }
-            throw lastError || new Error("通信に失敗しました");
-        }
+        async function postGas(payload, timeoutMs, attempts) {	// 関数を定義
+            let lastError;	// 状態を保持
+            for (let attempt = 0; attempt < (attempts || 2); attempt++) {	// 対象を順番に処理する
+                const controller = new AbortController();	// 定数を定義
+                const timer = setTimeout(() => controller.abort(), timeoutMs || 45000);	// 定数を定義
+                try {	// 失敗に備えて処理を始める
+                    const response = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload), signal: controller.signal });	// 定数を定義
+                    if (!response.ok) throw new Error("HTTP " + response.status);	// 条件に応じて処理を分ける
+                    return await response.json();	// 結果を返す
+                } catch (error) {	// 処理のまとまりを始める
+                    lastError = error;	// 処理を続ける
+                    if (attempt + 1 < (attempts || 2)) await wait(1500 * (attempt + 1));	// 条件に応じて処理を分ける
+                } finally {	// 処理のまとまりを始める
+                    clearTimeout(timer);	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+            }	// 処理のまとまりを閉じる
+            throw lastError || new Error("通信に失敗しました");	// エラーを通知する
+        }	// 処理のまとまりを閉じる
 
-        function lockCompletedConsultation() {
-            consultationCompleted = true;
-            const input = document.getElementById("ai-input");
-            input.disabled = true;
-            input.placeholder = "今回のAI相談は完了しました";
-            document.getElementById("ai-send").textContent = "相談完了";
-            document.getElementById("ai-status").textContent = "おすすめ表示まで完了";
-            saveState();
-        }
+        function lockCompletedConsultation() {	// 関数を定義
+            consultationCompleted = true;	// 処理を続ける
+            const input = document.getElementById("ai-input");	// 定数を定義
+            input.disabled = true;	// 処理を続ける
+            input.placeholder = "今回のAI相談は完了しました";	// 処理を続ける
+            document.getElementById("ai-send").textContent = "相談完了";	// 画面表示を更新する
+            document.getElementById("ai-status").textContent = "おすすめ表示まで完了";	// 画面表示を更新する
+            saveState();	// 処理を完了する
+        }	// 処理のまとまりを閉じる
 
-        async function requestAi(request, existingLoading) {
-            if (waiting || !request) return;
-            waiting = true;
-            pendingRequest = request;
-            saveState();
-            const sendButton = document.getElementById("ai-send");
-            const status = document.getElementById("ai-status");
-            sendButton.disabled = true;
-            status.textContent = "回答を取得中…";
-            const loading = existingLoading || addBubble("あなたに合う方法を考えています…", "model loading");
-            let result;
+        async function requestAi(request, existingLoading) {	// 関数を定義
+            if (waiting || !request) return;	// 条件に応じて処理を分ける
+            waiting = true;	// 処理を続ける
+            pendingRequest = request;	// 処理を続ける
+            saveState();	// 処理を完了する
+            const sendButton = document.getElementById("ai-send");	// 定数を定義
+            const status = document.getElementById("ai-status");	// 定数を定義
+            sendButton.disabled = true;	// 処理を続ける
+            status.textContent = "回答を取得中…";	// 処理を続ける
+            const loading = existingLoading || addBubble("あなたに合う方法を考えています…", "model loading");	// 定数を定義
+            let result;	// 状態を保持
 
-            try {
-                for (let poll = 0; poll < 6; poll++) {
-                    result = await postGas({
-                        mode: "aiStudyChat",
-                        userId: currentUserId,
-                        sessionId: request.sessionId,
-                        requestId: request.requestId,
-                        profile: request.profile,
-                        message: request.message,
-                        history: request.history
-                    }, 45000, 2);
-                    if (result.status === "success" && result.message && result.message.pending) {
-                        status.textContent = "回答を仕上げています…";
-                        await wait(2500);
-                        continue;
-                    }
-                    break;
-                }
+            try {	// 失敗に備えて処理を始める
+                for (let poll = 0; poll < 6; poll++) {	// 対象を順番に処理する
+                    result = await postGas({	// 処理のまとまりを始める
+                        mode: "aiStudyChat",	// 処理を続ける
+                        userId: currentUserId,	// 処理を続ける
+                        sessionId: request.sessionId,	// 処理を続ける
+                        requestId: request.requestId,	// 処理を続ける
+                        profile: request.profile,	// 処理を続ける
+                        message: request.message,	// 処理を続ける
+                        history: request.history	// 処理を続ける
+                    }, 45000, 2);	// 処理を完了する
+                    if (result.status === "success" && result.message && result.message.pending) {	// 条件に応じて処理を分ける
+                        status.textContent = "回答を仕上げています…";	// 処理を続ける
+                        await wait(2500);	// 処理を完了する
+                        continue;	// 処理を続ける
+                    }	// 処理のまとまりを閉じる
+                    break;	// 処理を続ける
+                }	// 処理のまとまりを閉じる
 
-                loading.remove();
-                if (!result || result.status !== "success" || !result.message || !result.message.reply) {
-                    throw new Error(result && result.message ? String(result.message) : "回答を取得できませんでした");
-                }
+                loading.remove();	// 処理を完了する
+                if (!result || result.status !== "success" || !result.message || !result.message.reply) {	// 条件に応じて処理を分ける
+                    throw new Error(result && result.message ? String(result.message) : "回答を取得できませんでした");	// エラーを通知する
+                }	// 処理のまとまりを閉じる
 
-                pendingRequest = null;
-                addBubble(result.message.reply, "model", result.message.responseId);
-                history.push({ role: "model", text: result.message.reply });
-                conversation.push({ type: "model", text: result.message.reply, responseId: result.message.responseId || "" });
-                if (result.message.completed) {
-                    lockCompletedConsultation();
-                    showNotice("おすすめの表示が完了しました。回答を評価してください", "success");
-                } else {
-                    document.getElementById("ai-input").placeholder = "AIの追加質問に答えてください…";
-                    status.textContent = "追加質問 1 / 1";
-                    saveState();
-                }
-            } catch (error) {
-                loading.remove();
-                saveState();
-                document.getElementById("ai-send").textContent = "回答を再取得";
-                showNotice(error.name === "AbortError" ? "通信に時間がかかっています。回答を再取得してください" : (error.message || "AIとの通信に失敗しました"), "error");
-            } finally {
-                waiting = false;
-                if (!consultationCompleted) sendButton.disabled = false;
-                if (!consultationCompleted && pendingRequest) status.textContent = "通信が不安定です。再取得できます";
-            }
-        }
+                pendingRequest = null;	// 処理を続ける
+                addBubble(result.message.reply, "model", result.message.responseId);	// 処理を完了する
+                history.push({ role: "model", text: result.message.reply });	// 処理を完了する
+                conversation.push({ type: "model", text: result.message.reply, responseId: result.message.responseId || "" });	// 処理を完了する
+                if (result.message.completed) {	// 条件に応じて処理を分ける
+                    lockCompletedConsultation();	// 処理を完了する
+                    showNotice("おすすめの表示が完了しました。回答を評価してください", "success");	// 処理結果を知らせる
+                } else {	// 処理のまとまりを始める
+                    document.getElementById("ai-input").placeholder = "AIの追加質問に答えてください…";	// 処理を続ける
+                    status.textContent = "追加質問 1 / 1";	// 処理を続ける
+                    saveState();	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+            } catch (error) {	// 処理のまとまりを始める
+                loading.remove();	// 処理を完了する
+                saveState();	// 処理を完了する
+                document.getElementById("ai-send").textContent = "回答を再取得";	// 画面表示を更新する
+                showNotice(error.name === "AbortError" ? "通信に時間がかかっています。回答を再取得してください" : (error.message || "AIとの通信に失敗しました"), "error");	// 処理結果を知らせる
+            } finally {	// 処理のまとまりを始める
+                waiting = false;	// 処理を続ける
+                if (!consultationCompleted) sendButton.disabled = false;	// 条件に応じて処理を分ける
+                if (!consultationCompleted && pendingRequest) status.textContent = "通信が不安定です。再取得できます";	// 条件に応じて処理を分ける
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        async function sendStudyMessage() {
-            if (waiting || consultationCompleted) return;
-            if (!currentUserId) {
-                showNotice("ログインしてから利用してください", "error");
-                location.href = "index.html";
-                return;
-            }
-            if (pendingRequest) {
-                requestAi(pendingRequest);
-                return;
-            }
-            const input = document.getElementById("ai-input");
-            const message = input.value.trim();
-            if (!message) return showNotice("相談内容を入力してください", "error");
+        async function sendStudyMessage() {	// 関数を定義
+            if (waiting || consultationCompleted) return;	// 条件に応じて処理を分ける
+            if (!currentUserId) {	// 条件に応じて処理を分ける
+                showNotice("ログインしてから利用してください", "error");	// 処理結果を知らせる
+                location.href = "index.html";	// 処理を続ける
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+            if (pendingRequest) {	// 条件に応じて処理を分ける
+                requestAi(pendingRequest);	// 処理を完了する
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+            const input = document.getElementById("ai-input");	// 定数を定義
+            const message = input.value.trim();	// 定数を定義
+            if (!message) return showNotice("相談内容を入力してください", "error");	// 条件に応じて処理を分ける
 
-            const request = {
-                requestId: createId(),
-                sessionId,
-                profile: getProfile(),
-                message,
-                history: history.slice(-8)
-            };
-            addBubble(message, "user");
-            conversation.push({ type: "user", text: message });
-            history.push({ role: "user", text: message });
-            input.value = "";
-            pendingRequest = request;
-            saveState();
-            requestAi(request);
-        }
+            const request = {	// 定数を定義
+                requestId: createId(),	// 処理を続ける
+                sessionId,	// 処理を続ける
+                profile: getProfile(),	// 処理を続ける
+                message,	// 処理を続ける
+                history: history.slice(-8)	// 処理を続ける
+            };	// 処理のまとまりを閉じる
+            addBubble(message, "user");	// 処理を完了する
+            conversation.push({ type: "user", text: message });	// 処理を完了する
+            history.push({ role: "user", text: message });	// 処理を完了する
+            input.value = "";	// 処理を続ける
+            pendingRequest = request;	// 処理を続ける
+            saveState();	// 処理を完了する
+            requestAi(request);	// 処理を完了する
+        }	// 処理のまとまりを閉じる
 
-        async function sendFeedback(responseId, rating, container) {
-            if (!container || container.dataset.saved) return;
-            container.dataset.saved = "true";
-            try {
-                const result = await postGas({ mode: "aiStudyFeedback", userId: currentUserId, responseId, rating });
-                if (result.status === "success") {
-                    container.textContent = "評価を保存しました";
-                    showNotice("評価を保存しました", "success");
-                } else {
-                    delete container.dataset.saved;
-                    showNotice(result.message || "評価を保存できませんでした", "error");
-                }
-            } catch (error) {
-                delete container.dataset.saved;
-                showNotice("評価を保存できませんでした", "error");
-            }
-        }
+        async function sendFeedback(responseId, rating, container) {	// 関数を定義
+            if (!container || container.dataset.saved) return;	// 条件に応じて処理を分ける
+            container.dataset.saved = "true";	// 処理を続ける
+            try {	// 失敗に備えて処理を始める
+                const result = await postGas({ mode: "aiStudyFeedback", userId: currentUserId, responseId, rating });	// 定数を定義
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    container.textContent = "評価を保存しました";	// 処理を続ける
+                    showNotice("評価を保存しました", "success");	// 処理結果を知らせる
+                } else {	// 処理のまとまりを始める
+                    delete container.dataset.saved;	// 処理を続ける
+                    showNotice(result.message || "評価を保存できませんでした", "error");	// 処理結果を知らせる
+                }	// 処理のまとまりを閉じる
+            } catch (error) {	// 処理のまとまりを始める
+                delete container.dataset.saved;	// 処理を続ける
+                showNotice("評価を保存できませんでした", "error");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        document.getElementById("ai-input").addEventListener("keydown", event => {
-            if (event.key !== "Enter" || event.shiftKey) return;
-            if (aiComposing || event.isComposing || event.keyCode === 229) {
-                aiEnterArmed = true;
-                return;
-            }
-            event.preventDefault();
-            if (!aiEnterArmed) {
-                aiEnterArmed = true;
-                document.getElementById("ai-status").textContent = "もう一度Enterで送信";
-                return;
-            }
-            aiEnterArmed = false;
-            sendStudyMessage();
-        });
+        document.getElementById("ai-input").addEventListener("keydown", event => {	// 操作イベントを登録
+            if (event.key !== "Enter" || event.shiftKey) return;	// 条件に応じて処理を分ける
+            if (aiComposing || event.isComposing || event.keyCode === 229) {	// 条件に応じて処理を分ける
+                aiEnterArmed = true;	// 処理を続ける
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+            event.preventDefault();	// 処理を完了する
+            if (!aiEnterArmed) {	// 条件に応じて処理を分ける
+                aiEnterArmed = true;	// 処理を続ける
+                document.getElementById("ai-status").textContent = "もう一度Enterで送信";	// 画面表示を更新する
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+            aiEnterArmed = false;	// 処理を続ける
+            sendStudyMessage();	// 処理を完了する
+        });	// 処理を完了する
 
-        document.getElementById("ai-input").addEventListener("compositionstart", () => {
-            aiComposing = true;
-        });
-        document.getElementById("ai-input").addEventListener("compositionend", () => {
-            aiComposing = false;
-        });
+        document.getElementById("ai-input").addEventListener("compositionstart", () => {	// 操作イベントを登録
+            aiComposing = true;	// 処理を続ける
+        });	// 処理を完了する
+        document.getElementById("ai-input").addEventListener("compositionend", () => {	// 操作イベントを登録
+            aiComposing = false;	// 処理を続ける
+        });	// 処理を完了する
 
-        function restoreState() {
-            if (!currentUserId) return;
-            try {
-                const saved = JSON.parse(localStorage.getItem(stateKey) || "null");
-                if (!saved) return;
-                if (saved.dateKey !== currentDateKey()) {
-                    localStorage.removeItem(stateKey);
-                    return;
-                }
-                if (saved.sessionId) sessionId = saved.sessionId;
-                setProfile(saved.profile);
-                if (Array.isArray(saved.history)) history.push(...saved.history);
-                if (Array.isArray(saved.conversation)) {
-                    saved.conversation.forEach(item => {
-                        if (!item || !item.text) return;
-                        conversation.push(item);
-                        addBubble(item.text, item.type === "model" ? "model" : "user", item.responseId || "");
-                    });
-                }
-                consultationCompleted = saved.consultationCompleted === true;
-                pendingRequest = saved.pendingRequest || null;
-                if (consultationCompleted) lockCompletedConsultation();
-                if (pendingRequest && !consultationCompleted) {
-                    document.getElementById("ai-send").textContent = "回答を再取得";
-                    setTimeout(() => requestAi(pendingRequest), 400);
-                }
-            } catch (error) {
-                localStorage.removeItem(stateKey);
-            }
-        }
+        function restoreState() {	// 関数を定義
+            if (!currentUserId) return;	// 条件に応じて処理を分ける
+            try {	// 失敗に備えて処理を始める
+                const saved = JSON.parse(localStorage.getItem(stateKey) || "null");	// 定数を定義
+                if (!saved) return;	// 条件に応じて処理を分ける
+                if (saved.dateKey !== currentDateKey()) {	// 条件に応じて処理を分ける
+                    localStorage.removeItem(stateKey);	// 端末内の保存情報を扱う
+                    return;	// 結果を返す
+                }	// 処理のまとまりを閉じる
+                if (saved.sessionId) sessionId = saved.sessionId;	// 条件に応じて処理を分ける
+                setProfile(saved.profile);	// 処理を完了する
+                if (Array.isArray(saved.history)) history.push(...saved.history);	// 条件に応じて処理を分ける
+                if (Array.isArray(saved.conversation)) {	// 条件に応じて処理を分ける
+                    saved.conversation.forEach(item => {	// 処理のまとまりを始める
+                        if (!item || !item.text) return;	// 条件に応じて処理を分ける
+                        conversation.push(item);	// 処理を完了する
+                        addBubble(item.text, item.type === "model" ? "model" : "user", item.responseId || "");	// 処理を完了する
+                    });	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+                consultationCompleted = saved.consultationCompleted === true;	// 処理を続ける
+                pendingRequest = saved.pendingRequest || null;	// 処理を続ける
+                if (consultationCompleted) lockCompletedConsultation();	// 条件に応じて処理を分ける
+                if (pendingRequest && !consultationCompleted) {	// 条件に応じて処理を分ける
+                    document.getElementById("ai-send").textContent = "回答を再取得";	// 画面表示を更新する
+                    setTimeout(() => requestAi(pendingRequest), 400);	// 時間を置いて処理する
+                }	// 処理のまとまりを閉じる
+            } catch (error) {	// 処理のまとまりを始める
+                localStorage.removeItem(stateKey);	// 端末内の保存情報を扱う
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        if (!currentUserId) {
-            showNotice("ログインしてから利用してください", "error");
-        } else {
-            restoreState();
-        }
+        if (!currentUserId) {	// 条件に応じて処理を分ける
+            showNotice("ログインしてから利用してください", "error");	// 処理結果を知らせる
+        } else {	// 処理のまとまりを始める
+            restoreState();	// 処理を完了する
+        }	// 処理のまとまりを閉じる
     </script>
-</body>
-</html>
+</body>	<!-- 要素を閉じる -->
+</html>	<!-- 要素を閉じる -->

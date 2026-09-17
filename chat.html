@@ -1,1042 +1,1042 @@
-<!DOCTYPE html>
-<html lang="ja">
+<!DOCTYPE html>	<!-- HTML文書として宣言 -->
+<html lang="ja">	<!-- 画面要素を配置 -->
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>チャット - 平工マッチング</title>
-    <link rel="icon" href="icon-192.png">
+<head>	<!-- 画面要素を配置 -->
+    <meta charset="UTF-8">	<!-- 表示環境を設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">	<!-- 表示環境を設定 -->
+    <title>チャット - 平工マッチング</title>	<!-- ページタイトルを設定 -->
+    <link rel="icon" href="icon-192.png">	<!-- 外部ファイルを読み込む -->
 
     <style>
-        body {
-            margin: 0;
-            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            color: #1e293b;
-            display: flex;
-            flex-direction: column;
-            min-height: 100dvh;
-            height: auto;
-            overflow-x: hidden;
-        }
+        body {	/* 対象要素のスタイルを始める */
+            margin: 0;	/* 見た目の設定を指定 */
+            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);	/* 見た目の設定を指定 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            min-height: 100dvh;	/* 見た目の設定を指定 */
+            height: auto;	/* 見た目の設定を指定 */
+            overflow-x: hidden;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .navbar {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 14px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+        .navbar {	/* 対象要素のスタイルを始める */
+            background: rgba(255, 255, 255, 0.75);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            -webkit-backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            padding: 14px 5%;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            justify-content: space-between;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
+            position: sticky;	/* 見た目の設定を指定 */
+            top: 0;	/* 見た目の設定を指定 */
+            z-index: 100;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            cursor: pointer;
-        }
+        .logo {	/* 対象要素のスタイルを始める */
+            font-size: 1.4rem;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            -webkit-background-clip: text;	/* 見た目の設定を指定 */
+            -webkit-text-fill-color: transparent;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-back {
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 13px;
-            color: #64748b;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        .btn-back {	/* 対象要素のスタイルを始める */
+            background: rgba(255, 255, 255, 0.8);	/* 見た目の設定を指定 */
+            border: 1px solid rgba(0, 0, 0, 0.08);	/* 見た目の設定を指定 */
+            padding: 8px 16px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            color: #64748b;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-back:hover {
-            background: #ffffff;
-            color: #1cbdc5;
-        }
+        .btn-back:hover {	/* 対象要素のスタイルを始める */
+            background: #ffffff;	/* 見た目の設定を指定 */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            max-width: 800px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 20px;
-            box-sizing: border-box;
-            overflow: hidden;
-            min-height: calc(100dvh - 170px);
-        }
+        .chat-container {	/* 対象要素のスタイルを始める */
+            flex: 1;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            max-width: 800px;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            margin: 0 auto;	/* 見た目の設定を指定 */
+            padding: 20px;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+            overflow: hidden;	/* 見た目の設定を指定 */
+            min-height: calc(100dvh - 170px);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .chat-header {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            padding: 16px 20px;
-            border-radius: 16px 16px 0 0;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            font-weight: 800;
-            font-size: 16px;
-            color: #1e293b;
-        }
+        .chat-header {	/* 対象要素のスタイルを始める */
+            background: rgba(255, 255, 255, 0.85);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(10px);	/* 見た目の設定を指定 */
+            padding: 16px 20px;	/* 見た目の設定を指定 */
+            border-radius: 16px 16px 0 0;	/* 見た目の設定を指定 */
+            border: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            font-size: 16px;	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .chat-messages {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            border-left: 1px solid rgba(255, 255, 255, 0.6);
-            border-right: 1px solid rgba(255, 255, 255, 0.6);
-        }
+        .chat-messages {	/* 対象要素のスタイルを始める */
+            flex: 1;	/* 見た目の設定を指定 */
+            background: rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(10px);	/* 見た目の設定を指定 */
+            padding: 20px;	/* 見た目の設定を指定 */
+            overflow-y: auto;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            gap: 12px;	/* 見た目の設定を指定 */
+            border-left: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
+            border-right: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .message-bubble {
-            max-width: 70%;
-            padding: 12px 16px;
-            border-radius: 16px;
-            font-size: 14px;
-            line-height: 1.5;
-            word-wrap: break-word;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-        }
+        .message-bubble {	/* 対象要素のスタイルを始める */
+            max-width: 70%;	/* 見た目の設定を指定 */
+            padding: 12px 16px;	/* 見た目の設定を指定 */
+            border-radius: 16px;	/* 見た目の設定を指定 */
+            font-size: 14px;	/* 見た目の設定を指定 */
+            line-height: 1.5;	/* 見た目の設定を指定 */
+            word-wrap: break-word;	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .msg-my {
-            align-self: flex-end;
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            color: #ffffff;
-            border-bottom-right-radius: 4px;
-        }
+        .msg-my {	/* 対象要素のスタイルを始める */
+            align-self: flex-end;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            color: #ffffff;	/* 見た目の設定を指定 */
+            border-bottom-right-radius: 4px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .msg-partner {
-            align-self: flex-start;
-            background: #ffffff;
-            color: #1e293b;
-            border-bottom-left-radius: 4px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
+        .msg-partner {	/* 対象要素のスタイルを始める */
+            align-self: flex-start;	/* 見た目の設定を指定 */
+            background: #ffffff;	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+            border-bottom-left-radius: 4px;	/* 見た目の設定を指定 */
+            border: 1px solid rgba(0, 0, 0, 0.05);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .chat-input-area {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            padding: 16px;
-            border-radius: 0 0 16px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
+        .chat-input-area {	/* 対象要素のスタイルを始める */
+            background: rgba(255, 255, 255, 0.85);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(10px);	/* 見た目の設定を指定 */
+            padding: 16px;	/* 見た目の設定を指定 */
+            border-radius: 0 0 16px 16px;	/* 見た目の設定を指定 */
+            border: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
+            border-top: 1px solid rgba(0, 0, 0, 0.05);	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-wrap: wrap;	/* 見た目の設定を指定 */
+            gap: 12px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .chat-message-input-row {
-            display: flex;
-            flex: 1 1 100%;
-            min-width: 0;
-            gap: 12px;
-        }
+        .chat-message-input-row {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            flex: 1 1 100%;	/* 見た目の設定を指定 */
+            min-width: 0;	/* 見た目の設定を指定 */
+            gap: 12px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-attach {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex: 0 0 auto;
-            min-width: 58px;
-            padding: 0 12px;
-            border: 1px solid #bae6fd;
-            border-radius: 10px;
-            background: #f0f9ff;
-            color: #0369a1;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            user-select: none;
-        }
+        .btn-attach {	/* 対象要素のスタイルを始める */
+            display: inline-flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            justify-content: center;	/* 見た目の設定を指定 */
+            flex: 0 0 auto;	/* 見た目の設定を指定 */
+            min-width: 58px;	/* 見た目の設定を指定 */
+            padding: 0 12px;	/* 見た目の設定を指定 */
+            border: 1px solid #bae6fd;	/* 見た目の設定を指定 */
+            border-radius: 10px;	/* 見た目の設定を指定 */
+            background: #f0f9ff;	/* 見た目の設定を指定 */
+            color: #0369a1;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            user-select: none;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-attach:hover {
-            background: #e0f2fe;
-        }
+        .btn-attach:hover {	/* 対象要素のスタイルを始める */
+            background: #e0f2fe;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .attachment-input {
-            display: none;
-        }
+        .attachment-input {	/* 対象要素のスタイルを始める */
+            display: none;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .attachment-preview {
-            display: flex;
-            flex: 1 1 100%;
-            flex-wrap: wrap;
-            gap: 8px;
-            min-height: 0;
-        }
+        .attachment-preview {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            flex: 1 1 100%;	/* 見た目の設定を指定 */
+            flex-wrap: wrap;	/* 見た目の設定を指定 */
+            gap: 8px;	/* 見た目の設定を指定 */
+            min-height: 0;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .attachment-preview:empty {
-            display: none;
-        }
+        .attachment-preview:empty {	/* 対象要素のスタイルを始める */
+            display: none;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .attachment-preview-item {
-            position: relative;
-            width: 64px;
-            height: 64px;
-            overflow: hidden;
-            border: 1px solid #cbd5e1;
-            border-radius: 10px;
-            background: #f8fafc;
-        }
+        .attachment-preview-item {	/* 対象要素のスタイルを始める */
+            position: relative;	/* 見た目の設定を指定 */
+            width: 64px;	/* 見た目の設定を指定 */
+            height: 64px;	/* 見た目の設定を指定 */
+            overflow: hidden;	/* 見た目の設定を指定 */
+            border: 1px solid #cbd5e1;	/* 見た目の設定を指定 */
+            border-radius: 10px;	/* 見た目の設定を指定 */
+            background: #f8fafc;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .attachment-preview-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .attachment-preview-item img {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            height: 100%;	/* 見た目の設定を指定 */
+            object-fit: cover;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .attachment-remove {
-            position: absolute;
-            top: 3px;
-            right: 3px;
-            width: 20px;
-            height: 20px;
-            padding: 0;
-            border: 0;
-            border-radius: 50%;
-            background: rgba(15, 23, 42, .78);
-            color: #fff;
-            line-height: 20px;
-            cursor: pointer;
-        }
+        .attachment-remove {	/* 対象要素のスタイルを始める */
+            position: absolute;	/* 見た目の設定を指定 */
+            top: 3px;	/* 見た目の設定を指定 */
+            right: 3px;	/* 見た目の設定を指定 */
+            width: 20px;	/* 見た目の設定を指定 */
+            height: 20px;	/* 見た目の設定を指定 */
+            padding: 0;	/* 見た目の設定を指定 */
+            border: 0;	/* 見た目の設定を指定 */
+            border-radius: 50%;	/* 見た目の設定を指定 */
+            background: rgba(15, 23, 42, .78);	/* 見た目の設定を指定 */
+            color: #fff;	/* 見た目の設定を指定 */
+            line-height: 20px;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .message-attachments {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 6px;
-            width: min(300px, 100%);
-            margin-top: 2px;
-        }
+        .message-attachments {	/* 対象要素のスタイルを始める */
+            display: grid;	/* 見た目の設定を指定 */
+            grid-template-columns: repeat(2, minmax(0, 1fr));	/* 見た目の設定を指定 */
+            gap: 6px;	/* 見た目の設定を指定 */
+            width: min(300px, 100%);	/* 見た目の設定を指定 */
+            margin-top: 2px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .message-attachment-image {
-            display: block;
-            width: 100%;
-            aspect-ratio: 1;
-            object-fit: cover;
-            border: 1px solid rgba(148, 163, 184, .35);
-            border-radius: 10px;
-            background: #f8fafc;
-            transition: transform .15s ease;
-        }
+        .message-attachment-image {	/* 対象要素のスタイルを始める */
+            display: block;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            aspect-ratio: 1;	/* 見た目の設定を指定 */
+            object-fit: cover;	/* 見た目の設定を指定 */
+            border: 1px solid rgba(148, 163, 184, .35);	/* 見た目の設定を指定 */
+            border-radius: 10px;	/* 見た目の設定を指定 */
+            background: #f8fafc;	/* 見た目の設定を指定 */
+            transition: transform .15s ease;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .message-attachment-image:hover {
-            transform: scale(1.02);
-        }
+        .message-attachment-image:hover {	/* 対象要素のスタイルを始める */
+            transform: scale(1.02);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .chat-input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            border-radius: 12px;
-            font-size: 14px;
-            outline: none;
-            background: rgba(248, 250, 252, 0.8);
-            transition: all 0.2s;
-        }
+        .chat-input {	/* 対象要素のスタイルを始める */
+            flex: 1;	/* 見た目の設定を指定 */
+            padding: 12px 16px;	/* 見た目の設定を指定 */
+            border: 1px solid rgba(0, 0, 0, 0.08);	/* 見た目の設定を指定 */
+            border-radius: 12px;	/* 見た目の設定を指定 */
+            font-size: 14px;	/* 見た目の設定を指定 */
+            outline: none;	/* 見た目の設定を指定 */
+            background: rgba(248, 250, 252, 0.8);	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .chat-input:focus {
-            background: #ffffff;
-            border-color: #1cbdc5;
-            box-shadow: 0 0 0 3px rgba(28, 189, 197, 0.15);
-        }
+        .chat-input:focus {	/* 対象要素のスタイルを始める */
+            background: #ffffff;	/* 見た目の設定を指定 */
+            border-color: #1cbdc5;	/* 見た目の設定を指定 */
+            box-shadow: 0 0 0 3px rgba(28, 189, 197, 0.15);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-send {
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            color: #ffffff;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25);
-        }
+        .btn-send {	/* 対象要素のスタイルを始める */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            color: #ffffff;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            padding: 12px 24px;	/* 見た目の設定を指定 */
+            border-radius: 12px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            font-size: 14px;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-send:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(28, 189, 197, 0.35);
-        }
+        .btn-send:hover {	/* 対象要素のスタイルを始める */
+            transform: translateY(-1px);	/* 見た目の設定を指定 */
+            box-shadow: 0 6px 16px rgba(28, 189, 197, 0.35);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-send:disabled {
-            background: #cbd5e1;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
+        .btn-send:disabled {	/* 対象要素のスタイルを始める */
+            background: #cbd5e1;	/* 見た目の設定を指定 */
+            cursor: not-allowed;	/* 見た目の設定を指定 */
+            transform: none;	/* 見た目の設定を指定 */
+            box-shadow: none;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .chat-header-actions {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            gap: 8px;
-        }
+        .chat-header-actions {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-wrap: wrap;	/* 見た目の設定を指定 */
+            justify-content: flex-end;	/* 見た目の設定を指定 */
+            gap: 8px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-delete-history {
-            border: 1px solid #fecaca;
-            border-radius: 8px;
-            padding: 8px 10px;
-            background: #fff1f2;
-            color: #be123c;
-            font-weight: 700;
-            cursor: pointer;
-        }
+        .btn-delete-history {	/* 対象要素のスタイルを始める */
+            border: 1px solid #fecaca;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            padding: 8px 10px;	/* 見た目の設定を指定 */
+            background: #fff1f2;	/* 見た目の設定を指定 */
+            color: #be123c;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .message-meta {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #94a3b8;
-            font-size: 10px;
-        }
+        .message-meta {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            gap: 8px;	/* 見た目の設定を指定 */
+            color: #94a3b8;	/* 見た目の設定を指定 */
+            font-size: 10px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .message-tools {
-            display: flex;
-            gap: 8px;
-        }
+        .message-tools {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            gap: 8px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .message-tool-button {
-            border: 0;
-            padding: 0 4px;
-            background: transparent;
-            color: #64748b;
-            font-size: 10px;
-            cursor: pointer;
-        }
+        .message-tool-button {	/* 対象要素のスタイルを始める */
+            border: 0;	/* 見た目の設定を指定 */
+            padding: 0 4px;	/* 見た目の設定を指定 */
+            background: transparent;	/* 見た目の設定を指定 */
+            color: #64748b;	/* 見た目の設定を指定 */
+            font-size: 10px;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .message-tool-button:hover {
-            color: #0f766e;
-            text-decoration: underline;
-        }
+        .message-tool-button:hover {	/* 対象要素のスタイルを始める */
+            color: #0f766e;	/* 見た目の設定を指定 */
+            text-decoration: underline;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .message-tool-button.unsend {
-            color: #b91c1c;
-        }
+        .message-tool-button.unsend {	/* 対象要素のスタイルを始める */
+            color: #b91c1c;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .message-bubble.is-unsent {
-            background: #f1f5f9;
-            color: #94a3b8;
-            border: 1px dashed #cbd5e1;
-            box-shadow: none;
-            font-style: italic;
-        }
+        .message-bubble.is-unsent {	/* 対象要素のスタイルを始める */
+            background: #f1f5f9;	/* 見た目の設定を指定 */
+            color: #94a3b8;	/* 見た目の設定を指定 */
+            border: 1px dashed #cbd5e1;	/* 見た目の設定を指定 */
+            box-shadow: none;	/* 見た目の設定を指定 */
+            font-style: italic;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        @media screen and (max-width: 600px) {
-            .chat-header {
-                align-items: flex-start !important;
-                flex-direction: column;
-            }
+        @media screen and (max-width: 600px) {	/* 表示条件を設定 */
+            .chat-header {	/* 対象要素のスタイルを始める */
+                align-items: flex-start !important;	/* 見た目の設定を指定 */
+                flex-direction: column;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .chat-header-actions {
-                width: 100%;
-                justify-content: flex-start;
-            }
+            .chat-header-actions {	/* 対象要素のスタイルを始める */
+                width: 100%;	/* 見た目の設定を指定 */
+                justify-content: flex-start;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .chat-input-area {
-                padding: 10px;
-                gap: 8px;
-            }
+            .chat-input-area {	/* 対象要素のスタイルを始める */
+                padding: 10px;	/* 見た目の設定を指定 */
+                gap: 8px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .chat-message-input-row {
-                gap: 8px;
-            }
+            .chat-message-input-row {	/* 対象要素のスタイルを始める */
+                gap: 8px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .btn-attach {
-                min-width: 52px;
-                padding: 0 9px;
-            }
+            .btn-attach {	/* 対象要素のスタイルを始める */
+                min-width: 52px;	/* 見た目の設定を指定 */
+                padding: 0 9px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .btn-send {
-                padding: 12px 16px;
-            }
+            .btn-send {	/* 対象要素のスタイルを始める */
+                padding: 12px 16px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .message-attachments {
-                width: min(240px, 100%);
-            }
-        }
+            .message-attachments {	/* 対象要素のスタイルを始める */
+                width: min(240px, 100%);	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+        }	/* スタイル定義を閉じる */
     </style>
-    <link rel="stylesheet" href="theme.css?v=20260917c">
+    <link rel="stylesheet" href="theme.css?v=20260917c">	<!-- 外部ファイルを読み込む -->
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
-</head>
+</head>	<!-- 要素を閉じる -->
 
-<body data-page="chat">
+<body data-page="chat">	<!-- 画面要素を配置 -->
 
-    <header class="navbar">
-        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
+    <header class="navbar">	<!-- ヘッダーを配置 -->
+        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>	<!-- 画面要素を配置 -->
 
-        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()" aria-label="メニューを開閉">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
+        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()" aria-label="メニューを開閉">	<!-- 操作できる要素を配置 -->
+            <span></span>	<!-- 画面要素を配置 -->
+            <span></span>	<!-- 画面要素を配置 -->
+            <span></span>	<!-- 画面要素を配置 -->
+        </button>	<!-- 要素を閉じる -->
 
-        <nav class="nav-links" id="nav-links">
-            <a class="nav-item" href="main.html?guide=1">使い方</a>
-            <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>
-            <a class="nav-item" href="recruit.html">募集投稿</a>
-            <a class="nav-item" href="users.html">ユーザーを探す</a>
-            <a class="nav-item active" href="messages.html">
-                メッセージ
-                <span id="unread-badge" class="unread-badge" style="display:none;">0</span>
-            </a>
-            <a class="nav-item" href="profile.html">マイページ</a>
-            <a class="nav-item" href="ai-study.html">AI学習相談</a>
-            <a class="nav-item" id="nav-admin-btn" style="display:none;" href="admin.html">管理者</a>
-            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>
-        </nav>
-    </header>
+        <nav class="nav-links" id="nav-links">	<!-- ナビゲーションを配置 -->
+            <a class="nav-item" href="main.html?guide=1">使い方</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="recruit.html">募集投稿</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="users.html">ユーザーを探す</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item active" href="messages.html">	<!-- 操作できる要素を配置 -->
+                メッセージ	<!-- 画面に表示する内容 -->
+                <span id="unread-badge" class="unread-badge" style="display:none;">0</span>	<!-- 画面要素を配置 -->
+            </a>	<!-- 要素を閉じる -->
+            <a class="nav-item" href="profile.html">マイページ</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="ai-study.html">AI学習相談</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" id="nav-admin-btn" style="display:none;" href="admin.html">管理者</a>	<!-- 操作できる要素を配置 -->
+            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>	<!-- 操作できる要素を配置 -->
+        </nav>	<!-- 要素を閉じる -->
+    </header>	<!-- 要素を閉じる -->
 
-    <main class="chat-container">
-        <div class="chat-header" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
-            <span id="chat-title">対話相手: 読み込み中...</span>
-            <div class="chat-header-actions">
-                <button id="block-user-btn" type="button" style="border:none; border-radius:8px; padding:8px 10px; background:#fef3c7; color:#92400e; font-weight:700; cursor:pointer;">ブロック</button>
-                <button id="report-user-btn" type="button" style="border:none; border-radius:8px; padding:8px 10px; background:#fee2e2; color:#b91c1c; font-weight:700; cursor:pointer;">通報</button>
-                <button id="delete-history-btn" type="button" class="btn-delete-history">履歴を削除</button>
-            </div>
-        </div>
+    <main class="chat-container">	<!-- ページの主内容を配置 -->
+        <div class="chat-header" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">	<!-- 画面要素を配置 -->
+            <span id="chat-title">対話相手: 読み込み中...</span>	<!-- 画面要素を配置 -->
+            <div class="chat-header-actions">	<!-- 画面要素を配置 -->
+                <button id="block-user-btn" type="button" style="border:none; border-radius:8px; padding:8px 10px; background:#fef3c7; color:#92400e; font-weight:700; cursor:pointer;">ブロック</button>	<!-- 操作できる要素を配置 -->
+                <button id="report-user-btn" type="button" style="border:none; border-radius:8px; padding:8px 10px; background:#fee2e2; color:#b91c1c; font-weight:700; cursor:pointer;">通報</button>	<!-- 操作できる要素を配置 -->
+                <button id="delete-history-btn" type="button" class="btn-delete-history">履歴を削除</button>	<!-- 操作できる要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+        </div>	<!-- 要素を閉じる -->
 
-        <div class="chat-messages" id="message-list">
-            <div style="text-align: center; color: #64748b; font-size: 13px;">メッセージを読み込んでいます...</div>
-        </div>
+        <div class="chat-messages" id="message-list">	<!-- 画面要素を配置 -->
+            <div style="text-align: center; color: #64748b; font-size: 13px;">メッセージを読み込んでいます...</div>	<!-- 画面要素を配置 -->
+        </div>	<!-- 要素を閉じる -->
 
-        <div class="chat-input-area">
-            <div id="attachment-preview" class="attachment-preview" aria-live="polite"></div>
-            <div class="chat-message-input-row">
-                <label class="btn-attach" for="attachment-input">画像</label>
-                <input id="attachment-input" class="attachment-input" type="file" accept="image/*" multiple>
-                <input type="text" id="message-input" class="chat-input" maxlength="2000" placeholder="メッセージを入力...">
-                <button id="send-btn" class="btn-send" onclick="sendMessage()">送信</button>
-            </div>
-        </div>
-    </main>
+        <div class="chat-input-area">	<!-- 画面要素を配置 -->
+            <div id="attachment-preview" class="attachment-preview" aria-live="polite"></div>	<!-- 画面要素を配置 -->
+            <div class="chat-message-input-row">	<!-- 画面要素を配置 -->
+                <label class="btn-attach" for="attachment-input">画像</label>	<!-- 画面要素を配置 -->
+                <input id="attachment-input" class="attachment-input" type="file" accept="image/*" multiple>	<!-- 入力要素を配置 -->
+                <input type="text" id="message-input" class="chat-input" maxlength="2000" placeholder="メッセージを入力...">	<!-- 入力要素を配置 -->
+                <button id="send-btn" class="btn-send" onclick="sendMessage()">送信</button>	<!-- 操作できる要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+        </div>	<!-- 要素を閉じる -->
+    </main>	<!-- 要素を閉じる -->
 
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-links">
-                <a href="main.html">ホーム</a>
-                <a href="messages.html">メッセージ</a>
-                <a href="profile.html">マイページ</a>
-                <a href="terms.html">利用規約</a>
-                <a href="privacy.html">プライバシーポリシー</a>
-            </div>
-            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>
-        </div>
-    </footer>
+    <footer class="footer">	<!-- フッターを配置 -->
+        <div class="footer-container">	<!-- 画面要素を配置 -->
+            <div class="footer-links">	<!-- 画面要素を配置 -->
+                <a href="main.html">ホーム</a>	<!-- 操作できる要素を配置 -->
+                <a href="messages.html">メッセージ</a>	<!-- 操作できる要素を配置 -->
+                <a href="profile.html">マイページ</a>	<!-- 操作できる要素を配置 -->
+                <a href="terms.html">利用規約</a>	<!-- 操作できる要素を配置 -->
+                <a href="privacy.html">プライバシーポリシー</a>	<!-- 操作できる要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>	<!-- 画面要素を配置 -->
+        </div>	<!-- 要素を閉じる -->
+    </footer>	<!-- 要素を閉じる -->
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
-
-        const myEmail = localStorage.getItem("userEmail");
-        const targetEmail = localStorage.getItem("chatTarget");
-        let messagesRequest = null;
-        let lastMessagesSignature = "";
-        let chatPollTimer = null;
-        const MAX_ATTACHMENTS = 8;
-        const MAX_ATTACHMENT_BYTES = 360 * 1024;
-        let selectedAttachments = [];
-        let isMessageComposing = false;
-        let unreadRequest = null;
-
-        function toggleMenu() {
-            document.getElementById("hud-menu-btn").classList.toggle("open");
-            document.getElementById("nav-links").classList.toggle("open");
-        }
-
-        function logout() {
-            localStorage.clear();
-            window.location.href = "index.html";
-        }
-
-        async function postChat(payload, timeoutMs = (Array.isArray(payload.attachments) && payload.attachments.length > 0 ? 45000 : 12000)) {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify(payload),
-                    signal: controller.signal
-                });
-
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const result = await res.json();
-                if (!result || result.status !== "success") {
-                    throw new Error(result && result.message ? result.message : "GASからエラーが返されました");
-                }
-                return result;
-            } finally {
-                clearTimeout(timeoutId);
-            }
-        }
-
-        if (!myEmail || !targetEmail) {
-            alert("不正なアクセスです");
-            window.location.href = "messages.html";
-        }
-
-        document.getElementById("chat-title").innerText = `💬 対話相手: ${targetEmail}`;
-
-        function getReportReason() {
-            const input = prompt(
-                "通報理由を番号で入力してください。\n" +
-                "1: 嫌がらせ・迷惑行為\n" +
-                "2: 不適切な内容\n" +
-                "3: 性的な内容\n" +
-                "4: 脅迫・危険な発言\n" +
-                "5: 個人情報の掲載\n" +
-                "6: なりすまし\n" +
-                "7: スパム\n" +
-                "8: その他"
-            );
-
-            const reasons = {
-                "1": "嫌がらせ・迷惑行為",
-                "2": "不適切な内容",
-                "3": "性的な内容",
-                "4": "脅迫・危険な発言",
-                "5": "個人情報の掲載",
-                "6": "なりすまし",
-                "7": "スパム",
-                "8": "その他"
-            };
-
-            return reasons[(input || "").trim()] || "";
-        }
-
-        async function reportCurrentUser() {
-            const reason = getReportReason();
-            if (!reason) {
-                alert("正しい通報理由を選択してください。");
-                return;
-            }
-
-            const detail = prompt("詳細があれば入力してください（任意）") || "";
-
-            try {
-                await postChat({
-                    mode: "reportContent",
-                    reporterId: myEmail,
-                    targetUserId: targetEmail,
-                    targetType: "user",
-                    targetId: targetEmail,
-                    targetContent: "",
-                    reason,
-                    detail
-                });
-                alert("通報を受け付けました。");
-            } catch (e) {
-                alert("通信エラーが発生しました。");
-            }
-        }
-
-        async function reportMessage(messageText, messageId) {
-            const reason = getReportReason();
-            if (!reason) {
-                alert("正しい通報理由を選択してください。");
-                return;
-            }
-
-            const detail = prompt("詳細があれば入力してください（任意）") || "";
-
-            try {
-                await postChat({
-                    mode: "reportContent",
-                    reporterId: myEmail,
-                    targetUserId: targetEmail,
-                    targetType: "message",
-                    targetId: messageId || targetEmail,
-                    targetContent: messageText,
-                    reason,
-                    detail
-                });
-                alert("メッセージの通報を受け付けました。");
-            } catch (e) {
-                alert("通信エラーが発生しました。");
-            }
-        }
-
-        async function blockCurrentUser() {
-            if (!confirm(
-                `「${targetEmail}」さんをブロックしますか？\n` +
-                "ブロックすると、このチャットと相手からの通知が表示されなくなります。"
-            )) {
-                return;
-            }
-
-            try {
-                await postChat({
-                    mode: "blockUser",
-                    blockerId: myEmail,
-                    blockedId: targetEmail
-                });
-                alert("ユーザーをブロックしました。");
-                localStorage.removeItem("chatTarget");
-                window.location.href = "messages.html";
-            } catch (e) {
-                alert("通信エラーが発生しました。");
-            }
-        }
-
-        function formatMessageTime(value) {
-            if (!value) return "";
-            const date = new Date(value);
-            if (Number.isNaN(date.getTime())) return "";
-            return date.toLocaleString("ja-JP", {
-                month: "numeric",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-            });
-        }
-
-        function blobToDataUrl(blob) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-            });
-        }
-
-        function loadImageFile(file) {
-            return new Promise((resolve, reject) => {
-                const image = new Image();
-                const objectUrl = URL.createObjectURL(file);
-                image.onload = () => {
-                    URL.revokeObjectURL(objectUrl);
-                    resolve(image);
-                };
-                image.onerror = () => {
-                    URL.revokeObjectURL(objectUrl);
-                    reject(new Error("画像を読み込めませんでした"));
-                };
-                image.src = objectUrl;
-            });
-        }
-
-        function canvasToBlob(canvas, quality) {
-            return new Promise((resolve, reject) => {
-                canvas.toBlob(blob => {
-                    if (blob) resolve(blob);
-                    else reject(new Error("画像の圧縮に失敗しました"));
-                }, "image/jpeg", quality);
-            });
-        }
-
-        async function compressImageFile(file) {
-            const image = await loadImageFile(file);
-            const maxDimensions = [1280, 960];
-            let bestBlob = null;
-
-            for (const maxDimension of maxDimensions) {
-                const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
-                const canvas = document.createElement("canvas");
-                canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
-                canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
-                const context = canvas.getContext("2d", { alpha: false });
-                context.drawImage(image, 0, 0, canvas.width, canvas.height);
-
-                for (const quality of [0.72, 0.58, 0.45]) {
-                    const blob = await canvasToBlob(canvas, quality);
-                    bestBlob = blob;
-                    if (blob.size <= MAX_ATTACHMENT_BYTES) {
-                        return {
-                            name: (file.name || "image").replace(/\.[^.]+$/, "") || "image",
-                            type: "image/jpeg",
-                            data: await blobToDataUrl(blob),
-                            size: blob.size
-                        };
-                    }
-                }
-            }
-
-            if (!bestBlob) throw new Error("画像の圧縮に失敗しました");
-            return {
-                name: (file.name || "image").replace(/\.[^.]+$/, "") || "image",
-                type: "image/jpeg",
-                data: await blobToDataUrl(bestBlob),
-                size: bestBlob.size
-            };
-        }
-
-        function renderAttachmentPreview() {
-            const preview = document.getElementById("attachment-preview");
-            if (!preview) return;
-            preview.innerHTML = "";
-
-            selectedAttachments.forEach((attachment, index) => {
-                const item = document.createElement("div");
-                item.className = "attachment-preview-item";
-
-                const image = document.createElement("img");
-                image.src = attachment.data;
-                image.alt = "添付予定の画像";
-                item.appendChild(image);
-
-                const removeButton = document.createElement("button");
-                removeButton.type = "button";
-                removeButton.className = "attachment-remove";
-                removeButton.innerText = "×";
-                removeButton.setAttribute("aria-label", "添付画像を削除");
-                removeButton.addEventListener("click", () => {
-                    selectedAttachments.splice(index, 1);
-                    renderAttachmentPreview();
-                });
-                item.appendChild(removeButton);
-                preview.appendChild(item);
-            });
-        }
-
-        async function handleAttachmentChange(event) {
-            const files = Array.from(event.target.files || []);
-            event.target.value = "";
-            if (files.length === 0) return;
-
-            const available = MAX_ATTACHMENTS - selectedAttachments.length;
-            if (available <= 0) {
-                alert("画像は1回の送信につき" + MAX_ATTACHMENTS + "枚まで添付できます。");
-                return;
-            }
-
-            const filesToAdd = files.slice(0, available);
-            if (files.length > available) {
-                alert("添付できる画像は残り" + available + "枚です。");
-            }
-
-            const attachLabel = document.querySelector(".btn-attach");
-            if (attachLabel) attachLabel.classList.add("is-disabled");
-
-            try {
-                for (const file of filesToAdd) {
-                    if (!file.type.startsWith("image/")) continue;
-                    const compressed = await compressImageFile(file);
-                    selectedAttachments.push(compressed);
-                }
-                renderAttachmentPreview();
-            } catch (e) {
-                alert("画像の読み込みに失敗しました。別の画像でお試しください。");
-            } finally {
-                if (attachLabel) attachLabel.classList.remove("is-disabled");
-            }
-        }
-
-        document.getElementById("attachment-input").addEventListener("change", handleAttachmentChange);
-
-        const messageInput = document.getElementById("message-input");
-        messageInput.addEventListener("compositionstart", () => {
-            isMessageComposing = true;
-        });
-        messageInput.addEventListener("compositionend", () => {
-            isMessageComposing = false;
-        });
-        messageInput.addEventListener("keydown", event => {
-            if (event.key !== "Enter") return;
-            if (isMessageComposing || event.isComposing || event.keyCode === 229) return;
-            event.preventDefault();
-            sendMessage();
-        });
-
-        async function unsendMessage(messageId, button) {
-            if (!messageId) return;
-            if (!confirm("このメッセージの送信を取り消しますか？")) return;
-
-            const originalText = button ? button.innerText : "送信取り消し";
-            if (button) {
-                button.disabled = true;
-                button.innerText = "処理中...";
-            }
-
-            try {
-                await postChat({
-                    mode: "unsendMessage",
-                    userId: myEmail,
-                    messageId: messageId
-                });
-                await loadMessages();
-            } catch (e) {
-                if (button) {
-                    button.disabled = false;
-                    button.innerText = originalText;
-                }
-                alert("通信エラーが発生しました。");
-            }
-        }
-
-        async function deleteChatHistory() {
-            if (!confirm("このチャット履歴を削除しますか？\n自分の画面から非表示になります。相手の画面には影響しません。")) return;
-
-            const deleteButton = document.getElementById("delete-history-btn");
-            if (deleteButton) {
-                deleteButton.disabled = true;
-                deleteButton.innerText = "削除中...";
-            }
-
-            try {
-                await postChat({
-                    mode: "deleteChatHistory",
-                    userId: myEmail,
-                    targetUserId: targetEmail
-                });
-                localStorage.removeItem("chatTarget");
-                window.location.href = "messages.html";
-            } catch (e) {
-                if (deleteButton) {
-                    deleteButton.disabled = false;
-                    deleteButton.innerText = "履歴を削除";
-                }
-                alert("通信エラーが発生しました。");
-            }
-        }
-
-        document.getElementById("block-user-btn").addEventListener("click", blockCurrentUser);
-        document.getElementById("report-user-btn").addEventListener("click", reportCurrentUser);
-        document.getElementById("delete-history-btn").addEventListener("click", deleteChatHistory);
-
-        async function loadMessages() {
-            if (messagesRequest) return messagesRequest;
-
-            messagesRequest = (async () => {
-                try {
-                    const result = await postChat({
-                        mode: "getMessages",
-                        user1: myEmail,
-                        user2: targetEmail
-                    });
-                    const listDiv = document.getElementById("message-list");
-
-                    if (result.status !== "success") return;
-
-                    const messages = Array.isArray(result.message) ? result.message : [];
-                    const tempMsgs = listDiv.querySelectorAll('.temp-msg');
-                    const signature = JSON.stringify(messages);
-                    const hasUnreadIncoming = messages.some(msg =>
-                        msg.from !== myEmail && !msg.isRead && !msg.isUnsent
-                    );
-                    if (hasUnreadIncoming) markAsRead();
-
-                    if (signature === lastMessagesSignature && tempMsgs.length === 0) return;
-                    lastMessagesSignature = signature;
-
-                    if (messages.length === 0 && tempMsgs.length === 0) {
-                        listDiv.innerHTML = `<div style="text-align: center; color: #94a3b8; font-size: 13px;">メッセージ履歴はありません</div>`;
-                        return;
-                    }
-
-                    listDiv.innerHTML = "";
-
-                    messages.forEach(msg => {
-                        const wrapper = document.createElement("div");
-                        wrapper.style.cssText = `display:flex; flex-direction:column; align-items:${msg.from === myEmail ? "flex-end" : "flex-start"}; gap:4px;`;
-
-                        const bubble = document.createElement("div");
-                        bubble.className = `message-bubble ${msg.from === myEmail ? 'msg-my' : 'msg-partner'}`;
-                        if (msg.isUnsent) bubble.classList.add("is-unsent");
-                        bubble.innerText = msg.text;
-                        wrapper.appendChild(bubble);
-
-                        if (Array.isArray(msg.attachments) && msg.attachments.length > 0 && !msg.isUnsent) {
-                            const attachments = document.createElement("div");
-                            attachments.className = "message-attachments";
-
-                            msg.attachments.slice(0, MAX_ATTACHMENTS).forEach(url => {
-                                if (typeof url !== "string" || !url.startsWith("http")) return;
-                                const link = document.createElement("a");
-                                link.href = url;
-                                link.target = "_blank";
-                                link.rel = "noopener noreferrer";
-
-                                const image = document.createElement("img");
-                                image.className = "message-attachment-image";
-                                image.src = url;
-                                image.alt = "添付画像";
-                                image.loading = "lazy";
-                                link.appendChild(image);
-                                attachments.appendChild(link);
-                            });
-
-                            if (attachments.childElementCount > 0) wrapper.appendChild(attachments);
-                        }
-
-                        const meta = document.createElement("div");
-                        meta.className = "message-meta";
-                        const time = formatMessageTime(msg.sentAt);
-                        if (time) {
-                            const timeText = document.createElement("span");
-                            timeText.innerText = time;
-                            meta.appendChild(timeText);
-                        }
-
-                        if (msg.from === myEmail && !msg.isUnsent && msg.isRead) {
-                            const readText = document.createElement("span");
-                            readText.innerText = "既読";
-                            meta.appendChild(readText);
-                        }
-
-                        const tools = document.createElement("div");
-                        tools.className = "message-tools";
-
-                        if (msg.from === myEmail && !msg.isUnsent) {
-                            const unsendButton = document.createElement("button");
-                            unsendButton.type = "button";
-                            unsendButton.className = "message-tool-button unsend";
-                            unsendButton.innerText = "送信取り消し";
-                            unsendButton.addEventListener("click", () => unsendMessage(msg.messageId, unsendButton));
-                            tools.appendChild(unsendButton);
-                        }
-
-                        if (msg.from !== myEmail && !msg.isUnsent) {
-                            const reportButton = document.createElement("button");
-                            reportButton.type = "button";
-                            reportButton.innerText = "このメッセージを通報";
-                            reportButton.className = "message-tool-button";
-                            reportButton.style.color = "#b91c1c";
-                            reportButton.addEventListener("click", () => reportMessage(msg.text, msg.messageId));
-                            tools.appendChild(reportButton);
-                        }
-
-                        if (tools.childElementCount > 0) meta.appendChild(tools);
-                        if (meta.childElementCount > 0) wrapper.appendChild(meta);
-
-                        listDiv.appendChild(wrapper);
-                    });
-
-                    listDiv.scrollTop = listDiv.scrollHeight;
-                } catch (e) {
-                    console.error("メッセージ取得エラー:", e);
-                } finally {
-                    messagesRequest = null;
-                }
-            })();
-
-            return messagesRequest;
-        }
-
-        async function markAsRead() {
-            try {
-                await postChat({
-                    mode: "markAsRead",
-                    myEmail: myEmail,
-                    targetEmail: targetEmail
-                });
-            } catch (e) {
-                console.error("既読処理エラー:", e);
-            }
-        }
-
-        async function updateUnreadBadge() {
-            const badge = document.getElementById("unread-badge");
-            if (!myEmail || !badge || unreadRequest) return unreadRequest;
-
-            unreadRequest = (async () => {
-                try {
-                    const result = await postChat({ mode: "getUnreadCount", email: myEmail });
-                    const count = Number(result.message && result.message.unreadCount) || 0;
-                    badge.textContent = count > 99 ? "99+" : String(count);
-                    badge.style.display = count > 0 ? "inline-block" : "none";
-                } catch (e) {
-                    console.error("未読チェックエラー:", e);
-                } finally {
-                    unreadRequest = null;
-                }
-            })();
-
-            return unreadRequest;
-        }
-
-        async function sendMessage() {
-            const textInput = document.getElementById("message-input");
-            const sendBtn = document.getElementById("send-btn");
-            const listDiv = document.getElementById("message-list");
-            const text = textInput.value.trim();
-            const outgoingAttachments = selectedAttachments.map(attachment => ({
-                name: attachment.name,
-                type: attachment.type,
-                data: attachment.data
-            }));
-
-            if (!text && outgoingAttachments.length === 0) return;
-
-            textInput.value = "";
-            if (sendBtn) {
-                sendBtn.disabled = true;
-                sendBtn.innerText = "送信中...";
-            }
-
-            const tempBubble = document.createElement("div");
-            tempBubble.className = "message-bubble msg-my temp-msg";
-            tempBubble.innerText = text || "画像を送信中...";
-            listDiv.appendChild(tempBubble);
-            listDiv.scrollTop = listDiv.scrollHeight;
-
-            try {
-                const result = await postChat({
-                    mode: "sendMessage",
-                    from: myEmail,
-                    to: targetEmail,
-                    text: text,
-                    attachments: outgoingAttachments
-                });
-
-                selectedAttachments = [];
-                renderAttachmentPreview();
-                await loadMessages();
-            } catch (e) {
-                alert("送信できませんでした: " + (e.message || "通信エラー"));
-                tempBubble.remove();
-            } finally {
-                if (sendBtn) {
-                    sendBtn.disabled = false;
-                    sendBtn.innerText = "送信";
-                }
-            }
-        }
-
-        function scheduleChatPoll() {
-            clearTimeout(chatPollTimer);
-            chatPollTimer = setTimeout(async () => {
-                if (document.visibilityState === "visible") {
-                    await loadMessages();
-                }
-                scheduleChatPoll();
-            }, 5000);
-        }
-
-        document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === "visible") {
-                loadMessages();
-            }
-        });
-
-        window.onload = async () => {
-            document.getElementById("hud-menu-btn").classList.remove("open");
-            document.getElementById("nav-links").classList.remove("open");
-
-            const currentUserId = localStorage.getItem("userId") || myEmail;
-            const adminButton = document.getElementById("nav-admin-btn");
-            if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") {
-                adminButton.style.display = "inline-block";
-            }
-
-            await loadMessages();
-            updateUnreadBadge();
-            scheduleChatPoll();
-            setInterval(() => {
-                if (document.visibilityState === "visible") updateUnreadBadge();
-            }, 8000);
-        };
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";	// GAS APIの接続先を設定
+
+        const myEmail = localStorage.getItem("userEmail");	// 定数を定義
+        const targetEmail = localStorage.getItem("chatTarget");	// 定数を定義
+        let messagesRequest = null;	// 状態を保持
+        let lastMessagesSignature = "";	// 状態を保持
+        let chatPollTimer = null;	// 状態を保持
+        const MAX_ATTACHMENTS = 8;	// 定数を定義
+        const MAX_ATTACHMENT_BYTES = 360 * 1024;	// 定数を定義
+        let selectedAttachments = [];	// 状態を保持
+        let isMessageComposing = false;	// 状態を保持
+        let unreadRequest = null;	// 状態を保持
+
+        function toggleMenu() {	// 関数を定義
+            document.getElementById("hud-menu-btn").classList.toggle("open");	// 画面表示を更新する
+            document.getElementById("nav-links").classList.toggle("open");	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
+
+        function logout() {	// 関数を定義
+            localStorage.clear();	// 端末内の保存情報を扱う
+            window.location.href = "index.html";	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
+
+        async function postChat(payload, timeoutMs = (Array.isArray(payload.attachments) && payload.attachments.length > 0 ? 45000 : 12000)) {	// 関数を定義
+            const controller = new AbortController();	// 定数を定義
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);	// 定数を定義
+
+            try {	// 失敗に備えて処理を始める
+                const res = await fetch(GAS_URL, {	// 定数を定義
+                    method: "POST",	// 処理を続ける
+                    body: JSON.stringify(payload),	// 処理を続ける
+                    signal: controller.signal	// 処理を続ける
+                });	// 処理を完了する
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);	// 条件に応じて処理を分ける
+                const result = await res.json();	// 定数を定義
+                if (!result || result.status !== "success") {	// 条件に応じて処理を分ける
+                    throw new Error(result && result.message ? result.message : "GASからエラーが返されました");	// エラーを通知する
+                }	// 処理のまとまりを閉じる
+                return result;	// 結果を返す
+            } finally {	// 処理のまとまりを始める
+                clearTimeout(timeoutId);	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        if (!myEmail || !targetEmail) {	// 条件に応じて処理を分ける
+            alert("不正なアクセスです");	// 処理結果を知らせる
+            window.location.href = "messages.html";	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
+
+        document.getElementById("chat-title").innerText = `💬 対話相手: ${targetEmail}`;	// 処理を続ける
+
+        function getReportReason() {	// 関数を定義
+            const input = prompt(	// 定数を定義
+                "通報理由を番号で入力してください。\n" +	// 処理を続ける
+                "1: 嫌がらせ・迷惑行為\n" +	// 処理を続ける
+                "2: 不適切な内容\n" +	// 処理を続ける
+                "3: 性的な内容\n" +	// 処理を続ける
+                "4: 脅迫・危険な発言\n" +	// 処理を続ける
+                "5: 個人情報の掲載\n" +	// 処理を続ける
+                "6: なりすまし\n" +	// 処理を続ける
+                "7: スパム\n" +	// 処理を続ける
+                "8: その他"	// 処理を続ける
+            );	// 処理を完了する
+
+            const reasons = {	// 定数を定義
+                "1": "嫌がらせ・迷惑行為",	// 処理を続ける
+                "2": "不適切な内容",	// 処理を続ける
+                "3": "性的な内容",	// 処理を続ける
+                "4": "脅迫・危険な発言",	// 処理を続ける
+                "5": "個人情報の掲載",	// 処理を続ける
+                "6": "なりすまし",	// 処理を続ける
+                "7": "スパム",	// 処理を続ける
+                "8": "その他"	// 処理を続ける
+            };	// 処理のまとまりを閉じる
+
+            return reasons[(input || "").trim()] || "";	// 結果を返す
+        }	// 処理のまとまりを閉じる
+
+        async function reportCurrentUser() {	// 関数を定義
+            const reason = getReportReason();	// 定数を定義
+            if (!reason) {	// 条件に応じて処理を分ける
+                alert("正しい通報理由を選択してください。");	// 処理結果を知らせる
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+
+            const detail = prompt("詳細があれば入力してください（任意）") || "";	// 定数を定義
+
+            try {	// 失敗に備えて処理を始める
+                await postChat({	// 処理のまとまりを始める
+                    mode: "reportContent",	// 処理を続ける
+                    reporterId: myEmail,	// 処理を続ける
+                    targetUserId: targetEmail,	// 処理を続ける
+                    targetType: "user",	// 処理を続ける
+                    targetId: targetEmail,	// 処理を続ける
+                    targetContent: "",	// 処理を続ける
+                    reason,	// 処理を続ける
+                    detail	// 処理を続ける
+                });	// 処理を完了する
+                alert("通報を受け付けました。");	// 処理結果を知らせる
+            } catch (e) {	// 処理のまとまりを始める
+                alert("通信エラーが発生しました。");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function reportMessage(messageText, messageId) {	// 関数を定義
+            const reason = getReportReason();	// 定数を定義
+            if (!reason) {	// 条件に応じて処理を分ける
+                alert("正しい通報理由を選択してください。");	// 処理結果を知らせる
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+
+            const detail = prompt("詳細があれば入力してください（任意）") || "";	// 定数を定義
+
+            try {	// 失敗に備えて処理を始める
+                await postChat({	// 処理のまとまりを始める
+                    mode: "reportContent",	// 処理を続ける
+                    reporterId: myEmail,	// 処理を続ける
+                    targetUserId: targetEmail,	// 処理を続ける
+                    targetType: "message",	// 処理を続ける
+                    targetId: messageId || targetEmail,	// 処理を続ける
+                    targetContent: messageText,	// 処理を続ける
+                    reason,	// 処理を続ける
+                    detail	// 処理を続ける
+                });	// 処理を完了する
+                alert("メッセージの通報を受け付けました。");	// 処理結果を知らせる
+            } catch (e) {	// 処理のまとまりを始める
+                alert("通信エラーが発生しました。");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function blockCurrentUser() {	// 関数を定義
+            if (!confirm(	// 条件に応じて処理を分ける
+                `「${targetEmail}」さんをブロックしますか？\n` +	// 処理を続ける
+                "ブロックすると、このチャットと相手からの通知が表示されなくなります。"	// 処理を続ける
+            )) {	// 処理のまとまりを始める
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+
+            try {	// 失敗に備えて処理を始める
+                await postChat({	// 処理のまとまりを始める
+                    mode: "blockUser",	// 処理を続ける
+                    blockerId: myEmail,	// 処理を続ける
+                    blockedId: targetEmail	// 処理を続ける
+                });	// 処理を完了する
+                alert("ユーザーをブロックしました。");	// 処理結果を知らせる
+                localStorage.removeItem("chatTarget");	// 端末内の保存情報を扱う
+                window.location.href = "messages.html";	// 画面表示を更新する
+            } catch (e) {	// 処理のまとまりを始める
+                alert("通信エラーが発生しました。");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        function formatMessageTime(value) {	// 関数を定義
+            if (!value) return "";	// 条件に応じて処理を分ける
+            const date = new Date(value);	// 定数を定義
+            if (Number.isNaN(date.getTime())) return "";	// 条件に応じて処理を分ける
+            return date.toLocaleString("ja-JP", {	// 結果を返す
+                month: "numeric",	// 処理を続ける
+                day: "numeric",	// 処理を続ける
+                hour: "2-digit",	// 処理を続ける
+                minute: "2-digit"	// 処理を続ける
+            });	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        function blobToDataUrl(blob) {	// 関数を定義
+            return new Promise((resolve, reject) => {	// 結果を返す
+                const reader = new FileReader();	// 定数を定義
+                reader.onload = () => resolve(reader.result);	// 処理を完了する
+                reader.onerror = reject;	// 処理を続ける
+                reader.readAsDataURL(blob);	// 処理を完了する
+            });	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        function loadImageFile(file) {	// 関数を定義
+            return new Promise((resolve, reject) => {	// 結果を返す
+                const image = new Image();	// 定数を定義
+                const objectUrl = URL.createObjectURL(file);	// 定数を定義
+                image.onload = () => {	// 処理のまとまりを始める
+                    URL.revokeObjectURL(objectUrl);	// 処理を完了する
+                    resolve(image);	// 処理を完了する
+                };	// 処理のまとまりを閉じる
+                image.onerror = () => {	// 処理のまとまりを始める
+                    URL.revokeObjectURL(objectUrl);	// 処理を完了する
+                    reject(new Error("画像を読み込めませんでした"));	// 処理を完了する
+                };	// 処理のまとまりを閉じる
+                image.src = objectUrl;	// 処理を続ける
+            });	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        function canvasToBlob(canvas, quality) {	// 関数を定義
+            return new Promise((resolve, reject) => {	// 結果を返す
+                canvas.toBlob(blob => {	// 処理のまとまりを始める
+                    if (blob) resolve(blob);	// 条件に応じて処理を分ける
+                    else reject(new Error("画像の圧縮に失敗しました"));	// 条件に応じて処理を分ける
+                }, "image/jpeg", quality);	// 処理を完了する
+            });	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        async function compressImageFile(file) {	// 関数を定義
+            const image = await loadImageFile(file);	// 定数を定義
+            const maxDimensions = [1280, 960];	// 定数を定義
+            let bestBlob = null;	// 状態を保持
+
+            for (const maxDimension of maxDimensions) {	// 対象を順番に処理する
+                const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));	// 定数を定義
+                const canvas = document.createElement("canvas");	// 定数を定義
+                canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));	// 処理を完了する
+                canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));	// 処理を完了する
+                const context = canvas.getContext("2d", { alpha: false });	// 定数を定義
+                context.drawImage(image, 0, 0, canvas.width, canvas.height);	// 処理を完了する
+
+                for (const quality of [0.72, 0.58, 0.45]) {	// 対象を順番に処理する
+                    const blob = await canvasToBlob(canvas, quality);	// 定数を定義
+                    bestBlob = blob;	// 処理を続ける
+                    if (blob.size <= MAX_ATTACHMENT_BYTES) {	// 条件に応じて処理を分ける
+                        return {	// 結果を返す
+                            name: (file.name || "image").replace(/\.[^.]+$/, "") || "image",	// 処理を続ける
+                            type: "image/jpeg",	// 処理を続ける
+                            data: await blobToDataUrl(blob),	// 処理を続ける
+                            size: blob.size	// 処理を続ける
+                        };	// 処理のまとまりを閉じる
+                    }	// 処理のまとまりを閉じる
+                }	// 処理のまとまりを閉じる
+            }	// 処理のまとまりを閉じる
+
+            if (!bestBlob) throw new Error("画像の圧縮に失敗しました");	// 条件に応じて処理を分ける
+            return {	// 結果を返す
+                name: (file.name || "image").replace(/\.[^.]+$/, "") || "image",	// 処理を続ける
+                type: "image/jpeg",	// 処理を続ける
+                data: await blobToDataUrl(bestBlob),	// 処理を続ける
+                size: bestBlob.size	// 処理を続ける
+            };	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        function renderAttachmentPreview() {	// 関数を定義
+            const preview = document.getElementById("attachment-preview");	// 定数を定義
+            if (!preview) return;	// 条件に応じて処理を分ける
+            preview.innerHTML = "";	// 処理を続ける
+
+            selectedAttachments.forEach((attachment, index) => {	// 処理のまとまりを始める
+                const item = document.createElement("div");	// 定数を定義
+                item.className = "attachment-preview-item";	// 処理を続ける
+
+                const image = document.createElement("img");	// 定数を定義
+                image.src = attachment.data;	// 処理を続ける
+                image.alt = "添付予定の画像";	// 処理を続ける
+                item.appendChild(image);	// 処理を完了する
+
+                const removeButton = document.createElement("button");	// 定数を定義
+                removeButton.type = "button";	// 処理を続ける
+                removeButton.className = "attachment-remove";	// 処理を続ける
+                removeButton.innerText = "×";	// 処理を続ける
+                removeButton.setAttribute("aria-label", "添付画像を削除");	// 処理を完了する
+                removeButton.addEventListener("click", () => {	// 操作イベントを登録
+                    selectedAttachments.splice(index, 1);	// 処理を完了する
+                    renderAttachmentPreview();	// 処理を完了する
+                });	// 処理を完了する
+                item.appendChild(removeButton);	// 処理を完了する
+                preview.appendChild(item);	// 処理を完了する
+            });	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        async function handleAttachmentChange(event) {	// 関数を定義
+            const files = Array.from(event.target.files || []);	// 定数を定義
+            event.target.value = "";	// 処理を続ける
+            if (files.length === 0) return;	// 条件に応じて処理を分ける
+
+            const available = MAX_ATTACHMENTS - selectedAttachments.length;	// 定数を定義
+            if (available <= 0) {	// 条件に応じて処理を分ける
+                alert("画像は1回の送信につき" + MAX_ATTACHMENTS + "枚まで添付できます。");	// 処理結果を知らせる
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+
+            const filesToAdd = files.slice(0, available);	// 定数を定義
+            if (files.length > available) {	// 条件に応じて処理を分ける
+                alert("添付できる画像は残り" + available + "枚です。");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+
+            const attachLabel = document.querySelector(".btn-attach");	// 定数を定義
+            if (attachLabel) attachLabel.classList.add("is-disabled");	// 条件に応じて処理を分ける
+
+            try {	// 失敗に備えて処理を始める
+                for (const file of filesToAdd) {	// 対象を順番に処理する
+                    if (!file.type.startsWith("image/")) continue;	// 条件に応じて処理を分ける
+                    const compressed = await compressImageFile(file);	// 定数を定義
+                    selectedAttachments.push(compressed);	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+                renderAttachmentPreview();	// 処理を完了する
+            } catch (e) {	// 処理のまとまりを始める
+                alert("画像の読み込みに失敗しました。別の画像でお試しください。");	// 処理結果を知らせる
+            } finally {	// 処理のまとまりを始める
+                if (attachLabel) attachLabel.classList.remove("is-disabled");	// 条件に応じて処理を分ける
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        document.getElementById("attachment-input").addEventListener("change", handleAttachmentChange);	// 操作イベントを登録
+
+        const messageInput = document.getElementById("message-input");	// 定数を定義
+        messageInput.addEventListener("compositionstart", () => {	// 操作イベントを登録
+            isMessageComposing = true;	// 処理を続ける
+        });	// 処理を完了する
+        messageInput.addEventListener("compositionend", () => {	// 操作イベントを登録
+            isMessageComposing = false;	// 処理を続ける
+        });	// 処理を完了する
+        messageInput.addEventListener("keydown", event => {	// 操作イベントを登録
+            if (event.key !== "Enter") return;	// 条件に応じて処理を分ける
+            if (isMessageComposing || event.isComposing || event.keyCode === 229) return;	// 条件に応じて処理を分ける
+            event.preventDefault();	// 処理を完了する
+            sendMessage();	// 処理を完了する
+        });	// 処理を完了する
+
+        async function unsendMessage(messageId, button) {	// 関数を定義
+            if (!messageId) return;	// 条件に応じて処理を分ける
+            if (!confirm("このメッセージの送信を取り消しますか？")) return;	// 条件に応じて処理を分ける
+
+            const originalText = button ? button.innerText : "送信取り消し";	// 定数を定義
+            if (button) {	// 条件に応じて処理を分ける
+                button.disabled = true;	// 処理を続ける
+                button.innerText = "処理中...";	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+
+            try {	// 失敗に備えて処理を始める
+                await postChat({	// 処理のまとまりを始める
+                    mode: "unsendMessage",	// 処理を続ける
+                    userId: myEmail,	// 処理を続ける
+                    messageId: messageId	// 処理を続ける
+                });	// 処理を完了する
+                await loadMessages();	// 処理を完了する
+            } catch (e) {	// 処理のまとまりを始める
+                if (button) {	// 条件に応じて処理を分ける
+                    button.disabled = false;	// 処理を続ける
+                    button.innerText = originalText;	// 処理を続ける
+                }	// 処理のまとまりを閉じる
+                alert("通信エラーが発生しました。");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function deleteChatHistory() {	// 関数を定義
+            if (!confirm("このチャット履歴を削除しますか？\n自分の画面から非表示になります。相手の画面には影響しません。")) return;	// 条件に応じて処理を分ける
+
+            const deleteButton = document.getElementById("delete-history-btn");	// 定数を定義
+            if (deleteButton) {	// 条件に応じて処理を分ける
+                deleteButton.disabled = true;	// 処理を続ける
+                deleteButton.innerText = "削除中...";	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+
+            try {	// 失敗に備えて処理を始める
+                await postChat({	// 処理のまとまりを始める
+                    mode: "deleteChatHistory",	// 処理を続ける
+                    userId: myEmail,	// 処理を続ける
+                    targetUserId: targetEmail	// 処理を続ける
+                });	// 処理を完了する
+                localStorage.removeItem("chatTarget");	// 端末内の保存情報を扱う
+                window.location.href = "messages.html";	// 画面表示を更新する
+            } catch (e) {	// 処理のまとまりを始める
+                if (deleteButton) {	// 条件に応じて処理を分ける
+                    deleteButton.disabled = false;	// 処理を続ける
+                    deleteButton.innerText = "履歴を削除";	// 処理を続ける
+                }	// 処理のまとまりを閉じる
+                alert("通信エラーが発生しました。");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        document.getElementById("block-user-btn").addEventListener("click", blockCurrentUser);	// 操作イベントを登録
+        document.getElementById("report-user-btn").addEventListener("click", reportCurrentUser);	// 操作イベントを登録
+        document.getElementById("delete-history-btn").addEventListener("click", deleteChatHistory);	// 操作イベントを登録
+
+        async function loadMessages() {	// 関数を定義
+            if (messagesRequest) return messagesRequest;	// 条件に応じて処理を分ける
+
+            messagesRequest = (async () => {	// 処理のまとまりを始める
+                try {	// 失敗に備えて処理を始める
+                    const result = await postChat({	// 定数を定義
+                        mode: "getMessages",	// 処理を続ける
+                        user1: myEmail,	// 処理を続ける
+                        user2: targetEmail	// 処理を続ける
+                    });	// 処理を完了する
+                    const listDiv = document.getElementById("message-list");	// 定数を定義
+
+                    if (result.status !== "success") return;	// 条件に応じて処理を分ける
+
+                    const messages = Array.isArray(result.message) ? result.message : [];	// 定数を定義
+                    const tempMsgs = listDiv.querySelectorAll('.temp-msg');	// 定数を定義
+                    const signature = JSON.stringify(messages);	// 定数を定義
+                    const hasUnreadIncoming = messages.some(msg =>	// 定数を定義
+                        msg.from !== myEmail && !msg.isRead && !msg.isUnsent	// 処理を続ける
+                    );	// 処理を完了する
+                    if (hasUnreadIncoming) markAsRead();	// 条件に応じて処理を分ける
+
+                    if (signature === lastMessagesSignature && tempMsgs.length === 0) return;	// 条件に応じて処理を分ける
+                    lastMessagesSignature = signature;	// 処理を続ける
+
+                    if (messages.length === 0 && tempMsgs.length === 0) {	// 条件に応じて処理を分ける
+                        listDiv.innerHTML = `<div style="text-align: center; color: #94a3b8; font-size: 13px;">メッセージ履歴はありません</div>`;	// 処理を続ける
+                        return;	// 結果を返す
+                    }	// 処理のまとまりを閉じる
+
+                    listDiv.innerHTML = "";	// 処理を続ける
+
+                    messages.forEach(msg => {	// 処理のまとまりを始める
+                        const wrapper = document.createElement("div");	// 定数を定義
+                        wrapper.style.cssText = `display:flex; flex-direction:column; align-items:${msg.from === myEmail ? "flex-end" : "flex-start"}; gap:4px;`;	// 処理を続ける
+
+                        const bubble = document.createElement("div");	// 定数を定義
+                        bubble.className = `message-bubble ${msg.from === myEmail ? 'msg-my' : 'msg-partner'}`;	// 処理を続ける
+                        if (msg.isUnsent) bubble.classList.add("is-unsent");	// 条件に応じて処理を分ける
+                        bubble.innerText = msg.text;	// 処理を続ける
+                        wrapper.appendChild(bubble);	// 処理を完了する
+
+                        if (Array.isArray(msg.attachments) && msg.attachments.length > 0 && !msg.isUnsent) {	// 条件に応じて処理を分ける
+                            const attachments = document.createElement("div");	// 定数を定義
+                            attachments.className = "message-attachments";	// 処理を続ける
+
+                            msg.attachments.slice(0, MAX_ATTACHMENTS).forEach(url => {	// 処理のまとまりを始める
+                                if (typeof url !== "string" || !url.startsWith("http")) return;	// 条件に応じて処理を分ける
+                                const link = document.createElement("a");	// 定数を定義
+                                link.href = url;	// 処理を続ける
+                                link.target = "_blank";	// 処理を続ける
+                                link.rel = "noopener noreferrer";	// 処理を続ける
+
+                                const image = document.createElement("img");	// 定数を定義
+                                image.className = "message-attachment-image";	// 処理を続ける
+                                image.src = url;	// 処理を続ける
+                                image.alt = "添付画像";	// 処理を続ける
+                                image.loading = "lazy";	// 処理を続ける
+                                link.appendChild(image);	// 処理を完了する
+                                attachments.appendChild(link);	// 処理を完了する
+                            });	// 処理を完了する
+
+                            if (attachments.childElementCount > 0) wrapper.appendChild(attachments);	// 条件に応じて処理を分ける
+                        }	// 処理のまとまりを閉じる
+
+                        const meta = document.createElement("div");	// 定数を定義
+                        meta.className = "message-meta";	// 処理を続ける
+                        const time = formatMessageTime(msg.sentAt);	// 定数を定義
+                        if (time) {	// 条件に応じて処理を分ける
+                            const timeText = document.createElement("span");	// 定数を定義
+                            timeText.innerText = time;	// 処理を続ける
+                            meta.appendChild(timeText);	// 処理を完了する
+                        }	// 処理のまとまりを閉じる
+
+                        if (msg.from === myEmail && !msg.isUnsent && msg.isRead) {	// 条件に応じて処理を分ける
+                            const readText = document.createElement("span");	// 定数を定義
+                            readText.innerText = "既読";	// 処理を続ける
+                            meta.appendChild(readText);	// 処理を完了する
+                        }	// 処理のまとまりを閉じる
+
+                        const tools = document.createElement("div");	// 定数を定義
+                        tools.className = "message-tools";	// 処理を続ける
+
+                        if (msg.from === myEmail && !msg.isUnsent) {	// 条件に応じて処理を分ける
+                            const unsendButton = document.createElement("button");	// 定数を定義
+                            unsendButton.type = "button";	// 処理を続ける
+                            unsendButton.className = "message-tool-button unsend";	// 処理を続ける
+                            unsendButton.innerText = "送信取り消し";	// 処理を続ける
+                            unsendButton.addEventListener("click", () => unsendMessage(msg.messageId, unsendButton));	// 操作イベントを登録
+                            tools.appendChild(unsendButton);	// 処理を完了する
+                        }	// 処理のまとまりを閉じる
+
+                        if (msg.from !== myEmail && !msg.isUnsent) {	// 条件に応じて処理を分ける
+                            const reportButton = document.createElement("button");	// 定数を定義
+                            reportButton.type = "button";	// 処理を続ける
+                            reportButton.innerText = "このメッセージを通報";	// 処理を続ける
+                            reportButton.className = "message-tool-button";	// 処理を続ける
+                            reportButton.style.color = "#b91c1c";	// 処理を続ける
+                            reportButton.addEventListener("click", () => reportMessage(msg.text, msg.messageId));	// 操作イベントを登録
+                            tools.appendChild(reportButton);	// 処理を完了する
+                        }	// 処理のまとまりを閉じる
+
+                        if (tools.childElementCount > 0) meta.appendChild(tools);	// 条件に応じて処理を分ける
+                        if (meta.childElementCount > 0) wrapper.appendChild(meta);	// 条件に応じて処理を分ける
+
+                        listDiv.appendChild(wrapper);	// 処理を完了する
+                    });	// 処理を完了する
+
+                    listDiv.scrollTop = listDiv.scrollHeight;	// 処理を続ける
+                } catch (e) {	// 処理のまとまりを始める
+                    console.error("メッセージ取得エラー:", e);	// 処理を完了する
+                } finally {	// 処理のまとまりを始める
+                    messagesRequest = null;	// 処理を続ける
+                }	// 処理のまとまりを閉じる
+            })();	// 処理を完了する
+
+            return messagesRequest;	// 結果を返す
+        }	// 処理のまとまりを閉じる
+
+        async function markAsRead() {	// 関数を定義
+            try {	// 失敗に備えて処理を始める
+                await postChat({	// 処理のまとまりを始める
+                    mode: "markAsRead",	// 処理を続ける
+                    myEmail: myEmail,	// 処理を続ける
+                    targetEmail: targetEmail	// 処理を続ける
+                });	// 処理を完了する
+            } catch (e) {	// 処理のまとまりを始める
+                console.error("既読処理エラー:", e);	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function updateUnreadBadge() {	// 関数を定義
+            const badge = document.getElementById("unread-badge");	// 定数を定義
+            if (!myEmail || !badge || unreadRequest) return unreadRequest;	// 条件に応じて処理を分ける
+
+            unreadRequest = (async () => {	// 処理のまとまりを始める
+                try {	// 失敗に備えて処理を始める
+                    const result = await postChat({ mode: "getUnreadCount", email: myEmail });	// 定数を定義
+                    const count = Number(result.message && result.message.unreadCount) || 0;	// 定数を定義
+                    badge.textContent = count > 99 ? "99+" : String(count);	// 処理を完了する
+                    badge.style.display = count > 0 ? "inline-block" : "none";	// 処理を続ける
+                } catch (e) {	// 処理のまとまりを始める
+                    console.error("未読チェックエラー:", e);	// 処理を完了する
+                } finally {	// 処理のまとまりを始める
+                    unreadRequest = null;	// 処理を続ける
+                }	// 処理のまとまりを閉じる
+            })();	// 処理を完了する
+
+            return unreadRequest;	// 結果を返す
+        }	// 処理のまとまりを閉じる
+
+        async function sendMessage() {	// 関数を定義
+            const textInput = document.getElementById("message-input");	// 定数を定義
+            const sendBtn = document.getElementById("send-btn");	// 定数を定義
+            const listDiv = document.getElementById("message-list");	// 定数を定義
+            const text = textInput.value.trim();	// 定数を定義
+            const outgoingAttachments = selectedAttachments.map(attachment => ({	// 定数を定義
+                name: attachment.name,	// 処理を続ける
+                type: attachment.type,	// 処理を続ける
+                data: attachment.data	// 処理を続ける
+            }));	// 処理を完了する
+
+            if (!text && outgoingAttachments.length === 0) return;	// 条件に応じて処理を分ける
+
+            textInput.value = "";	// 処理を続ける
+            if (sendBtn) {	// 条件に応じて処理を分ける
+                sendBtn.disabled = true;	// 処理を続ける
+                sendBtn.innerText = "送信中...";	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+
+            const tempBubble = document.createElement("div");	// 定数を定義
+            tempBubble.className = "message-bubble msg-my temp-msg";	// 処理を続ける
+            tempBubble.innerText = text || "画像を送信中...";	// 処理を続ける
+            listDiv.appendChild(tempBubble);	// 処理を完了する
+            listDiv.scrollTop = listDiv.scrollHeight;	// 処理を続ける
+
+            try {	// 失敗に備えて処理を始める
+                const result = await postChat({	// 定数を定義
+                    mode: "sendMessage",	// 処理を続ける
+                    from: myEmail,	// 処理を続ける
+                    to: targetEmail,	// 処理を続ける
+                    text: text,	// 処理を続ける
+                    attachments: outgoingAttachments	// 処理を続ける
+                });	// 処理を完了する
+
+                selectedAttachments = [];	// 処理を続ける
+                renderAttachmentPreview();	// 処理を完了する
+                await loadMessages();	// 処理を完了する
+            } catch (e) {	// 処理のまとまりを始める
+                alert("送信できませんでした: " + (e.message || "通信エラー"));	// 処理結果を知らせる
+                tempBubble.remove();	// 処理を完了する
+            } finally {	// 処理のまとまりを始める
+                if (sendBtn) {	// 条件に応じて処理を分ける
+                    sendBtn.disabled = false;	// 処理を続ける
+                    sendBtn.innerText = "送信";	// 処理を続ける
+                }	// 処理のまとまりを閉じる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        function scheduleChatPoll() {	// 関数を定義
+            clearTimeout(chatPollTimer);	// 処理を完了する
+            chatPollTimer = setTimeout(async () => {	// 時間を置いて処理する
+                if (document.visibilityState === "visible") {	// 条件に応じて処理を分ける
+                    await loadMessages();	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+                scheduleChatPoll();	// 処理を完了する
+            }, 5000);	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        document.addEventListener("visibilitychange", () => {	// 操作イベントを登録
+            if (document.visibilityState === "visible") {	// 条件に応じて処理を分ける
+                loadMessages();	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        });	// 処理を完了する
+
+        window.onload = async () => {	// 処理のまとまりを始める
+            document.getElementById("hud-menu-btn").classList.remove("open");	// 画面表示を更新する
+            document.getElementById("nav-links").classList.remove("open");	// 画面表示を更新する
+
+            const currentUserId = localStorage.getItem("userId") || myEmail;	// 定数を定義
+            const adminButton = document.getElementById("nav-admin-btn");	// 定数を定義
+            if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") {	// 端末内の保存情報を扱う
+                adminButton.style.display = "inline-block";	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+
+            await loadMessages();	// 処理を完了する
+            updateUnreadBadge();	// 処理を完了する
+            scheduleChatPoll();	// 処理を完了する
+            setInterval(() => {	// 時間を置いて処理する
+                if (document.visibilityState === "visible") updateUnreadBadge();	// 条件に応じて処理を分ける
+            }, 8000);	// 処理を完了する
+        };	// 処理のまとまりを閉じる
     </script>
-</body>
+</body>	<!-- 要素を閉じる -->
 
-</html>
+</html>	<!-- 要素を閉じる -->

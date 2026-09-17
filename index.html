@@ -1,1122 +1,1122 @@
-<!DOCTYPE html>
-<html lang="ja">
+<!DOCTYPE html>	<!-- HTML文書として宣言 -->
+<html lang="ja">	<!-- 画面要素を配置 -->
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ログイン - 平工マッチング</title>
+<head>	<!-- 画面要素を配置 -->
+    <meta charset="UTF-8">	<!-- 表示環境を設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">	<!-- 表示環境を設定 -->
+    <title>ログイン - 平工マッチング</title>	<!-- ページタイトルを設定 -->
 
-    <link rel="icon" href="icon-192.png">
+    <link rel="icon" href="icon-192.png">	<!-- 外部ファイルを読み込む -->
 
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100dvh;
-            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
+        body {	/* 対象要素のスタイルを始める */
+            margin: 0;	/* 見た目の設定を指定 */
+            padding: 0;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            min-height: 100dvh;	/* 見た目の設定を指定 */
+            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);	/* 見た目の設定を指定 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;	/* 見た目の設定を指定 */
+            -webkit-font-smoothing: antialiased;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .login-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            padding: 32px 24px;
-            box-sizing: border-box;
-        }
+        .login-container {	/* 対象要素のスタイルを始める */
+            flex: 1;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            justify-content: center;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            padding: 32px 24px;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .login-card {
-            background-color: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 40px 32px;
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01),
-                0 20px 40px -4px rgba(24, 76, 92, 0.08);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            box-sizing: border-box;
-        }
+        .login-card {	/* 対象要素のスタイルを始める */
+            background-color: rgba(255, 255, 255, 0.85);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            -webkit-backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            padding: 40px 32px;	/* 見た目の設定を指定 */
+            border-radius: 24px;	/* 見た目の設定を指定 */
+            border: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01),	/* 見た目の設定を指定 */
+                0 20px 40px -4px rgba(24, 76, 92, 0.08);	/* スタイルを設定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            max-width: 400px;	/* 見た目の設定を指定 */
+            text-align: center;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        h1 {
-            color: #1e293b;
-            margin-bottom: 30px;
-            font-size: 1.75rem;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-        }
+        h1 {	/* 対象要素のスタイルを始める */
+            color: #1e293b;	/* 見た目の設定を指定 */
+            margin-bottom: 30px;	/* 見た目の設定を指定 */
+            font-size: 1.75rem;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            letter-spacing: -0.02em;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .input-group {
-            text-align: left;
-        }
+        .input-group {	/* 対象要素のスタイルを始める */
+            text-align: left;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .password-wrapper,
-        .confirm-password-wrapper,
-        .name-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            width: 100%;
-            box-sizing: border-box;
-        }
+        .password-wrapper,	/* スタイルを設定 */
+        .confirm-password-wrapper,	/* スタイルを設定 */
+        .name-wrapper {	/* 対象要素のスタイルを始める */
+            position: relative;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .confirm-password-wrapper,
-        .name-wrapper {
-            display: none;
-        }
+        .confirm-password-wrapper,	/* スタイルを設定 */
+        .name-wrapper {	/* 対象要素のスタイルを始める */
+            display: none;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        input {
-            width: 100%;
-            padding: 14px 16px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            border-radius: 12px;
-            box-sizing: border-box;
-            font-size: 15px;
-            background-color: rgba(248, 250, 252, 0.8);
-            color: #1e293b;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            -webkit-appearance: none;
-        }
+        input {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            padding: 14px 16px;	/* 見た目の設定を指定 */
+            margin-bottom: 16px;	/* 見た目の設定を指定 */
+            border: 1px solid rgba(0, 0, 0, 0.08);	/* 見た目の設定を指定 */
+            border-radius: 12px;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+            font-size: 15px;	/* 見た目の設定を指定 */
+            background-color: rgba(248, 250, 252, 0.8);	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);	/* 見た目の設定を指定 */
+            -webkit-appearance: none;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        input::placeholder {
-            color: #94a3b8;
-        }
+        input::placeholder {	/* 対象要素のスタイルを始める */
+            color: #94a3b8;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        input:focus {
-            outline: none;
-            border-color: #1cbdc5;
-            background-color: #ffffff;
-            box-shadow: 0 0 0 4px rgba(28, 189, 197, 0.15);
-        }
+        input:focus {	/* 対象要素のスタイルを始める */
+            outline: none;	/* 見た目の設定を指定 */
+            border-color: #1cbdc5;	/* 見た目の設定を指定 */
+            background-color: #ffffff;	/* 見た目の設定を指定 */
+            box-shadow: 0 0 0 4px rgba(28, 189, 197, 0.15);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .password-input,
-        .confirm-password-input {
-            width: 100% !important;
-            padding-right: 45px;
-            box-sizing: border-box;
-        }
+        .password-input,	/* スタイルを設定 */
+        .confirm-password-input {	/* 対象要素のスタイルを始める */
+            width: 100% !important;	/* 見た目の設定を指定 */
+            padding-right: 45px;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .toggle-password-btn,
-        .toggle-confirm-btn {
-            position: absolute;
-            right: 14px;
-            width: max-content;
-            background: none !important;
-            border: none !important;
-            cursor: pointer;
-            padding: 0;
-            color: #64748b;
-            font-size: 13px;
-            font-weight: 600;
-            line-height: 1;
-            z-index: 10;
-            margin-bottom: 16px;
-            transition: color 0.2s;
-        }
+        .toggle-password-btn,	/* スタイルを設定 */
+        .toggle-confirm-btn {	/* 対象要素のスタイルを始める */
+            position: absolute;	/* 見た目の設定を指定 */
+            right: 14px;	/* 見た目の設定を指定 */
+            width: max-content;	/* 見た目の設定を指定 */
+            background: none !important;	/* 見た目の設定を指定 */
+            border: none !important;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            padding: 0;	/* 見た目の設定を指定 */
+            color: #64748b;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            font-weight: 600;	/* 見た目の設定を指定 */
+            line-height: 1;	/* 見た目の設定を指定 */
+            z-index: 10;	/* 見た目の設定を指定 */
+            margin-bottom: 16px;	/* 見た目の設定を指定 */
+            transition: color 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .toggle-password-btn:hover,
-        .toggle-confirm-btn:hover {
-            color: #1cbdc5;
-        }
+        .toggle-password-btn:hover,	/* 見た目の設定を指定 */
+        .toggle-confirm-btn:hover {	/* 対象要素のスタイルを始める */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .message {
-            min-height: 20px;
-            margin-bottom: 16px;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: center;
-        }
+        .message {	/* 対象要素のスタイルを始める */
+            min-height: 20px;	/* 見た目の設定を指定 */
+            margin-bottom: 16px;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            font-weight: 600;	/* 見た目の設定を指定 */
+            text-align: center;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .success {
-            color: #10b981;
-        }
+        .success {	/* 対象要素のスタイルを始める */
+            color: #10b981;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .error {
-            color: #ef4444;
-        }
+        .error {	/* 対象要素のスタイルを始める */
+            color: #ef4444;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        button {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            border: none;
-            display: block;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-        }
+        button {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            padding: 14px;	/* 見た目の設定を指定 */
+            border-radius: 12px;	/* 見た目の設定を指定 */
+            font-size: 15px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            display: block;	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-submit-primary {
-            background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);
-        }
+        .btn-submit-primary {	/* 対象要素のスタイルを始める */
+            background: linear-gradient(135deg, #1a73e8 0%, #1557b0 100%);	/* 見た目の設定を指定 */
+            color: white;	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        #face-login-btn {
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%) !important;
-            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25) !important;
-            color: white;
-        }
+        #face-login-btn {	/* 対象要素のスタイルを始める */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%) !important;	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25) !important;	/* 見た目の設定を指定 */
+            color: white;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        #face-register-btn {
-            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%) !important;
-            box-shadow: 0 4px 12px rgba(230, 126, 34, 0.25) !important;
-            color: white;
-        }
+        #face-register-btn {	/* 対象要素のスタイルを始める */
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%) !important;	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 12px rgba(230, 126, 34, 0.25) !important;	/* 見た目の設定を指定 */
+            color: white;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        button:hover {
-            transform: translateY(-2px);
-            opacity: 0.95;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-        }
+        button:hover {	/* 対象要素のスタイルを始める */
+            transform: translateY(-2px);	/* 見た目の設定を指定 */
+            opacity: 0.95;	/* 見た目の設定を指定 */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-flat {
-            background-color: transparent;
-            color: #64748b;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            margin-top: 14px;
-            box-shadow: none;
-            display: inline-block;
-            width: auto;
-            padding: 6px 12px;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-        }
+        .btn-flat {	/* 対象要素のスタイルを始める */
+            background-color: transparent;	/* 見た目の設定を指定 */
+            color: #64748b;	/* 見た目の設定を指定 */
+            text-decoration: none;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            font-weight: 600;	/* 見た目の設定を指定 */
+            margin-top: 14px;	/* 見た目の設定を指定 */
+            box-shadow: none;	/* 見た目の設定を指定 */
+            display: inline-block;	/* 見た目の設定を指定 */
+            width: auto;	/* 見た目の設定を指定 */
+            padding: 6px 12px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            transition: all 0.2s ease;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-flat:hover {
-            background-color: rgba(28, 189, 197, 0.08);
-            color: #1cbdc5;
-            transform: none;
-            box-shadow: none;
-        }
+        .btn-flat:hover {	/* 対象要素のスタイルを始める */
+            background-color: rgba(28, 189, 197, 0.08);	/* 見た目の設定を指定 */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+            transform: none;	/* 見た目の設定を指定 */
+            box-shadow: none;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .camera-box {
-            display: none;
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto 20px auto;
-            border-radius: 16px;
-            overflow: hidden;
-            transform: scaleX(-1);
-            box-shadow: 0 10px 25px rgba(28, 189, 197, 0.15);
-            position: relative;
-            aspect-ratio: 4 / 3;
-            border: 2px solid rgba(28, 189, 197, 0.3);
-            background-color: #000;
-        }
+        .camera-box {	/* 対象要素のスタイルを始める */
+            display: none;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            max-width: 400px;	/* 見た目の設定を指定 */
+            margin: 0 auto 20px auto;	/* 見た目の設定を指定 */
+            border-radius: 16px;	/* 見た目の設定を指定 */
+            overflow: hidden;	/* 見た目の設定を指定 */
+            transform: scaleX(-1);	/* 見た目の設定を指定 */
+            box-shadow: 0 10px 25px rgba(28, 189, 197, 0.15);	/* 見た目の設定を指定 */
+            position: relative;	/* 見た目の設定を指定 */
+            aspect-ratio: 4 / 3;	/* 見た目の設定を指定 */
+            border: 2px solid rgba(28, 189, 197, 0.3);	/* 見た目の設定を指定 */
+            background-color: #000;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-            background: #000;
-        }
+        video {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            height: 100%;	/* 見た目の設定を指定 */
+            object-fit: cover;	/* 見た目の設定を指定 */
+            display: block;	/* 見た目の設定を指定 */
+            position: absolute;	/* 見た目の設定を指定 */
+            top: 0;	/* 見た目の設定を指定 */
+            left: 0;	/* 見た目の設定を指定 */
+            z-index: 1;	/* 見た目の設定を指定 */
+            background: #000;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        canvas#face-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            pointer-events: none;
-        }
+        canvas#face-overlay {	/* 対象要素のスタイルを始める */
+            position: absolute;	/* 見た目の設定を指定 */
+            top: 0;	/* 見た目の設定を指定 */
+            left: 0;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            height: 100%;	/* 見た目の設定を指定 */
+            z-index: 10;	/* 見た目の設定を指定 */
+            pointer-events: none;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        #auth-status {
-            font-size: 13px;
-            font-weight: 600;
-            margin: 8px 0 0 0;
-            min-height: 20px;
-        }
+        #auth-status {	/* 対象要素のスタイルを始める */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            font-weight: 600;	/* 見た目の設定を指定 */
+            margin: 8px 0 0 0;	/* 見た目の設定を指定 */
+            min-height: 20px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .page-transition-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #ffffff;
-            z-index: 9999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s ease-in-out;
-        }
+        .page-transition-overlay {	/* 対象要素のスタイルを始める */
+            position: fixed;	/* 見た目の設定を指定 */
+            top: 0;	/* 見た目の設定を指定 */
+            left: 0;	/* 見た目の設定を指定 */
+            width: 100vw;	/* 見た目の設定を指定 */
+            height: 100vh;	/* 見た目の設定を指定 */
+            background-color: #ffffff;	/* 見た目の設定を指定 */
+            z-index: 9999;	/* 見た目の設定を指定 */
+            opacity: 0;	/* 見た目の設定を指定 */
+            pointer-events: none;	/* 見た目の設定を指定 */
+            transition: opacity 0.5s ease-in-out;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .page-transition-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        .page-transition-overlay.active {	/* 対象要素のスタイルを始める */
+            opacity: 1;	/* 見た目の設定を指定 */
+            pointer-events: auto;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .login-card.fade-out-exit {
-            opacity: 0 !important;
-            transform: scale(0.95) translateY(-10px) !important;
-            filter: blur(8px) !important;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        }
+        .login-card.fade-out-exit {	/* 対象要素のスタイルを始める */
+            opacity: 0 !important;	/* 見た目の設定を指定 */
+            transform: scale(0.95) translateY(-10px) !important;	/* 見た目の設定を指定 */
+            filter: blur(8px) !important;	/* 見た目の設定を指定 */
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .footer {
-            background-color: transparent;
-            padding: 28px 20px;
-            width: 100%;
-            box-sizing: border-box;
-            margin-top: auto;
-            border-top: 1px solid rgba(255, 255, 255, 0.5);
-        }
+        .footer {	/* 対象要素のスタイルを始める */
+            background-color: transparent;	/* 見た目の設定を指定 */
+            padding: 28px 20px;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+            margin-top: auto;	/* 見た目の設定を指定 */
+            border-top: 1px solid rgba(255, 255, 255, 0.5);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
+        .footer-container {	/* 対象要素のスタイルを始める */
+            max-width: 1200px;	/* 見た目の設定を指定 */
+            margin: 0 auto;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            gap: 12px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .footer-links {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
+        .footer-links {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            gap: 20px;	/* 見た目の設定を指定 */
+            justify-content: center;	/* 見た目の設定を指定 */
+            flex-wrap: wrap;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .footer-links a {
-            color: #64748b;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 700;
-            transition: all 0.2s ease;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
+        .footer-links a {	/* 対象要素のスタイルを始める */
+            color: #64748b;	/* 見た目の設定を指定 */
+            text-decoration: none;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            transition: all 0.2s ease;	/* 見た目の設定を指定 */
+            padding: 4px 8px;	/* 見た目の設定を指定 */
+            border-radius: 6px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .footer-links a:hover {
-            color: #1cbdc5;
-            background: rgba(28, 189, 197, 0.08);
-        }
+        .footer-links a:hover {	/* 対象要素のスタイルを始める */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+            background: rgba(28, 189, 197, 0.08);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .copyright {
-            color: #94a3b8;
-            font-size: 0.75rem;
-            margin: 0;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-        }
+        .copyright {	/* 対象要素のスタイルを始める */
+            color: #94a3b8;	/* 見た目の設定を指定 */
+            font-size: 0.75rem;	/* 見た目の設定を指定 */
+            margin: 0;	/* 見た目の設定を指定 */
+            font-weight: 600;	/* 見た目の設定を指定 */
+            letter-spacing: 0.03em;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        #verify-section,
-        #forgot-password-section {
-            display: none;
-        }
+        #verify-section,	/* スタイルを設定 */
+        #forgot-password-section {	/* 対象要素のスタイルを始める */
+            display: none;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .code-hint {
-            font-size: 12.5px;
-            color: #64748b;
-            margin-bottom: 16px;
-            line-height: 1.6;
-        }
+        .code-hint {	/* 対象要素のスタイルを始める */
+            font-size: 12.5px;	/* 見た目の設定を指定 */
+            color: #64748b;	/* 見た目の設定を指定 */
+            margin-bottom: 16px;	/* 見た目の設定を指定 */
+            line-height: 1.6;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        @media screen and (max-width: 480px) {
-            .login-container {
-                padding: 16px;
-            }
+        @media screen and (max-width: 480px) {	/* 表示条件を設定 */
+            .login-container {	/* 対象要素のスタイルを始める */
+                padding: 16px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .login-card {
-                padding: 32px 20px;
-                border-radius: 20px;
-            }
+            .login-card {	/* 対象要素のスタイルを始める */
+                padding: 32px 20px;	/* 見た目の設定を指定 */
+                border-radius: 20px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            h1 {
-                font-size: 1.5rem;
-                margin-bottom: 24px;
-            }
+            h1 {	/* 対象要素のスタイルを始める */
+                font-size: 1.5rem;	/* 見た目の設定を指定 */
+                margin-bottom: 24px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .footer-links {
-                gap: 12px 16px;
-            }
-        }
+            .footer-links {	/* 対象要素のスタイルを始める */
+                gap: 12px 16px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+        }	/* スタイル定義を閉じる */
     </style>
 
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0284c7">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="theme.css?v=20260917c">
+    <link rel="manifest" href="manifest.json">	<!-- 外部ファイルを読み込む -->
+    <meta name="theme-color" content="#0284c7">	<!-- 表示環境を設定 -->
+    <link rel="apple-touch-icon" href="icon-192.png">	<!-- 外部ファイルを読み込む -->
+    <link rel="stylesheet" href="theme.css?v=20260917c">	<!-- 外部ファイルを読み込む -->
     <script src="ui.js"></script>
-</head>
+</head>	<!-- 要素を閉じる -->
 
-<body data-page="index">
-    <div id="transition-overlay" class="page-transition-overlay"></div>
+<body data-page="index">	<!-- 画面要素を配置 -->
+    <div id="transition-overlay" class="page-transition-overlay"></div>	<!-- 画面要素を配置 -->
 
-    <div class="login-container">
-        <div class="login-card">
-            <h1 id="form-title">ログイン</h1>
+    <div class="login-container">	<!-- 画面要素を配置 -->
+        <div class="login-card">	<!-- 画面要素を配置 -->
+            <h1 id="form-title">ログイン</h1>	<!-- 画面要素を配置 -->
 
-            <div id="camera-container" class="camera-box">
-                <video id="video" autoplay playsinline muted></video>
-                <canvas id="face-overlay"></canvas>
-            </div>
+            <div id="camera-container" class="camera-box">	<!-- 画面要素を配置 -->
+                <video id="video" autoplay playsinline muted></video>	<!-- 画面要素を配置 -->
+                <canvas id="face-overlay"></canvas>	<!-- 画面要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
 
-            <div id="face-auth-section" style="margin-bottom: 20px; text-align: center;">
-                <button type="button" id="face-login-btn" style="margin-bottom: 5px;">顔認証でログイン</button>
+            <div id="face-auth-section" style="margin-bottom: 20px; text-align: center;">	<!-- 画面要素を配置 -->
+                <button type="button" id="face-login-btn" style="margin-bottom: 5px;">顔認証でログイン</button>	<!-- 操作できる要素を配置 -->
                 <button type="button" id="face-register-btn"
                     style="margin-bottom: 5px; display: none;">顔情報を撮影・登録</button>
-                <p id="auth-status" style="color: #64748b;"></p>
-            </div>
+                <p id="auth-status" style="color: #64748b;"></p>	<!-- 画面要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
 
-            <div class="input-group">
-                <input type="text" id="login-userid" maxlength="64" placeholder="ユーザID（顔認証にも使用）" onkeypress="handleKeyPress(event)">
+            <div class="input-group">	<!-- 画面要素を配置 -->
+                <input type="text" id="login-userid" maxlength="64" placeholder="ユーザID（顔認証にも使用）" onkeypress="handleKeyPress(event)">	<!-- 入力要素を配置 -->
 
-                <div class="name-wrapper" id="name-wrapper">
-                    <input type="text" id="display-name" maxlength="50" placeholder="表示名（ニックネーム）">
-                </div>
-                <div class="name-wrapper" id="reg-email-wrapper">
-                    <input type="text" id="reg-email" maxlength="254" placeholder="メールアドレス（認証コード送信用）" inputmode="email">
-                </div>
+                <div class="name-wrapper" id="name-wrapper">	<!-- 画面要素を配置 -->
+                    <input type="text" id="display-name" maxlength="50" placeholder="表示名（ニックネーム）">	<!-- 入力要素を配置 -->
+                </div>	<!-- 要素を閉じる -->
+                <div class="name-wrapper" id="reg-email-wrapper">	<!-- 画面要素を配置 -->
+                    <input type="text" id="reg-email" maxlength="254" placeholder="メールアドレス（認証コード送信用）" inputmode="email">	<!-- 入力要素を配置 -->
+                </div>	<!-- 要素を閉じる -->
 
-                <div class="password-wrapper">
+                <div class="password-wrapper">	<!-- 画面要素を配置 -->
                     <input type="password" id="password" placeholder="パスワード" class="password-input" maxlength="128" autocomplete="new-password"
                         onkeypress="handleKeyPress(event)">
                     <button type="button" id="toggle-password" onclick="togglePasswordVisibility()"
                         class="toggle-password-btn">表示</button>
-                </div>
+                </div>	<!-- 要素を閉じる -->
 
-                <div class="confirm-password-wrapper">
-                    <input type="password" id="confirm-password" placeholder="パスワード（確認）" class="confirm-password-input" maxlength="128" autocomplete="new-password">
+                <div class="confirm-password-wrapper">	<!-- 画面要素を配置 -->
+                    <input type="password" id="confirm-password" placeholder="パスワード（確認）" class="confirm-password-input" maxlength="128" autocomplete="new-password">	<!-- 入力要素を配置 -->
                     <button type="button" id="toggle-confirm" onclick="toggleconfirmVisibility()"
                         class="toggle-confirm-btn">表示</button>
-                </div>
+                </div>	<!-- 要素を閉じる -->
 
-                <p id="password-rule-note" style="display:none; margin:-4px 2px 14px; color:#64748b; font-size:12px; line-height:1.65;">
-                    半角4文字以上で、英大文字・英小文字・数字・記号を各1文字以上含めてください。同じ数字4桁の繰り返しや、1234・4321のような4桁の連番は使用できません。
-                </p>
+                <p id="password-rule-note" style="display:none; margin:-4px 2px 14px; color:#64748b; font-size:12px; line-height:1.65;">	<!-- 画面要素を配置 -->
+                    半角4文字以上で、英大文字・英小文字・数字・記号を各1文字以上含めてください。同じ数字4桁の繰り返しや、1234・4321のような4桁の連番は使用できません。	<!-- 画面に表示する内容 -->
+                </p>	<!-- 要素を閉じる -->
 
-                <div id="message" class="message"></div>
+                <div id="message" class="message"></div>	<!-- 画面要素を配置 -->
 
-                <div class="button-group" style="text-align: center;">
-                    <div id="login-section">
-                        <button class="btn-submit-primary" onclick="handleLogin()">ログイン</button>
-                        <button class="btn-flat" onclick="toggleMode('register')">新規登録はこちら</button>
-                        <br>
-                        <button class="btn-flat" onclick="showForgotPasswordForm()">パスワードを忘れた場合はこちら</button>
-                    </div>
+                <div class="button-group" style="text-align: center;">	<!-- 画面要素を配置 -->
+                    <div id="login-section">	<!-- 画面要素を配置 -->
+                        <button class="btn-submit-primary" onclick="handleLogin()">ログイン</button>	<!-- 操作できる要素を配置 -->
+                        <button class="btn-flat" onclick="toggleMode('register')">新規登録はこちら</button>	<!-- 操作できる要素を配置 -->
+                        <br>	<!-- 画面要素を配置 -->
+                        <button class="btn-flat" onclick="showForgotPasswordForm()">パスワードを忘れた場合はこちら</button>	<!-- 操作できる要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
 
-                    <div id="register-section" style="display: none;">
+                    <div id="register-section" style="display: none;">	<!-- 画面要素を配置 -->
                         <button class="btn-submit-primary"
                             style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);"
                             onclick="handleRegister()">認証コードを送信する</button>
-                        <button class="btn-flat" onclick="toggleMode('login')">ログインに戻る</button>
-                    </div>
+                        <button class="btn-flat" onclick="toggleMode('login')">ログインに戻る</button>	<!-- 操作できる要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
 
-                    <div id="verify-section">
-                        <p class="code-hint">入力されたメールアドレス宛に、6桁の認証コードを送信しました。ご確認のうえ、下に入力してください。（10分間有効）</p>
-                        <p class="code-hint">※迷惑メールフォルダに入る場合があります。届かない場合は「コードを再送する」を押してください。</p>
-                        <input type="text" id="verify-code" placeholder="認証コード（6桁）" inputmode="numeric" maxlength="6">
+                    <div id="verify-section">	<!-- 画面要素を配置 -->
+                        <p class="code-hint">入力されたメールアドレス宛に、6桁の認証コードを送信しました。ご確認のうえ、下に入力してください。（10分間有効）</p>	<!-- 画面要素を配置 -->
+                        <p class="code-hint">※迷惑メールフォルダに入る場合があります。届かない場合は「コードを再送する」を押してください。</p>	<!-- 画面要素を配置 -->
+                        <input type="text" id="verify-code" placeholder="認証コード（6桁）" inputmode="numeric" maxlength="6">	<!-- 入力要素を配置 -->
                         <button class="btn-submit-primary"
                             style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);"
                             onclick="handleVerifyCode()">認証して登録完了</button>
-                        <button class="btn-flat" onclick="resendCode()">コードを再送する</button>
-                        <br>
-                        <button class="btn-flat" onclick="toggleMode('login')">ログインに戻る</button>
-                    </div>
+                        <button class="btn-flat" onclick="resendCode()">コードを再送する</button>	<!-- 操作できる要素を配置 -->
+                        <br>	<!-- 画面要素を配置 -->
+                        <button class="btn-flat" onclick="toggleMode('login')">ログインに戻る</button>	<!-- 操作できる要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
 
-                    <div id="forgot-password-section">
-                        <input type="text" id="forgot-userid" placeholder="登録したユーザID">
-                        <button class="btn-submit-primary" onclick="submitForgotPassword()">再設定メールを送信</button>
-                        <button class="btn-flat" onclick="hideForgotPasswordForm()">キャンセル</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                    <div id="forgot-password-section">	<!-- 画面要素を配置 -->
+                        <input type="text" id="forgot-userid" placeholder="登録したユーザID">	<!-- 入力要素を配置 -->
+                        <button class="btn-submit-primary" onclick="submitForgotPassword()">再設定メールを送信</button>	<!-- 操作できる要素を配置 -->
+                        <button class="btn-flat" onclick="hideForgotPasswordForm()">キャンセル</button>	<!-- 操作できる要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
+                </div>	<!-- 要素を閉じる -->
+            </div>	<!-- 要素を閉じる -->
+        </div>	<!-- 要素を閉じる -->
+    </div>	<!-- 要素を閉じる -->
 
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-links">
-                <a href="main.html">ホーム</a>
-                <a href="messages.html">メッセージ</a>
-                <a href="profile.html">マイページ</a>
-                <a href="terms.html">利用規約</a>
-                <a href="privacy.html">プライバシーポリシー</a>
-            </div>
-            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>
-        </div>
-    </footer>
+    <footer class="footer">	<!-- フッターを配置 -->
+        <div class="footer-container">	<!-- 画面要素を配置 -->
+            <div class="footer-links">	<!-- 画面要素を配置 -->
+                <a href="main.html">ホーム</a>	<!-- 操作できる要素を配置 -->
+                <a href="messages.html">メッセージ</a>	<!-- 操作できる要素を配置 -->
+                <a href="profile.html">マイページ</a>	<!-- 操作できる要素を配置 -->
+                <a href="terms.html">利用規約</a>	<!-- 操作できる要素を配置 -->
+                <a href="privacy.html">プライバシーポリシー</a>	<!-- 操作できる要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>	<!-- 画面要素を配置 -->
+        </div>	<!-- 要素を閉じる -->
+    </footer>	<!-- 要素を閉じる -->
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
-
-        let videoStream = null;
-        let faceMesh = null;
-        let lastLandmarks = null;
-        let faceFrameRequest = null;
-        let faceFrameCallback = null;
-        let faceProcessing = false;
-        let lastFaceCheck = 0;
-        let cameraStartPromise = null;
-        let cameraSession = 0;
-        let lastFaceSeen = 0;
-        const faceCheckInterval = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 100 : 66;
-        let faceSamples = [];
-        let collectingFaceSamples = false;
-        let lastFaceSampleAt = 0;
-        let faceLoginTimer = null;
-        let savedFeaturesText = "";
-        let isCapturing = false;
-        let pendingUserId = "";
-
-        function compactFaceLandmarks(landmarks) {
-            if (!Array.isArray(landmarks)) return [];
-            return landmarks.map(point => ({
-                x: Number(Number(point.x || 0).toFixed(5)),
-                y: Number(Number(point.y || 0).toFixed(5)),
-                z: Number(Number(point.z || 0).toFixed(5))
-            }));
-        }
-
-        async function postGas(payload, timeoutMs = 15000) {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify(payload),
-                    signal: controller.signal
-                });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                return await res.json();
-            } finally {
-                clearTimeout(timeoutId);
-            }
-        }
-
-        function hasWeakNumberSequence(password) {
-            const numberRuns = String(password).match(/\d{4,}/g) || [];
-            return numberRuns.some(run => {
-                for (let i = 0; i <= run.length - 4; i++) {
-                    const digits = run.slice(i, i + 4).split("").map(Number);
-                    const same = digits.every(digit => digit === digits[0]);
-                    const ascending = digits.slice(1).every((digit, index) => digit === (digits[index] + 1) % 10);
-                    const descending = digits.slice(1).every((digit, index) => digit === (digits[index] + 9) % 10);
-                    if (same || ascending || descending) return true;
-                }
-                return false;
-            });
-        }
-
-        function validatePassword(password) {
-            if (password.length < 4) return "パスワードは4文字以上で入力してください";
-            if (password.length > 128) return "パスワードは128文字以内で入力してください";
-            if (!/^[\x21-\x7E]+$/.test(password)) return "パスワードは半角英数字・記号のみ使用できます";
-            if (!/[A-Z]/.test(password)) return "パスワードに英大文字を1文字以上含めてください";
-            if (!/[a-z]/.test(password)) return "パスワードに英小文字を1文字以上含めてください";
-            if (!/[0-9]/.test(password)) return "パスワードに数字を1文字以上含めてください";
-            if (!/[^A-Za-z0-9]/.test(password)) return "パスワードに記号を1文字以上含めてください";
-            if (hasWeakNumberSequence(password)) return "同じ数字4桁の繰り返しや、1234・4321のような4桁の連番は使用できません";
-            return "";
-        }
-
-        function drawFeatures(landmarks) {
-            const canvas = document.getElementById('face-overlay');
-            const video = document.getElementById('video');
-            const ctx = canvas.getContext('2d');
-
-            const rect = video.getBoundingClientRect();
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            const width = Math.max(1, Math.round(rect.width));
-            const height = Math.max(1, Math.round(rect.height));
-            const pixelWidth = Math.round(width * dpr);
-            const pixelHeight = Math.round(height * dpr);
-
-            if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
-                canvas.width = pixelWidth;
-                canvas.height = pixelHeight;
-                canvas.style.width = `${width}px`;
-                canvas.style.height = `${height}px`;
-            }
-
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (!landmarks) return;
-
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-            const vWidth = video.videoWidth || 320;
-            const vHeight = video.videoHeight || 240;
-
-            const scale = Math.max(width / vWidth, height / vHeight);
-            const renderWidth = vWidth * scale;
-            const renderHeight = vHeight * scale;
-            const offsetX = (width - renderWidth) / 2;
-            const offsetY = (height - renderHeight) / 2;
-
-            ctx.fillStyle = "#00FF00";
-            for (let i = 0; i < landmarks.length; i++) {
-                const pt = landmarks[i];
-                const x = pt.x * renderWidth + offsetX;
-                const y = pt.y * renderHeight + offsetY;
-                ctx.beginPath();
-                ctx.arc(x, y, 1.5, 0, 2 * Math.PI);
-                ctx.fill();
-            }
-        }
-
-        async function checkFace() {
-            const video = document.getElementById('video');
-            if (!faceMesh || !videoStream || faceProcessing || video.readyState < 2) return;
-
-            const now = performance.now();
-            if (now - lastFaceCheck < faceCheckInterval) return;
-
-            faceProcessing = true;
-            lastFaceCheck = now;
-            try {
-                await faceMesh.send({ image: video });
-            } catch (err) {
-                if (videoStream) {
-                    lastLandmarks = null;
-                    drawFeatures(null);
-                }
-            } finally {
-                faceProcessing = false;
-            }
-        }
-
-        function scheduleFaceFrame(session) {
-            const video = document.getElementById('video');
-            if (!videoStream || session !== cameraSession) return;
-
-            if (typeof video.requestVideoFrameCallback === "function") {
-                faceFrameCallback = video.requestVideoFrameCallback(async () => {
-                    if (session !== cameraSession) return;
-                    await checkFace();
-                    scheduleFaceFrame(session);
-                });
-                return;
-            }
-
-            faceFrameRequest = requestAnimationFrame(async (time) => {
-                if (session !== cameraSession) return;
-                if (time - lastFaceCheck >= faceCheckInterval) await checkFace();
-                scheduleFaceFrame(session);
-            });
-        }
-
-        function stopFaceLoop() {
-            const video = document.getElementById('video');
-            if (faceFrameRequest !== null) {
-                cancelAnimationFrame(faceFrameRequest);
-                faceFrameRequest = null;
-            }
-            if (faceFrameCallback !== null && typeof video.cancelVideoFrameCallback === "function") {
-                video.cancelVideoFrameCallback(faceFrameCallback);
-                faceFrameCallback = null;
-            }
-        }
-
-        function initFaceMesh() {
-            if (faceMesh) return;
-            faceMesh = new FaceMesh({
-                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
-            });
-            faceMesh.setOptions({
-                maxNumFaces: 1,
-                refineLandmarks: true,
-                minDetectionConfidence: 0.5,
-                minTrackingConfidence: 0.5
-            });
-            faceMesh.onResults((results) => {
-                if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
-                    lastLandmarks = results.multiFaceLandmarks[0];
-                    const now = performance.now();
-                    lastFaceSeen = now;
-                    if (collectingFaceSamples && now - lastFaceSampleAt >= 350) {
-                        faceSamples.push(compactFaceLandmarks(lastLandmarks));
-                        if (faceSamples.length > 5) faceSamples.shift();
-                        lastFaceSampleAt = now;
-                    }
-                    drawFeatures(lastLandmarks);
-                } else {
-                    if (performance.now() - lastFaceSeen > 500) lastLandmarks = null;
-                    drawFeatures(null);
-                }
-            });
-        }
-
-        async function startCamera() {
-            if (videoStream) return true;
-            if (cameraStartPromise) return cameraStartPromise;
-
-            cameraStartPromise = startCameraInternal();
-            try {
-                return await cameraStartPromise;
-            } finally {
-                cameraStartPromise = null;
-            }
-        }
-
-        async function startCameraInternal() {
-            initFaceMesh();
-            const container = document.getElementById('camera-container');
-            const video = document.getElementById('video');
-            const authStatus = document.getElementById('auth-status');
-            container.style.display = "block";
-
-            try {
-                const constraints = {
-                    audio: false,
-                    video: {
-                        facingMode: { ideal: "user" },
-                        width: { ideal: 1280, max: 1920 },
-                        height: { ideal: 720, max: 1080 },
-                        frameRate: { ideal: 30, max: 30 }
-                    }
-                };
-
-                try {
-                    videoStream = await navigator.mediaDevices.getUserMedia(constraints);
-                } catch (err) {
-                    if (err.name === "NotAllowedError" || err.name === "SecurityError" || err.name === "AbortError") {
-                        throw err;
-                    }
-                    videoStream = await navigator.mediaDevices.getUserMedia({
-                        audio: false,
-                        video: { facingMode: "user" }
-                    });
-                }
-
-                video.srcObject = videoStream;
-                video.muted = true;
-                video.setAttribute("playsinline", "");
-                await new Promise(resolve => {
-                    if (video.readyState >= 1) {
-                        resolve();
-                    } else {
-                        video.addEventListener("loadedmetadata", resolve, { once: true });
-                    }
-                });
-                await video.play();
-
-                cameraSession++;
-                lastFaceCheck = 0;
-                scheduleFaceFrame(cameraSession);
-                authStatus.innerText = "";
-                return true;
-            } catch (err) {
-                if (videoStream) {
-                    videoStream.getTracks().forEach(track => track.stop());
-                }
-                videoStream = null;
-                video.srcObject = null;
-                container.style.display = "none";
-                authStatus.innerText = "カメラの起動に失敗しました。ブラウザのカメラ許可も確認してください。";
-                authStatus.style.color = "#ef4444";
-                return false;
-            }
-        }
-
-        function stopCamera() {
-            cameraSession++;
-            stopFaceLoop();
-            collectingFaceSamples = false;
-            if (faceLoginTimer !== null) {
-                clearTimeout(faceLoginTimer);
-                faceLoginTimer = null;
-                document.getElementById('face-login-btn').disabled = false;
-            }
-            if (videoStream) videoStream.getTracks().forEach(track => track.stop());
-            videoStream = null;
-            document.getElementById('video').pause();
-            document.getElementById('video').srcObject = null;
-            lastLandmarks = null;
-            lastFaceSeen = 0;
-            document.getElementById('camera-container').style.display = "none";
-            drawFeatures(null);
-        }
-
-        function toggleMode(mode) {
-            const title = document.getElementById("form-title");
-            const nameWrapper = document.getElementById("name-wrapper");
-            const regEmailWrapper = document.getElementById("reg-email-wrapper");
-            const confirmWrapper = document.querySelector(".confirm-password-wrapper");
-            const loginSec = document.getElementById("login-section");
-            const registerSec = document.getElementById("register-section");
-            const verifySec = document.getElementById("verify-section");
-            const forgotSec = document.getElementById("forgot-password-section");
-            const msg = document.getElementById("message");
-            const faceLoginBtn = document.getElementById("face-login-btn");
-            const faceRegBtn = document.getElementById("face-register-btn");
-            const authStatus = document.getElementById("auth-status");
-            const loginUserId = document.getElementById("login-userid");
-            const passwordRuleNote = document.getElementById("password-rule-note");
-
-            msg.innerText = "";
-            authStatus.innerText = "";
-            verifySec.style.display = "none";
-            forgotSec.style.display = "none";
-
-            if (mode === 'register') {
-                title.innerText = "新規登録";
-                nameWrapper.style.display = "flex";
-                regEmailWrapper.style.display = "flex";
-                confirmWrapper.style.display = "flex";
-                passwordRuleNote.style.display = "block";
-
-                loginSec.style.display = "none";
-                registerSec.style.display = "block";
-                loginUserId.style.display = "block";
-
-                faceLoginBtn.style.display = "none";
-                faceRegBtn.style.display = "inline-block";
-
-                authStatus.innerText = "「顔情報を撮影・登録」ボタンを押すとカメラが起動します。";
-                authStatus.style.color = "#64748b";
-            } else {
-                title.innerText = "ログイン";
-                nameWrapper.style.display = "none";
-                regEmailWrapper.style.display = "none";
-                confirmWrapper.style.display = "none";
-                passwordRuleNote.style.display = "none";
-
-                loginSec.style.display = "block";
-                registerSec.style.display = "none";
-                loginUserId.style.display = "block";
-
-                document.getElementById("confirm-password").value = "";
-                document.getElementById("display-name").value = "";
-                document.getElementById("reg-email").value = "";
-
-                faceLoginBtn.style.display = "inline-block";
-                faceRegBtn.style.display = "none";
-                stopCamera();
-            }
-        }
-
-        document.getElementById('face-register-btn').addEventListener('click', async () => {
-            const authStatus = document.getElementById('auth-status');
-            if (isCapturing) return;
-
-            if (!videoStream) {
-                const started = await startCamera();
-                if (!started) return;
-                authStatus.innerText = "カメラが起動しました。正面を向いてもう一度ボタンを押すと撮影されます。";
-                authStatus.style.color = "#1a73e8";
-                return;
-            }
-
-            isCapturing = true;
-            let seconds = 3;
-            authStatus.innerText = `${seconds}秒後に自動で顔スキャンを実行します。正面を向いてください。`;
-            authStatus.style.color = "#e67e22";
-
-            const timer = setInterval(() => {
-                seconds--;
-                if (seconds > 0) {
-                    authStatus.innerText = `${seconds}秒後に自動で顔スキャンを実行します。正面を向いてください。`;
-                } else {
-                    clearInterval(timer);
-                    captureFace();
-                }
-            }, 1000);
-        });
-
-        function captureFace() {
-            const authStatus = document.getElementById('auth-status');
-            if (!lastLandmarks) {
-                authStatus.innerText = "顔を検出できずスキャンに失敗しました。もう一度ボタンを押してやり直してください。";
-                authStatus.style.color = "#ef4444";
-                isCapturing = false;
-                return;
-            }
-            savedFeaturesText = JSON.stringify(compactFaceLandmarks(lastLandmarks));
-            stopCamera();
-            authStatus.innerText = "顔情報の撮影が完了しました。「認証コードを送信する」を押してください。";
-            authStatus.style.color = "#10b981";
-            isCapturing = false;
-        }
-
-        document.getElementById('face-login-btn').addEventListener('click', async () => {
-            if (faceLoginTimer !== null) return;
-            const userId = document.getElementById('login-userid').value.trim();
-            const authStatus = document.getElementById('auth-status');
-            if (!userId) {
-                authStatus.innerText = "顔認証前にユーザーIDを入力してください。";
-                authStatus.style.color = "#ef4444";
-                document.getElementById('login-userid').focus();
-                return;
-            }
-
-            const started = await startCamera();
-            if (!started) return;
-            faceSamples = [];
-            lastFaceSampleAt = 0;
-            collectingFaceSamples = true;
-            document.getElementById('face-login-btn').disabled = true;
-            authStatus.innerText = "3秒後に顔を確認します。正面を向いてください。";
-            authStatus.style.color = "#1a73e8";
-
-            faceLoginTimer = setTimeout(async () => {
-                collectingFaceSamples = false;
-                if (!lastLandmarks || faceSamples.length < 2) {
-                    document.getElementById('auth-status').innerText = "顔を検出できずスキャンに失敗しました。";
-                    document.getElementById('auth-status').style.color = "#ef4444";
-                    stopCamera();
-                    return;
-                }
-
-                const currentLandmarks = compactFaceLandmarks(lastLandmarks);
-                const currentFeaturesSamples = faceSamples.slice();
-                stopCamera();
-
-                document.getElementById('auth-status').innerText = "AIデータ解析中...";
-                document.getElementById('auth-status').style.color = "#e67e22";
-
-                try {
-                    const result = await postGas({
-                        mode: "verify_face_for_user",
-                        userId: userId,
-                        currentFeatures: currentLandmarks,
-                        currentFeaturesSamples: currentFeaturesSamples
-                    });
-
-                    if (result.status === "success" && result.message.email) {
-                        localStorage.setItem("userEmail", result.message.email);
-                        localStorage.setItem("userId", result.message.userId || result.message.email);
-                        localStorage.setItem("userName", result.message.name || "");
-                        localStorage.setItem("profileImage", result.message.profileImage || "");
-                        if (result.message.adminToken) localStorage.setItem("adminToken", result.message.adminToken);
-                        else localStorage.removeItem("adminToken");
-
-                        document.getElementById('auth-status').innerText =
-                            `認証成功！こんにちは、${result.message.name}さん。`;
-                        document.getElementById('auth-status').style.color = "#10b981";
-
-                        document.querySelector('.login-card').classList.add('fade-out-exit');
-                        document.getElementById('transition-overlay').classList.add('active');
-                        setTimeout(() => {
-                            window.location.href = "main.html";
-                        }, 500);
-                    } else {
-                        document.getElementById('auth-status').innerText = "顔認証失敗: " + result.message;
-                        document.getElementById('auth-status').style.color = "#ef4444";
-                    }
-                } catch (err) {
-                    document.getElementById('auth-status').innerText = "通信エラーが発生しました。";
-                    document.getElementById('auth-status').style.color = "#ef4444";
-                }
-            }, 3000);
-        });
-
-        async function handleLogin() {
-            const userId = document.getElementById("login-userid").value.trim();
-            const password = document.getElementById("password").value.trim();
-            if (!userId || !password) return updateMsg("入力してください", "error");
-
-            try {
-                updateMsg("ログイン処理中...", "");
-                const result = await postGas({
-                    mode: "login",
-                    email: userId,
-                    password
-                });
-
-                if (result.status === "success") {
-                    localStorage.setItem("userEmail", result.message.email);
-                    localStorage.setItem("userId", result.message.userId || result.message.email);
-                    localStorage.setItem("userName", result.message.name || "");
-                    localStorage.setItem("profileImage", result.message.profileImage || "");
-                    if (result.message.adminToken) localStorage.setItem("adminToken", result.message.adminToken);
-                    else localStorage.removeItem("adminToken");
-
-                    updateMsg("ログイン成功", "success");
-
-                    document.querySelector('.login-card').classList.add('fade-out-exit');
-                    document.getElementById('transition-overlay').classList.add('active');
-                    setTimeout(() => {
-                        window.location.href = "main.html";
-                    }, 500);
-                } else {
-                    updateMsg(result.message, "error");
-                }
-            } catch (e) {
-                updateMsg("通信エラーが発生しました。", "error");
-            }
-        }
-
-        async function handleRegister() {
-            const userId = document.getElementById("login-userid").value.trim();
-            const name = document.getElementById("display-name").value.trim();
-            const email = document.getElementById("reg-email").value.trim();
-            const password = document.getElementById("password").value;
-            const confirm = document.getElementById("confirm-password").value;
-
-            if (!userId || !name || !email || !password || !confirm) return updateMsg("全項目を入力してください", "error");
-            const passwordError = validatePassword(password);
-            if (passwordError) return updateMsg(passwordError, "error");
-            if (password !== confirm) return updateMsg("パスワードが一致しません", "error");
-            if (!email.includes("@")) return updateMsg("メールアドレスの形式が正しくありません", "error");
-
-            try {
-                updateMsg("送信中...", "");
-                const result = await postGas({
-                    mode: "register",
-                    userId: userId,
-                    name: name,
-                    email: email,
-                    password: password,
-                    faceFeatures: savedFeaturesText
-                }, 25000);
-
-                if (result.status === "success") {
-                    pendingUserId = userId;
-                    document.getElementById("register-section").style.display = "none";
-                    document.getElementById("verify-section").style.display = "block";
-                    document.getElementById("form-title").innerText = "メール認証";
-                    updateMsg("", "");
-                } else {
-                    updateMsg(result.message, "error");
-                }
-            } catch (e) {
-                updateMsg("通信エラーが発生しました", "error");
-            }
-        }
-
-        async function handleVerifyCode() {
-            const code = document.getElementById("verify-code").value.trim();
-            if (!code) return updateMsg("認証コードを入力してください", "error");
-
-            try {
-                updateMsg("確認中...", "");
-                const result = await postGas({
-                    mode: "verifyEmail",
-                    userId: pendingUserId,
-                    code: code
-                });
-
-                if (result.status === "success") {
-                    updateMsg("登録が完了しました！ログインしてください", "success");
-                    savedFeaturesText = "";
-                    document.getElementById("verify-code").value = "";
-                    setTimeout(() => toggleMode('login'), 1500);
-                } else {
-                    updateMsg(result.message, "error");
-                }
-            } catch (e) {
-                updateMsg("通信エラーが発生しました", "error");
-            }
-        }
-
-        async function resendCode() {
-            if (!pendingUserId) return;
-            try {
-                updateMsg("再送中...", "");
-                const result = await postGas({
-                    mode: "resendVerificationCode",
-                    userId: pendingUserId
-                }, 25000);
-                if (result.status === "success") {
-                    updateMsg("認証コードを再送しました。メールをご確認ください。", "success");
-                } else {
-                    updateMsg(result.message, "error");
-                }
-            } catch (e) {
-                updateMsg("通信エラーが発生しました", "error");
-            }
-        }
-
-        function showForgotPasswordForm() {
-            document.getElementById("login-section").style.display = "none";
-            document.getElementById("forgot-password-section").style.display = "block";
-
-            const userId = document.getElementById("login-userid").value.trim();
-            if (userId) {
-                document.getElementById("forgot-userid").value = userId;
-            }
-            updateMsg("", "");
-        }
-
-        function hideForgotPasswordForm() {
-            document.getElementById("forgot-password-section").style.display = "none";
-            document.getElementById("login-section").style.display = "block";
-            updateMsg("", "");
-        }
-
-        async function submitForgotPassword() {
-            const targetUserId = document.getElementById("forgot-userid").value.trim();
-            if (!targetUserId) {
-                updateMsg("ユーザIDを入力してください", "error");
-                return;
-            }
-
-            updateMsg("送信中...", "");
-            try {
-                const result = await postGas({
-                    mode: "forgotPassword",
-                    userId: targetUserId
-                }, 25000);
-                if (result.status === "success") {
-                    updateMsg("登録済みのメールアドレス宛に、再設定用のリンクを送信しました。メールをご確認ください。", "success");
-                } else {
-                    updateMsg(result.message, "error");
-                }
-            } catch (e) {
-                updateMsg("通信エラーが発生しました。", "error");
-            }
-        }
-
-        function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('password');
-            const toggleButton = document.getElementById('toggle-password');
-            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
-            toggleButton.textContent = passwordInput.type === 'password' ? '表示' : '非表示';
-        }
-
-        function toggleconfirmVisibility() {
-            const confirmpasswordInput = document.getElementById('confirm-password');
-            const toggleconfirmButton = document.getElementById('toggle-confirm');
-            confirmpasswordInput.type = confirmpasswordInput.type === 'password' ? 'text' : 'password';
-            toggleconfirmButton.textContent = confirmpasswordInput.type === 'password' ? '表示' : '非表示';
-        }
-
-        function updateMsg(txt, type) {
-            const el = document.getElementById("message");
-            el.innerText = txt;
-            el.className = "message " + type;
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                if (document.getElementById("login-section").style.display !== "none") {
-                    handleLogin();
-                }
-            }
-        }
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('ServiceWorker 登録成功:', reg.scope))
-                    .catch(err => console.log('ServiceWorker 登録失敗:', err));
-            });
-        }
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";	// GAS APIの接続先を設定
+
+        let videoStream = null;	// 状態を保持
+        let faceMesh = null;	// 状態を保持
+        let lastLandmarks = null;	// 状態を保持
+        let faceFrameRequest = null;	// 状態を保持
+        let faceFrameCallback = null;	// 状態を保持
+        let faceProcessing = false;	// 状態を保持
+        let lastFaceCheck = 0;	// 状態を保持
+        let cameraStartPromise = null;	// 状態を保持
+        let cameraSession = 0;	// 状態を保持
+        let lastFaceSeen = 0;	// 状態を保持
+        const faceCheckInterval = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 100 : 66;	// 定数を定義
+        let faceSamples = [];	// 状態を保持
+        let collectingFaceSamples = false;	// 状態を保持
+        let lastFaceSampleAt = 0;	// 状態を保持
+        let faceLoginTimer = null;	// 状態を保持
+        let savedFeaturesText = "";	// 状態を保持
+        let isCapturing = false;	// 状態を保持
+        let pendingUserId = "";	// 状態を保持
+
+        function compactFaceLandmarks(landmarks) {	// 関数を定義
+            if (!Array.isArray(landmarks)) return [];	// 条件に応じて処理を分ける
+            return landmarks.map(point => ({	// 結果を返す
+                x: Number(Number(point.x || 0).toFixed(5)),	// 処理を続ける
+                y: Number(Number(point.y || 0).toFixed(5)),	// 処理を続ける
+                z: Number(Number(point.z || 0).toFixed(5))	// 処理を続ける
+            }));	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        async function postGas(payload, timeoutMs = 15000) {	// 関数を定義
+            const controller = new AbortController();	// 定数を定義
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);	// 定数を定義
+            try {	// 失敗に備えて処理を始める
+                const res = await fetch(GAS_URL, {	// 定数を定義
+                    method: "POST",	// 処理を続ける
+                    body: JSON.stringify(payload),	// 処理を続ける
+                    signal: controller.signal	// 処理を続ける
+                });	// 処理を完了する
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);	// 条件に応じて処理を分ける
+                return await res.json();	// 結果を返す
+            } finally {	// 処理のまとまりを始める
+                clearTimeout(timeoutId);	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        function hasWeakNumberSequence(password) {	// 関数を定義
+            const numberRuns = String(password).match(/\d{4,}/g) || [];	// 定数を定義
+            return numberRuns.some(run => {	// 結果を返す
+                for (let i = 0; i <= run.length - 4; i++) {	// 対象を順番に処理する
+                    const digits = run.slice(i, i + 4).split("").map(Number);	// 定数を定義
+                    const same = digits.every(digit => digit === digits[0]);	// 定数を定義
+                    const ascending = digits.slice(1).every((digit, index) => digit === (digits[index] + 1) % 10);	// 定数を定義
+                    const descending = digits.slice(1).every((digit, index) => digit === (digits[index] + 9) % 10);	// 定数を定義
+                    if (same || ascending || descending) return true;	// 条件に応じて処理を分ける
+                }	// 処理のまとまりを閉じる
+                return false;	// 結果を返す
+            });	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        function validatePassword(password) {	// 関数を定義
+            if (password.length < 4) return "パスワードは4文字以上で入力してください";	// 条件に応じて処理を分ける
+            if (password.length > 128) return "パスワードは128文字以内で入力してください";	// 条件に応じて処理を分ける
+            if (!/^[\x21-\x7E]+$/.test(password)) return "パスワードは半角英数字・記号のみ使用できます";	// 条件に応じて処理を分ける
+            if (!/[A-Z]/.test(password)) return "パスワードに英大文字を1文字以上含めてください";	// 条件に応じて処理を分ける
+            if (!/[a-z]/.test(password)) return "パスワードに英小文字を1文字以上含めてください";	// 条件に応じて処理を分ける
+            if (!/[0-9]/.test(password)) return "パスワードに数字を1文字以上含めてください";	// 条件に応じて処理を分ける
+            if (!/[^A-Za-z0-9]/.test(password)) return "パスワードに記号を1文字以上含めてください";	// 条件に応じて処理を分ける
+            if (hasWeakNumberSequence(password)) return "同じ数字4桁の繰り返しや、1234・4321のような4桁の連番は使用できません";	// 条件に応じて処理を分ける
+            return "";	// 結果を返す
+        }	// 処理のまとまりを閉じる
+
+        function drawFeatures(landmarks) {	// 関数を定義
+            const canvas = document.getElementById('face-overlay');	// 定数を定義
+            const video = document.getElementById('video');	// 定数を定義
+            const ctx = canvas.getContext('2d');	// 定数を定義
+
+            const rect = video.getBoundingClientRect();	// 定数を定義
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);	// 定数を定義
+            const width = Math.max(1, Math.round(rect.width));	// 定数を定義
+            const height = Math.max(1, Math.round(rect.height));	// 定数を定義
+            const pixelWidth = Math.round(width * dpr);	// 定数を定義
+            const pixelHeight = Math.round(height * dpr);	// 定数を定義
+
+            if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {	// 条件に応じて処理を分ける
+                canvas.width = pixelWidth;	// 処理を続ける
+                canvas.height = pixelHeight;	// 処理を続ける
+                canvas.style.width = `${width}px`;	// 処理を続ける
+                canvas.style.height = `${height}px`;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+
+            ctx.setTransform(1, 0, 0, 1, 0, 0);	// 処理を完了する
+            ctx.clearRect(0, 0, canvas.width, canvas.height);	// 処理を完了する
+            if (!landmarks) return;	// 条件に応じて処理を分ける
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);	// 処理を完了する
+
+            const vWidth = video.videoWidth || 320;	// 定数を定義
+            const vHeight = video.videoHeight || 240;	// 定数を定義
+
+            const scale = Math.max(width / vWidth, height / vHeight);	// 定数を定義
+            const renderWidth = vWidth * scale;	// 定数を定義
+            const renderHeight = vHeight * scale;	// 定数を定義
+            const offsetX = (width - renderWidth) / 2;	// 定数を定義
+            const offsetY = (height - renderHeight) / 2;	// 定数を定義
+
+            ctx.fillStyle = "#00FF00";	// 処理を続ける
+            for (let i = 0; i < landmarks.length; i++) {	// 対象を順番に処理する
+                const pt = landmarks[i];	// 定数を定義
+                const x = pt.x * renderWidth + offsetX;	// 定数を定義
+                const y = pt.y * renderHeight + offsetY;	// 定数を定義
+                ctx.beginPath();	// 処理を完了する
+                ctx.arc(x, y, 1.5, 0, 2 * Math.PI);	// 処理を完了する
+                ctx.fill();	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function checkFace() {	// 関数を定義
+            const video = document.getElementById('video');	// 定数を定義
+            if (!faceMesh || !videoStream || faceProcessing || video.readyState < 2) return;	// 条件に応じて処理を分ける
+
+            const now = performance.now();	// 定数を定義
+            if (now - lastFaceCheck < faceCheckInterval) return;	// 条件に応じて処理を分ける
+
+            faceProcessing = true;	// 処理を続ける
+            lastFaceCheck = now;	// 処理を続ける
+            try {	// 失敗に備えて処理を始める
+                await faceMesh.send({ image: video });	// 処理を完了する
+            } catch (err) {	// 処理のまとまりを始める
+                if (videoStream) {	// 条件に応じて処理を分ける
+                    lastLandmarks = null;	// 処理を続ける
+                    drawFeatures(null);	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+            } finally {	// 処理のまとまりを始める
+                faceProcessing = false;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        function scheduleFaceFrame(session) {	// 関数を定義
+            const video = document.getElementById('video');	// 定数を定義
+            if (!videoStream || session !== cameraSession) return;	// 条件に応じて処理を分ける
+
+            if (typeof video.requestVideoFrameCallback === "function") {	// 条件に応じて処理を分ける
+                faceFrameCallback = video.requestVideoFrameCallback(async () => {	// 処理のまとまりを始める
+                    if (session !== cameraSession) return;	// 条件に応じて処理を分ける
+                    await checkFace();	// 処理を完了する
+                    scheduleFaceFrame(session);	// 処理を完了する
+                });	// 処理を完了する
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+
+            faceFrameRequest = requestAnimationFrame(async (time) => {	// 処理のまとまりを始める
+                if (session !== cameraSession) return;	// 条件に応じて処理を分ける
+                if (time - lastFaceCheck >= faceCheckInterval) await checkFace();	// 条件に応じて処理を分ける
+                scheduleFaceFrame(session);	// 処理を完了する
+            });	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        function stopFaceLoop() {	// 関数を定義
+            const video = document.getElementById('video');	// 定数を定義
+            if (faceFrameRequest !== null) {	// 条件に応じて処理を分ける
+                cancelAnimationFrame(faceFrameRequest);	// 処理を完了する
+                faceFrameRequest = null;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+            if (faceFrameCallback !== null && typeof video.cancelVideoFrameCallback === "function") {	// 条件に応じて処理を分ける
+                video.cancelVideoFrameCallback(faceFrameCallback);	// 処理を完了する
+                faceFrameCallback = null;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        function initFaceMesh() {	// 関数を定義
+            if (faceMesh) return;	// 条件に応じて処理を分ける
+            faceMesh = new FaceMesh({	// 処理のまとまりを始める
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`	// 処理を続ける
+            });	// 処理を完了する
+            faceMesh.setOptions({	// 処理のまとまりを始める
+                maxNumFaces: 1,	// 処理を続ける
+                refineLandmarks: true,	// 処理を続ける
+                minDetectionConfidence: 0.5,	// 処理を続ける
+                minTrackingConfidence: 0.5	// 処理を続ける
+            });	// 処理を完了する
+            faceMesh.onResults((results) => {	// 処理のまとまりを始める
+                if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {	// 条件に応じて処理を分ける
+                    lastLandmarks = results.multiFaceLandmarks[0];	// 処理を続ける
+                    const now = performance.now();	// 定数を定義
+                    lastFaceSeen = now;	// 処理を続ける
+                    if (collectingFaceSamples && now - lastFaceSampleAt >= 350) {	// 条件に応じて処理を分ける
+                        faceSamples.push(compactFaceLandmarks(lastLandmarks));	// 処理を完了する
+                        if (faceSamples.length > 5) faceSamples.shift();	// 条件に応じて処理を分ける
+                        lastFaceSampleAt = now;	// 処理を続ける
+                    }	// 処理のまとまりを閉じる
+                    drawFeatures(lastLandmarks);	// 処理を完了する
+                } else {	// 処理のまとまりを始める
+                    if (performance.now() - lastFaceSeen > 500) lastLandmarks = null;	// 条件に応じて処理を分ける
+                    drawFeatures(null);	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+            });	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        async function startCamera() {	// 関数を定義
+            if (videoStream) return true;	// 条件に応じて処理を分ける
+            if (cameraStartPromise) return cameraStartPromise;	// 条件に応じて処理を分ける
+
+            cameraStartPromise = startCameraInternal();	// 処理を完了する
+            try {	// 失敗に備えて処理を始める
+                return await cameraStartPromise;	// 結果を返す
+            } finally {	// 処理のまとまりを始める
+                cameraStartPromise = null;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function startCameraInternal() {	// 関数を定義
+            initFaceMesh();	// 処理を完了する
+            const container = document.getElementById('camera-container');	// 定数を定義
+            const video = document.getElementById('video');	// 定数を定義
+            const authStatus = document.getElementById('auth-status');	// 定数を定義
+            container.style.display = "block";	// 処理を続ける
+
+            try {	// 失敗に備えて処理を始める
+                const constraints = {	// 定数を定義
+                    audio: false,	// 処理を続ける
+                    video: {	// 処理のまとまりを始める
+                        facingMode: { ideal: "user" },	// 処理を続ける
+                        width: { ideal: 1280, max: 1920 },	// 処理を続ける
+                        height: { ideal: 720, max: 1080 },	// 処理を続ける
+                        frameRate: { ideal: 30, max: 30 }	// 処理を完了する
+                    }	// 処理のまとまりを閉じる
+                };	// 処理のまとまりを閉じる
+
+                try {	// 失敗に備えて処理を始める
+                    videoStream = await navigator.mediaDevices.getUserMedia(constraints);	// 処理を完了する
+                } catch (err) {	// 処理のまとまりを始める
+                    if (err.name === "NotAllowedError" || err.name === "SecurityError" || err.name === "AbortError") {	// 条件に応じて処理を分ける
+                        throw err;	// エラーを通知する
+                    }	// 処理のまとまりを閉じる
+                    videoStream = await navigator.mediaDevices.getUserMedia({	// 処理のまとまりを始める
+                        audio: false,	// 処理を続ける
+                        video: { facingMode: "user" }	// 処理を完了する
+                    });	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+
+                video.srcObject = videoStream;	// 処理を続ける
+                video.muted = true;	// 処理を続ける
+                video.setAttribute("playsinline", "");	// 処理を完了する
+                await new Promise(resolve => {	// 処理のまとまりを始める
+                    if (video.readyState >= 1) {	// 条件に応じて処理を分ける
+                        resolve();	// 処理を完了する
+                    } else {	// 処理のまとまりを始める
+                        video.addEventListener("loadedmetadata", resolve, { once: true });	// 操作イベントを登録
+                    }	// 処理のまとまりを閉じる
+                });	// 処理を完了する
+                await video.play();	// 処理を完了する
+
+                cameraSession++;	// 処理を続ける
+                lastFaceCheck = 0;	// 処理を続ける
+                scheduleFaceFrame(cameraSession);	// 処理を完了する
+                authStatus.innerText = "";	// 処理を続ける
+                return true;	// 結果を返す
+            } catch (err) {	// 処理のまとまりを始める
+                if (videoStream) {	// 条件に応じて処理を分ける
+                    videoStream.getTracks().forEach(track => track.stop());	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+                videoStream = null;	// 処理を続ける
+                video.srcObject = null;	// 処理を続ける
+                container.style.display = "none";	// 処理を続ける
+                authStatus.innerText = "カメラの起動に失敗しました。ブラウザのカメラ許可も確認してください。";	// 処理を続ける
+                authStatus.style.color = "#ef4444";	// 処理を続ける
+                return false;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        function stopCamera() {	// 関数を定義
+            cameraSession++;	// 処理を続ける
+            stopFaceLoop();	// 処理を完了する
+            collectingFaceSamples = false;	// 処理を続ける
+            if (faceLoginTimer !== null) {	// 条件に応じて処理を分ける
+                clearTimeout(faceLoginTimer);	// 処理を完了する
+                faceLoginTimer = null;	// 処理を続ける
+                document.getElementById('face-login-btn').disabled = false;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+            if (videoStream) videoStream.getTracks().forEach(track => track.stop());	// 条件に応じて処理を分ける
+            videoStream = null;	// 処理を続ける
+            document.getElementById('video').pause();	// 処理を完了する
+            document.getElementById('video').srcObject = null;	// 処理を続ける
+            lastLandmarks = null;	// 処理を続ける
+            lastFaceSeen = 0;	// 処理を続ける
+            document.getElementById('camera-container').style.display = "none";	// 画面表示を更新する
+            drawFeatures(null);	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        function toggleMode(mode) {	// 関数を定義
+            const title = document.getElementById("form-title");	// 定数を定義
+            const nameWrapper = document.getElementById("name-wrapper");	// 定数を定義
+            const regEmailWrapper = document.getElementById("reg-email-wrapper");	// 定数を定義
+            const confirmWrapper = document.querySelector(".confirm-password-wrapper");	// 定数を定義
+            const loginSec = document.getElementById("login-section");	// 定数を定義
+            const registerSec = document.getElementById("register-section");	// 定数を定義
+            const verifySec = document.getElementById("verify-section");	// 定数を定義
+            const forgotSec = document.getElementById("forgot-password-section");	// 定数を定義
+            const msg = document.getElementById("message");	// 定数を定義
+            const faceLoginBtn = document.getElementById("face-login-btn");	// 定数を定義
+            const faceRegBtn = document.getElementById("face-register-btn");	// 定数を定義
+            const authStatus = document.getElementById("auth-status");	// 定数を定義
+            const loginUserId = document.getElementById("login-userid");	// 定数を定義
+            const passwordRuleNote = document.getElementById("password-rule-note");	// 定数を定義
+
+            msg.innerText = "";	// 処理を続ける
+            authStatus.innerText = "";	// 処理を続ける
+            verifySec.style.display = "none";	// 処理を続ける
+            forgotSec.style.display = "none";	// 処理を続ける
+
+            if (mode === 'register') {	// 条件に応じて処理を分ける
+                title.innerText = "新規登録";	// 処理を続ける
+                nameWrapper.style.display = "flex";	// 処理を続ける
+                regEmailWrapper.style.display = "flex";	// 処理を続ける
+                confirmWrapper.style.display = "flex";	// 処理を続ける
+                passwordRuleNote.style.display = "block";	// 処理を続ける
+
+                loginSec.style.display = "none";	// 処理を続ける
+                registerSec.style.display = "block";	// 処理を続ける
+                loginUserId.style.display = "block";	// 処理を続ける
+
+                faceLoginBtn.style.display = "none";	// 処理を続ける
+                faceRegBtn.style.display = "inline-block";	// 処理を続ける
+
+                authStatus.innerText = "「顔情報を撮影・登録」ボタンを押すとカメラが起動します。";	// 処理を続ける
+                authStatus.style.color = "#64748b";	// 処理を続ける
+            } else {	// 処理のまとまりを始める
+                title.innerText = "ログイン";	// 処理を続ける
+                nameWrapper.style.display = "none";	// 処理を続ける
+                regEmailWrapper.style.display = "none";	// 処理を続ける
+                confirmWrapper.style.display = "none";	// 処理を続ける
+                passwordRuleNote.style.display = "none";	// 処理を続ける
+
+                loginSec.style.display = "block";	// 処理を続ける
+                registerSec.style.display = "none";	// 処理を続ける
+                loginUserId.style.display = "block";	// 処理を続ける
+
+                document.getElementById("confirm-password").value = "";	// 処理を続ける
+                document.getElementById("display-name").value = "";	// 処理を続ける
+                document.getElementById("reg-email").value = "";	// 処理を続ける
+
+                faceLoginBtn.style.display = "inline-block";	// 処理を続ける
+                faceRegBtn.style.display = "none";	// 処理を続ける
+                stopCamera();	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        document.getElementById('face-register-btn').addEventListener('click', async () => {	// 操作イベントを登録
+            const authStatus = document.getElementById('auth-status');	// 定数を定義
+            if (isCapturing) return;	// 条件に応じて処理を分ける
+
+            if (!videoStream) {	// 条件に応じて処理を分ける
+                const started = await startCamera();	// 定数を定義
+                if (!started) return;	// 条件に応じて処理を分ける
+                authStatus.innerText = "カメラが起動しました。正面を向いてもう一度ボタンを押すと撮影されます。";	// 処理を続ける
+                authStatus.style.color = "#1a73e8";	// 処理を続ける
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+
+            isCapturing = true;	// 処理を続ける
+            let seconds = 3;	// 状態を保持
+            authStatus.innerText = `${seconds}秒後に自動で顔スキャンを実行します。正面を向いてください。`;	// 処理を続ける
+            authStatus.style.color = "#e67e22";	// 処理を続ける
+
+            const timer = setInterval(() => {	// 定数を定義
+                seconds--;	// 処理を続ける
+                if (seconds > 0) {	// 条件に応じて処理を分ける
+                    authStatus.innerText = `${seconds}秒後に自動で顔スキャンを実行します。正面を向いてください。`;	// 処理を続ける
+                } else {	// 処理のまとまりを始める
+                    clearInterval(timer);	// 処理を完了する
+                    captureFace();	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+            }, 1000);	// 処理を完了する
+        });	// 処理を完了する
+
+        function captureFace() {	// 関数を定義
+            const authStatus = document.getElementById('auth-status');	// 定数を定義
+            if (!lastLandmarks) {	// 条件に応じて処理を分ける
+                authStatus.innerText = "顔を検出できずスキャンに失敗しました。もう一度ボタンを押してやり直してください。";	// 処理を続ける
+                authStatus.style.color = "#ef4444";	// 処理を続ける
+                isCapturing = false;	// 処理を続ける
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+            savedFeaturesText = JSON.stringify(compactFaceLandmarks(lastLandmarks));	// 処理を完了する
+            stopCamera();	// 処理を完了する
+            authStatus.innerText = "顔情報の撮影が完了しました。「認証コードを送信する」を押してください。";	// 処理を続ける
+            authStatus.style.color = "#10b981";	// 処理を続ける
+            isCapturing = false;	// 処理を続ける
+        }	// 処理のまとまりを閉じる
+
+        document.getElementById('face-login-btn').addEventListener('click', async () => {	// 操作イベントを登録
+            if (faceLoginTimer !== null) return;	// 条件に応じて処理を分ける
+            const userId = document.getElementById('login-userid').value.trim();	// 定数を定義
+            const authStatus = document.getElementById('auth-status');	// 定数を定義
+            if (!userId) {	// 条件に応じて処理を分ける
+                authStatus.innerText = "顔認証前にユーザーIDを入力してください。";	// 処理を続ける
+                authStatus.style.color = "#ef4444";	// 処理を続ける
+                document.getElementById('login-userid').focus();	// 処理を完了する
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+
+            const started = await startCamera();	// 定数を定義
+            if (!started) return;	// 条件に応じて処理を分ける
+            faceSamples = [];	// 処理を続ける
+            lastFaceSampleAt = 0;	// 処理を続ける
+            collectingFaceSamples = true;	// 処理を続ける
+            document.getElementById('face-login-btn').disabled = true;	// 処理を続ける
+            authStatus.innerText = "3秒後に顔を確認します。正面を向いてください。";	// 処理を続ける
+            authStatus.style.color = "#1a73e8";	// 処理を続ける
+
+            faceLoginTimer = setTimeout(async () => {	// 時間を置いて処理する
+                collectingFaceSamples = false;	// 処理を続ける
+                if (!lastLandmarks || faceSamples.length < 2) {	// 条件に応じて処理を分ける
+                    document.getElementById('auth-status').innerText = "顔を検出できずスキャンに失敗しました。";	// 処理を続ける
+                    document.getElementById('auth-status').style.color = "#ef4444";	// 画面表示を更新する
+                    stopCamera();	// 処理を完了する
+                    return;	// 結果を返す
+                }	// 処理のまとまりを閉じる
+
+                const currentLandmarks = compactFaceLandmarks(lastLandmarks);	// 定数を定義
+                const currentFeaturesSamples = faceSamples.slice();	// 定数を定義
+                stopCamera();	// 処理を完了する
+
+                document.getElementById('auth-status').innerText = "AIデータ解析中...";	// 処理を続ける
+                document.getElementById('auth-status').style.color = "#e67e22";	// 画面表示を更新する
+
+                try {	// 失敗に備えて処理を始める
+                    const result = await postGas({	// 定数を定義
+                        mode: "verify_face_for_user",	// 処理を続ける
+                        userId: userId,	// 処理を続ける
+                        currentFeatures: currentLandmarks,	// 処理を続ける
+                        currentFeaturesSamples: currentFeaturesSamples	// 処理を続ける
+                    });	// 処理を完了する
+
+                    if (result.status === "success" && result.message.email) {	// 条件に応じて処理を分ける
+                        localStorage.setItem("userEmail", result.message.email);	// 端末内の保存情報を扱う
+                        localStorage.setItem("userId", result.message.userId || result.message.email);	// 端末内の保存情報を扱う
+                        localStorage.setItem("userName", result.message.name || "");	// 端末内の保存情報を扱う
+                        localStorage.setItem("profileImage", result.message.profileImage || "");	// 端末内の保存情報を扱う
+                        if (result.message.adminToken) localStorage.setItem("adminToken", result.message.adminToken);	// 端末内の保存情報を扱う
+                        else localStorage.removeItem("adminToken");	// 端末内の保存情報を扱う
+
+                        document.getElementById('auth-status').innerText =	// 処理を続ける
+                            `認証成功！こんにちは、${result.message.name}さん。`;	// 処理を続ける
+                        document.getElementById('auth-status').style.color = "#10b981";	// 画面表示を更新する
+
+                        document.querySelector('.login-card').classList.add('fade-out-exit');	// 画面表示を更新する
+                        document.getElementById('transition-overlay').classList.add('active');	// 画面表示を更新する
+                        setTimeout(() => {	// 時間を置いて処理する
+                            window.location.href = "main.html";	// 画面表示を更新する
+                        }, 500);	// 処理を完了する
+                    } else {	// 処理のまとまりを始める
+                        document.getElementById('auth-status').innerText = "顔認証失敗: " + result.message;	// 処理を続ける
+                        document.getElementById('auth-status').style.color = "#ef4444";	// 画面表示を更新する
+                    }	// 処理のまとまりを閉じる
+                } catch (err) {	// 処理のまとまりを始める
+                    document.getElementById('auth-status').innerText = "通信エラーが発生しました。";	// 処理を続ける
+                    document.getElementById('auth-status').style.color = "#ef4444";	// 画面表示を更新する
+                }	// 処理のまとまりを閉じる
+            }, 3000);	// 処理を完了する
+        });	// 処理を完了する
+
+        async function handleLogin() {	// 関数を定義
+            const userId = document.getElementById("login-userid").value.trim();	// 定数を定義
+            const password = document.getElementById("password").value.trim();	// 定数を定義
+            if (!userId || !password) return updateMsg("入力してください", "error");	// 条件に応じて処理を分ける
+
+            try {	// 失敗に備えて処理を始める
+                updateMsg("ログイン処理中...", "");	// 処理を完了する
+                const result = await postGas({	// 定数を定義
+                    mode: "login",	// 処理を続ける
+                    email: userId,	// 処理を続ける
+                    password	// 処理を続ける
+                });	// 処理を完了する
+
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    localStorage.setItem("userEmail", result.message.email);	// 端末内の保存情報を扱う
+                    localStorage.setItem("userId", result.message.userId || result.message.email);	// 端末内の保存情報を扱う
+                    localStorage.setItem("userName", result.message.name || "");	// 端末内の保存情報を扱う
+                    localStorage.setItem("profileImage", result.message.profileImage || "");	// 端末内の保存情報を扱う
+                    if (result.message.adminToken) localStorage.setItem("adminToken", result.message.adminToken);	// 端末内の保存情報を扱う
+                    else localStorage.removeItem("adminToken");	// 端末内の保存情報を扱う
+
+                    updateMsg("ログイン成功", "success");	// 処理を完了する
+
+                    document.querySelector('.login-card').classList.add('fade-out-exit');	// 画面表示を更新する
+                    document.getElementById('transition-overlay').classList.add('active');	// 画面表示を更新する
+                    setTimeout(() => {	// 時間を置いて処理する
+                        window.location.href = "main.html";	// 画面表示を更新する
+                    }, 500);	// 処理を完了する
+                } else {	// 処理のまとまりを始める
+                    updateMsg(result.message, "error");	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                updateMsg("通信エラーが発生しました。", "error");	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function handleRegister() {	// 関数を定義
+            const userId = document.getElementById("login-userid").value.trim();	// 定数を定義
+            const name = document.getElementById("display-name").value.trim();	// 定数を定義
+            const email = document.getElementById("reg-email").value.trim();	// 定数を定義
+            const password = document.getElementById("password").value;	// 定数を定義
+            const confirm = document.getElementById("confirm-password").value;	// 定数を定義
+
+            if (!userId || !name || !email || !password || !confirm) return updateMsg("全項目を入力してください", "error");	// 条件に応じて処理を分ける
+            const passwordError = validatePassword(password);	// 定数を定義
+            if (passwordError) return updateMsg(passwordError, "error");	// 条件に応じて処理を分ける
+            if (password !== confirm) return updateMsg("パスワードが一致しません", "error");	// 条件に応じて処理を分ける
+            if (!email.includes("@")) return updateMsg("メールアドレスの形式が正しくありません", "error");	// 条件に応じて処理を分ける
+
+            try {	// 失敗に備えて処理を始める
+                updateMsg("送信中...", "");	// 処理を完了する
+                const result = await postGas({	// 定数を定義
+                    mode: "register",	// 処理を続ける
+                    userId: userId,	// 処理を続ける
+                    name: name,	// 処理を続ける
+                    email: email,	// 処理を続ける
+                    password: password,	// 処理を続ける
+                    faceFeatures: savedFeaturesText	// 処理を続ける
+                }, 25000);	// 処理を完了する
+
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    pendingUserId = userId;	// 処理を続ける
+                    document.getElementById("register-section").style.display = "none";	// 画面表示を更新する
+                    document.getElementById("verify-section").style.display = "block";	// 画面表示を更新する
+                    document.getElementById("form-title").innerText = "メール認証";	// 処理を続ける
+                    updateMsg("", "");	// 処理を完了する
+                } else {	// 処理のまとまりを始める
+                    updateMsg(result.message, "error");	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                updateMsg("通信エラーが発生しました", "error");	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function handleVerifyCode() {	// 関数を定義
+            const code = document.getElementById("verify-code").value.trim();	// 定数を定義
+            if (!code) return updateMsg("認証コードを入力してください", "error");	// 条件に応じて処理を分ける
+
+            try {	// 失敗に備えて処理を始める
+                updateMsg("確認中...", "");	// 処理を完了する
+                const result = await postGas({	// 定数を定義
+                    mode: "verifyEmail",	// 処理を続ける
+                    userId: pendingUserId,	// 処理を続ける
+                    code: code	// 処理を続ける
+                });	// 処理を完了する
+
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    updateMsg("登録が完了しました！ログインしてください", "success");	// 処理を完了する
+                    savedFeaturesText = "";	// 処理を続ける
+                    document.getElementById("verify-code").value = "";	// 処理を続ける
+                    setTimeout(() => toggleMode('login'), 1500);	// 時間を置いて処理する
+                } else {	// 処理のまとまりを始める
+                    updateMsg(result.message, "error");	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                updateMsg("通信エラーが発生しました", "error");	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function resendCode() {	// 関数を定義
+            if (!pendingUserId) return;	// 条件に応じて処理を分ける
+            try {	// 失敗に備えて処理を始める
+                updateMsg("再送中...", "");	// 処理を完了する
+                const result = await postGas({	// 定数を定義
+                    mode: "resendVerificationCode",	// 処理を続ける
+                    userId: pendingUserId	// 処理を続ける
+                }, 25000);	// 処理を完了する
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    updateMsg("認証コードを再送しました。メールをご確認ください。", "success");	// 処理を完了する
+                } else {	// 処理のまとまりを始める
+                    updateMsg(result.message, "error");	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                updateMsg("通信エラーが発生しました", "error");	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        function showForgotPasswordForm() {	// 関数を定義
+            document.getElementById("login-section").style.display = "none";	// 画面表示を更新する
+            document.getElementById("forgot-password-section").style.display = "block";	// 画面表示を更新する
+
+            const userId = document.getElementById("login-userid").value.trim();	// 定数を定義
+            if (userId) {	// 条件に応じて処理を分ける
+                document.getElementById("forgot-userid").value = userId;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+            updateMsg("", "");	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        function hideForgotPasswordForm() {	// 関数を定義
+            document.getElementById("forgot-password-section").style.display = "none";	// 画面表示を更新する
+            document.getElementById("login-section").style.display = "block";	// 画面表示を更新する
+            updateMsg("", "");	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        async function submitForgotPassword() {	// 関数を定義
+            const targetUserId = document.getElementById("forgot-userid").value.trim();	// 定数を定義
+            if (!targetUserId) {	// 条件に応じて処理を分ける
+                updateMsg("ユーザIDを入力してください", "error");	// 処理を完了する
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+
+            updateMsg("送信中...", "");	// 処理を完了する
+            try {	// 失敗に備えて処理を始める
+                const result = await postGas({	// 定数を定義
+                    mode: "forgotPassword",	// 処理を続ける
+                    userId: targetUserId	// 処理を続ける
+                }, 25000);	// 処理を完了する
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    updateMsg("登録済みのメールアドレス宛に、再設定用のリンクを送信しました。メールをご確認ください。", "success");	// 処理を完了する
+                } else {	// 処理のまとまりを始める
+                    updateMsg(result.message, "error");	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                updateMsg("通信エラーが発生しました。", "error");	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        function togglePasswordVisibility() {	// 関数を定義
+            const passwordInput = document.getElementById('password');	// 定数を定義
+            const toggleButton = document.getElementById('toggle-password');	// 定数を定義
+            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';	// 処理を続ける
+            toggleButton.textContent = passwordInput.type === 'password' ? '表示' : '非表示';	// 処理を続ける
+        }	// 処理のまとまりを閉じる
+
+        function toggleconfirmVisibility() {	// 関数を定義
+            const confirmpasswordInput = document.getElementById('confirm-password');	// 定数を定義
+            const toggleconfirmButton = document.getElementById('toggle-confirm');	// 定数を定義
+            confirmpasswordInput.type = confirmpasswordInput.type === 'password' ? 'text' : 'password';	// 処理を続ける
+            toggleconfirmButton.textContent = confirmpasswordInput.type === 'password' ? '表示' : '非表示';	// 処理を続ける
+        }	// 処理のまとまりを閉じる
+
+        function updateMsg(txt, type) {	// 関数を定義
+            const el = document.getElementById("message");	// 定数を定義
+            el.innerText = txt;	// 処理を続ける
+            el.className = "message " + type;	// 処理を続ける
+        }	// 処理のまとまりを閉じる
+
+        function handleKeyPress(event) {	// 関数を定義
+            if (event.key === 'Enter') {	// 条件に応じて処理を分ける
+                event.preventDefault();	// 処理を完了する
+                if (document.getElementById("login-section").style.display !== "none") {	// 画面表示を更新する
+                    handleLogin();	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
+
+        if ('serviceWorker' in navigator) {	// 条件に応じて処理を分ける
+            window.addEventListener('load', () => {	// 操作イベントを登録
+                navigator.serviceWorker.register('sw.js')	// 処理を続ける
+                    .then(reg => console.log('ServiceWorker 登録成功:', reg.scope))	// 処理を続ける
+                    .catch(err => console.log('ServiceWorker 登録失敗:', err));	// 処理を完了する
+            });	// 処理を完了する
+        }	// 処理のまとまりを閉じる
     </script>
-</body>
+</body>	<!-- 要素を閉じる -->
 
-</html>
+</html>	<!-- 要素を閉じる -->

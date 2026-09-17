@@ -1,1735 +1,1735 @@
-<!DOCTYPE html>
-<html lang="ja">
+<!DOCTYPE html>	<!-- HTML文書として宣言 -->
+<html lang="ja">	<!-- 画面要素を配置 -->
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ホーム - 平工マッチング</title>
-    <link rel="icon" href="icon-192.png">
+<head>	<!-- 画面要素を配置 -->
+    <meta charset="UTF-8">	<!-- 表示環境を設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">	<!-- 表示環境を設定 -->
+    <title>ホーム - 平工マッチング</title>	<!-- ページタイトルを設定 -->
+    <link rel="icon" href="icon-192.png">	<!-- 外部ファイルを読み込む -->
 
     <style>
-        body {
-            margin: 0;
-            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            color: #1e293b;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        .navbar {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 14px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            cursor: pointer;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-item {
-            cursor: pointer;
-            color: #64748b;
-            font-weight: 700;
-            font-size: 14px;
-            padding: 8px 16px;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .nav-item:hover {
-            background-color: rgba(28, 189, 197, 0.06);
-            color: #1cbdc5;
-        }
-
-        .nav-item.active {
-            color: #1cbdc5;
-            background-color: rgba(28, 189, 197, 0.1);
-        }
-
-        .unread-badge {
-            position: absolute;
-            top: 2px;
-            right: 4px;
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: #ffffff;
-            font-size: 10px;
-            font-weight: 800;
-            padding: 2px 6px;
-            border-radius: 10px;
-            line-height: 1;
-            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
-            min-width: 14px;
-            text-align: center;
-            box-sizing: border-box;
-        }
-
-        .btn-logout {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: none;
-            background-color: #ef4444;
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
-            transition: all 0.2s;
-        }
-
-        .btn-logout:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
-        }
-
-        .hamburger-btn {
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 24px;
-            height: 18px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            z-index: 110;
-        }
-
-        .hamburger-btn span {
-            width: 100%;
-            height: 2.5px;
-            background-color: #1e293b;
-            border-radius: 3px;
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        .container {
-            display: flex;
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 24px;
-            flex: 1;
-            width: 100%;
-            box-sizing: border-box;
-            gap: 40px;
-        }
-
-        .sidebar {
-            width: 260px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .main-area {
-            flex: 1;
-        }
-
-        #recruit-form-area .sidebar-form {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 32px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 20px 40px -4px rgba(24, 76, 92, 0.05);
-            box-sizing: border-box;
-        }
-
-        #form-title {
-            font-size: 1.15rem;
-            color: #1e293b;
-            margin-top: 0;
-            margin-bottom: 24px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        #form-title::before {
-            content: '';
-            display: inline-block;
-            width: 4px;
-            height: 18px;
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            border-radius: 4px;
-        }
-
-        select, textarea, input[type="text"] {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            border-radius: 12px;
-            font-size: 14px;
-            color: #1e293b;
-            background-color: rgba(248, 250, 252, 0.8);
-            box-sizing: border-box;
-            transition: all 0.25s ease;
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        #user-name {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            border-radius: 12px;
-            color: #64748b;
-            background-color: #e2e8f0;
-            cursor: not-allowed;
-            outline: none;
-            margin-bottom: 12px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        select:focus, textarea:focus, input[type="text"]:focus {
-            border-color: #1cbdc5;
-            background-color: #ffffff;
-            box-shadow: 0 0 0 4px rgba(28, 189, 197, 0.15);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 130px;
-            line-height: 1.6;
-        }
-
-        .btn-search, #submit-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25);
-            box-sizing: border-box;
-        }
-
-        .btn-search:hover, #submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(28, 189, 197, 0.4);
-        }
-
-        #submit-btn:disabled {
-            background: #cbd5e1;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .search-box-container {
-            margin-bottom: 24px;
-            position: relative;
-            width: 100%;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 14px 16px 14px 52px;
-            font-size: 14px;
-            border: 1px solid rgba(28, 189, 197, 0.3);
-            border-radius: 16px;
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 8px 20px -4px rgba(24, 76, 92, 0.04);
-            box-sizing: border-box;
-        }
-
-        .search-icon-inside {
-            position: absolute;
-            left: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 16px;
-            color: #1cbdc5;
-            pointer-events: none;
-        }
-
-        .card-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-bottom: 16px;
-        }
-
-        .tag-badge {
-            border: 0;
-            background: rgba(28, 189, 197, 0.1);
-            color: #119299;
-            font-family: inherit;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            user-select: none;
-        }
-
-        .tag-badge:hover {
-            background: #1cbdc5;
-            color: #ffffff;
-        }
-
-
-        .countdown-badge {
-            font-size: 11px;
-            font-weight: 800;
-            color: #d97706;
-            background: #fef3c7;
-            padding: 4px 10px;
-            border-radius: 8px;
-            margin-left: auto;
-        }
-
-        .card-action-row {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .btn-card-action {
-            flex: 1;
-            border: none;
-            padding: 8px 6px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-card-action:hover {
-            transform: translateY(-1px);
-        }
-
-        .btn-card-block {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .btn-card-report {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .user-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 24px;
-            width: 100%;
-        }
-
-        .user-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            padding: 28px 24px;
-            border-radius: 20px;
-            text-align: left;
-            position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.02);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .user-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px -4px rgba(28, 189, 197, 0.12);
-            background: #ffffff;
-        }
-
-        .user-card h3 {
-            margin: 0 0 12px 0;
-            font-size: 1.15rem;
-            color: #1e293b;
-            font-weight: 800;
-        }
-
-        .user-card p {
-            font-size: 14px;
-            color: #475569;
-            line-height: 1.6;
-            margin: 0 0 16px 0;
-            flex: 1;
-            white-space: pre-wrap;
-        }
-
-        .user-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, rgba(28, 189, 197, 0.1) 0%, rgba(17, 146, 153, 0.1) 100%);
-            color: #1cbdc5;
-            font-size: 11px;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-weight: 700;
-            margin-bottom: 0;
-            align-self: flex-start;
-        }
-
-        .btn-match {
-            background: #ffffff;
-            color: #1cbdc5;
-            border: 1.5px solid #1cbdc5;
-            padding: 10px;
-            border-radius: 10px;
-            width: 100%;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 14px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: none;
-            margin-top: auto;
-        }
-
-        .btn-match:hover {
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            color: white;
-            border-color: transparent;
-            transform: translateY(0);
-            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25);
-        }
-
-        .quick-reaction-area {
-            margin: 12px 0 2px;
-        }
-
-        .quick-reaction-label {
-            display: block;
-            margin-bottom: 6px;
-            color: #64748b;
-            font-size: 10px;
-            font-weight: 700;
-        }
-
-        .quick-reaction-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .btn-quick-reaction {
-            border: 1px solid #dbeafe;
-            border-radius: 999px;
-            padding: 6px 9px;
-            background: #f8fbff;
-            color: #2563eb;
-            font-size: 10px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .btn-quick-reaction:hover {
-            border-color: #93c5fd;
-            background: #dbeafe;
-            transform: translateY(-1px);
-        }
-
-        .big-profile-icon {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            display: block;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(24, 76, 92, 0.12);
-            border: 3px solid #ffffff;
-            transition: all 0.25s;
-        }
-
-        .big-profile-icon:hover {
-            transform: scale(1.05);
-            box-shadow: 0 12px 24px rgba(24, 76, 92, 0.2);
-        }
-
-        .mypage-area {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 30px;
-        }
-
-        #mypage-text {
-            font-size: 16px;
-            font-weight: 800;
-            color: #1e293b;
-        }
-
-        .btn-refresh {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            background-color: rgba(255, 255, 255, 0.8);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            padding: 0;
-        }
-
-        .btn-refresh:hover {
-            background-color: #ffffff;
-            border-color: #1cbdc5;
-            transform: rotate(30deg);
-        }
-
-        .refresh-icon {
-            width: 18px;
-            height: 18px;
-            object-fit: contain;
-        }
-
-        .loading-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            grid-column: 1 / -1;
-            padding: 60px 20px;
-            gap: 14px;
-            color: #64748b;
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid rgba(28, 189, 197, 0.2);
-            border-top: 3px solid #1cbdc5;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .toast-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1.5px solid #1cbdc5;
-            padding: 16px 20px;
-            border-radius: 16px;
-            box-shadow: 0 12px 30px rgba(28, 189, 197, 0.25);
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            max-width: 320px;
-            cursor: pointer;
-            transform: translateY(-100px) scale(0.9);
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .toast-notification.show {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
-        }
-
-        .toast-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 18px;
-            flex-shrink: 0;
-        }
-
-        .toast-content {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            overflow: hidden;
-        }
-
-        .toast-title {
-            font-size: 13px;
-            font-weight: 800;
-            color: #1cbdc5;
-        }
-
-        .toast-sender {
-            font-size: 14px;
-            font-weight: 700;
-            color: #1e293b;
-        }
-
-        .toast-text {
-            font-size: 12.5px;
-            color: #64748b;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .footer {
-            background-color: transparent;
-            padding: 36px 20px;
-            margin-top: auto;
-            width: 100%;
-            box-sizing: border-box;
-            border-top: 1px solid rgba(255, 255, 255, 0.5);
-        }
-
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 24px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .footer-links a {
-            color: #64748b;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 700;
-            transition: all 0.2s ease;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
-
-        .footer-links a:hover {
-            color: #1cbdc5;
-            background: rgba(28, 189, 197, 0.08);
-        }
-
-        .copyright {
-            color: #94a3b8;
-            font-size: 0.75rem;
-            margin: 0;
-            font-weight: 600;
-        }
-
-        @media screen and (max-width: 768px) {
-            .container {
-                flex-direction: column;
-                padding: 16px;
-                margin: 10px auto;
-                gap: 24px;
-            }
-
-            .sidebar {
-                width: 100%;
-            }
-
-            .toast-notification {
-                top: 10px;
-                left: 10px;
-                right: 10px;
-                max-width: none;
-            }
-
-            .hamburger-btn {
-                display: flex !important;
-            }
-
-            .nav-links {
-                position: fixed !important;
-                top: 54px !important;
-                left: 0 !important;
-                width: 100% !important;
-                background: rgba(255, 255, 255, 0.98) !important;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
-                flex-direction: column !important;
-                padding: 24px 0 !important;
-                gap: 8px !important;
-                z-index: 99 !important;
-                opacity: 0 !important;
-                pointer-events: none !important;
-                transform: translateY(-10px) !important;
-                transition: transform 0.3s ease, opacity 0.3s ease !important;
-            }
-
-            .nav-links.open {
-                opacity: 1 !important;
-                pointer-events: auto !important;
-                transform: translateY(0) !important;
-            }
-
-            .nav-item {
-                font-size: 16px !important;
-                padding: 12px 0 !important;
-                width: 80% !important;
-                text-align: center !important;
-                border-radius: 10px;
-            }
-
-            .btn-logout {
-                width: 80% !important;
-                padding: 12px 0 !important;
-                margin: 0 auto !important;
-            }
-
-            .hamburger-btn.open span:nth-child(1) { transform: translateY(8px) rotate(45deg) !important; }
-            .hamburger-btn.open span:nth-child(2) { opacity: 0 !important; transform: scale(0) !important; }
-            .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) !important; }
-
-            .footer-links {
-                gap: 12px 16px;
-            }
-        }
+        body {	/* 対象要素のスタイルを始める */
+            margin: 0;	/* 見た目の設定を指定 */
+            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);	/* 見た目の設定を指定 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            min-height: 100vh;	/* 見た目の設定を指定 */
+            -webkit-font-smoothing: antialiased;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .navbar {	/* 対象要素のスタイルを始める */
+            background: rgba(255, 255, 255, 0.75);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            -webkit-backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            padding: 14px 5%;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            justify-content: space-between;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);	/* 見た目の設定を指定 */
+            position: sticky;	/* 見た目の設定を指定 */
+            top: 0;	/* 見た目の設定を指定 */
+            z-index: 100;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .logo {	/* 対象要素のスタイルを始める */
+            font-size: 1.4rem;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            letter-spacing: -0.03em;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            -webkit-background-clip: text;	/* 見た目の設定を指定 */
+            -webkit-text-fill-color: transparent;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .nav-links {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            gap: 8px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .nav-item {	/* 対象要素のスタイルを始める */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            color: #64748b;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            font-size: 14px;	/* 見た目の設定を指定 */
+            padding: 8px 16px;	/* 見た目の設定を指定 */
+            text-decoration: none;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            transition: all 0.2s ease;	/* 見た目の設定を指定 */
+            position: relative;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .nav-item:hover {	/* 対象要素のスタイルを始める */
+            background-color: rgba(28, 189, 197, 0.06);	/* 見た目の設定を指定 */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .nav-item.active {	/* 対象要素のスタイルを始める */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+            background-color: rgba(28, 189, 197, 0.1);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .unread-badge {	/* 対象要素のスタイルを始める */
+            position: absolute;	/* 見た目の設定を指定 */
+            top: 2px;	/* 見た目の設定を指定 */
+            right: 4px;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);	/* 見た目の設定を指定 */
+            color: #ffffff;	/* 見た目の設定を指定 */
+            font-size: 10px;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            padding: 2px 6px;	/* 見た目の設定を指定 */
+            border-radius: 10px;	/* 見た目の設定を指定 */
+            line-height: 1;	/* 見た目の設定を指定 */
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);	/* 見た目の設定を指定 */
+            min-width: 14px;	/* 見た目の設定を指定 */
+            text-align: center;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-logout {	/* 対象要素のスタイルを始める */
+            padding: 8px 16px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            background-color: #ef4444;	/* 見た目の設定を指定 */
+            color: #ffffff;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-logout:hover {	/* 対象要素のスタイルを始める */
+            opacity: 0.9;	/* 見た目の設定を指定 */
+            transform: translateY(-1px);	/* 見た目の設定を指定 */
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .hamburger-btn {	/* 対象要素のスタイルを始める */
+            display: none;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            justify-content: space-between;	/* 見た目の設定を指定 */
+            width: 24px;	/* 見た目の設定を指定 */
+            height: 18px;	/* 見た目の設定を指定 */
+            background: transparent;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            padding: 0;	/* 見た目の設定を指定 */
+            z-index: 110;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .hamburger-btn span {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            height: 2.5px;	/* 見た目の設定を指定 */
+            background-color: #1e293b;	/* 見た目の設定を指定 */
+            border-radius: 3px;	/* 見た目の設定を指定 */
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .container {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            max-width: 1200px;	/* 見た目の設定を指定 */
+            margin: 40px auto;	/* 見た目の設定を指定 */
+            padding: 0 24px;	/* 見た目の設定を指定 */
+            flex: 1;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+            gap: 40px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .sidebar {	/* 対象要素のスタイルを始める */
+            width: 260px;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            flex-shrink: 0;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .main-area {	/* 対象要素のスタイルを始める */
+            flex: 1;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #recruit-form-area .sidebar-form {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            background: rgba(255, 255, 255, 0.8);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            -webkit-backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            padding: 32px;	/* 見た目の設定を指定 */
+            border-radius: 20px;	/* 見た目の設定を指定 */
+            border: 1px solid rgba(255, 255, 255, 0.5);	/* 見た目の設定を指定 */
+            box-shadow: 0 20px 40px -4px rgba(24, 76, 92, 0.05);	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #form-title {	/* 対象要素のスタイルを始める */
+            font-size: 1.15rem;	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+            margin-top: 0;	/* 見た目の設定を指定 */
+            margin-bottom: 24px;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            gap: 8px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #form-title::before {	/* 対象要素のスタイルを始める */
+            content: '';	/* 見た目の設定を指定 */
+            display: inline-block;	/* 見た目の設定を指定 */
+            width: 4px;	/* 見た目の設定を指定 */
+            height: 18px;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            border-radius: 4px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        select, textarea, input[type="text"] {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            padding: 12px 16px;	/* 見た目の設定を指定 */
+            border: 1px solid rgba(0, 0, 0, 0.08);	/* 見た目の設定を指定 */
+            border-radius: 12px;	/* 見た目の設定を指定 */
+            font-size: 14px;	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+            background-color: rgba(248, 250, 252, 0.8);	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+            transition: all 0.25s ease;	/* 見た目の設定を指定 */
+            outline: none;	/* 見た目の設定を指定 */
+            -webkit-appearance: none;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #user-name {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            padding: 12px 16px;	/* 見た目の設定を指定 */
+            border: 1px solid rgba(0, 0, 0, 0.05);	/* 見た目の設定を指定 */
+            border-radius: 12px;	/* 見た目の設定を指定 */
+            color: #64748b;	/* 見た目の設定を指定 */
+            background-color: #e2e8f0;	/* 見た目の設定を指定 */
+            cursor: not-allowed;	/* 見た目の設定を指定 */
+            outline: none;	/* 見た目の設定を指定 */
+            margin-bottom: 12px;	/* 見た目の設定を指定 */
+            font-weight: 600;	/* 見た目の設定を指定 */
+            font-size: 14px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        select:focus, textarea:focus, input[type="text"]:focus {	/* 対象要素のスタイルを始める */
+            border-color: #1cbdc5;	/* 見た目の設定を指定 */
+            background-color: #ffffff;	/* 見た目の設定を指定 */
+            box-shadow: 0 0 0 4px rgba(28, 189, 197, 0.15);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        textarea {	/* 対象要素のスタイルを始める */
+            resize: vertical;	/* 見た目の設定を指定 */
+            min-height: 130px;	/* 見た目の設定を指定 */
+            line-height: 1.6;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-search, #submit-btn {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            color: white;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            padding: 14px;	/* 見た目の設定を指定 */
+            border-radius: 12px;	/* 見た目の設定を指定 */
+            font-size: 15px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            transition: all 0.25s ease;	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25);	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-search:hover, #submit-btn:hover {	/* 対象要素のスタイルを始める */
+            transform: translateY(-2px);	/* 見た目の設定を指定 */
+            box-shadow: 0 6px 20px rgba(28, 189, 197, 0.4);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #submit-btn:disabled {	/* 対象要素のスタイルを始める */
+            background: #cbd5e1;	/* 見た目の設定を指定 */
+            cursor: not-allowed;	/* 見た目の設定を指定 */
+            transform: none;	/* 見た目の設定を指定 */
+            box-shadow: none;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .search-box-container {	/* 対象要素のスタイルを始める */
+            margin-bottom: 24px;	/* 見た目の設定を指定 */
+            position: relative;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .search-input {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            padding: 14px 16px 14px 52px;	/* 見た目の設定を指定 */
+            font-size: 14px;	/* 見た目の設定を指定 */
+            border: 1px solid rgba(28, 189, 197, 0.3);	/* 見た目の設定を指定 */
+            border-radius: 16px;	/* 見た目の設定を指定 */
+            background: rgba(255, 255, 255, 0.9);	/* 見た目の設定を指定 */
+            box-shadow: 0 8px 20px -4px rgba(24, 76, 92, 0.04);	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .search-icon-inside {	/* 対象要素のスタイルを始める */
+            position: absolute;	/* 見た目の設定を指定 */
+            left: 18px;	/* 見た目の設定を指定 */
+            top: 50%;	/* 見た目の設定を指定 */
+            transform: translateY(-50%);	/* 見た目の設定を指定 */
+            font-size: 16px;	/* 見た目の設定を指定 */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+            pointer-events: none;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .card-tags {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-wrap: wrap;	/* 見た目の設定を指定 */
+            gap: 6px;	/* 見た目の設定を指定 */
+            margin-bottom: 16px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .tag-badge {	/* 対象要素のスタイルを始める */
+            border: 0;	/* 見た目の設定を指定 */
+            background: rgba(28, 189, 197, 0.1);	/* 見た目の設定を指定 */
+            color: #119299;	/* 見た目の設定を指定 */
+            font-family: inherit;	/* 見た目の設定を指定 */
+            font-size: 11px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            padding: 4px 10px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+            user-select: none;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .tag-badge:hover {	/* 対象要素のスタイルを始める */
+            background: #1cbdc5;	/* 見た目の設定を指定 */
+            color: #ffffff;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+
+        .countdown-badge {	/* 対象要素のスタイルを始める */
+            font-size: 11px;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            color: #d97706;	/* 見た目の設定を指定 */
+            background: #fef3c7;	/* 見た目の設定を指定 */
+            padding: 4px 10px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            margin-left: auto;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .card-action-row {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            gap: 8px;	/* 見た目の設定を指定 */
+            margin-top: 10px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-card-action {	/* 対象要素のスタイルを始める */
+            flex: 1;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            padding: 8px 6px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            font-size: 11px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-card-action:hover {	/* 対象要素のスタイルを始める */
+            transform: translateY(-1px);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-card-block {	/* 対象要素のスタイルを始める */
+            background: #fef3c7;	/* 見た目の設定を指定 */
+            color: #92400e;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-card-report {	/* 対象要素のスタイルを始める */
+            background: #fee2e2;	/* 見た目の設定を指定 */
+            color: #b91c1c;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .user-grid {	/* 対象要素のスタイルを始める */
+            display: grid;	/* 見た目の設定を指定 */
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));	/* 見た目の設定を指定 */
+            gap: 24px;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .user-card {	/* 対象要素のスタイルを始める */
+            background: rgba(255, 255, 255, 0.85);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(10px);	/* 見た目の設定を指定 */
+            -webkit-backdrop-filter: blur(10px);	/* 見た目の設定を指定 */
+            padding: 28px 24px;	/* 見た目の設定を指定 */
+            border-radius: 20px;	/* 見た目の設定を指定 */
+            text-align: left;	/* 見た目の設定を指定 */
+            position: relative;	/* 見た目の設定を指定 */
+            border: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
+            box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.02);	/* 見た目の設定を指定 */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .user-card:hover {	/* 対象要素のスタイルを始める */
+            transform: translateY(-5px);	/* 見た目の設定を指定 */
+            box-shadow: 0 20px 40px -4px rgba(28, 189, 197, 0.12);	/* 見た目の設定を指定 */
+            background: #ffffff;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .user-card h3 {	/* 対象要素のスタイルを始める */
+            margin: 0 0 12px 0;	/* 見た目の設定を指定 */
+            font-size: 1.15rem;	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .user-card p {	/* 対象要素のスタイルを始める */
+            font-size: 14px;	/* 見た目の設定を指定 */
+            color: #475569;	/* 見た目の設定を指定 */
+            line-height: 1.6;	/* 見た目の設定を指定 */
+            margin: 0 0 16px 0;	/* 見た目の設定を指定 */
+            flex: 1;	/* 見た目の設定を指定 */
+            white-space: pre-wrap;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .user-badge {	/* 対象要素のスタイルを始める */
+            display: inline-block;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, rgba(28, 189, 197, 0.1) 0%, rgba(17, 146, 153, 0.1) 100%);	/* 見た目の設定を指定 */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+            font-size: 11px;	/* 見た目の設定を指定 */
+            padding: 6px 12px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            margin-bottom: 0;	/* 見た目の設定を指定 */
+            align-self: flex-start;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-match {	/* 対象要素のスタイルを始める */
+            background: #ffffff;	/* 見た目の設定を指定 */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+            border: 1.5px solid #1cbdc5;	/* 見た目の設定を指定 */
+            padding: 10px;	/* 見た目の設定を指定 */
+            border-radius: 10px;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            font-size: 14px;	/* 見た目の設定を指定 */
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);	/* 見た目の設定を指定 */
+            box-shadow: none;	/* 見た目の設定を指定 */
+            margin-top: auto;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-match:hover {	/* 対象要素のスタイルを始める */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            color: white;	/* 見た目の設定を指定 */
+            border-color: transparent;	/* 見た目の設定を指定 */
+            transform: translateY(0);	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .quick-reaction-area {	/* 対象要素のスタイルを始める */
+            margin: 12px 0 2px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .quick-reaction-label {	/* 対象要素のスタイルを始める */
+            display: block;	/* 見た目の設定を指定 */
+            margin-bottom: 6px;	/* 見た目の設定を指定 */
+            color: #64748b;	/* 見た目の設定を指定 */
+            font-size: 10px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .quick-reaction-row {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-wrap: wrap;	/* 見た目の設定を指定 */
+            gap: 6px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-quick-reaction {	/* 対象要素のスタイルを始める */
+            border: 1px solid #dbeafe;	/* 見た目の設定を指定 */
+            border-radius: 999px;	/* 見た目の設定を指定 */
+            padding: 6px 9px;	/* 見た目の設定を指定 */
+            background: #f8fbff;	/* 見た目の設定を指定 */
+            color: #2563eb;	/* 見た目の設定を指定 */
+            font-size: 10px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-quick-reaction:hover {	/* 対象要素のスタイルを始める */
+            border-color: #93c5fd;	/* 見た目の設定を指定 */
+            background: #dbeafe;	/* 見た目の設定を指定 */
+            transform: translateY(-1px);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .big-profile-icon {	/* 対象要素のスタイルを始める */
+            width: 100px;	/* 見た目の設定を指定 */
+            height: 100px;	/* 見た目の設定を指定 */
+            border-radius: 50%;	/* 見た目の設定を指定 */
+            object-fit: cover;	/* 見た目の設定を指定 */
+            display: block;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            box-shadow: 0 8px 20px rgba(24, 76, 92, 0.12);	/* 見た目の設定を指定 */
+            border: 3px solid #ffffff;	/* 見た目の設定を指定 */
+            transition: all 0.25s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .big-profile-icon:hover {	/* 対象要素のスタイルを始める */
+            transform: scale(1.05);	/* 見た目の設定を指定 */
+            box-shadow: 0 12px 24px rgba(24, 76, 92, 0.2);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .mypage-area {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            gap: 12px;	/* 見た目の設定を指定 */
+            margin-bottom: 30px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #mypage-text {	/* 対象要素のスタイルを始める */
+            font-size: 16px;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-refresh {	/* 対象要素のスタイルを始める */
+            width: 40px;	/* 見た目の設定を指定 */
+            height: 40px;	/* 見た目の設定を指定 */
+            border-radius: 10px;	/* 見た目の設定を指定 */
+            border: 1px solid rgba(0, 0, 0, 0.08);	/* 見た目の設定を指定 */
+            background-color: rgba(255, 255, 255, 0.8);	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            justify-content: center;	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+            padding: 0;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-refresh:hover {	/* 対象要素のスタイルを始める */
+            background-color: #ffffff;	/* 見た目の設定を指定 */
+            border-color: #1cbdc5;	/* 見た目の設定を指定 */
+            transform: rotate(30deg);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .refresh-icon {	/* 対象要素のスタイルを始める */
+            width: 18px;	/* 見た目の設定を指定 */
+            height: 18px;	/* 見た目の設定を指定 */
+            object-fit: contain;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .loading-box {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            justify-content: center;	/* 見た目の設定を指定 */
+            grid-column: 1 / -1;	/* 見た目の設定を指定 */
+            padding: 60px 20px;	/* 見た目の設定を指定 */
+            gap: 14px;	/* 見た目の設定を指定 */
+            color: #64748b;	/* 見た目の設定を指定 */
+            font-size: 14px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .spinner {	/* 対象要素のスタイルを始める */
+            width: 32px;	/* 見た目の設定を指定 */
+            height: 32px;	/* 見た目の設定を指定 */
+            border: 3px solid rgba(28, 189, 197, 0.2);	/* 見た目の設定を指定 */
+            border-top: 3px solid #1cbdc5;	/* 見た目の設定を指定 */
+            border-radius: 50%;	/* 見た目の設定を指定 */
+            animation: spin 0.8s linear infinite;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        @keyframes spin {	/* 表示条件を設定 */
+            0% { transform: rotate(0deg); }	/* 見た目の設定を指定 */
+            100% { transform: rotate(360deg); }	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .toast-notification {	/* 対象要素のスタイルを始める */
+            position: fixed;	/* 見た目の設定を指定 */
+            top: 20px;	/* 見た目の設定を指定 */
+            right: 20px;	/* 見た目の設定を指定 */
+            z-index: 9999;	/* 見た目の設定を指定 */
+            background: rgba(255, 255, 255, 0.95);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(16px);	/* 見た目の設定を指定 */
+            -webkit-backdrop-filter: blur(16px);	/* 見た目の設定を指定 */
+            border: 1.5px solid #1cbdc5;	/* 見た目の設定を指定 */
+            padding: 16px 20px;	/* 見た目の設定を指定 */
+            border-radius: 16px;	/* 見た目の設定を指定 */
+            box-shadow: 0 12px 30px rgba(28, 189, 197, 0.25);	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            gap: 14px;	/* 見た目の設定を指定 */
+            max-width: 320px;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            transform: translateY(-100px) scale(0.9);	/* 見た目の設定を指定 */
+            opacity: 0;	/* 見た目の設定を指定 */
+            visibility: hidden;	/* 見た目の設定を指定 */
+            pointer-events: none;	/* 見た目の設定を指定 */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .toast-notification.show {	/* 対象要素のスタイルを始める */
+            transform: translateY(0) scale(1);	/* 見た目の設定を指定 */
+            opacity: 1;	/* 見た目の設定を指定 */
+            visibility: visible;	/* 見た目の設定を指定 */
+            pointer-events: auto;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .toast-icon {	/* 対象要素のスタイルを始める */
+            width: 40px;	/* 見た目の設定を指定 */
+            height: 40px;	/* 見た目の設定を指定 */
+            border-radius: 50%;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            color: white;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            justify-content: center;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            font-size: 18px;	/* 見た目の設定を指定 */
+            flex-shrink: 0;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .toast-content {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            gap: 2px;	/* 見た目の設定を指定 */
+            overflow: hidden;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .toast-title {	/* 対象要素のスタイルを始める */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .toast-sender {	/* 対象要素のスタイルを始める */
+            font-size: 14px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .toast-text {	/* 対象要素のスタイルを始める */
+            font-size: 12.5px;	/* 見た目の設定を指定 */
+            color: #64748b;	/* 見た目の設定を指定 */
+            white-space: nowrap;	/* 見た目の設定を指定 */
+            overflow: hidden;	/* 見た目の設定を指定 */
+            text-overflow: ellipsis;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .footer {	/* 対象要素のスタイルを始める */
+            background-color: transparent;	/* 見た目の設定を指定 */
+            padding: 36px 20px;	/* 見た目の設定を指定 */
+            margin-top: auto;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+            border-top: 1px solid rgba(255, 255, 255, 0.5);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .footer-container {	/* 対象要素のスタイルを始める */
+            max-width: 1200px;	/* 見た目の設定を指定 */
+            margin: 0 auto;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            gap: 16px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .footer-links {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            gap: 24px;	/* 見た目の設定を指定 */
+            justify-content: center;	/* 見た目の設定を指定 */
+            flex-wrap: wrap;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .footer-links a {	/* 対象要素のスタイルを始める */
+            color: #64748b;	/* 見た目の設定を指定 */
+            text-decoration: none;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            transition: all 0.2s ease;	/* 見た目の設定を指定 */
+            padding: 4px 8px;	/* 見た目の設定を指定 */
+            border-radius: 6px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .footer-links a:hover {	/* 対象要素のスタイルを始める */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+            background: rgba(28, 189, 197, 0.08);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .copyright {	/* 対象要素のスタイルを始める */
+            color: #94a3b8;	/* 見た目の設定を指定 */
+            font-size: 0.75rem;	/* 見た目の設定を指定 */
+            margin: 0;	/* 見た目の設定を指定 */
+            font-weight: 600;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        @media screen and (max-width: 768px) {	/* 表示条件を設定 */
+            .container {	/* 対象要素のスタイルを始める */
+                flex-direction: column;	/* 見た目の設定を指定 */
+                padding: 16px;	/* 見た目の設定を指定 */
+                margin: 10px auto;	/* 見た目の設定を指定 */
+                gap: 24px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .sidebar {	/* 対象要素のスタイルを始める */
+                width: 100%;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .toast-notification {	/* 対象要素のスタイルを始める */
+                top: 10px;	/* 見た目の設定を指定 */
+                left: 10px;	/* 見た目の設定を指定 */
+                right: 10px;	/* 見た目の設定を指定 */
+                max-width: none;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .hamburger-btn {	/* 対象要素のスタイルを始める */
+                display: flex !important;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .nav-links {	/* 対象要素のスタイルを始める */
+                position: fixed !important;	/* 見た目の設定を指定 */
+                top: 54px !important;	/* 見た目の設定を指定 */
+                left: 0 !important;	/* 見た目の設定を指定 */
+                width: 100% !important;	/* 見た目の設定を指定 */
+                background: rgba(255, 255, 255, 0.98) !important;	/* 見た目の設定を指定 */
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;	/* 見た目の設定を指定 */
+                flex-direction: column !important;	/* 見た目の設定を指定 */
+                padding: 24px 0 !important;	/* 見た目の設定を指定 */
+                gap: 8px !important;	/* 見た目の設定を指定 */
+                z-index: 99 !important;	/* 見た目の設定を指定 */
+                opacity: 0 !important;	/* 見た目の設定を指定 */
+                pointer-events: none !important;	/* 見た目の設定を指定 */
+                transform: translateY(-10px) !important;	/* 見た目の設定を指定 */
+                transition: transform 0.3s ease, opacity 0.3s ease !important;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .nav-links.open {	/* 対象要素のスタイルを始める */
+                opacity: 1 !important;	/* 見た目の設定を指定 */
+                pointer-events: auto !important;	/* 見た目の設定を指定 */
+                transform: translateY(0) !important;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .nav-item {	/* 対象要素のスタイルを始める */
+                font-size: 16px !important;	/* 見た目の設定を指定 */
+                padding: 12px 0 !important;	/* 見た目の設定を指定 */
+                width: 80% !important;	/* 見た目の設定を指定 */
+                text-align: center !important;	/* 見た目の設定を指定 */
+                border-radius: 10px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .btn-logout {	/* 対象要素のスタイルを始める */
+                width: 80% !important;	/* 見た目の設定を指定 */
+                padding: 12px 0 !important;	/* 見た目の設定を指定 */
+                margin: 0 auto !important;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .hamburger-btn.open span:nth-child(1) { transform: translateY(8px) rotate(45deg) !important; }	/* 見た目の設定を指定 */
+            .hamburger-btn.open span:nth-child(2) { opacity: 0 !important; transform: scale(0) !important; }	/* 見た目の設定を指定 */
+            .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) !important; }	/* 見た目の設定を指定 */
+
+            .footer-links {	/* 対象要素のスタイルを始める */
+                gap: 12px 16px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+        }	/* スタイル定義を閉じる */
     </style>
 
     <style>
-        :root {
-            --ink: #102033;
-            --muted: #718096;
-            --line: #e7edf3;
-            --paper: #ffffff;
-            --surface: #f5f8fb;
-            --teal: #18b8b0;
-            --teal-dark: #087f83;
-            --coral: #ff776b;
-            --navy: #102033;
-            --shadow-sm: 0 8px 24px rgba(16, 32, 51, .06);
-            --shadow-lg: 0 24px 60px rgba(16, 32, 51, .12);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            position: relative;
-            overflow-x: hidden;
-            background: var(--surface);
-            color: var(--ink);
-            font-family: "Avenir Next", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
-        }
-
-        body::before,
-        body::after {
-            content: "";
-            position: fixed;
-            z-index: -1;
-            width: 460px;
-            height: 460px;
-            border-radius: 50%;
-            filter: blur(4px);
-            pointer-events: none;
-        }
-
-        body::before {
-            top: -220px;
-            right: -150px;
-            background: radial-gradient(circle, rgba(24, 184, 176, .16), rgba(24, 184, 176, 0) 68%);
-        }
-
-        body::after {
-            bottom: -270px;
-            left: -160px;
-            background: radial-gradient(circle, rgba(255, 119, 107, .12), rgba(255, 119, 107, 0) 68%);
-        }
-
-        .navbar {
-            min-height: 76px;
-            padding: 16px clamp(20px, 5vw, 72px);
-            background: rgba(255, 255, 255, .86);
-            border-bottom: 1px solid rgba(231, 237, 243, .9);
-            box-shadow: 0 8px 30px rgba(16, 32, 51, .04);
-        }
-
-        .logo {
-            position: relative;
-            color: var(--ink);
-            background: none;
-            -webkit-text-fill-color: initial;
-            font-size: 1.15rem;
-            letter-spacing: -.04em;
-        }
-
-        .logo::before {
-            content: "";
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            margin: 0 9px 1px 0;
-            border-radius: 50%;
-            background: var(--coral);
-            box-shadow: 7px 0 0 var(--teal);
-        }
-
-        .nav-links {
-            gap: 2px;
-        }
-
-        .nav-item {
-            color: #627286;
-            padding: 10px 13px;
-            border-radius: 999px;
-            font-size: 12px;
-            letter-spacing: .02em;
-        }
-
-        .nav-item:hover,
-        .nav-item.active {
-            color: var(--ink);
-            background: #edf8f7;
-        }
-
-        .nav-item.active {
-            box-shadow: inset 0 0 0 1px rgba(24, 184, 176, .18);
-        }
-
-        .unread-badge {
-            top: 0;
-            right: 2px;
-            background: var(--coral);
-            box-shadow: 0 4px 10px rgba(255, 119, 107, .3);
-        }
-
-        .btn-logout {
-            margin-left: 8px;
-            padding: 10px 15px;
-            border-radius: 999px;
-            background: var(--navy);
-            box-shadow: 0 8px 16px rgba(16, 32, 51, .14);
-            font-size: 12px;
-        }
-
-        .btn-logout:hover {
-            background: var(--teal-dark);
-        }
-
-        .container {
-            max-width: 1320px;
-            margin: 46px auto 70px;
-            padding: 0 clamp(18px, 4vw, 48px);
-            gap: 30px;
-            align-items: flex-start;
-        }
-
-        .sidebar {
-            width: 286px;
-            position: sticky;
-            top: 104px;
-            align-items: stretch;
-            gap: 16px;
-        }
-
-        .mypage-area {
-            position: relative;
-            overflow: hidden;
-            align-items: flex-start;
-            gap: 14px;
-            margin: 0;
-            padding: 24px;
-            border-radius: 26px;
-            background: linear-gradient(145deg, #132b43 0%, #0d1b2d 100%);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .mypage-area::after {
-            content: "";
-            position: absolute;
-            width: 150px;
-            height: 150px;
-            top: -60px;
-            right: -42px;
-            border-radius: 50%;
-            background: rgba(24, 184, 176, .2);
-        }
-
-        .big-profile-icon {
-            position: relative;
-            z-index: 1;
-            width: 72px;
-            height: 72px;
-            border: 4px solid rgba(255, 255, 255, .94);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, .2);
-        }
-
-        #mypage-text {
-            position: relative;
-            z-index: 1;
-            color: #fff;
-            font-size: 17px;
-        }
-
-        #my-post-area {
-            width: 100% !important;
-            padding: 20px !important;
-            border: 1px solid var(--line) !important;
-            border-radius: 22px !important;
-            background: rgba(255, 255, 255, .88) !important;
-            box-shadow: var(--shadow-sm) !important;
-        }
-
-        #my-post-area h4 {
-            color: var(--ink) !important;
-            font-size: 12px !important;
-            letter-spacing: .04em;
-        }
-
-        #my-post-content {
-            color: var(--muted) !important;
-        }
-
-        .main-area {
-            min-width: 0;
-        }
-
-        #search-area::before {
-            content: "あなたの学びを、誰かの一歩につなげよう。";
-            display: block;
-            margin: 0 0 9px;
-            color: var(--teal-dark);
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: .12em;
-        }
-
-        #search-area > div:first-child {
-            margin-bottom: 22px !important;
-        }
-
-        #search-area h2 {
-            color: var(--ink) !important;
-            font-size: clamp(1.5rem, 2.4vw, 2rem) !important;
-            letter-spacing: -.05em;
-        }
-
-        .search-box-container {
-            margin-bottom: 28px;
-        }
-
-        .search-input {
-            min-height: 54px;
-            padding-left: 52px;
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            background: rgba(255, 255, 255, .92);
-            box-shadow: var(--shadow-sm);
-            color: var(--ink);
-        }
-
-        .search-input:focus {
-            border-color: rgba(24, 184, 176, .55);
-            box-shadow: 0 0 0 5px rgba(24, 184, 176, .1), var(--shadow-sm);
-        }
-
-        .search-icon-inside {
-            color: var(--teal-dark);
-        }
-
-        .btn-refresh {
-            width: 44px;
-            height: 44px;
-            border: 1px solid var(--line);
-            border-radius: 14px;
-            background: #fff;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .btn-refresh:hover {
-            border-color: var(--teal);
-            background: #edf8f7;
-        }
-
-        .user-grid {
-            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-            gap: 18px;
-        }
-
-        .user-card {
-            min-height: 255px;
-            padding: 22px;
-            border: 1px solid var(--line);
-            border-radius: 24px;
-            background: rgba(255, 255, 255, .94);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .user-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 22px;
-            right: 22px;
-            height: 3px;
-            border-radius: 0 0 8px 8px;
-            background: linear-gradient(90deg, var(--teal), #8ce3d7, var(--coral));
-            opacity: .8;
-        }
-
-        .user-card:hover {
-            transform: translateY(-6px);
-            border-color: rgba(24, 184, 176, .32);
-            box-shadow: 0 22px 42px rgba(16, 32, 51, .11);
-        }
-
-        .user-card h3 {
-            margin-bottom: 9px;
-            color: var(--ink);
-            font-size: 1.05rem;
-            letter-spacing: -.02em;
-        }
-
-        .user-card p {
-            color: #68798c;
-            font-size: 13px;
-            line-height: 1.75;
-        }
-
-        .user-badge {
-            padding: 6px 10px;
-            border-radius: 999px;
-            background: #edf8f7;
-            color: var(--teal-dark);
-            font-size: 10px;
-            letter-spacing: .04em;
-        }
-
-        .countdown-badge {
-            padding: 6px 9px;
-            border-radius: 999px;
-            background: #fff4e9;
-            color: #bd6a22;
-            font-size: 10px;
-        }
-
-        .card-tags {
-            gap: 6px;
-            margin-bottom: 17px;
-        }
-
-        .tag-badge {
-            padding: 5px 9px;
-            border-radius: 999px;
-            background: #f0f4f7;
-            color: #5d7389;
-            font-size: 10px;
-        }
-
-        .tag-badge:hover {
-            background: var(--teal);
-        }
-
-        .btn-match {
-            padding: 12px;
-            border: none;
-            border-radius: 12px;
-            background: var(--navy);
-            color: #fff;
-            font-size: 13px;
-            box-shadow: 0 8px 16px rgba(16, 32, 51, .12);
-        }
-
-        .btn-match:hover {
-            background: linear-gradient(135deg, var(--teal), var(--teal-dark));
-            box-shadow: 0 10px 20px rgba(24, 184, 176, .22);
-        }
-
-        .card-action-row {
-            margin-top: 9px;
-        }
-
-        .btn-card-action {
-            border: 1px solid transparent;
-            border-radius: 10px;
-            background: #f6f8fa;
-            color: #738398;
-            font-size: 10px;
-        }
-
-        .btn-card-block:hover {
-            background: #fff5df;
-            color: #a3651e;
-        }
-
-        .btn-card-report:hover {
-            background: #fff0ee;
-            color: #c85b50;
-        }
-
-        #recruit-form-area .sidebar-form {
-            padding: 30px;
-            border: 1px solid var(--line);
-            border-radius: 26px;
-            background: rgba(255, 255, 255, .95);
-            box-shadow: var(--shadow-lg);
-        }
-
-        #form-title {
-            margin-bottom: 24px;
-            color: var(--ink);
-            font-size: 1.35rem;
-            letter-spacing: -.04em;
-        }
-
-        #form-title::before {
-            width: 7px;
-            height: 24px;
-            background: linear-gradient(180deg, var(--coral), var(--teal));
-        }
-
-        select,
-        textarea,
-        input[type="text"] {
-            border: 1px solid var(--line);
-            border-radius: 13px;
-            background: #f8fafc;
-            color: var(--ink);
-        }
-
-        select:focus,
-        textarea:focus,
-        input[type="text"]:focus {
-            border-color: rgba(24, 184, 176, .55);
-            box-shadow: 0 0 0 5px rgba(24, 184, 176, .1);
-        }
-
-        #user-name {
-            border: 1px solid var(--line);
-            border-radius: 13px;
-            background: #eef2f5;
-        }
-
-        .btn-search,
-        #submit-btn {
-            border-radius: 13px;
-            background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
-            box-shadow: 0 10px 20px rgba(24, 184, 176, .2);
-        }
-
-        .btn-search:hover,
-        #submit-btn:hover {
-            box-shadow: 0 14px 26px rgba(24, 184, 176, .28);
-        }
-
-        .loading-box {
-            min-height: 260px;
-            padding: 40px 20px;
-            border: 1px dashed #d8e2e9;
-            border-radius: 22px;
-            background: rgba(255, 255, 255, .6);
-        }
-
-        .spinner {
-            border-color: rgba(24, 184, 176, .18);
-            border-top-color: var(--teal);
-        }
-
-        .toast-notification {
-            top: 92px;
-            right: 24px;
-            border: 1px solid rgba(24, 184, 176, .26);
-            border-radius: 18px;
-            background: rgba(255, 255, 255, .94);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .toast-icon {
-            background: linear-gradient(135deg, var(--teal), var(--teal-dark));
-        }
-
-        .toast-title {
-            color: var(--teal-dark);
-        }
-
-        .footer {
-            padding: 32px 20px;
-            border-top: 1px solid var(--line);
-            background: #edf2f5;
-        }
-
-        .footer-links a:hover {
-            color: var(--teal-dark);
-            background: #fff;
-        }
-
-        @media screen and (max-width: 768px) {
-            .navbar {
-                min-height: 64px;
-                padding: 14px 18px;
-            }
-
-            .logo {
-                font-size: 1.05rem;
-            }
-
-            .hamburger-btn span {
-                background: var(--ink);
-            }
-
-            .nav-links {
-                top: 64px !important;
-                padding: 20px 0 !important;
-                background: rgba(255, 255, 255, .97) !important;
-                border-bottom: 1px solid var(--line);
-            }
-
-            .container {
-                margin: 28px auto 48px;
-                padding: 0 16px;
-                gap: 24px;
-            }
-
-            .sidebar {
-                position: static;
-                width: 100%;
-            }
-
-            .mypage-area {
-                padding: 20px;
-            }
-
-            .user-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .user-card {
-                min-height: 230px;
-            }
-
-            #recruit-form-area .sidebar-form {
-                padding: 22px;
-            }
-
-            .toast-notification {
-                top: 76px;
-                right: 12px;
-                left: 12px;
-                max-width: none;
-            }
-        }
+        :root {	/* 対象要素のスタイルを始める */
+            --ink: #102033;	/* 見た目の設定を指定 */
+            --muted: #718096;	/* 見た目の設定を指定 */
+            --line: #e7edf3;	/* 見た目の設定を指定 */
+            --paper: #ffffff;	/* 見た目の設定を指定 */
+            --surface: #f5f8fb;	/* 見た目の設定を指定 */
+            --teal: #18b8b0;	/* 見た目の設定を指定 */
+            --teal-dark: #087f83;	/* 見た目の設定を指定 */
+            --coral: #ff776b;	/* 見た目の設定を指定 */
+            --navy: #102033;	/* 見た目の設定を指定 */
+            --shadow-sm: 0 8px 24px rgba(16, 32, 51, .06);	/* 見た目の設定を指定 */
+            --shadow-lg: 0 24px 60px rgba(16, 32, 51, .12);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        * {	/* 対象要素のスタイルを始める */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        body {	/* 対象要素のスタイルを始める */
+            position: relative;	/* 見た目の設定を指定 */
+            overflow-x: hidden;	/* 見た目の設定を指定 */
+            background: var(--surface);	/* 見た目の設定を指定 */
+            color: var(--ink);	/* 見た目の設定を指定 */
+            font-family: "Avenir Next", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        body::before,	/* 見た目の設定を指定 */
+        body::after {	/* 対象要素のスタイルを始める */
+            content: "";	/* 見た目の設定を指定 */
+            position: fixed;	/* 見た目の設定を指定 */
+            z-index: -1;	/* 見た目の設定を指定 */
+            width: 460px;	/* 見た目の設定を指定 */
+            height: 460px;	/* 見た目の設定を指定 */
+            border-radius: 50%;	/* 見た目の設定を指定 */
+            filter: blur(4px);	/* 見た目の設定を指定 */
+            pointer-events: none;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        body::before {	/* 対象要素のスタイルを始める */
+            top: -220px;	/* 見た目の設定を指定 */
+            right: -150px;	/* 見た目の設定を指定 */
+            background: radial-gradient(circle, rgba(24, 184, 176, .16), rgba(24, 184, 176, 0) 68%);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        body::after {	/* 対象要素のスタイルを始める */
+            bottom: -270px;	/* 見た目の設定を指定 */
+            left: -160px;	/* 見た目の設定を指定 */
+            background: radial-gradient(circle, rgba(255, 119, 107, .12), rgba(255, 119, 107, 0) 68%);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .navbar {	/* 対象要素のスタイルを始める */
+            min-height: 76px;	/* 見た目の設定を指定 */
+            padding: 16px clamp(20px, 5vw, 72px);	/* 見た目の設定を指定 */
+            background: rgba(255, 255, 255, .86);	/* 見た目の設定を指定 */
+            border-bottom: 1px solid rgba(231, 237, 243, .9);	/* 見た目の設定を指定 */
+            box-shadow: 0 8px 30px rgba(16, 32, 51, .04);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .logo {	/* 対象要素のスタイルを始める */
+            position: relative;	/* 見た目の設定を指定 */
+            color: var(--ink);	/* 見た目の設定を指定 */
+            background: none;	/* 見た目の設定を指定 */
+            -webkit-text-fill-color: initial;	/* 見た目の設定を指定 */
+            font-size: 1.15rem;	/* 見た目の設定を指定 */
+            letter-spacing: -.04em;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .logo::before {	/* 対象要素のスタイルを始める */
+            content: "";	/* 見た目の設定を指定 */
+            display: inline-block;	/* 見た目の設定を指定 */
+            width: 10px;	/* 見た目の設定を指定 */
+            height: 10px;	/* 見た目の設定を指定 */
+            margin: 0 9px 1px 0;	/* 見た目の設定を指定 */
+            border-radius: 50%;	/* 見た目の設定を指定 */
+            background: var(--coral);	/* 見た目の設定を指定 */
+            box-shadow: 7px 0 0 var(--teal);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .nav-links {	/* 対象要素のスタイルを始める */
+            gap: 2px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .nav-item {	/* 対象要素のスタイルを始める */
+            color: #627286;	/* 見た目の設定を指定 */
+            padding: 10px 13px;	/* 見た目の設定を指定 */
+            border-radius: 999px;	/* 見た目の設定を指定 */
+            font-size: 12px;	/* 見た目の設定を指定 */
+            letter-spacing: .02em;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .nav-item:hover,	/* 見た目の設定を指定 */
+        .nav-item.active {	/* 対象要素のスタイルを始める */
+            color: var(--ink);	/* 見た目の設定を指定 */
+            background: #edf8f7;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .nav-item.active {	/* 対象要素のスタイルを始める */
+            box-shadow: inset 0 0 0 1px rgba(24, 184, 176, .18);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .unread-badge {	/* 対象要素のスタイルを始める */
+            top: 0;	/* 見た目の設定を指定 */
+            right: 2px;	/* 見た目の設定を指定 */
+            background: var(--coral);	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 10px rgba(255, 119, 107, .3);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-logout {	/* 対象要素のスタイルを始める */
+            margin-left: 8px;	/* 見た目の設定を指定 */
+            padding: 10px 15px;	/* 見た目の設定を指定 */
+            border-radius: 999px;	/* 見た目の設定を指定 */
+            background: var(--navy);	/* 見た目の設定を指定 */
+            box-shadow: 0 8px 16px rgba(16, 32, 51, .14);	/* 見た目の設定を指定 */
+            font-size: 12px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-logout:hover {	/* 対象要素のスタイルを始める */
+            background: var(--teal-dark);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .container {	/* 対象要素のスタイルを始める */
+            max-width: 1320px;	/* 見た目の設定を指定 */
+            margin: 46px auto 70px;	/* 見た目の設定を指定 */
+            padding: 0 clamp(18px, 4vw, 48px);	/* 見た目の設定を指定 */
+            gap: 30px;	/* 見た目の設定を指定 */
+            align-items: flex-start;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .sidebar {	/* 対象要素のスタイルを始める */
+            width: 286px;	/* 見た目の設定を指定 */
+            position: sticky;	/* 見た目の設定を指定 */
+            top: 104px;	/* 見た目の設定を指定 */
+            align-items: stretch;	/* 見た目の設定を指定 */
+            gap: 16px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .mypage-area {	/* 対象要素のスタイルを始める */
+            position: relative;	/* 見た目の設定を指定 */
+            overflow: hidden;	/* 見た目の設定を指定 */
+            align-items: flex-start;	/* 見た目の設定を指定 */
+            gap: 14px;	/* 見た目の設定を指定 */
+            margin: 0;	/* 見た目の設定を指定 */
+            padding: 24px;	/* 見た目の設定を指定 */
+            border-radius: 26px;	/* 見た目の設定を指定 */
+            background: linear-gradient(145deg, #132b43 0%, #0d1b2d 100%);	/* 見た目の設定を指定 */
+            box-shadow: var(--shadow-lg);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .mypage-area::after {	/* 対象要素のスタイルを始める */
+            content: "";	/* 見た目の設定を指定 */
+            position: absolute;	/* 見た目の設定を指定 */
+            width: 150px;	/* 見た目の設定を指定 */
+            height: 150px;	/* 見た目の設定を指定 */
+            top: -60px;	/* 見た目の設定を指定 */
+            right: -42px;	/* 見た目の設定を指定 */
+            border-radius: 50%;	/* 見た目の設定を指定 */
+            background: rgba(24, 184, 176, .2);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .big-profile-icon {	/* 対象要素のスタイルを始める */
+            position: relative;	/* 見た目の設定を指定 */
+            z-index: 1;	/* 見た目の設定を指定 */
+            width: 72px;	/* 見た目の設定を指定 */
+            height: 72px;	/* 見た目の設定を指定 */
+            border: 4px solid rgba(255, 255, 255, .94);	/* 見た目の設定を指定 */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .2);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #mypage-text {	/* 対象要素のスタイルを始める */
+            position: relative;	/* 見た目の設定を指定 */
+            z-index: 1;	/* 見た目の設定を指定 */
+            color: #fff;	/* 見た目の設定を指定 */
+            font-size: 17px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #my-post-area {	/* 対象要素のスタイルを始める */
+            width: 100% !important;	/* 見た目の設定を指定 */
+            padding: 20px !important;	/* 見た目の設定を指定 */
+            border: 1px solid var(--line) !important;	/* 見た目の設定を指定 */
+            border-radius: 22px !important;	/* 見た目の設定を指定 */
+            background: rgba(255, 255, 255, .88) !important;	/* 見た目の設定を指定 */
+            box-shadow: var(--shadow-sm) !important;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #my-post-area h4 {	/* 対象要素のスタイルを始める */
+            color: var(--ink) !important;	/* 見た目の設定を指定 */
+            font-size: 12px !important;	/* 見た目の設定を指定 */
+            letter-spacing: .04em;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #my-post-content {	/* 対象要素のスタイルを始める */
+            color: var(--muted) !important;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .main-area {	/* 対象要素のスタイルを始める */
+            min-width: 0;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #search-area::before {	/* 対象要素のスタイルを始める */
+            content: "あなたの学びを、誰かの一歩につなげよう。";	/* 見た目の設定を指定 */
+            display: block;	/* 見た目の設定を指定 */
+            margin: 0 0 9px;	/* 見た目の設定を指定 */
+            color: var(--teal-dark);	/* 見た目の設定を指定 */
+            font-size: 12px;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            letter-spacing: .12em;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #search-area > div:first-child {	/* 対象要素のスタイルを始める */
+            margin-bottom: 22px !important;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #search-area h2 {	/* 対象要素のスタイルを始める */
+            color: var(--ink) !important;	/* 見た目の設定を指定 */
+            font-size: clamp(1.5rem, 2.4vw, 2rem) !important;	/* 見た目の設定を指定 */
+            letter-spacing: -.05em;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .search-box-container {	/* 対象要素のスタイルを始める */
+            margin-bottom: 28px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .search-input {	/* 対象要素のスタイルを始める */
+            min-height: 54px;	/* 見た目の設定を指定 */
+            padding-left: 52px;	/* 見た目の設定を指定 */
+            border: 1px solid var(--line);	/* 見た目の設定を指定 */
+            border-radius: 16px;	/* 見た目の設定を指定 */
+            background: rgba(255, 255, 255, .92);	/* 見た目の設定を指定 */
+            box-shadow: var(--shadow-sm);	/* 見た目の設定を指定 */
+            color: var(--ink);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .search-input:focus {	/* 対象要素のスタイルを始める */
+            border-color: rgba(24, 184, 176, .55);	/* 見た目の設定を指定 */
+            box-shadow: 0 0 0 5px rgba(24, 184, 176, .1), var(--shadow-sm);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .search-icon-inside {	/* 対象要素のスタイルを始める */
+            color: var(--teal-dark);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-refresh {	/* 対象要素のスタイルを始める */
+            width: 44px;	/* 見た目の設定を指定 */
+            height: 44px;	/* 見た目の設定を指定 */
+            border: 1px solid var(--line);	/* 見た目の設定を指定 */
+            border-radius: 14px;	/* 見た目の設定を指定 */
+            background: #fff;	/* 見た目の設定を指定 */
+            box-shadow: var(--shadow-sm);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-refresh:hover {	/* 対象要素のスタイルを始める */
+            border-color: var(--teal);	/* 見た目の設定を指定 */
+            background: #edf8f7;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .user-grid {	/* 対象要素のスタイルを始める */
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));	/* 見た目の設定を指定 */
+            gap: 18px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .user-card {	/* 対象要素のスタイルを始める */
+            min-height: 255px;	/* 見た目の設定を指定 */
+            padding: 22px;	/* 見た目の設定を指定 */
+            border: 1px solid var(--line);	/* 見た目の設定を指定 */
+            border-radius: 24px;	/* 見た目の設定を指定 */
+            background: rgba(255, 255, 255, .94);	/* 見た目の設定を指定 */
+            box-shadow: var(--shadow-sm);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .user-card::before {	/* 対象要素のスタイルを始める */
+            content: "";	/* 見た目の設定を指定 */
+            position: absolute;	/* 見た目の設定を指定 */
+            top: 0;	/* 見た目の設定を指定 */
+            left: 22px;	/* 見た目の設定を指定 */
+            right: 22px;	/* 見た目の設定を指定 */
+            height: 3px;	/* 見た目の設定を指定 */
+            border-radius: 0 0 8px 8px;	/* 見た目の設定を指定 */
+            background: linear-gradient(90deg, var(--teal), #8ce3d7, var(--coral));	/* 見た目の設定を指定 */
+            opacity: .8;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .user-card:hover {	/* 対象要素のスタイルを始める */
+            transform: translateY(-6px);	/* 見た目の設定を指定 */
+            border-color: rgba(24, 184, 176, .32);	/* 見た目の設定を指定 */
+            box-shadow: 0 22px 42px rgba(16, 32, 51, .11);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .user-card h3 {	/* 対象要素のスタイルを始める */
+            margin-bottom: 9px;	/* 見た目の設定を指定 */
+            color: var(--ink);	/* 見た目の設定を指定 */
+            font-size: 1.05rem;	/* 見た目の設定を指定 */
+            letter-spacing: -.02em;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .user-card p {	/* 対象要素のスタイルを始める */
+            color: #68798c;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            line-height: 1.75;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .user-badge {	/* 対象要素のスタイルを始める */
+            padding: 6px 10px;	/* 見た目の設定を指定 */
+            border-radius: 999px;	/* 見た目の設定を指定 */
+            background: #edf8f7;	/* 見た目の設定を指定 */
+            color: var(--teal-dark);	/* 見た目の設定を指定 */
+            font-size: 10px;	/* 見た目の設定を指定 */
+            letter-spacing: .04em;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .countdown-badge {	/* 対象要素のスタイルを始める */
+            padding: 6px 9px;	/* 見た目の設定を指定 */
+            border-radius: 999px;	/* 見た目の設定を指定 */
+            background: #fff4e9;	/* 見た目の設定を指定 */
+            color: #bd6a22;	/* 見た目の設定を指定 */
+            font-size: 10px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .card-tags {	/* 対象要素のスタイルを始める */
+            gap: 6px;	/* 見た目の設定を指定 */
+            margin-bottom: 17px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .tag-badge {	/* 対象要素のスタイルを始める */
+            padding: 5px 9px;	/* 見た目の設定を指定 */
+            border-radius: 999px;	/* 見た目の設定を指定 */
+            background: #f0f4f7;	/* 見た目の設定を指定 */
+            color: #5d7389;	/* 見た目の設定を指定 */
+            font-size: 10px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .tag-badge:hover {	/* 対象要素のスタイルを始める */
+            background: var(--teal);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-match {	/* 対象要素のスタイルを始める */
+            padding: 12px;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            border-radius: 12px;	/* 見た目の設定を指定 */
+            background: var(--navy);	/* 見た目の設定を指定 */
+            color: #fff;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            box-shadow: 0 8px 16px rgba(16, 32, 51, .12);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-match:hover {	/* 対象要素のスタイルを始める */
+            background: linear-gradient(135deg, var(--teal), var(--teal-dark));	/* 見た目の設定を指定 */
+            box-shadow: 0 10px 20px rgba(24, 184, 176, .22);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .card-action-row {	/* 対象要素のスタイルを始める */
+            margin-top: 9px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-card-action {	/* 対象要素のスタイルを始める */
+            border: 1px solid transparent;	/* 見た目の設定を指定 */
+            border-radius: 10px;	/* 見た目の設定を指定 */
+            background: #f6f8fa;	/* 見た目の設定を指定 */
+            color: #738398;	/* 見た目の設定を指定 */
+            font-size: 10px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-card-block:hover {	/* 対象要素のスタイルを始める */
+            background: #fff5df;	/* 見た目の設定を指定 */
+            color: #a3651e;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-card-report:hover {	/* 対象要素のスタイルを始める */
+            background: #fff0ee;	/* 見た目の設定を指定 */
+            color: #c85b50;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #recruit-form-area .sidebar-form {	/* 対象要素のスタイルを始める */
+            padding: 30px;	/* 見た目の設定を指定 */
+            border: 1px solid var(--line);	/* 見た目の設定を指定 */
+            border-radius: 26px;	/* 見た目の設定を指定 */
+            background: rgba(255, 255, 255, .95);	/* 見た目の設定を指定 */
+            box-shadow: var(--shadow-lg);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #form-title {	/* 対象要素のスタイルを始める */
+            margin-bottom: 24px;	/* 見た目の設定を指定 */
+            color: var(--ink);	/* 見た目の設定を指定 */
+            font-size: 1.35rem;	/* 見た目の設定を指定 */
+            letter-spacing: -.04em;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #form-title::before {	/* 対象要素のスタイルを始める */
+            width: 7px;	/* 見た目の設定を指定 */
+            height: 24px;	/* 見た目の設定を指定 */
+            background: linear-gradient(180deg, var(--coral), var(--teal));	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        select,	/* スタイルを設定 */
+        textarea,	/* スタイルを設定 */
+        input[type="text"] {	/* 対象要素のスタイルを始める */
+            border: 1px solid var(--line);	/* 見た目の設定を指定 */
+            border-radius: 13px;	/* 見た目の設定を指定 */
+            background: #f8fafc;	/* 見た目の設定を指定 */
+            color: var(--ink);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        select:focus,	/* 見た目の設定を指定 */
+        textarea:focus,	/* 見た目の設定を指定 */
+        input[type="text"]:focus {	/* 対象要素のスタイルを始める */
+            border-color: rgba(24, 184, 176, .55);	/* 見た目の設定を指定 */
+            box-shadow: 0 0 0 5px rgba(24, 184, 176, .1);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        #user-name {	/* 対象要素のスタイルを始める */
+            border: 1px solid var(--line);	/* 見た目の設定を指定 */
+            border-radius: 13px;	/* 見た目の設定を指定 */
+            background: #eef2f5;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-search,	/* スタイルを設定 */
+        #submit-btn {	/* 対象要素のスタイルを始める */
+            border-radius: 13px;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);	/* 見た目の設定を指定 */
+            box-shadow: 0 10px 20px rgba(24, 184, 176, .2);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-search:hover,	/* 見た目の設定を指定 */
+        #submit-btn:hover {	/* 対象要素のスタイルを始める */
+            box-shadow: 0 14px 26px rgba(24, 184, 176, .28);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .loading-box {	/* 対象要素のスタイルを始める */
+            min-height: 260px;	/* 見た目の設定を指定 */
+            padding: 40px 20px;	/* 見た目の設定を指定 */
+            border: 1px dashed #d8e2e9;	/* 見た目の設定を指定 */
+            border-radius: 22px;	/* 見た目の設定を指定 */
+            background: rgba(255, 255, 255, .6);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .spinner {	/* 対象要素のスタイルを始める */
+            border-color: rgba(24, 184, 176, .18);	/* 見た目の設定を指定 */
+            border-top-color: var(--teal);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .toast-notification {	/* 対象要素のスタイルを始める */
+            top: 92px;	/* 見た目の設定を指定 */
+            right: 24px;	/* 見た目の設定を指定 */
+            border: 1px solid rgba(24, 184, 176, .26);	/* 見た目の設定を指定 */
+            border-radius: 18px;	/* 見た目の設定を指定 */
+            background: rgba(255, 255, 255, .94);	/* 見た目の設定を指定 */
+            box-shadow: var(--shadow-lg);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .toast-icon {	/* 対象要素のスタイルを始める */
+            background: linear-gradient(135deg, var(--teal), var(--teal-dark));	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .toast-title {	/* 対象要素のスタイルを始める */
+            color: var(--teal-dark);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .footer {	/* 対象要素のスタイルを始める */
+            padding: 32px 20px;	/* 見た目の設定を指定 */
+            border-top: 1px solid var(--line);	/* 見た目の設定を指定 */
+            background: #edf2f5;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .footer-links a:hover {	/* 対象要素のスタイルを始める */
+            color: var(--teal-dark);	/* 見た目の設定を指定 */
+            background: #fff;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        @media screen and (max-width: 768px) {	/* 表示条件を設定 */
+            .navbar {	/* 対象要素のスタイルを始める */
+                min-height: 64px;	/* 見た目の設定を指定 */
+                padding: 14px 18px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .logo {	/* 対象要素のスタイルを始める */
+                font-size: 1.05rem;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .hamburger-btn span {	/* 対象要素のスタイルを始める */
+                background: var(--ink);	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .nav-links {	/* 対象要素のスタイルを始める */
+                top: 64px !important;	/* 見た目の設定を指定 */
+                padding: 20px 0 !important;	/* 見た目の設定を指定 */
+                background: rgba(255, 255, 255, .97) !important;	/* 見た目の設定を指定 */
+                border-bottom: 1px solid var(--line);	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .container {	/* 対象要素のスタイルを始める */
+                margin: 28px auto 48px;	/* 見た目の設定を指定 */
+                padding: 0 16px;	/* 見た目の設定を指定 */
+                gap: 24px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .sidebar {	/* 対象要素のスタイルを始める */
+                position: static;	/* 見た目の設定を指定 */
+                width: 100%;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .mypage-area {	/* 対象要素のスタイルを始める */
+                padding: 20px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .user-grid {	/* 対象要素のスタイルを始める */
+                grid-template-columns: 1fr;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .user-card {	/* 対象要素のスタイルを始める */
+                min-height: 230px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            #recruit-form-area .sidebar-form {	/* 対象要素のスタイルを始める */
+                padding: 22px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+
+            .toast-notification {	/* 対象要素のスタイルを始める */
+                top: 76px;	/* 見た目の設定を指定 */
+                right: 12px;	/* 見た目の設定を指定 */
+                left: 12px;	/* 見た目の設定を指定 */
+                max-width: none;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
+        }	/* スタイル定義を閉じる */
     </style>
-    <link rel="stylesheet" href="theme.css?v=20260917c">
+    <link rel="stylesheet" href="theme.css?v=20260917c">	<!-- 外部ファイルを読み込む -->
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
-</head>
+</head>	<!-- 要素を閉じる -->
 
-<body data-page="main">
+<body data-page="main">	<!-- 画面要素を配置 -->
 
-    <div id="impersonate-bar" style="display: none; background: #fef08a; color: #854d0e; text-align: center; padding: 10px; font-weight: 700; font-size: 13px; border-bottom: 1px solid #fde047; z-index: 1000; position: relative;">
-        ⚠️ 現在 <span id="impersonate-user-id" style="text-decoration: underline;"></span> として代理ログイン中です。
-        <button onclick="exitImpersonation()" style="margin-left: 12px; background: #854d0e; color: #ffffff; border: none; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700;">
-            管理者ダッシュボードに戻る
-        </button>
-    </div>
+    <div id="impersonate-bar" style="display: none; background: #fef08a; color: #854d0e; text-align: center; padding: 10px; font-weight: 700; font-size: 13px; border-bottom: 1px solid #fde047; z-index: 1000; position: relative;">	<!-- 画面要素を配置 -->
+        ⚠️ 現在 <span id="impersonate-user-id" style="text-decoration: underline;"></span> として代理ログイン中です。	<!-- 画面に表示する内容 -->
+        <button onclick="exitImpersonation()" style="margin-left: 12px; background: #854d0e; color: #ffffff; border: none; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700;">	<!-- 操作できる要素を配置 -->
+            管理者ダッシュボードに戻る	<!-- 画面に表示する内容 -->
+        </button>	<!-- 要素を閉じる -->
+    </div>	<!-- 要素を閉じる -->
 
-    <div id="toast-notification" class="toast-notification" onclick="clickToast()">
-        <div class="toast-icon">💬</div>
-        <div class="toast-content">
-            <div class="toast-title">新着メッセージ</div>
-            <div class="toast-sender" id="toast-sender-name">ユーザー</div>
-            <div class="toast-text" id="toast-text-body">メッセージが届きました</div>
-        </div>
-    </div>
+    <div id="toast-notification" class="toast-notification" onclick="clickToast()">	<!-- 画面要素を配置 -->
+        <div class="toast-icon">💬</div>	<!-- 画面要素を配置 -->
+        <div class="toast-content">	<!-- 画面要素を配置 -->
+            <div class="toast-title">新着メッセージ</div>	<!-- 画面要素を配置 -->
+            <div class="toast-sender" id="toast-sender-name">ユーザー</div>	<!-- 画面要素を配置 -->
+            <div class="toast-text" id="toast-text-body">メッセージが届きました</div>	<!-- 画面要素を配置 -->
+        </div>	<!-- 要素を閉じる -->
+    </div>	<!-- 要素を閉じる -->
 
-    <header class="navbar">
-        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
+    <header class="navbar">	<!-- ヘッダーを配置 -->
+        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>	<!-- 画面要素を配置 -->
 
-        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
+        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">	<!-- 操作できる要素を配置 -->
+            <span></span>	<!-- 画面要素を配置 -->
+            <span></span>	<!-- 画面要素を配置 -->
+            <span></span>	<!-- 画面要素を配置 -->
+        </button>	<!-- 要素を閉じる -->
 
-        <nav class="nav-links" id="nav-links">
-            <button type="button" class="nav-item nav-guide-button" onclick="openUsageGuide(); closeMenu();">使い方</button>
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header" class="nav-item">意見箱</a>
-            <a class="nav-item" href="recruit.html">募集投稿</a>
-            <a class="nav-item active" href="users.html">ユーザーを探す</a>
-            <a class="nav-item" href="messages.html">
-                メッセージ
-                <span id="unread-badge" class="unread-badge" style="display: none;">0</span>
-            </a>
-            <a class="nav-item" href="profile.html">マイページ</a>
-            <a class="nav-item" href="ai-study.html">AI学習相談</a>
+        <nav class="nav-links" id="nav-links">	<!-- ナビゲーションを配置 -->
+            <button type="button" class="nav-item nav-guide-button" onclick="openUsageGuide(); closeMenu();">使い方</button>	<!-- 操作できる要素を配置 -->
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header" class="nav-item">意見箱</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="recruit.html">募集投稿</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item active" href="users.html">ユーザーを探す</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="messages.html">	<!-- 操作できる要素を配置 -->
+                メッセージ	<!-- 画面に表示する内容 -->
+                <span id="unread-badge" class="unread-badge" style="display: none;">0</span>	<!-- 画面要素を配置 -->
+            </a>	<!-- 要素を閉じる -->
+            <a class="nav-item" href="profile.html">マイページ</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="ai-study.html">AI学習相談</a>	<!-- 操作できる要素を配置 -->
 
-            <a class="nav-item" id="nav-admin-btn" style="display: none; color: #ef4444;" href="admin.html" aria-label="管理者ページを開く">管理者</a>
+            <a class="nav-item" id="nav-admin-btn" style="display: none; color: #ef4444;" href="admin.html" aria-label="管理者ページを開く">管理者</a>	<!-- 操作できる要素を配置 -->
 
-            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>
-        </nav>
-    </header>
+            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>	<!-- 操作できる要素を配置 -->
+        </nav>	<!-- 要素を閉じる -->
+    </header>	<!-- 要素を閉じる -->
 
-    <main class="container">
-        <div class="sidebar">
-            <a class="mypage-area" href="profile.html" aria-label="マイページを開く" style="text-decoration: none;">
-                <img id="profile-icon" class="big-profile-icon" src="" alt="プロフィール画像">
-                <div id="mypage-text">マイページ</div>
-            </a>
+    <main class="container">	<!-- ページの主内容を配置 -->
+        <div class="sidebar">	<!-- 画面要素を配置 -->
+            <a class="mypage-area" href="profile.html" aria-label="マイページを開く" style="text-decoration: none;">	<!-- 操作できる要素を配置 -->
+                <img id="profile-icon" class="big-profile-icon" src="" alt="プロフィール画像">	<!-- 画面要素を配置 -->
+                <div id="mypage-text">マイページ</div>	<!-- 画面要素を配置 -->
+            </a>	<!-- 要素を閉じる -->
 
             <div id="my-post-area"
                 style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(28, 189, 197, 0.2); padding: 20px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(24, 76, 92, 0.02); text-align: left; width: 100%; box-sizing: border-box;">
-                <h4 style="margin: 0 0 12px 0; color: #1e293b; font-weight: 800; font-size: 13px; display: flex; align-items: center; gap: 6px;">
-                    📢 あなたの現在の募集
-                </h4>
-                <div id="my-post-content" style="font-size: 13px; color: #64748b; line-height: 1.5;">投稿している募集はありません。</div>
-            </div>
-        </div>
+                <h4 style="margin: 0 0 12px 0; color: #1e293b; font-weight: 800; font-size: 13px; display: flex; align-items: center; gap: 6px;">	<!-- 画面要素を配置 -->
+                    📢 あなたの現在の募集	<!-- 画面に表示する内容 -->
+                </h4>	<!-- 要素を閉じる -->
+                <div id="my-post-content" style="font-size: 13px; color: #64748b; line-height: 1.5;">投稿している募集はありません。</div>	<!-- 画面要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+        </div>	<!-- 要素を閉じる -->
 
-        <div class="main-area">
-            <section id="recruit-form-area" style="display: none;">
-                <div class="sidebar-form">
-                    <h3 id="form-title">募集を投稿する</h3>
+        <div class="main-area">	<!-- 画面要素を配置 -->
+            <section id="recruit-form-area" style="display: none;">	<!-- 画面要素を配置 -->
+                <div class="sidebar-form">	<!-- 画面要素を配置 -->
+                    <h3 id="form-title">募集を投稿する</h3>	<!-- 画面要素を配置 -->
                     <input type="text" id="user-name" placeholder="マイページで名前を設定してください" readonly
                         style="margin-bottom:12px;" />
-                    <select id="rec-grade" style="margin-bottom:12px;">
-                        <option value="1年">1年</option>
-                        <option value="2年">2年</option>
-                        <option value="3年">3年</option>
-                    </select>
-                    <select id="rec-dept" style="margin-bottom:12px;">
-                        <option value="機械工学科">機械工学科</option>
-                        <option value="電気工学科">電気工学科</option>
-                        <option value="制御工学科">制御工学科</option>
-                        <option value="土木環境工学科">土木環境工学科</option>
-                        <option value="情報工学科">情報工学科</option>
-                    </select>
+                    <select id="rec-grade" style="margin-bottom:12px;">	<!-- 入力要素を配置 -->
+                        <option value="1年">1年</option>	<!-- 入力要素を配置 -->
+                        <option value="2年">2年</option>	<!-- 入力要素を配置 -->
+                        <option value="3年">3年</option>	<!-- 入力要素を配置 -->
+                    </select>	<!-- 要素を閉じる -->
+                    <select id="rec-dept" style="margin-bottom:12px;">	<!-- 入力要素を配置 -->
+                        <option value="機械工学科">機械工学科</option>	<!-- 入力要素を配置 -->
+                        <option value="電気工学科">電気工学科</option>	<!-- 入力要素を配置 -->
+                        <option value="制御工学科">制御工学科</option>	<!-- 入力要素を配置 -->
+                        <option value="土木環境工学科">土木環境工学科</option>	<!-- 入力要素を配置 -->
+                        <option value="情報工学科">情報工学科</option>	<!-- 入力要素を配置 -->
+                    </select>	<!-- 要素を閉じる -->
                     <textarea id="rec-content" rows="4" maxlength="2000" placeholder="募集内容を入力してください"
                         style="margin-bottom:12px;"></textarea>
 
-                    <label for="rec-fixed-tag" style="display:block; margin:0 0 6px; color:#475569; font-size:13px; font-weight:700;">おすすめタグから選ぶ</label>
-                    <select id="rec-fixed-tag" style="margin-bottom:12px;">
-                        <option value="">タグを1つ選ぶ（任意）</option>
-                        <option value="数学">数学</option>
-                        <option value="英語">英語</option>
-                        <option value="国語">国語</option>
-                        <option value="理科">理科</option>
-                        <option value="社会">社会</option>
-                        <option value="専門科目">専門科目</option>
-                        <option value="プログラミング">プログラミング</option>
-                        <option value="資格">資格</option>
-                        <option value="定期テスト">定期テスト</option>
-                        <option value="課題">課題</option>
-                        <option value="放課後">放課後</option>
-                        <option value="初心者歓迎">初心者歓迎</option>
-                    </select>
+                    <label for="rec-fixed-tag" style="display:block; margin:0 0 6px; color:#475569; font-size:13px; font-weight:700;">おすすめタグから選ぶ</label>	<!-- 画面要素を配置 -->
+                    <select id="rec-fixed-tag" style="margin-bottom:12px;">	<!-- 入力要素を配置 -->
+                        <option value="">タグを1つ選ぶ（任意）</option>	<!-- 入力要素を配置 -->
+                        <option value="数学">数学</option>	<!-- 入力要素を配置 -->
+                        <option value="英語">英語</option>	<!-- 入力要素を配置 -->
+                        <option value="国語">国語</option>	<!-- 入力要素を配置 -->
+                        <option value="理科">理科</option>	<!-- 入力要素を配置 -->
+                        <option value="社会">社会</option>	<!-- 入力要素を配置 -->
+                        <option value="専門科目">専門科目</option>	<!-- 入力要素を配置 -->
+                        <option value="プログラミング">プログラミング</option>	<!-- 入力要素を配置 -->
+                        <option value="資格">資格</option>	<!-- 入力要素を配置 -->
+                        <option value="定期テスト">定期テスト</option>	<!-- 入力要素を配置 -->
+                        <option value="課題">課題</option>	<!-- 入力要素を配置 -->
+                        <option value="放課後">放課後</option>	<!-- 入力要素を配置 -->
+                        <option value="初心者歓迎">初心者歓迎</option>	<!-- 入力要素を配置 -->
+                    </select>	<!-- 要素を閉じる -->
 
                     <input type="text" id="rec-tags" maxlength="500" placeholder="関連タグを自由入力（任意・例: 物理, 検定対策）"
                         style="margin-bottom:16px;" />
 
-                    <label for="rec-duration" style="display:block; margin:0 0 6px; color:#475569; font-size:13px; font-weight:700;">募集を表示する時間</label>
-                    <select id="rec-duration" style="margin-bottom:6px;">
-                        <option value="15">15分</option>
-                        <option value="30">30分</option>
-                        <option value="45">45分</option>
-                        <option value="60">1時間</option>
-                        <option value="120">2時間</option>
-                        <option value="180">3時間</option>
-                        <option value="240">4時間</option>
-                        <option value="300">5時間</option>
-                        <option value="360">6時間</option>
-                        <option value="420">7時間</option>
-                        <option value="480">8時間</option>
-                        <option value="540">9時間</option>
-                        <option value="600">10時間</option>
-                        <option value="660">11時間</option>
-                        <option value="720">12時間</option>
-                        <option value="780">13時間</option>
-                        <option value="840">14時間</option>
-                        <option value="900">15時間</option>
-                        <option value="960">16時間</option>
-                        <option value="1020">17時間</option>
-                        <option value="1080">18時間</option>
-                        <option value="1140">19時間</option>
-                        <option value="1200">20時間</option>
-                        <option value="1260">21時間</option>
-                        <option value="1320">22時間</option>
-                        <option value="1380">23時間</option>
-                        <option value="1440" selected>24時間</option>
-                    </select>
-                    <p style="margin:0 0 16px; color:#64748b; font-size:11px; line-height:1.5;">選んだ時間を過ぎると、募集一覧から自動的に非表示になります。</p>
+                    <label for="rec-duration" style="display:block; margin:0 0 6px; color:#475569; font-size:13px; font-weight:700;">募集を表示する時間</label>	<!-- 画面要素を配置 -->
+                    <select id="rec-duration" style="margin-bottom:6px;">	<!-- 入力要素を配置 -->
+                        <option value="15">15分</option>	<!-- 入力要素を配置 -->
+                        <option value="30">30分</option>	<!-- 入力要素を配置 -->
+                        <option value="45">45分</option>	<!-- 入力要素を配置 -->
+                        <option value="60">1時間</option>	<!-- 入力要素を配置 -->
+                        <option value="120">2時間</option>	<!-- 入力要素を配置 -->
+                        <option value="180">3時間</option>	<!-- 入力要素を配置 -->
+                        <option value="240">4時間</option>	<!-- 入力要素を配置 -->
+                        <option value="300">5時間</option>	<!-- 入力要素を配置 -->
+                        <option value="360">6時間</option>	<!-- 入力要素を配置 -->
+                        <option value="420">7時間</option>	<!-- 入力要素を配置 -->
+                        <option value="480">8時間</option>	<!-- 入力要素を配置 -->
+                        <option value="540">9時間</option>	<!-- 入力要素を配置 -->
+                        <option value="600">10時間</option>	<!-- 入力要素を配置 -->
+                        <option value="660">11時間</option>	<!-- 入力要素を配置 -->
+                        <option value="720">12時間</option>	<!-- 入力要素を配置 -->
+                        <option value="780">13時間</option>	<!-- 入力要素を配置 -->
+                        <option value="840">14時間</option>	<!-- 入力要素を配置 -->
+                        <option value="900">15時間</option>	<!-- 入力要素を配置 -->
+                        <option value="960">16時間</option>	<!-- 入力要素を配置 -->
+                        <option value="1020">17時間</option>	<!-- 入力要素を配置 -->
+                        <option value="1080">18時間</option>	<!-- 入力要素を配置 -->
+                        <option value="1140">19時間</option>	<!-- 入力要素を配置 -->
+                        <option value="1200">20時間</option>	<!-- 入力要素を配置 -->
+                        <option value="1260">21時間</option>	<!-- 入力要素を配置 -->
+                        <option value="1320">22時間</option>	<!-- 入力要素を配置 -->
+                        <option value="1380">23時間</option>	<!-- 入力要素を配置 -->
+                        <option value="1440" selected>24時間</option>	<!-- 入力要素を配置 -->
+                    </select>	<!-- 要素を閉じる -->
+                    <p style="margin:0 0 16px; color:#64748b; font-size:11px; line-height:1.5;">選んだ時間を過ぎると、募集一覧から自動的に非表示になります。</p>	<!-- 画面要素を配置 -->
 
-                    <button class="btn-search" id="submit-btn" onclick="submitRecruitment()">投稿する</button>
-                </div>
-            </section>
+                    <button class="btn-search" id="submit-btn" onclick="submitRecruitment()">投稿する</button>	<!-- 操作できる要素を配置 -->
+                </div>	<!-- 要素を閉じる -->
+            </section>	<!-- 要素を閉じる -->
 
-            <div class="main-content">
-                <section id="search-area">
-                    <div class="usage-intro-card">
-                        <div>
-                            <span class="usage-intro-label">CLASS TRIAL GUIDE</span>
-                            <h1>募集を見つけて、勉強の相談を始めよう。</h1>
-                            <p>投稿、検索、チャット、安全機能まで、初めて使うときの流れをまとめています。</p>
-                        </div>
-                        <button type="button" class="usage-intro-button" onclick="openUsageGuide()">使い方を見る</button>
-                    </div>
+            <div class="main-content">	<!-- 画面要素を配置 -->
+                <section id="search-area">	<!-- 画面要素を配置 -->
+                    <div class="usage-intro-card">	<!-- 画面要素を配置 -->
+                        <div>	<!-- 画面要素を配置 -->
+                            <span class="usage-intro-label">CLASS TRIAL GUIDE</span>	<!-- 画面要素を配置 -->
+                            <h1>募集を見つけて、勉強の相談を始めよう。</h1>	<!-- 画面要素を配置 -->
+                            <p>投稿、検索、チャット、安全機能まで、初めて使うときの流れをまとめています。</p>	<!-- 画面要素を配置 -->
+                        </div>	<!-- 要素を閉じる -->
+                        <button type="button" class="usage-intro-button" onclick="openUsageGuide()">使い方を見る</button>	<!-- 操作できる要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
 
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-                        <h2 style="font-size: 1.35rem; font-weight: 800; margin: 0; color: #1e293b;">他ユーザーの募集一覧</h2>
-                        <button onclick="loadRecruitments()" class="btn-refresh">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">	<!-- 画面要素を配置 -->
+                        <h2 style="font-size: 1.35rem; font-weight: 800; margin: 0; color: #1e293b;">他ユーザーの募集一覧</h2>	<!-- 画面要素を配置 -->
+                        <button onclick="loadRecruitments()" class="btn-refresh">	<!-- 操作できる要素を配置 -->
                             <img class="refresh-icon"
                                 src="https://kotonohaworks.com/free-icons/wp-content/uploads/kkrn_icon_koushin_17.png"
                                 alt="更新">
-                        </button>
-                    </div>
+                        </button>	<!-- 要素を閉じる -->
+                    </div>	<!-- 要素を閉じる -->
 
-                    <div class="search-box-container">
-                        <span class="search-icon-inside">🔍</span>
+                    <div class="search-box-container">	<!-- 画面要素を配置 -->
+                        <span class="search-icon-inside">🔍</span>	<!-- 画面要素を配置 -->
                         <input type="text" id="search-input" class="search-input"
                             placeholder="キーワードやタグで検索（例: プログラミング, 部活, 1年）"
                             oninput="renderFilteredRecruitments()">
-                    </div>
+                    </div>	<!-- 要素を閉じる -->
 
-                    <div class="user-grid" id="user-list">
-                        <div class="loading-box">
-                            <div class="spinner"></div>
-                            <span>読み込み中...</span>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </div>
-    </main>
+                    <div class="user-grid" id="user-list">	<!-- 画面要素を配置 -->
+                        <div class="loading-box">	<!-- 画面要素を配置 -->
+                            <div class="spinner"></div>	<!-- 画面要素を配置 -->
+                            <span>読み込み中...</span>	<!-- 画面要素を配置 -->
+                        </div>	<!-- 要素を閉じる -->
+                    </div>	<!-- 要素を閉じる -->
+                </section>	<!-- 要素を閉じる -->
+            </div>	<!-- 要素を閉じる -->
+        </div>	<!-- 要素を閉じる -->
+    </main>	<!-- 要素を閉じる -->
 
-    <div id="usage-guide" class="usage-guide" aria-hidden="true">
-        <button type="button" class="usage-guide-backdrop" aria-label="使い方を閉じる" onclick="closeUsageGuide()"></button>
-        <section class="usage-guide-panel" role="dialog" aria-modal="true" aria-labelledby="usage-guide-title">
-            <div class="usage-guide-header">
-                <div>
-                    <span class="usage-guide-kicker">HOW TO USE</span>
-                    <h2 id="usage-guide-title">平工マッチングの使い方</h2>
-                    <p>興味のある募集を見つけ、チャットで勉強の相談や予定の確認をするサービスです。</p>
-                </div>
-                <button type="button" class="usage-guide-close" onclick="closeUsageGuide()" aria-label="使い方を閉じる">×</button>
-            </div>
+    <div id="usage-guide" class="usage-guide" aria-hidden="true">	<!-- 画面要素を配置 -->
+        <button type="button" class="usage-guide-backdrop" aria-label="使い方を閉じる" onclick="closeUsageGuide()"></button>	<!-- 操作できる要素を配置 -->
+        <section class="usage-guide-panel" role="dialog" aria-modal="true" aria-labelledby="usage-guide-title">	<!-- 画面要素を配置 -->
+            <div class="usage-guide-header">	<!-- 画面要素を配置 -->
+                <div>	<!-- 画面要素を配置 -->
+                    <span class="usage-guide-kicker">HOW TO USE</span>	<!-- 画面要素を配置 -->
+                    <h2 id="usage-guide-title">平工マッチングの使い方</h2>	<!-- 画面要素を配置 -->
+                    <p>興味のある募集を見つけ、チャットで勉強の相談や予定の確認をするサービスです。</p>	<!-- 画面要素を配置 -->
+                </div>	<!-- 要素を閉じる -->
+                <button type="button" class="usage-guide-close" onclick="closeUsageGuide()" aria-label="使い方を閉じる">×</button>	<!-- 操作できる要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
 
-            <div class="usage-guide-body">
-                <div class="usage-guide-flow" aria-label="基本的な利用手順">
-                    <article class="usage-step-card">
-                        <span class="usage-step-number">01</span>
-                        <h3>プロフィールを整える</h3>
-                        <p>マイページで表示名とプロフィール画像を設定します。表示名は募集やチャットに表示されます。</p>
-                        <a href="profile.html">マイページを開く</a>
-                    </article>
-                    <article class="usage-step-card">
-                        <span class="usage-step-number">02</span>
-                        <h3>募集する・探す</h3>
-                        <p>募集投稿とユーザー検索は別ページです。勉強内容、タグ、表示時間を設定して投稿できます。</p>
-                        <button type="button" onclick="showGuideDestination('recruit')">募集を投稿する</button>
-                    </article>
-                    <article class="usage-step-card">
-                        <span class="usage-step-number">03</span>
-                        <h3>相談を始める</h3>
-                        <p>気になる募集にリアクションを送るか、チャットを始めます。AI学習相談では勉強方法も一緒に考えられます。</p>
-                        <button type="button" onclick="showGuideDestination('search')">募集一覧を見る</button>
-                    </article>
-                </div>
+            <div class="usage-guide-body">	<!-- 画面要素を配置 -->
+                <div class="usage-guide-flow" aria-label="基本的な利用手順">	<!-- 画面要素を配置 -->
+                    <article class="usage-step-card">	<!-- 画面要素を配置 -->
+                        <span class="usage-step-number">01</span>	<!-- 画面要素を配置 -->
+                        <h3>プロフィールを整える</h3>	<!-- 画面要素を配置 -->
+                        <p>マイページで表示名とプロフィール画像を設定します。表示名は募集やチャットに表示されます。</p>	<!-- 画面要素を配置 -->
+                        <a href="profile.html">マイページを開く</a>	<!-- 操作できる要素を配置 -->
+                    </article>	<!-- 要素を閉じる -->
+                    <article class="usage-step-card">	<!-- 画面要素を配置 -->
+                        <span class="usage-step-number">02</span>	<!-- 画面要素を配置 -->
+                        <h3>募集する・探す</h3>	<!-- 画面要素を配置 -->
+                        <p>募集投稿とユーザー検索は別ページです。勉強内容、タグ、表示時間を設定して投稿できます。</p>	<!-- 画面要素を配置 -->
+                        <button type="button" onclick="showGuideDestination('recruit')">募集を投稿する</button>	<!-- 操作できる要素を配置 -->
+                    </article>	<!-- 要素を閉じる -->
+                    <article class="usage-step-card">	<!-- 画面要素を配置 -->
+                        <span class="usage-step-number">03</span>	<!-- 画面要素を配置 -->
+                        <h3>相談を始める</h3>	<!-- 画面要素を配置 -->
+                        <p>気になる募集にリアクションを送るか、チャットを始めます。AI学習相談では勉強方法も一緒に考えられます。</p>	<!-- 画面要素を配置 -->
+                        <button type="button" onclick="showGuideDestination('search')">募集一覧を見る</button>	<!-- 操作できる要素を配置 -->
+                    </article>	<!-- 要素を閉じる -->
+                </div>	<!-- 要素を閉じる -->
 
-                <section class="usage-guide-section">
-                    <div class="usage-guide-section-title">
-                        <span>募集について</span>
-                        <h3>表示時間を自分で決められます</h3>
-                    </div>
-                    <div class="usage-info-grid">
-                        <div><strong>表示時間</strong><p>15分・30分・45分、1時間以降は1時間刻みで、最大24時間まで選べます。</p></div>
-                        <div><strong>タグ検索</strong><p>おすすめタグと自由入力タグを組み合わせて、募集を見つけやすくできます。タグを押すと絞り込めます。</p></div>
-                        <div><strong>残り時間と削除</strong><p>募集一覧では残り時間を確認できます。募集投稿ページから自分の募集を手動削除できます。</p></div>
-                    </div>
-                    <a class="usage-guide-primary-link" href="recruit.html">募集投稿ページを開く</a>
-                    <a class="usage-guide-primary-link" href="users.html">ユーザー検索ページを開く</a>
-                </section>
+                <section class="usage-guide-section">	<!-- 画面要素を配置 -->
+                    <div class="usage-guide-section-title">	<!-- 画面要素を配置 -->
+                        <span>募集について</span>	<!-- 画面要素を配置 -->
+                        <h3>表示時間を自分で決められます</h3>	<!-- 画面要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
+                    <div class="usage-info-grid">	<!-- 画面要素を配置 -->
+                        <div><strong>表示時間</strong><p>15分・30分・45分、1時間以降は1時間刻みで、最大24時間まで選べます。</p></div>	<!-- 画面要素を配置 -->
+                        <div><strong>タグ検索</strong><p>おすすめタグと自由入力タグを組み合わせて、募集を見つけやすくできます。タグを押すと絞り込めます。</p></div>	<!-- 画面要素を配置 -->
+                        <div><strong>残り時間と削除</strong><p>募集一覧では残り時間を確認できます。募集投稿ページから自分の募集を手動削除できます。</p></div>	<!-- 画面要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
+                    <a class="usage-guide-primary-link" href="recruit.html">募集投稿ページを開く</a>	<!-- 操作できる要素を配置 -->
+                    <a class="usage-guide-primary-link" href="users.html">ユーザー検索ページを開く</a>	<!-- 操作できる要素を配置 -->
+                </section>	<!-- 要素を閉じる -->
 
-                <section class="usage-guide-section">
-                    <div class="usage-guide-section-title">
-                        <span>募集一覧の機能</span>
-                        <h3>気になる相手へすぐ反応できます</h3>
-                    </div>
-                    <div class="usage-guide-note">
-                        <p><strong>クイックリアクション：</strong>「気になる！」「一緒に勉強したい！」「質問したい！」をワンタップで送れます。</p>
-                        <p><strong>チャット：</strong>募集内容を見て詳しく相談したいときは「チャットを始める」を押します。</p>
-                        <p><strong>ブロック・通報：</strong>相手との接触を止めたいときはブロック、不適切な投稿は通報を使います。</p>
-                    </div>
-                </section>
+                <section class="usage-guide-section">	<!-- 画面要素を配置 -->
+                    <div class="usage-guide-section-title">	<!-- 画面要素を配置 -->
+                        <span>募集一覧の機能</span>	<!-- 画面要素を配置 -->
+                        <h3>気になる相手へすぐ反応できます</h3>	<!-- 画面要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
+                    <div class="usage-guide-note">	<!-- 画面要素を配置 -->
+                        <p><strong>クイックリアクション：</strong>「気になる！」「一緒に勉強したい！」「質問したい！」をワンタップで送れます。</p>	<!-- 画面要素を配置 -->
+                        <p><strong>チャット：</strong>募集内容を見て詳しく相談したいときは「チャットを始める」を押します。</p>	<!-- 画面要素を配置 -->
+                        <p><strong>ブロック・通報：</strong>相手との接触を止めたいときはブロック、不適切な投稿は通報を使います。</p>	<!-- 画面要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
+                </section>	<!-- 要素を閉じる -->
 
-                <section class="usage-guide-section">
-                    <div class="usage-guide-section-title">
-                        <span>メッセージと通知</span>
-                        <h3>チャットを安全・便利に使う</h3>
-                    </div>
-                    <div class="usage-guide-note">
-                        <p><strong>メッセージ一覧：</strong>上部の「メッセージ」から会話相手を選べます。未読件数も表示されます。</p>
-                        <p><strong>チャット機能：</strong>画像添付、送信取り消し、チャット履歴の削除、メッセージ一覧からの削除に対応しています。</p>
-                        <p><strong>PC操作：</strong>入力欄では日本語変換を確定してから送信してください。送信ボタンも利用できます。</p>
-                        <p><strong>LINE通知：</strong>LINE公式アカウントへ、自分のユーザーIDまたは登録メールアドレスを送信すると連携できます。</p>
-                    </div>
-                    <a class="usage-guide-primary-link" href="messages.html">メッセージ一覧を開く</a>
-                </section>
+                <section class="usage-guide-section">	<!-- 画面要素を配置 -->
+                    <div class="usage-guide-section-title">	<!-- 画面要素を配置 -->
+                        <span>メッセージと通知</span>	<!-- 画面要素を配置 -->
+                        <h3>チャットを安全・便利に使う</h3>	<!-- 画面要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
+                    <div class="usage-guide-note">	<!-- 画面要素を配置 -->
+                        <p><strong>メッセージ一覧：</strong>上部の「メッセージ」から会話相手を選べます。未読件数も表示されます。</p>	<!-- 画面要素を配置 -->
+                        <p><strong>チャット機能：</strong>画像添付、送信取り消し、チャット履歴の削除、メッセージ一覧からの削除に対応しています。</p>	<!-- 画面要素を配置 -->
+                        <p><strong>PC操作：</strong>入力欄では日本語変換を確定してから送信してください。送信ボタンも利用できます。</p>	<!-- 画面要素を配置 -->
+                        <p><strong>LINE通知：</strong>LINE公式アカウントへ、自分のユーザーIDまたは登録メールアドレスを送信すると連携できます。</p>	<!-- 画面要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
+                    <a class="usage-guide-primary-link" href="messages.html">メッセージ一覧を開く</a>	<!-- 操作できる要素を配置 -->
+                </section>	<!-- 要素を閉じる -->
 
-                <section class="usage-guide-section">
-                    <div class="usage-guide-section-title">
-                        <span>AI学習相談</span>
-                        <h3>自分に合う勉強方法を見つける</h3>
-                    </div>
-                    <div class="usage-guide-note">
-                        <p>教科、目標、苦手なこと、勉強できる時間を入力すると、AIが追加質問をしてから勉強方法と具体的な行動を提案します。</p>
-                        <p>通常は「追加質問」→「最終提案」の2回で相談が完了します。回答後は「役に立った／合わなかった」で評価できます。</p>
-                        <p>AI相談は1日5回までです。個人情報、パスワード、住所、電話番号は入力しないでください。</p>
-                    </div>
-                    <a class="usage-guide-primary-link" href="ai-study.html">AI学習相談を開く</a>
-                </section>
+                <section class="usage-guide-section">	<!-- 画面要素を配置 -->
+                    <div class="usage-guide-section-title">	<!-- 画面要素を配置 -->
+                        <span>AI学習相談</span>	<!-- 画面要素を配置 -->
+                        <h3>自分に合う勉強方法を見つける</h3>	<!-- 画面要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
+                    <div class="usage-guide-note">	<!-- 画面要素を配置 -->
+                        <p>教科、目標、苦手なこと、勉強できる時間を入力すると、AIが追加質問をしてから勉強方法と具体的な行動を提案します。</p>	<!-- 画面要素を配置 -->
+                        <p>通常は「追加質問」→「最終提案」の2回で相談が完了します。回答後は「役に立った／合わなかった」で評価できます。</p>	<!-- 画面要素を配置 -->
+                        <p>AI相談は1日5回までです。個人情報、パスワード、住所、電話番号は入力しないでください。</p>	<!-- 画面要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
+                    <a class="usage-guide-primary-link" href="ai-study.html">AI学習相談を開く</a>	<!-- 操作できる要素を配置 -->
+                </section>	<!-- 要素を閉じる -->
 
-                <section class="usage-guide-section">
-                    <div class="usage-guide-section-title">
-                        <span>アカウントと認証</span>
-                        <h3>登録情報を安全に管理する</h3>
-                    </div>
-                    <div class="usage-guide-note">
-                        <p><strong>パスワード：</strong>半角4文字以上で、英大文字・英小文字・数字・記号を各1文字以上含めます。1111や1234のような推測されやすい数字列は使えません。</p>
-                        <p><strong>顔認証：</strong>マイページから顔情報を更新できます。明るい場所で正面を向き、カメラへのアクセスを許可してください。</p>
-                        <p><strong>パスワード再設定：</strong>ログイン画面の再設定手続きから、登録メールアドレスを使って更新できます。</p>
-                    </div>
-                </section>
+                <section class="usage-guide-section">	<!-- 画面要素を配置 -->
+                    <div class="usage-guide-section-title">	<!-- 画面要素を配置 -->
+                        <span>アカウントと認証</span>	<!-- 画面要素を配置 -->
+                        <h3>登録情報を安全に管理する</h3>	<!-- 画面要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
+                    <div class="usage-guide-note">	<!-- 画面要素を配置 -->
+                        <p><strong>パスワード：</strong>半角4文字以上で、英大文字・英小文字・数字・記号を各1文字以上含めます。1111や1234のような推測されやすい数字列は使えません。</p>	<!-- 画面要素を配置 -->
+                        <p><strong>顔認証：</strong>マイページから顔情報を更新できます。明るい場所で正面を向き、カメラへのアクセスを許可してください。</p>	<!-- 画面要素を配置 -->
+                        <p><strong>パスワード再設定：</strong>ログイン画面の再設定手続きから、登録メールアドレスを使って更新できます。</p>	<!-- 画面要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
+                </section>	<!-- 要素を閉じる -->
 
-                <section class="usage-guide-section usage-safety-section">
-                    <div class="usage-guide-section-title">
-                        <span>安全に使うために</span>
-                        <h3>困ったときは一人で抱え込まない</h3>
-                    </div>
-                    <ul>
-                        <li>住所、電話番号、パスワード、顔認証情報などの個人情報は投稿・送信しないでください。</li>
-                        <li>不快なメッセージや不適切な募集は「通報」を使って運営へ知らせてください。</li>
-                        <li>相手とのやり取りを止めたい場合は「ブロック」を使えます。解除はマイページから行えます。</li>
-                        <li>緊急性がある内容は、サービス内だけで解決せず先生や身近な大人へ相談してください。</li>
-                    </ul>
-                </section>
+                <section class="usage-guide-section usage-safety-section">	<!-- 画面要素を配置 -->
+                    <div class="usage-guide-section-title">	<!-- 画面要素を配置 -->
+                        <span>安全に使うために</span>	<!-- 画面要素を配置 -->
+                        <h3>困ったときは一人で抱え込まない</h3>	<!-- 画面要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
+                    <ul>	<!-- 画面要素を配置 -->
+                        <li>住所、電話番号、パスワード、顔認証情報などの個人情報は投稿・送信しないでください。</li>	<!-- 画面要素を配置 -->
+                        <li>不快なメッセージや不適切な募集は「通報」を使って運営へ知らせてください。</li>	<!-- 画面要素を配置 -->
+                        <li>相手とのやり取りを止めたい場合は「ブロック」を使えます。解除はマイページから行えます。</li>	<!-- 画面要素を配置 -->
+                        <li>緊急性がある内容は、サービス内だけで解決せず先生や身近な大人へ相談してください。</li>	<!-- 画面要素を配置 -->
+                    </ul>	<!-- 要素を閉じる -->
+                </section>	<!-- 要素を閉じる -->
 
-                <section class="usage-trial-box">
-                    <div>
-                        <span>試験運用への協力</span>
-                        <h3>使いにくい点や不具合を教えてください</h3>
-                        <p>操作で迷った場所、欲しい機能、エラーが起きた状況を意見箱から送ってください。</p>
-                    </div>
-                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱を開く</a>
-                </section>
-            </div>
-        </section>
-    </div>
+                <section class="usage-trial-box">	<!-- 画面要素を配置 -->
+                    <div>	<!-- 画面要素を配置 -->
+                        <span>試験運用への協力</span>	<!-- 画面要素を配置 -->
+                        <h3>使いにくい点や不具合を教えてください</h3>	<!-- 画面要素を配置 -->
+                        <p>操作で迷った場所、欲しい機能、エラーが起きた状況を意見箱から送ってください。</p>	<!-- 画面要素を配置 -->
+                    </div>	<!-- 要素を閉じる -->
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱を開く</a>	<!-- 操作できる要素を配置 -->
+                </section>	<!-- 要素を閉じる -->
+            </div>	<!-- 要素を閉じる -->
+        </section>	<!-- 要素を閉じる -->
+    </div>	<!-- 要素を閉じる -->
 
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-links">
-                <a href="users.html">ユーザーを探す</a>
-                <a href="recruit.html">募集投稿</a>
-                <a href="messages.html">メッセージ</a>
-                <a href="profile.html">マイページ</a>
-                <a href="ai-study.html">AI学習相談</a>
-                <a href="terms.html">利用規約</a>
-                <a href="privacy.html">プライバシーポリシー</a>
-            </div>
-            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>
-        </div>
-    </footer>
+    <footer class="footer">	<!-- フッターを配置 -->
+        <div class="footer-container">	<!-- 画面要素を配置 -->
+            <div class="footer-links">	<!-- 画面要素を配置 -->
+                <a href="users.html">ユーザーを探す</a>	<!-- 操作できる要素を配置 -->
+                <a href="recruit.html">募集投稿</a>	<!-- 操作できる要素を配置 -->
+                <a href="messages.html">メッセージ</a>	<!-- 操作できる要素を配置 -->
+                <a href="profile.html">マイページ</a>	<!-- 操作できる要素を配置 -->
+                <a href="ai-study.html">AI学習相談</a>	<!-- 操作できる要素を配置 -->
+                <a href="terms.html">利用規約</a>	<!-- 操作できる要素を配置 -->
+                <a href="privacy.html">プライバシーポリシー</a>	<!-- 操作できる要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>	<!-- 画面要素を配置 -->
+        </div>	<!-- 要素を閉じる -->
+    </footer>	<!-- 要素を閉じる -->
 
     <script>
-        if (!localStorage.getItem("userEmail")) {
-            window.location.href = "index.html";
-        }
+        if (!localStorage.getItem("userEmail")) {	// 端末内の保存情報を扱う
+            window.location.href = "index.html";	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
 
-        const legacyMainParams = new URLSearchParams(window.location.search);
-        if (!legacyMainParams.has("guide")) {
-            window.location.replace(legacyMainParams.get("tab") === "recruit" ? "recruit.html" : "users.html");
-        }
+        const legacyMainParams = new URLSearchParams(window.location.search);	// 定数を定義
+        if (!legacyMainParams.has("guide")) {	// 条件に応じて処理を分ける
+            window.location.replace(legacyMainParams.get("tab") === "recruit" ? "recruit.html" : "users.html");	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
 
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";	// GAS APIの接続先を設定
 
-        let lastMessageTime = 0;
-        let activeTargetEmail = "";
-        let allOtherPosts = [];
-        let countdownTimer = null;
-        let notificationRequest = null;
+        let lastMessageTime = 0;	// 状態を保持
+        let activeTargetEmail = "";	// 状態を保持
+        let allOtherPosts = [];	// 状態を保持
+        let countdownTimer = null;	// 状態を保持
+        let notificationRequest = null;	// 状態を保持
 
-        async function fetchGas(payload, timeoutMs = 20000) {
-            const readModes = ["getUserProfile", "getRecruitments", "getNotificationSummary"];
-            const canRetry = readModes.includes(payload && payload.mode);
-            const maxAttempts = canRetry ? 2 : 1;
-            let lastError;
+        async function fetchGas(payload, timeoutMs = 20000) {	// 関数を定義
+            const readModes = ["getUserProfile", "getRecruitments", "getNotificationSummary"];	// 定数を定義
+            const canRetry = readModes.includes(payload && payload.mode);	// 定数を定義
+            const maxAttempts = canRetry ? 2 : 1;	// 定数を定義
+            let lastError;	// 状態を保持
 
-            for (let attempt = 0; attempt < maxAttempts; attempt++) {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {	// 対象を順番に処理する
+                const controller = new AbortController();	// 定数を定義
+                const timeoutId = setTimeout(() => controller.abort(), timeoutMs);	// 定数を定義
 
-                try {
-                    const res = await fetch(GAS_URL, {
-                        method: "POST",
-                        body: JSON.stringify(payload),
-                        signal: controller.signal
-                    });
+                try {	// 失敗に備えて処理を始める
+                    const res = await fetch(GAS_URL, {	// 定数を定義
+                        method: "POST",	// 処理を続ける
+                        body: JSON.stringify(payload),	// 処理を続ける
+                        signal: controller.signal	// 処理を続ける
+                    });	// 処理を完了する
 
-                    if (!res.ok) {
-                        throw new Error(`GAS通信エラー（HTTP ${res.status}）`);
-                    }
+                    if (!res.ok) {	// 条件に応じて処理を分ける
+                        throw new Error(`GAS通信エラー（HTTP ${res.status}）`);	// エラーを通知する
+                    }	// 処理のまとまりを閉じる
 
-                    const result = await res.json();
-                    if (!result || result.status !== "success") {
-                        throw new Error(result && result.message ? result.message : "GASからエラーが返されました");
-                    }
+                    const result = await res.json();	// 定数を定義
+                    if (!result || result.status !== "success") {	// 条件に応じて処理を分ける
+                        throw new Error(result && result.message ? result.message : "GASからエラーが返されました");	// エラーを通知する
+                    }	// 処理のまとまりを閉じる
 
-                    return result;
-                } catch (error) {
-                    lastError = error;
-                    if (attempt + 1 < maxAttempts) {
-                        await new Promise(resolve => setTimeout(resolve, 1200));
-                    }
-                } finally {
-                    clearTimeout(timeoutId);
-                }
-            }
+                    return result;	// 結果を返す
+                } catch (error) {	// 処理のまとまりを始める
+                    lastError = error;	// 処理を続ける
+                    if (attempt + 1 < maxAttempts) {	// 条件に応じて処理を分ける
+                        await new Promise(resolve => setTimeout(resolve, 1200));	// 時間を置いて処理する
+                    }	// 処理のまとまりを閉じる
+                } finally {	// 処理のまとまりを始める
+                    clearTimeout(timeoutId);	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+            }	// 処理のまとまりを閉じる
 
-            throw lastError || new Error("GASとの通信に失敗しました");
-        }
+            throw lastError || new Error("GASとの通信に失敗しました");	// エラーを通知する
+        }	// 処理のまとまりを閉じる
 
-        function escapeHtml(value) {
-            return String(value ?? "")
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
+        function escapeHtml(value) {	// 関数を定義
+            return String(value ?? "")	// 結果を返す
+                .replace(/&/g, "&amp;")	// 処理を続ける
+                .replace(/</g, "&lt;")	// 処理を続ける
+                .replace(/>/g, "&gt;")	// 処理を続ける
+                .replace(/"/g, "&quot;")	// 処理を続ける
+                .replace(/'/g, "&#039;");	// 処理を完了する
+        }	// 処理のまとまりを閉じる
 
-        function applyUserProfile(profile) {
-            if (!profile) return;
+        function applyUserProfile(profile) {	// 関数を定義
+            if (!profile) return;	// 条件に応じて処理を分ける
 
-            const userName = String(profile.name || profile.userId || "").trim();
-            const profileImage = String(profile.profileImage || "").trim();
-            localStorage.setItem("userName", userName);
-            localStorage.setItem("profileImage", profileImage);
+            const userName = String(profile.name || profile.userId || "").trim();	// 定数を定義
+            const profileImage = String(profile.profileImage || "").trim();	// 定数を定義
+            localStorage.setItem("userName", userName);	// 端末内の保存情報を扱う
+            localStorage.setItem("profileImage", profileImage);	// 端末内の保存情報を扱う
 
-            const nameInput = document.getElementById("user-name");
-            const mypageText = document.getElementById("mypage-text");
-            const profileIcon = document.getElementById("profile-icon");
-            if (nameInput) nameInput.value = userName;
-            if (mypageText) mypageText.innerText = userName || "マイページ";
-            if (profileIcon) {
-                profileIcon.src = profileImage || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-            }
-        }
+            const nameInput = document.getElementById("user-name");	// 定数を定義
+            const mypageText = document.getElementById("mypage-text");	// 定数を定義
+            const profileIcon = document.getElementById("profile-icon");	// 定数を定義
+            if (nameInput) nameInput.value = userName;	// 条件に応じて処理を分ける
+            if (mypageText) mypageText.innerText = userName || "マイページ";	// 条件に応じて処理を分ける
+            if (profileIcon) {	// 条件に応じて処理を分ける
+                profileIcon.src = profileImage || "https://cdn-icons-png.flaticon.com/512/149/149071.png";	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        async function refreshUserProfile(userId) {
-            if (!userId || userId === "admin") return;
-            try {
-                const result = await fetchGas({ mode: "getUserProfile", userId: userId }, 20000);
-                applyUserProfile(result.message);
-            } catch (e) {
-                if (!e || e.name !== "AbortError") console.error("プロフィール情報の取得エラー:", e);
-            }
-        }
+        async function refreshUserProfile(userId) {	// 関数を定義
+            if (!userId || userId === "admin") return;	// 条件に応じて処理を分ける
+            try {	// 失敗に備えて処理を始める
+                const result = await fetchGas({ mode: "getUserProfile", userId: userId }, 20000);	// 定数を定義
+                applyUserProfile(result.message);	// 処理を完了する
+            } catch (e) {	// 処理のまとまりを始める
+                if (!e || e.name !== "AbortError") console.error("プロフィール情報の取得エラー:", e);	// 条件に応じて処理を分ける
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        function toggleMenu() {
-            document.getElementById("hud-menu-btn").classList.toggle("open");
-            document.getElementById("nav-links").classList.toggle("open");
-        }
+        function toggleMenu() {	// 関数を定義
+            document.getElementById("hud-menu-btn").classList.toggle("open");	// 画面表示を更新する
+            document.getElementById("nav-links").classList.toggle("open");	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
 
-        function closeMenu() {
-            document.getElementById("hud-menu-btn").classList.remove("open");
-            document.getElementById("nav-links").classList.remove("open");
-        }
+        function closeMenu() {	// 関数を定義
+            document.getElementById("hud-menu-btn").classList.remove("open");	// 画面表示を更新する
+            document.getElementById("nav-links").classList.remove("open");	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
 
-        function openUsageGuide() {
-            const guide = document.getElementById("usage-guide");
-            if (!guide) return;
-            guide.classList.add("is-open");
-            guide.setAttribute("aria-hidden", "false");
-            document.body.classList.add("guide-open");
-            const panel = guide.querySelector(".usage-guide-panel");
-            if (panel) panel.scrollTop = 0;
-            const closeButton = guide.querySelector(".usage-guide-close");
-            if (closeButton) closeButton.focus();
-        }
+        function openUsageGuide() {	// 関数を定義
+            const guide = document.getElementById("usage-guide");	// 定数を定義
+            if (!guide) return;	// 条件に応じて処理を分ける
+            guide.classList.add("is-open");	// 処理を完了する
+            guide.setAttribute("aria-hidden", "false");	// 処理を完了する
+            document.body.classList.add("guide-open");	// 画面表示を更新する
+            const panel = guide.querySelector(".usage-guide-panel");	// 定数を定義
+            if (panel) panel.scrollTop = 0;	// 条件に応じて処理を分ける
+            const closeButton = guide.querySelector(".usage-guide-close");	// 定数を定義
+            if (closeButton) closeButton.focus();	// 条件に応じて処理を分ける
+        }	// 処理のまとまりを閉じる
 
-        function closeUsageGuide() {
-            const guide = document.getElementById("usage-guide");
-            if (!guide) return;
-            guide.classList.remove("is-open");
-            guide.setAttribute("aria-hidden", "true");
-            document.body.classList.remove("guide-open");
-        }
+        function closeUsageGuide() {	// 関数を定義
+            const guide = document.getElementById("usage-guide");	// 定数を定義
+            if (!guide) return;	// 条件に応じて処理を分ける
+            guide.classList.remove("is-open");	// 処理を完了する
+            guide.setAttribute("aria-hidden", "true");	// 処理を完了する
+            document.body.classList.remove("guide-open");	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
 
-        function showGuideDestination(mode) {
-            closeUsageGuide();
-            location.href = mode === "recruit" ? "recruit.html" : "users.html";
-        }
+        function showGuideDestination(mode) {	// 関数を定義
+            closeUsageGuide();	// 処理を完了する
+            location.href = mode === "recruit" ? "recruit.html" : "users.html";	// 処理を続ける
+        }	// 処理のまとまりを閉じる
 
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape") closeUsageGuide();
-        });
+        document.addEventListener("keydown", (event) => {	// 操作イベントを登録
+            if (event.key === "Escape") closeUsageGuide();	// 条件に応じて処理を分ける
+        });	// 処理を完了する
 
-        function switchTab(mode) {
-            if (!document.getElementById("tab-recruit-btn") || !document.getElementById("tab-search-btn")) {
-                location.href = mode === "recruit" ? "recruit.html" : "users.html";
-                return;
-            }
-            document.getElementById("recruit-form-area").style.display = (mode === 'recruit') ? "block" : "none";
-            document.getElementById("search-area").style.display = (mode === 'search') ? "block" : "none";
-            document.getElementById("tab-recruit-btn").classList.toggle("active", mode === 'recruit');
-            document.getElementById("tab-search-btn").classList.toggle("active", mode === 'search');
-            if (mode === 'recruit') {
-                document.getElementById("user-name").value = localStorage.getItem("userName") || "";
-            }
-        }
+        function switchTab(mode) {	// 関数を定義
+            if (!document.getElementById("tab-recruit-btn") || !document.getElementById("tab-search-btn")) {	// 条件に応じて処理を分ける
+                location.href = mode === "recruit" ? "recruit.html" : "users.html";	// 処理を続ける
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+            document.getElementById("recruit-form-area").style.display = (mode === 'recruit') ? "block" : "none";	// 画面表示を更新する
+            document.getElementById("search-area").style.display = (mode === 'search') ? "block" : "none";	// 画面表示を更新する
+            document.getElementById("tab-recruit-btn").classList.toggle("active", mode === 'recruit');	// 画面表示を更新する
+            document.getElementById("tab-search-btn").classList.toggle("active", mode === 'search');	// 画面表示を更新する
+            if (mode === 'recruit') {	// 条件に応じて処理を分ける
+                document.getElementById("user-name").value = localStorage.getItem("userName") || "";	// 端末内の保存情報を扱う
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        async function loadRecruitments() {
-            const myEmail = localStorage.getItem("userEmail");
-            const listDiv = document.getElementById("user-list");
-            const myPostContentDiv = document.getElementById("my-post-content");
+        async function loadRecruitments() {	// 関数を定義
+            const myEmail = localStorage.getItem("userEmail");	// 定数を定義
+            const listDiv = document.getElementById("user-list");	// 定数を定義
+            const myPostContentDiv = document.getElementById("my-post-content");	// 定数を定義
 
             listDiv.innerHTML = `
                 <div class="loading-box">
@@ -1737,31 +1737,31 @@
                     <span>データを更新中...</span>
                 </div>
             `;
-            myPostContentDiv.innerHTML = "更新中...";
+            myPostContentDiv.innerHTML = "更新中...";	// 処理を続ける
 
-            try {
-                const result = await fetchGas({ mode: "getRecruitments", email: myEmail });
-                if (!Array.isArray(result.message)) {
-                    throw new Error("募集データの形式が正しくありません");
-                }
+            try {	// 失敗に備えて処理を始める
+                const result = await fetchGas({ mode: "getRecruitments", email: myEmail });	// 定数を定義
+                if (!Array.isArray(result.message)) {	// 条件に応じて処理を分ける
+                    throw new Error("募集データの形式が正しくありません");	// エラーを通知する
+                }	// 処理のまとまりを閉じる
 
-                listDiv.innerHTML = "";
-                myPostContentDiv.innerHTML = "投稿している募集はありません。";
+                listDiv.innerHTML = "";	// 処理を続ける
+                myPostContentDiv.innerHTML = "投稿している募集はありません。";	// 処理を続ける
 
-                const items = [...result.message].reverse();
-                const myPosts = items.filter(item => item.email === myEmail);
-                allOtherPosts = items.filter(item => item.email !== myEmail);
+                const items = [...result.message].reverse();	// 定数を定義
+                const myPosts = items.filter(item => item.email === myEmail);	// 定数を定義
+                allOtherPosts = items.filter(item => item.email !== myEmail);	// 処理を完了する
 
-                if (myPosts.length > 0) {
-                    const myItem = myPosts[0];
-                    let myTagsHtml = "";
-                    const durationLabel = formatRecruitmentDuration(myItem.durationMinutes);
-                    if (myItem.tags) {
-                        const tagArray = myItem.tags.split(/[,、\s]+/).filter(t => t);
-                        myTagsHtml = `<div class="card-tags" style="margin-top:6px; margin-bottom:10px;">` +
-                            tagArray.map(t => `<span class="tag-badge">#${escapeHtml(t)}</span>`).join("") +
-                            `</div>`;
-                    }
+                if (myPosts.length > 0) {	// 条件に応じて処理を分ける
+                    const myItem = myPosts[0];	// 定数を定義
+                    let myTagsHtml = "";	// 状態を保持
+                    const durationLabel = formatRecruitmentDuration(myItem.durationMinutes);	// 定数を定義
+                    if (myItem.tags) {	// 条件に応じて処理を分ける
+                        const tagArray = myItem.tags.split(/[,、\s]+/).filter(t => t);	// 定数を定義
+                        myTagsHtml = `<div class="card-tags" style="margin-top:6px; margin-bottom:10px;">` +	// 処理を続ける
+                            tagArray.map(t => `<span class="tag-badge">#${escapeHtml(t)}</span>`).join("") +	// 処理を続ける
+                            `</div>`;	// 処理を続ける
+                    }	// 処理のまとまりを閉じる
 
                     myPostContentDiv.innerHTML = `
                         <div style="font-weight: 700; margin-bottom: 6px; color:#1cbdc5; font-size: 12px;">${escapeHtml(myItem.grade)} | ${escapeHtml(myItem.dept)}</div>
@@ -1772,59 +1772,59 @@
                             ✖ この募集を削除する
                         </button>
                     `;
-                }
+                }	// 処理のまとまりを閉じる
 
-                renderFilteredRecruitments();
+                renderFilteredRecruitments();	// 処理を完了する
 
-            } catch (e) {
-                if (!e || e.name !== "AbortError") console.error(e);
-                const message = e && e.name === "AbortError"
-                    ? "通信に時間がかかっています。しばらくしてから更新してください。"
-                    : (e && e.message ? e.message : "原因不明のエラー");
-                listDiv.innerHTML = `<p style='color: #ef4444; font-size: 14px; grid-column: 1 / -1; text-align: center; padding: 40px 0;'>読み込みエラーが発生しました。<br><small>${escapeHtml(message)}</small></p>`;
-            }
-        }
+            } catch (e) {	// 処理のまとまりを始める
+                if (!e || e.name !== "AbortError") console.error(e);	// 条件に応じて処理を分ける
+                const message = e && e.name === "AbortError"	// 定数を定義
+                    ? "通信に時間がかかっています。しばらくしてから更新してください。"	// 処理を続ける
+                    : (e && e.message ? e.message : "原因不明のエラー");	// 処理を完了する
+                listDiv.innerHTML = `<p style='color: #ef4444; font-size: 14px; grid-column: 1 / -1; text-align: center; padding: 40px 0;'>読み込みエラーが発生しました。<br><small>${escapeHtml(message)}</small></p>`;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        function renderFilteredRecruitments() {
-            const listDiv = document.getElementById("user-list");
-            const keyword = document.getElementById("search-input").value.trim().toLowerCase();
+        function renderFilteredRecruitments() {	// 関数を定義
+            const listDiv = document.getElementById("user-list");	// 定数を定義
+            const keyword = document.getElementById("search-input").value.trim().toLowerCase();	// 定数を定義
 
-            if (countdownTimer) {
-                clearInterval(countdownTimer);
-                countdownTimer = null;
-            }
+            if (countdownTimer) {	// 条件に応じて処理を分ける
+                clearInterval(countdownTimer);	// 処理を完了する
+                countdownTimer = null;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
 
-            listDiv.innerHTML = "";
+            listDiv.innerHTML = "";	// 処理を続ける
 
-            const filteredPosts = allOtherPosts.filter(item => {
-                if (!keyword) return true;
-                const searchTarget = `${item.name} ${item.grade} ${item.dept} ${item.content} ${item.tags || ""}`.toLowerCase();
-                return searchTarget.includes(keyword);
-            });
+            const filteredPosts = allOtherPosts.filter(item => {	// 定数を定義
+                if (!keyword) return true;	// 条件に応じて処理を分ける
+                const searchTarget = `${item.name} ${item.grade} ${item.dept} ${item.content} ${item.tags || ""}`.toLowerCase();	// 定数を定義
+                return searchTarget.includes(keyword);	// 結果を返す
+            });	// 処理を完了する
 
-            if (filteredPosts.length === 0) {
-                listDiv.innerHTML = "<p style='color: #64748b; font-size: 14px; grid-column: 1 / -1; text-align: center; padding: 40px 0;'>該当する募集が見つかりませんでした。</p>";
-                return;
-            }
+            if (filteredPosts.length === 0) {	// 条件に応じて処理を分ける
+                listDiv.innerHTML = "<p style='color: #64748b; font-size: 14px; grid-column: 1 / -1; text-align: center; padding: 40px 0;'>該当する募集が見つかりませんでした。</p>";	// 処理を続ける
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
 
-            const fragment = document.createDocumentFragment();
-            filteredPosts.forEach((item, idx) => {
-                const card = document.createElement("div");
-                card.className = "user-card";
+            const fragment = document.createDocumentFragment();	// 定数を定義
+            filteredPosts.forEach((item, idx) => {	// 処理のまとまりを始める
+                const card = document.createElement("div");	// 定数を定義
+                card.className = "user-card";	// 処理を続ける
 
-                let tagsHtml = "";
-                if (item.tags) {
-                    const tagArray = item.tags.split(/[,、\s]+/).filter(t => t);
-                    if (tagArray.length > 0) {
-                        tagsHtml = `<div class="card-tags">` +
-                            tagArray.map(t => `<button type="button" class="tag-badge js-search-tag" data-tag="${escapeHtml(t)}">#${escapeHtml(t)}</button>`).join("") +
-                            `</div>`;
-                    }
-                }
+                let tagsHtml = "";	// 状態を保持
+                if (item.tags) {	// 条件に応じて処理を分ける
+                    const tagArray = item.tags.split(/[,、\s]+/).filter(t => t);	// 定数を定義
+                    if (tagArray.length > 0) {	// 条件に応じて処理を分ける
+                        tagsHtml = `<div class="card-tags">` +	// 処理を続ける
+                            tagArray.map(t => `<button type="button" class="tag-badge js-search-tag" data-tag="${escapeHtml(t)}">#${escapeHtml(t)}</button>`).join("") +	// 処理を続ける
+                            `</div>`;	// 処理を続ける
+                    }	// 処理のまとまりを閉じる
+                }	// 処理のまとまりを閉じる
 
-                const postTime = new Date(item.time).getTime();
-                const expireTime = postTime + getRecruitmentDurationMinutes(item.durationMinutes) * 60 * 1000;
-                const timerAttribute = Number.isNaN(expireTime) ? "" : `data-expire-time="${expireTime}"`;
+                const postTime = new Date(item.time).getTime();	// 定数を定義
+                const expireTime = postTime + getRecruitmentDurationMinutes(item.durationMinutes) * 60 * 1000;	// 定数を定義
+                const timerAttribute = Number.isNaN(expireTime) ? "" : `data-expire-time="${expireTime}"`;	// 定数を定義
 
                 card.innerHTML = `
                     <div style="display:flex; align-items:center; margin-bottom:12px;">
@@ -1849,418 +1849,418 @@
                     </div>
                 `;
 
-                card.querySelector(".btn-card-block").addEventListener("click", () => {
-                    blockUser(item.email, item.name);
-                });
+                card.querySelector(".btn-card-block").addEventListener("click", () => {	// 操作イベントを登録
+                    blockUser(item.email, item.name);	// 処理を完了する
+                });	// 処理を完了する
 
-                card.querySelector(".btn-match").addEventListener("click", () => startChat(item.email));
+                card.querySelector(".btn-match").addEventListener("click", () => startChat(item.email));	// 操作イベントを登録
 
-                card.querySelectorAll(".js-search-tag").forEach(button => {
-                    button.addEventListener("click", () => searchByTag(button.dataset.tag));
-                });
+                card.querySelectorAll(".js-search-tag").forEach(button => {	// 処理のまとまりを始める
+                    button.addEventListener("click", () => searchByTag(button.dataset.tag));	// 操作イベントを登録
+                });	// 処理を完了する
 
-                card.querySelector(".btn-card-report").addEventListener("click", () => {
-                    reportContent(item.email, "recruitment", item.email, item.content);
-                });
+                card.querySelector(".btn-card-report").addEventListener("click", () => {	// 操作イベントを登録
+                    reportContent(item.email, "recruitment", item.email, item.content);	// 処理を完了する
+                });	// 処理を完了する
 
-                card.querySelectorAll(".btn-quick-reaction").forEach(button => {
-                    button.addEventListener("click", () => {
-                        sendQuickReaction(item.email, item.name, button.dataset.reaction, button);
-                    });
-                });
+                card.querySelectorAll(".btn-quick-reaction").forEach(button => {	// 処理のまとまりを始める
+                    button.addEventListener("click", () => {	// 操作イベントを登録
+                        sendQuickReaction(item.email, item.name, button.dataset.reaction, button);	// 処理を完了する
+                    });	// 処理を完了する
+                });	// 処理を完了する
 
-                fragment.appendChild(card);
+                fragment.appendChild(card);	// 処理を完了する
 
-            });
-            listDiv.appendChild(fragment);
-            startCountdownTimer();
-        }
+            });	// 処理を完了する
+            listDiv.appendChild(fragment);	// 処理を完了する
+            startCountdownTimer();	// 処理を完了する
+        }	// 処理のまとまりを閉じる
 
-        function startCountdownTimer() {
-            if (countdownTimer) clearInterval(countdownTimer);
-            const update = () => {
-                let hasActiveTimer = false;
-                let hasExpiredTimer = false;
-                document.querySelectorAll(".countdown-badge[data-expire-time]").forEach(el => {
-                    const remainingMilliseconds = Number(el.dataset.expireTime) - Date.now();
-                    if (!Number.isFinite(remainingMilliseconds)) {
-                        el.innerText = "時刻取得エラー";
-                        return;
-                    }
-                    if (remainingMilliseconds <= 0) {
-                        hasExpiredTimer = true;
-                        el.innerText = "⏰ 終了";
-                        el.style.background = "#fee2e2";
-                        el.style.color = "#ef4444";
-                        return;
-                    }
+        function startCountdownTimer() {	// 関数を定義
+            if (countdownTimer) clearInterval(countdownTimer);	// 条件に応じて処理を分ける
+            const update = () => {	// 定数を定義
+                let hasActiveTimer = false;	// 状態を保持
+                let hasExpiredTimer = false;	// 状態を保持
+                document.querySelectorAll(".countdown-badge[data-expire-time]").forEach(el => {	// 処理のまとまりを始める
+                    const remainingMilliseconds = Number(el.dataset.expireTime) - Date.now();	// 定数を定義
+                    if (!Number.isFinite(remainingMilliseconds)) {	// 条件に応じて処理を分ける
+                        el.innerText = "時刻取得エラー";	// 処理を続ける
+                        return;	// 結果を返す
+                    }	// 処理のまとまりを閉じる
+                    if (remainingMilliseconds <= 0) {	// 条件に応じて処理を分ける
+                        hasExpiredTimer = true;	// 処理を続ける
+                        el.innerText = "⏰ 終了";	// 処理を続ける
+                        el.style.background = "#fee2e2";	// 処理を続ける
+                        el.style.color = "#ef4444";	// 処理を続ける
+                        return;	// 結果を返す
+                    }	// 処理のまとまりを閉じる
 
-                    hasActiveTimer = true;
-                    const totalSeconds = Math.ceil(remainingMilliseconds / 1000);
-                    const hours = Math.floor(totalSeconds / 3600);
-                    const minutes = Math.floor((totalSeconds % 3600) / 60);
-                    const seconds = totalSeconds % 60;
-                    el.innerText = `⏳ 残り ${hours}時間${String(minutes).padStart(2, "0")}分${String(seconds).padStart(2, "0")}秒`;
-                });
+                    hasActiveTimer = true;	// 処理を続ける
+                    const totalSeconds = Math.ceil(remainingMilliseconds / 1000);	// 定数を定義
+                    const hours = Math.floor(totalSeconds / 3600);	// 定数を定義
+                    const minutes = Math.floor((totalSeconds % 3600) / 60);	// 定数を定義
+                    const seconds = totalSeconds % 60;	// 定数を定義
+                    el.innerText = `⏳ 残り ${hours}時間${String(minutes).padStart(2, "0")}分${String(seconds).padStart(2, "0")}秒`;	// 処理を続ける
+                });	// 処理を完了する
 
-                if (!hasActiveTimer && countdownTimer) {
-                    clearInterval(countdownTimer);
-                    countdownTimer = null;
-                }
-                if (hasExpiredTimer && !startCountdownTimer.reloadScheduled) {
-                    startCountdownTimer.reloadScheduled = true;
-                    setTimeout(async () => {
-                        await loadRecruitments();
-                        startCountdownTimer.reloadScheduled = false;
-                    }, 500);
-                }
-            };
+                if (!hasActiveTimer && countdownTimer) {	// 条件に応じて処理を分ける
+                    clearInterval(countdownTimer);	// 処理を完了する
+                    countdownTimer = null;	// 処理を続ける
+                }	// 処理のまとまりを閉じる
+                if (hasExpiredTimer && !startCountdownTimer.reloadScheduled) {	// 条件に応じて処理を分ける
+                    startCountdownTimer.reloadScheduled = true;	// 処理を続ける
+                    setTimeout(async () => {	// 時間を置いて処理する
+                        await loadRecruitments();	// 処理を完了する
+                        startCountdownTimer.reloadScheduled = false;	// 処理を続ける
+                    }, 500);	// 処理を完了する
+                }	// 処理のまとまりを閉じる
+            };	// 処理のまとまりを閉じる
 
-            update();
-            if (!countdownTimer && document.querySelector(".countdown-badge[data-expire-time]")) {
-                countdownTimer = setInterval(update, 1000);
-            }
-        }
+            update();	// 処理を完了する
+            if (!countdownTimer && document.querySelector(".countdown-badge[data-expire-time]")) {	// 条件に応じて処理を分ける
+                countdownTimer = setInterval(update, 1000);	// 時間を置いて処理する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        function getRecruitmentDurationMinutes(value) {
-            const allowed = [15, 30, 45, 60, 120, 180, 240, 300, 360, 420, 480, 540, 600, 660, 720, 780, 840, 900, 960, 1020, 1080, 1140, 1200, 1260, 1320, 1380, 1440];
-            const minutes = Number(value);
-            return allowed.includes(minutes) ? minutes : 1440;
-        }
+        function getRecruitmentDurationMinutes(value) {	// 関数を定義
+            const allowed = [15, 30, 45, 60, 120, 180, 240, 300, 360, 420, 480, 540, 600, 660, 720, 780, 840, 900, 960, 1020, 1080, 1140, 1200, 1260, 1320, 1380, 1440];	// 定数を定義
+            const minutes = Number(value);	// 定数を定義
+            return allowed.includes(minutes) ? minutes : 1440;	// 結果を返す
+        }	// 処理のまとまりを閉じる
 
-        function formatRecruitmentDuration(value) {
-            const minutes = getRecruitmentDurationMinutes(value);
-            return minutes < 60 ? `${minutes}分` : `${minutes / 60}時間`;
-        }
+        function formatRecruitmentDuration(value) {	// 関数を定義
+            const minutes = getRecruitmentDurationMinutes(value);	// 定数を定義
+            return minutes < 60 ? `${minutes}分` : `${minutes / 60}時間`;	// 結果を返す
+        }	// 処理のまとまりを閉じる
 
-        function mergeRecruitmentTags(fixedTag, manualTags) {
-            const tags = `${fixedTag || ""},${manualTags || ""}`
-                .split(/[,、\s]+/)
-                .map(tag => tag.replace(/^#/, "").trim())
-                .filter(tag => tag);
+        function mergeRecruitmentTags(fixedTag, manualTags) {	// 関数を定義
+            const tags = `${fixedTag || ""},${manualTags || ""}`	// 定数を定義
+                .split(/[,、\s]+/)	// 処理を続ける
+                .map(tag => tag.replace(/^#/, "").trim())	// 処理を続ける
+                .filter(tag => tag);	// 処理を完了する
 
-            return [...new Set(tags)].join(", ");
-        }
+            return [...new Set(tags)].join(", ");	// 結果を返す
+        }	// 処理のまとまりを閉じる
 
-        async function sendQuickReaction(targetUserId, targetName, reaction, button) {
-            const myUserId = localStorage.getItem("userEmail");
-            if (!myUserId || !reaction || !button) return;
+        async function sendQuickReaction(targetUserId, targetName, reaction, button) {	// 関数を定義
+            const myUserId = localStorage.getItem("userEmail");	// 定数を定義
+            if (!myUserId || !reaction || !button) return;	// 条件に応じて処理を分ける
 
-            const cooldownKey = `quick-reaction:${myUserId}:${targetUserId}:${reaction}`;
-            const lastSent = Number(sessionStorage.getItem(cooldownKey) || 0);
-            if (Date.now() - lastSent < 10 * 60 * 1000) {
-                alert("同じリアクションは、少し時間をおいてから送れます。");
-                return;
-            }
+            const cooldownKey = `quick-reaction:${myUserId}:${targetUserId}:${reaction}`;	// 定数を定義
+            const lastSent = Number(sessionStorage.getItem(cooldownKey) || 0);	// 定数を定義
+            if (Date.now() - lastSent < 10 * 60 * 1000) {	// 条件に応じて処理を分ける
+                alert("同じリアクションは、少し時間をおいてから送れます。");	// 処理結果を知らせる
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
 
-            const originalText = button.innerText;
-            button.disabled = true;
-            button.innerText = "送信中...";
+            const originalText = button.innerText;	// 定数を定義
+            button.disabled = true;	// 処理を続ける
+            button.innerText = "送信中...";	// 処理を続ける
 
-            try {
-                const result = await fetchGas({
-                    mode: "sendMessage",
-                    from: myUserId,
-                    to: targetUserId,
-                    text: `募集を見て「${reaction}」とリアクションしました。`
-                });
+            try {	// 失敗に備えて処理を始める
+                const result = await fetchGas({	// 定数を定義
+                    mode: "sendMessage",	// 処理を続ける
+                    from: myUserId,	// 処理を続ける
+                    to: targetUserId,	// 処理を続ける
+                    text: `募集を見て「${reaction}」とリアクションしました。`	// 処理を続ける
+                });	// 処理を完了する
 
-                if (result.status === "success") {
-                    sessionStorage.setItem(cooldownKey, String(Date.now()));
-                    button.innerText = "送信しました ✓";
-                    alert(`${targetName}さんにリアクションを送りました。`);
-                } else {
-                    button.disabled = false;
-                    button.innerText = originalText;
-                    alert("リアクションの送信に失敗しました: " + result.message);
-                }
-            } catch (e) {
-                button.disabled = false;
-                button.innerText = originalText;
-                alert("通信エラーが発生しました。");
-            }
-        }
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    sessionStorage.setItem(cooldownKey, String(Date.now()));	// 端末内の保存情報を扱う
+                    button.innerText = "送信しました ✓";	// 処理を続ける
+                    alert(`${targetName}さんにリアクションを送りました。`);	// 処理結果を知らせる
+                } else {	// 処理のまとまりを始める
+                    button.disabled = false;	// 処理を続ける
+                    button.innerText = originalText;	// 処理を続ける
+                    alert("リアクションの送信に失敗しました: " + result.message);	// 処理結果を知らせる
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                button.disabled = false;	// 処理を続ける
+                button.innerText = originalText;	// 処理を続ける
+                alert("通信エラーが発生しました。");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        function searchByTag(tagName) {
-            const searchInput = document.getElementById("search-input");
-            searchInput.value = tagName;
-            renderFilteredRecruitments();
-        }
+        function searchByTag(tagName) {	// 関数を定義
+            const searchInput = document.getElementById("search-input");	// 定数を定義
+            searchInput.value = tagName;	// 処理を続ける
+            renderFilteredRecruitments();	// 処理を完了する
+        }	// 処理のまとまりを閉じる
 
-        async function deleteMyRecruitment() {
-            if (!confirm("本当にこの募集を削除しますか？")) return;
-            const myEmail = localStorage.getItem("userEmail");
-            try {
-                const result = await fetchGas({ mode: "deleteRecruitment", email: myEmail });
-                if (result.status === "success") {
-                    alert("募集を削除しました。");
-                    loadRecruitments();
-                } else {
-                    alert("削除に失敗しました。");
-                }
-            } catch (e) {
-                alert("通信エラーが発生しました。");
-            }
-        }
+        async function deleteMyRecruitment() {	// 関数を定義
+            if (!confirm("本当にこの募集を削除しますか？")) return;	// 条件に応じて処理を分ける
+            const myEmail = localStorage.getItem("userEmail");	// 定数を定義
+            try {	// 失敗に備えて処理を始める
+                const result = await fetchGas({ mode: "deleteRecruitment", email: myEmail });	// 定数を定義
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    alert("募集を削除しました。");	// 処理結果を知らせる
+                    loadRecruitments();	// 処理を完了する
+                } else {	// 処理のまとまりを始める
+                    alert("削除に失敗しました。");	// 処理結果を知らせる
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                alert("通信エラーが発生しました。");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        async function submitRecruitment() {
-            const submitBtn = document.getElementById("submit-btn");
-            const content = document.getElementById("rec-content").value.trim();
-            const fixedTag = document.getElementById("rec-fixed-tag").value;
-            const tags = mergeRecruitmentTags(fixedTag, document.getElementById("rec-tags").value);
-            const durationMinutes = getRecruitmentDurationMinutes(document.getElementById("rec-duration").value);
+        async function submitRecruitment() {	// 関数を定義
+            const submitBtn = document.getElementById("submit-btn");	// 定数を定義
+            const content = document.getElementById("rec-content").value.trim();	// 定数を定義
+            const fixedTag = document.getElementById("rec-fixed-tag").value;	// 定数を定義
+            const tags = mergeRecruitmentTags(fixedTag, document.getElementById("rec-tags").value);	// 定数を定義
+            const durationMinutes = getRecruitmentDurationMinutes(document.getElementById("rec-duration").value);	// 定数を定義
 
-            if (!content) {
-                alert("募集内容を入力してください");
-                return;
-            }
+            if (!content) {	// 条件に応じて処理を分ける
+                alert("募集内容を入力してください");	// 処理結果を知らせる
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
 
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.innerText = "投稿中...";
-            }
+            if (submitBtn) {	// 条件に応じて処理を分ける
+                submitBtn.disabled = true;	// 処理を続ける
+                submitBtn.innerText = "投稿中...";	// 処理を続ける
+            }	// 処理のまとまりを閉じる
 
-            const data = {
-                mode: "postRecruitment",
-                name: localStorage.getItem("userName"),
-                grade: document.getElementById("rec-grade").value,
-                dept: document.getElementById("rec-dept").value,
-                content: content,
-                tags: tags,
-                durationMinutes: durationMinutes,
-                email: localStorage.getItem("userEmail")
-            };
+            const data = {	// 定数を定義
+                mode: "postRecruitment",	// 処理を続ける
+                name: localStorage.getItem("userName"),	// 端末内の保存情報を扱う
+                grade: document.getElementById("rec-grade").value,	// 処理を続ける
+                dept: document.getElementById("rec-dept").value,	// 処理を続ける
+                content: content,	// 処理を続ける
+                tags: tags,	// 処理を続ける
+                durationMinutes: durationMinutes,	// 処理を続ける
+                email: localStorage.getItem("userEmail")	// 端末内の保存情報を扱う
+            };	// 処理のまとまりを閉じる
 
-            try {
-                const result = await fetchGas(data);
+            try {	// 失敗に備えて処理を始める
+                const result = await fetchGas(data);	// 定数を定義
 
-                if (result.status === "success") {
-                    alert(`${formatRecruitmentDuration(durationMinutes)}の募集を投稿しました`);
-                    switchTab('search');
-                    loadRecruitments();
-                    document.getElementById("rec-content").value = "";
-                    document.getElementById("rec-tags").value = "";
-                    document.getElementById("rec-fixed-tag").value = "";
-                } else {
-                    alert("投稿エラー: " + result.message);
-                }
-            } catch (e) {
-                alert("通信エラーが発生しました");
-            } finally {
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerText = "投稿する";
-                }
-            }
-        }
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    alert(`${formatRecruitmentDuration(durationMinutes)}の募集を投稿しました`);	// 処理結果を知らせる
+                    switchTab('search');	// 処理を完了する
+                    loadRecruitments();	// 処理を完了する
+                    document.getElementById("rec-content").value = "";	// 処理を続ける
+                    document.getElementById("rec-tags").value = "";	// 処理を続ける
+                    document.getElementById("rec-fixed-tag").value = "";	// 処理を続ける
+                } else {	// 処理のまとまりを始める
+                    alert("投稿エラー: " + result.message);	// 処理結果を知らせる
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                alert("通信エラーが発生しました");	// 処理結果を知らせる
+            } finally {	// 処理のまとまりを始める
+                if (submitBtn) {	// 条件に応じて処理を分ける
+                    submitBtn.disabled = false;	// 処理を続ける
+                    submitBtn.innerText = "投稿する";	// 処理を続ける
+                }	// 処理のまとまりを閉じる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        function getReportReason() {
-            const input = prompt(
-                "通報理由を番号で入力してください。\n" +
-                "1: 嫌がらせ・迷惑行為\n" +
-                "2: 不適切な内容\n" +
-                "3: 性的な内容\n" +
-                "4: 脅迫・危険な発言\n" +
-                "5: 個人情報の掲載\n" +
-                "6: なりすまし\n" +
-                "7: スパム\n" +
-                "8: その他"
-            );
+        function getReportReason() {	// 関数を定義
+            const input = prompt(	// 定数を定義
+                "通報理由を番号で入力してください。\n" +	// 処理を続ける
+                "1: 嫌がらせ・迷惑行為\n" +	// 処理を続ける
+                "2: 不適切な内容\n" +	// 処理を続ける
+                "3: 性的な内容\n" +	// 処理を続ける
+                "4: 脅迫・危険な発言\n" +	// 処理を続ける
+                "5: 個人情報の掲載\n" +	// 処理を続ける
+                "6: なりすまし\n" +	// 処理を続ける
+                "7: スパム\n" +	// 処理を続ける
+                "8: その他"	// 処理を続ける
+            );	// 処理を完了する
 
-            const reasons = {
-                "1": "嫌がらせ・迷惑行為",
-                "2": "不適切な内容",
-                "3": "性的な内容",
-                "4": "脅迫・危険な発言",
-                "5": "個人情報の掲載",
-                "6": "なりすまし",
-                "7": "スパム",
-                "8": "その他"
-            };
+            const reasons = {	// 定数を定義
+                "1": "嫌がらせ・迷惑行為",	// 処理を続ける
+                "2": "不適切な内容",	// 処理を続ける
+                "3": "性的な内容",	// 処理を続ける
+                "4": "脅迫・危険な発言",	// 処理を続ける
+                "5": "個人情報の掲載",	// 処理を続ける
+                "6": "なりすまし",	// 処理を続ける
+                "7": "スパム",	// 処理を続ける
+                "8": "その他"	// 処理を続ける
+            };	// 処理のまとまりを閉じる
 
-            return reasons[(input || "").trim()] || "";
-        }
+            return reasons[(input || "").trim()] || "";	// 結果を返す
+        }	// 処理のまとまりを閉じる
 
-        async function reportContent(targetUserId, targetType, targetId, targetContent) {
-            const reason = getReportReason();
-            if (!reason) {
-                alert("正しい通報理由を選択してください。");
-                return;
-            }
+        async function reportContent(targetUserId, targetType, targetId, targetContent) {	// 関数を定義
+            const reason = getReportReason();	// 定数を定義
+            if (!reason) {	// 条件に応じて処理を分ける
+                alert("正しい通報理由を選択してください。");	// 処理結果を知らせる
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
 
-            const detail = prompt("詳細があれば入力してください（任意）") || "";
-            const reporterId = localStorage.getItem("userEmail");
+            const detail = prompt("詳細があれば入力してください（任意）") || "";	// 定数を定義
+            const reporterId = localStorage.getItem("userEmail");	// 定数を定義
 
-            try {
-                const result = await fetchGas({
-                    mode: "reportContent",
-                    reporterId,
-                    targetUserId,
-                    targetType,
-                    targetId,
-                    targetContent,
-                    reason,
-                    detail
-                });
+            try {	// 失敗に備えて処理を始める
+                const result = await fetchGas({	// 定数を定義
+                    mode: "reportContent",	// 処理を続ける
+                    reporterId,	// 処理を続ける
+                    targetUserId,	// 処理を続ける
+                    targetType,	// 処理を続ける
+                    targetId,	// 処理を続ける
+                    targetContent,	// 処理を続ける
+                    reason,	// 処理を続ける
+                    detail	// 処理を続ける
+                });	// 処理を完了する
 
-                if (result.status === "success") {
-                    alert("通報を受け付けました。確認までお待ちください。");
-                } else {
-                    alert("通報に失敗しました: " + result.message);
-                }
-            } catch (e) {
-                alert("通信エラーが発生しました。");
-            }
-        }
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    alert("通報を受け付けました。確認までお待ちください。");	// 処理結果を知らせる
+                } else {	// 処理のまとまりを始める
+                    alert("通報に失敗しました: " + result.message);	// 処理結果を知らせる
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                alert("通信エラーが発生しました。");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        async function blockUser(targetUserId, targetName) {
-            if (!confirm(
-                `「${targetName}」さんをブロックしますか？\n` +
-                "ブロックすると、相手の募集・チャット・通知が表示されなくなります。"
-            )) {
-                return;
-            }
+        async function blockUser(targetUserId, targetName) {	// 関数を定義
+            if (!confirm(	// 条件に応じて処理を分ける
+                `「${targetName}」さんをブロックしますか？\n` +	// 処理を続ける
+                "ブロックすると、相手の募集・チャット・通知が表示されなくなります。"	// 処理を続ける
+            )) {	// 処理のまとまりを始める
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
 
-            const blockerId = localStorage.getItem("userEmail");
+            const blockerId = localStorage.getItem("userEmail");	// 定数を定義
 
-            try {
-                const result = await fetchGas({
-                    mode: "blockUser",
-                    blockerId,
-                    blockedId: targetUserId
-                });
+            try {	// 失敗に備えて処理を始める
+                const result = await fetchGas({	// 定数を定義
+                    mode: "blockUser",	// 処理を続ける
+                    blockerId,	// 処理を続ける
+                    blockedId: targetUserId	// 処理を続ける
+                });	// 処理を完了する
 
-                if (result.status === "success") {
-                    alert("ユーザーをブロックしました。");
-                    loadRecruitments();
-                } else {
-                    alert("ブロックに失敗しました: " + result.message);
-                }
-            } catch (e) {
-                alert("通信エラーが発生しました。");
-            }
-        }
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    alert("ユーザーをブロックしました。");	// 処理結果を知らせる
+                    loadRecruitments();	// 処理を完了する
+                } else {	// 処理のまとまりを始める
+                    alert("ブロックに失敗しました: " + result.message);	// 処理結果を知らせる
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                alert("通信エラーが発生しました。");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        function startChat(email) {
-            localStorage.setItem("chatTarget", email);
-            location.href = 'chat.html';
-        }
+        function startChat(email) {	// 関数を定義
+            localStorage.setItem("chatTarget", email);	// 端末内の保存情報を扱う
+            location.href = 'chat.html';	// 処理を続ける
+        }	// 処理のまとまりを閉じる
 
-        async function updateNotificationSummary() {
-            const myEmail = localStorage.getItem("userEmail");
-            const badge = document.getElementById("unread-badge");
-            if (!myEmail || !badge || notificationRequest) return notificationRequest;
+        async function updateNotificationSummary() {	// 関数を定義
+            const myEmail = localStorage.getItem("userEmail");	// 定数を定義
+            const badge = document.getElementById("unread-badge");	// 定数を定義
+            if (!myEmail || !badge || notificationRequest) return notificationRequest;	// 条件に応じて処理を分ける
 
-            notificationRequest = (async () => {
-                try {
-                    const result = await fetchGas({ mode: "getNotificationSummary", email: myEmail }, 20000);
-                    const count = result.message.unreadCount || 0;
-                    badge.innerText = count > 99 ? "99+" : count;
-                    badge.style.display = count > 0 ? "inline-block" : "none";
+            notificationRequest = (async () => {	// 処理のまとまりを始める
+                try {	// 失敗に備えて処理を始める
+                    const result = await fetchGas({ mode: "getNotificationSummary", email: myEmail }, 20000);	// 定数を定義
+                    const count = result.message.unreadCount || 0;	// 定数を定義
+                    badge.innerText = count > 99 ? "99+" : count;	// 処理を続ける
+                    badge.style.display = count > 0 ? "inline-block" : "none";	// 処理を続ける
 
-                    const msg = result.message.latestIncoming;
-                    if (!msg) return;
+                    const msg = result.message.latestIncoming;	// 定数を定義
+                    if (!msg) return;	// 条件に応じて処理を分ける
 
-                    if (lastMessageTime === 0) {
-                        lastMessageTime = msg.time;
-                    } else if (msg.time > lastMessageTime) {
-                        lastMessageTime = msg.time;
-                        activeTargetEmail = msg.fromEmail;
-                        showToast(msg.fromName, msg.text);
-                    }
-                } catch (e) {
-                    if (!e || e.name !== "AbortError") console.error("通知情報の取得エラー:", e);
-                } finally {
-                    notificationRequest = null;
-                }
-            })();
+                    if (lastMessageTime === 0) {	// 条件に応じて処理を分ける
+                        lastMessageTime = msg.time;	// 処理を続ける
+                    } else if (msg.time > lastMessageTime) {	// 処理のまとまりを始める
+                        lastMessageTime = msg.time;	// 処理を続ける
+                        activeTargetEmail = msg.fromEmail;	// 処理を続ける
+                        showToast(msg.fromName, msg.text);	// 処理を完了する
+                    }	// 処理のまとまりを閉じる
+                } catch (e) {	// 処理のまとまりを始める
+                    if (!e || e.name !== "AbortError") console.error("通知情報の取得エラー:", e);	// 条件に応じて処理を分ける
+                } finally {	// 処理のまとまりを始める
+                    notificationRequest = null;	// 処理を続ける
+                }	// 処理のまとまりを閉じる
+            })();	// 処理を完了する
 
-            return notificationRequest;
-        }
+            return notificationRequest;	// 結果を返す
+        }	// 処理のまとまりを閉じる
 
-        function showToast(senderName, text) {
-            document.getElementById("toast-sender-name").innerText = String(senderName || "ユーザー").trim() || "ユーザー";
-            document.getElementById("toast-text-body").innerText = String(text || "");
-            const toast = document.getElementById("toast-notification");
+        function showToast(senderName, text) {	// 関数を定義
+            document.getElementById("toast-sender-name").innerText = String(senderName || "ユーザー").trim() || "ユーザー";	// 処理を続ける
+            document.getElementById("toast-text-body").innerText = String(text || "");	// 処理を完了する
+            const toast = document.getElementById("toast-notification");	// 定数を定義
 
-            toast.classList.add("show");
+            toast.classList.add("show");	// 処理を完了する
 
-            setTimeout(() => {
-                toast.classList.remove("show");
-            }, 5000);
-        }
+            setTimeout(() => {	// 時間を置いて処理する
+                toast.classList.remove("show");	// 処理を完了する
+            }, 5000);	// 処理を完了する
+        }	// 処理のまとまりを閉じる
 
-        function clickToast() {
-            if (activeTargetEmail) {
-                startChat(activeTargetEmail);
-            }
-        }
+        function clickToast() {	// 関数を定義
+            if (activeTargetEmail) {	// 条件に応じて処理を分ける
+                startChat(activeTargetEmail);	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = "index.html";
-        }
+        function logout() {	// 関数を定義
+            localStorage.clear();	// 端末内の保存情報を扱う
+            window.location.href = "index.html";	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
 
-        function exitImpersonation() {
-            localStorage.setItem("userEmail", "admin");
-            localStorage.setItem("userId", "admin");
-            localStorage.setItem("userName", "管理者");
-            localStorage.removeItem("isImpersonating");
-            window.location.href = "admin.html";
-        }
+        function exitImpersonation() {	// 関数を定義
+            localStorage.setItem("userEmail", "admin");	// 端末内の保存情報を扱う
+            localStorage.setItem("userId", "admin");	// 端末内の保存情報を扱う
+            localStorage.setItem("userName", "管理者");	// 端末内の保存情報を扱う
+            localStorage.removeItem("isImpersonating");	// 端末内の保存情報を扱う
+            window.location.href = "admin.html";	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
 
-        document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById("hud-menu-btn").classList.remove("open");
-            document.getElementById("nav-links").classList.remove("open");
+        document.addEventListener("DOMContentLoaded", () => {	// 操作イベントを登録
+            document.getElementById("hud-menu-btn").classList.remove("open");	// 画面表示を更新する
+            document.getElementById("nav-links").classList.remove("open");	// 画面表示を更新する
 
-            const myEmail = localStorage.getItem("userEmail");
-            const currentUserId = localStorage.getItem("userId") || myEmail;
-            const userName = localStorage.getItem("userName");
-            const profileImage = localStorage.getItem("profileImage");
-            const isImpersonating = localStorage.getItem("isImpersonating");
+            const myEmail = localStorage.getItem("userEmail");	// 定数を定義
+            const currentUserId = localStorage.getItem("userId") || myEmail;	// 定数を定義
+            const userName = localStorage.getItem("userName");	// 定数を定義
+            const profileImage = localStorage.getItem("profileImage");	// 定数を定義
+            const isImpersonating = localStorage.getItem("isImpersonating");	// 定数を定義
 
-            if (isImpersonating === "true") {
-                const bar = document.getElementById("impersonate-bar");
-                const idSpan = document.getElementById("impersonate-user-id");
-                if (bar && idSpan) {
-                    idSpan.innerText = `${userName} (${myEmail})`;
-                    bar.style.display = "block";
-                }
-            }
+            if (isImpersonating === "true") {	// 条件に応じて処理を分ける
+                const bar = document.getElementById("impersonate-bar");	// 定数を定義
+                const idSpan = document.getElementById("impersonate-user-id");	// 定数を定義
+                if (bar && idSpan) {	// 条件に応じて処理を分ける
+                    idSpan.innerText = `${userName} (${myEmail})`;	// 処理を続ける
+                    bar.style.display = "block";	// 処理を続ける
+                }	// 処理のまとまりを閉じる
+            }	// 処理のまとまりを閉じる
 
-            if (isImpersonating !== "true" && (currentUserId === "admin" || myEmail === "admin")) {
-                const adminBtn = document.getElementById("nav-admin-btn");
-                if (adminBtn) {
-                    adminBtn.style.display = "inline-block";
-                }
-            }
+            if (isImpersonating !== "true" && (currentUserId === "admin" || myEmail === "admin")) {	// 条件に応じて処理を分ける
+                const adminBtn = document.getElementById("nav-admin-btn");	// 定数を定義
+                if (adminBtn) {	// 条件に応じて処理を分ける
+                    adminBtn.style.display = "inline-block";	// 処理を続ける
+                }	// 処理のまとまりを閉じる
+            }	// 処理のまとまりを閉じる
 
-            document.getElementById("mypage-text").innerText = userName || currentUserId || "マイページ";
+            document.getElementById("mypage-text").innerText = userName || currentUserId || "マイページ";	// 処理を続ける
 
-            if (profileImage && profileImage !== "null") {
-                document.getElementById("profile-icon").src = profileImage;
-            } else {
-                document.getElementById("profile-icon").src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-            }
+            if (profileImage && profileImage !== "null") {	// 条件に応じて処理を分ける
+                document.getElementById("profile-icon").src = profileImage;	// 処理を続ける
+            } else {	// 処理のまとまりを始める
+                document.getElementById("profile-icon").src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";	// 処理を続ける
+            }	// 処理のまとまりを閉じる
 
-            loadRecruitments();
-            refreshUserProfile(currentUserId);
-            updateNotificationSummary();
+            loadRecruitments();	// 処理を完了する
+            refreshUserProfile(currentUserId);	// 処理を完了する
+            updateNotificationSummary();	// 処理を完了する
 
-            const pageParams = new URLSearchParams(window.location.search);
-            const requestedTab = pageParams.get("tab");
-            if (requestedTab === "recruit" || requestedTab === "search") {
-                switchTab(requestedTab);
-            }
-            if (pageParams.get("guide") === "1") {
-                requestAnimationFrame(openUsageGuide);
-            }
+            const pageParams = new URLSearchParams(window.location.search);	// 定数を定義
+            const requestedTab = pageParams.get("tab");	// 定数を定義
+            if (requestedTab === "recruit" || requestedTab === "search") {	// 条件に応じて処理を分ける
+                switchTab(requestedTab);	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+            if (pageParams.get("guide") === "1") {	// 条件に応じて処理を分ける
+                requestAnimationFrame(openUsageGuide);	// 処理を完了する
+            }	// 処理のまとまりを閉じる
 
-            setInterval(() => {
-                if (document.visibilityState === "visible") updateNotificationSummary();
-            }, 8000);
-        });
+            setInterval(() => {	// 時間を置いて処理する
+                if (document.visibilityState === "visible") updateNotificationSummary();	// 条件に応じて処理を分ける
+            }, 8000);	// 処理を完了する
+        });	// 処理を完了する
     </script>
-</body>
+</body>	<!-- 要素を閉じる -->
 
-</html>
+</html>	<!-- 要素を閉じる -->

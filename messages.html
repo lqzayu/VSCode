@@ -1,511 +1,511 @@
-<!DOCTYPE html>
-<html lang="ja">
+<!DOCTYPE html>	<!-- HTML文書として宣言 -->
+<html lang="ja">	<!-- 画面要素を配置 -->
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>メッセージ - 平工マッチング</title>
+<head>	<!-- 画面要素を配置 -->
+    <meta charset="UTF-8">	<!-- 表示環境を設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">	<!-- 表示環境を設定 -->
+    <title>メッセージ - 平工マッチング</title>	<!-- ページタイトルを設定 -->
 
-    <link rel="icon" href="icon-192.png">
+    <link rel="icon" href="icon-192.png">	<!-- 外部ファイルを読み込む -->
 
 
     <style>
 
-        body {
-            margin: 0;
-            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
-            color: #1e293b;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-        }
+        body {	/* 対象要素のスタイルを始める */
+            margin: 0;	/* 見た目の設定を指定 */
+            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);	/* 見た目の設定を指定 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            min-height: 100vh;	/* 見た目の設定を指定 */
+            -webkit-font-smoothing: antialiased;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .navbar {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 14px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+        .navbar {	/* 対象要素のスタイルを始める */
+            background: rgba(255, 255, 255, 0.75);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            -webkit-backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            padding: 14px 5%;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            justify-content: space-between;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);	/* 見た目の設定を指定 */
+            position: sticky;	/* 見た目の設定を指定 */
+            top: 0;	/* 見た目の設定を指定 */
+            z-index: 100;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            cursor: pointer;
-        }
+        .logo {	/* 対象要素のスタイルを始める */
+            font-size: 1.4rem;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            letter-spacing: -0.03em;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            -webkit-background-clip: text;	/* 見た目の設定を指定 */
+            -webkit-text-fill-color: transparent;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .nav-links {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            gap: 8px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .nav-item {
-            cursor: pointer;
-            color: #64748b;
-            font-weight: 700;
-            font-size: 14px;
-            padding: 8px 16px;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            position: relative;
-        }
+        .nav-item {	/* 対象要素のスタイルを始める */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            color: #64748b;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            font-size: 14px;	/* 見た目の設定を指定 */
+            padding: 8px 16px;	/* 見た目の設定を指定 */
+            text-decoration: none;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            transition: all 0.2s ease;	/* 見た目の設定を指定 */
+            position: relative;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .nav-item:hover {
-            background-color: rgba(28, 189, 197, 0.06);
-            color: #1cbdc5;
-        }
+        .nav-item:hover {	/* 対象要素のスタイルを始める */
+            background-color: rgba(28, 189, 197, 0.06);	/* 見た目の設定を指定 */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .nav-item.active {
-            color: #1cbdc5;
-            background-color: rgba(28, 189, 197, 0.1);
-        }
+        .nav-item.active {	/* 対象要素のスタイルを始める */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+            background-color: rgba(28, 189, 197, 0.1);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .unread-badge {
-            position: absolute;
-            top: 2px;
-            right: 4px;
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: #ffffff;
-            font-size: 10px;
-            font-weight: 800;
-            padding: 2px 6px;
-            border-radius: 10px;
-            line-height: 1;
-            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
-            min-width: 14px;
-            text-align: center;
-            box-sizing: border-box;
-        }
+        .unread-badge {	/* 対象要素のスタイルを始める */
+            position: absolute;	/* 見た目の設定を指定 */
+            top: 2px;	/* 見た目の設定を指定 */
+            right: 4px;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);	/* 見た目の設定を指定 */
+            color: #ffffff;	/* 見た目の設定を指定 */
+            font-size: 10px;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            padding: 2px 6px;	/* 見た目の設定を指定 */
+            border-radius: 10px;	/* 見た目の設定を指定 */
+            line-height: 1;	/* 見た目の設定を指定 */
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);	/* 見た目の設定を指定 */
+            min-width: 14px;	/* 見た目の設定を指定 */
+            text-align: center;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-logout {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: none;
-            background-color: #ef4444;
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
-            transition: all 0.2s;
-        }
+        .btn-logout {	/* 対象要素のスタイルを始める */
+            padding: 8px 16px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            background-color: #ef4444;	/* 見た目の設定を指定 */
+            color: #ffffff;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-logout:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
-        }
+        .btn-logout:hover {	/* 対象要素のスタイルを始める */
+            opacity: 0.9;	/* 見た目の設定を指定 */
+            transform: translateY(-1px);	/* 見た目の設定を指定 */
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .hamburger-btn {
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 24px;
-            height: 18px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            z-index: 110;
-        }
+        .hamburger-btn {	/* 対象要素のスタイルを始める */
+            display: none;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            justify-content: space-between;	/* 見た目の設定を指定 */
+            width: 24px;	/* 見た目の設定を指定 */
+            height: 18px;	/* 見た目の設定を指定 */
+            background: transparent;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            padding: 0;	/* 見た目の設定を指定 */
+            z-index: 110;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .hamburger-btn span {
-            width: 100%;
-            height: 2.5px;
-            background-color: #1e293b;
-            border-radius: 3px;
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-        }
+        .hamburger-btn span {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            height: 2.5px;	/* 見た目の設定を指定 */
+            background-color: #1e293b;	/* 見た目の設定を指定 */
+            border-radius: 3px;	/* 見た目の設定を指定 */
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .container {
-            flex: 1;
-            width: 100%;
-            max-width: 680px;
-            margin: 40px auto;
-            padding: 0 24px;
-            box-sizing: border-box;
-        }
+        .container {	/* 対象要素のスタイルを始める */
+            flex: 1;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            max-width: 680px;	/* 見た目の設定を指定 */
+            margin: 40px auto;	/* 見た目の設定を指定 */
+            padding: 0 24px;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .dm-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px -4px rgba(24, 76, 92, 0.05);
-        }
+        .dm-card {	/* 対象要素のスタイルを始める */
+            background: rgba(255, 255, 255, 0.85);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            -webkit-backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            border: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
+            border-radius: 24px;	/* 見た目の設定を指定 */
+            overflow: hidden;	/* 見た目の設定を指定 */
+            box-shadow: 0 20px 40px -4px rgba(24, 76, 92, 0.05);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .dm-header {
-            padding: 24px 28px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+        .dm-header {	/* 対象要素のスタイルを始める */
+            padding: 24px 28px;	/* 見た目の設定を指定 */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            justify-content: space-between;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .dm-header h2 {
-            font-size: 1.25rem;
-            margin: 0;
-            color: #1e293b;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .dm-header h2 {	/* 対象要素のスタイルを始める */
+            font-size: 1.25rem;	/* 見た目の設定を指定 */
+            margin: 0;	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            gap: 10px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .dm-header h2::before {
-            content: '';
-            display: inline-block;
-            width: 4px;
-            height: 20px;
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            border-radius: 4px;
-        }
+        .dm-header h2::before {	/* 対象要素のスタイルを始める */
+            content: '';	/* 見た目の設定を指定 */
+            display: inline-block;	/* 見た目の設定を指定 */
+            width: 4px;	/* 見た目の設定を指定 */
+            height: 20px;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            border-radius: 4px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .partner-item {
-            display: flex;
-            align-items: center;
-            padding: 18px 24px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
-        }
+        .partner-item {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            padding: 18px 24px;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            transition: all 0.25s ease;	/* 見た目の設定を指定 */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .partner-item:hover {
-            background-color: rgba(28, 189, 197, 0.05);
-            transform: translateX(4px);
-        }
+        .partner-item:hover {	/* 対象要素のスタイルを始める */
+            background-color: rgba(28, 189, 197, 0.05);	/* 見た目の設定を指定 */
+            transform: translateX(4px);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .avatar-ring {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            padding: 2px;
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            margin-right: 18px;
-            flex-shrink: 0;
-            box-sizing: border-box;
-            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.2);
-        }
+        .avatar-ring {	/* 対象要素のスタイルを始める */
+            width: 52px;	/* 見た目の設定を指定 */
+            height: 52px;	/* 見た目の設定を指定 */
+            border-radius: 50%;	/* 見た目の設定を指定 */
+            padding: 2px;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            margin-right: 18px;	/* 見た目の設定を指定 */
+            flex-shrink: 0;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.2);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .partner-avatar {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 2px solid #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 800;
-            font-size: 18px;
-            box-sizing: border-box;
-        }
+        .partner-avatar {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            height: 100%;	/* 見た目の設定を指定 */
+            border-radius: 50%;	/* 見た目の設定を指定 */
+            border: 2px solid #ffffff;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            justify-content: center;	/* 見た目の設定を指定 */
+            color: white;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            font-size: 18px;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .partner-content-box {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex: 1;
-            overflow: hidden;
-        }
+        .partner-content-box {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            gap: 4px;	/* 見た目の設定を指定 */
+            flex: 1;	/* 見た目の設定を指定 */
+            overflow: hidden;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .partner-name {
-            font-weight: 800;
-            font-size: 15px;
-            color: #1e293b;
-        }
+        .partner-name {	/* 対象要素のスタイルを始める */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            font-size: 15px;	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .partner-email {
-            font-size: 13px;
-            color: #64748b;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        .partner-email {	/* 対象要素のスタイルを始める */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            color: #64748b;	/* 見た目の設定を指定 */
+            white-space: nowrap;	/* 見た目の設定を指定 */
+            overflow: hidden;	/* 見た目の設定を指定 */
+            text-overflow: ellipsis;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .arrow-badge {
-            background: rgba(28, 189, 197, 0.1);
-            color: #1cbdc5;
-            font-size: 12px;
-            font-weight: 800;
-            padding: 6px 14px;
-            border-radius: 20px;
-            margin-left: 10px;
-            transition: all 0.2s;
-        }
+        .arrow-badge {	/* 対象要素のスタイルを始める */
+            background: rgba(28, 189, 197, 0.1);	/* 見た目の設定を指定 */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+            font-size: 12px;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            padding: 6px 14px;	/* 見た目の設定を指定 */
+            border-radius: 20px;	/* 見た目の設定を指定 */
+            margin-left: 10px;	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .partner-item:hover .arrow-badge {
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            color: #ffffff;
-        }
+        .partner-item:hover .arrow-badge {	/* 対象要素のスタイルを始める */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            color: #ffffff;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .partner-delete-button {
-            flex-shrink: 0;
-            margin-left: 8px;
-            padding: 7px 10px;
-            border: 1px solid #fecaca;
-            border-radius: 8px;
-            background: #fff1f2;
-            color: #be123c;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-        }
+        .partner-delete-button {	/* 対象要素のスタイルを始める */
+            flex-shrink: 0;	/* 見た目の設定を指定 */
+            margin-left: 8px;	/* 見た目の設定を指定 */
+            padding: 7px 10px;	/* 見た目の設定を指定 */
+            border: 1px solid #fecaca;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            background: #fff1f2;	/* 見た目の設定を指定 */
+            color: #be123c;	/* 見た目の設定を指定 */
+            font-size: 11px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .partner-delete-button:hover {
-            background: #ffe4e6;
-        }
+        .partner-delete-button:hover {	/* 対象要素のスタイルを始める */
+            background: #ffe4e6;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .empty-message {
-            text-align: center;
-            color: #64748b;
-            font-size: 14px;
-            line-height: 1.7;
-            padding: 60px 20px;
-            font-weight: 600;
-        }
+        .empty-message {	/* 対象要素のスタイルを始める */
+            text-align: center;	/* 見た目の設定を指定 */
+            color: #64748b;	/* 見た目の設定を指定 */
+            font-size: 14px;	/* 見た目の設定を指定 */
+            line-height: 1.7;	/* 見た目の設定を指定 */
+            padding: 60px 20px;	/* 見た目の設定を指定 */
+            font-weight: 600;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .loading-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 60px 20px;
-            gap: 14px;
-            color: #64748b;
-            font-size: 14px;
-            font-weight: 700;
-        }
+        .loading-box {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            justify-content: center;	/* 見た目の設定を指定 */
+            padding: 60px 20px;	/* 見た目の設定を指定 */
+            gap: 14px;	/* 見た目の設定を指定 */
+            color: #64748b;	/* 見た目の設定を指定 */
+            font-size: 14px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid rgba(28, 189, 197, 0.2);
-            border-top: 3px solid #1cbdc5;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
+        .spinner {	/* 対象要素のスタイルを始める */
+            width: 32px;	/* 見た目の設定を指定 */
+            height: 32px;	/* 見た目の設定を指定 */
+            border: 3px solid rgba(28, 189, 197, 0.2);	/* 見た目の設定を指定 */
+            border-top: 3px solid #1cbdc5;	/* 見た目の設定を指定 */
+            border-radius: 50%;	/* 見た目の設定を指定 */
+            animation: spin 0.8s linear infinite;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes spin {	/* 表示条件を設定 */
+            0% { transform: rotate(0deg); }	/* 見た目の設定を指定 */
+            100% { transform: rotate(360deg); }	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .footer {
-            background-color: transparent;
-            padding: 30px 20px;
-            margin-top: auto;
-            width: 100%;
-            box-sizing: border-box;
-        }
+        .footer {	/* 対象要素のスタイルを始める */
+            background-color: transparent;	/* 見た目の設定を指定 */
+            padding: 30px 20px;	/* 見た目の設定を指定 */
+            margin-top: auto;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
+        .footer-container {	/* 対象要素のスタイルを始める */
+            max-width: 1200px;	/* 見た目の設定を指定 */
+            margin: 0 auto;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            gap: 12px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .footer-links {
-            display: flex;
-            gap: 24px;
-            justify-content: center;
-        }
+        .footer-links {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            gap: 24px;	/* 見た目の設定を指定 */
+            justify-content: center;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .footer-links a {
-            color: #64748b;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 700;
-            transition: color 0.2s;
-        }
+        .footer-links a {	/* 対象要素のスタイルを始める */
+            color: #64748b;	/* 見た目の設定を指定 */
+            text-decoration: none;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            transition: color 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .footer-links a:hover {
-            color: #1cbdc5;
-        }
+        .footer-links a:hover {	/* 対象要素のスタイルを始める */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .copyright {
-            color: #94a3b8;
-            font-size: 0.75rem;
-            margin: 0;
-            font-weight: 600;
-        }
+        .copyright {	/* 対象要素のスタイルを始める */
+            color: #94a3b8;	/* 見た目の設定を指定 */
+            font-size: 0.75rem;	/* 見た目の設定を指定 */
+            margin: 0;	/* 見た目の設定を指定 */
+            font-weight: 600;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        @media screen and (max-width: 768px) {
-            .container {
-                margin: 16px auto;
-                padding: 0 16px;
-            }
+        @media screen and (max-width: 768px) {	/* 表示条件を設定 */
+            .container {	/* 対象要素のスタイルを始める */
+                margin: 16px auto;	/* 見た目の設定を指定 */
+                padding: 0 16px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .hamburger-btn {
-                display: flex !important;
-            }
+            .hamburger-btn {	/* 対象要素のスタイルを始める */
+                display: flex !important;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .nav-links {
-                position: fixed !important;
-                top: 54px !important;
-                left: 0 !important;
-                width: 100% !important;
-                background: rgba(255, 255, 255, 0.98) !important;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
-                flex-direction: column !important;
-                padding: 24px 0 !important;
-                gap: 8px !important;
-                z-index: 99 !important;
-                opacity: 0 !important;
-                pointer-events: none !important;
-                transform: translateY(-10px) !important;
-                transition: transform 0.3s ease, opacity 0.3s ease !important;
-            }
+            .nav-links {	/* 対象要素のスタイルを始める */
+                position: fixed !important;	/* 見た目の設定を指定 */
+                top: 54px !important;	/* 見た目の設定を指定 */
+                left: 0 !important;	/* 見た目の設定を指定 */
+                width: 100% !important;	/* 見た目の設定を指定 */
+                background: rgba(255, 255, 255, 0.98) !important;	/* 見た目の設定を指定 */
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;	/* 見た目の設定を指定 */
+                flex-direction: column !important;	/* 見た目の設定を指定 */
+                padding: 24px 0 !important;	/* 見た目の設定を指定 */
+                gap: 8px !important;	/* 見た目の設定を指定 */
+                z-index: 99 !important;	/* 見た目の設定を指定 */
+                opacity: 0 !important;	/* 見た目の設定を指定 */
+                pointer-events: none !important;	/* 見た目の設定を指定 */
+                transform: translateY(-10px) !important;	/* 見た目の設定を指定 */
+                transition: transform 0.3s ease, opacity 0.3s ease !important;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .nav-links.open {
-                opacity: 1 !important;
-                pointer-events: auto !important;
-                transform: translateY(0) !important;
-            }
+            .nav-links.open {	/* 対象要素のスタイルを始める */
+                opacity: 1 !important;	/* 見た目の設定を指定 */
+                pointer-events: auto !important;	/* 見た目の設定を指定 */
+                transform: translateY(0) !important;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .nav-item {
-                font-size: 16px !important;
-                padding: 12px 0 !important;
-                width: 80% !important;
-                text-align: center !important;
-                border-radius: 10px;
-            }
+            .nav-item {	/* 対象要素のスタイルを始める */
+                font-size: 16px !important;	/* 見た目の設定を指定 */
+                padding: 12px 0 !important;	/* 見た目の設定を指定 */
+                width: 80% !important;	/* 見た目の設定を指定 */
+                text-align: center !important;	/* 見た目の設定を指定 */
+                border-radius: 10px;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .btn-logout {
-                width: 80% !important;
-                padding: 12px 0 !important;
-                margin: 0 auto !important;
-            }
+            .btn-logout {	/* 対象要素のスタイルを始める */
+                width: 80% !important;	/* 見た目の設定を指定 */
+                padding: 12px 0 !important;	/* 見た目の設定を指定 */
+                margin: 0 auto !important;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .hamburger-btn.open span:nth-child(1) { transform: translateY(8px) rotate(45deg) !important; }
-            .hamburger-btn.open span:nth-child(2) { opacity: 0 !important; transform: scale(0) !important; }
-            .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) !important; }
-        }
+            .hamburger-btn.open span:nth-child(1) { transform: translateY(8px) rotate(45deg) !important; }	/* 見た目の設定を指定 */
+            .hamburger-btn.open span:nth-child(2) { opacity: 0 !important; transform: scale(0) !important; }	/* 見た目の設定を指定 */
+            .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) !important; }	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
     </style>
 
-    <link rel="stylesheet" href="theme.css?v=20260917c">
+    <link rel="stylesheet" href="theme.css?v=20260917c">	<!-- 外部ファイルを読み込む -->
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
-</head>
+</head>	<!-- 要素を閉じる -->
 
-<body data-page="messages">
+<body data-page="messages">	<!-- 画面要素を配置 -->
 
-    <header class="navbar">
-        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
+    <header class="navbar">	<!-- ヘッダーを配置 -->
+        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>	<!-- 画面要素を配置 -->
 
-        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
+        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">	<!-- 操作できる要素を配置 -->
+            <span></span>	<!-- 画面要素を配置 -->
+            <span></span>	<!-- 画面要素を配置 -->
+            <span></span>	<!-- 画面要素を配置 -->
+        </button>	<!-- 要素を閉じる -->
 
-        <nav class="nav-links" id="nav-links">
-            <a class="nav-item" href="main.html?guide=1">使い方</a>
-            <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>
-            <a class="nav-item" href="recruit.html">募集投稿</a>
-            <a class="nav-item" href="users.html">ユーザーを探す</a>
-            <a class="nav-item active" href="messages.html">
-                メッセージ
-                <span id="unread-badge" class="unread-badge" style="display: none;">0</span>
-            </a>
-            <a class="nav-item" href="profile.html">マイページ</a>
-            <a class="nav-item" href="ai-study.html">AI学習相談</a>
-            <a class="nav-item" id="nav-admin-btn" style="display:none;" href="admin.html">管理者</a>
-            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>
-        </nav>
-    </header>
+        <nav class="nav-links" id="nav-links">	<!-- ナビゲーションを配置 -->
+            <a class="nav-item" href="main.html?guide=1">使い方</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="recruit.html">募集投稿</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="users.html">ユーザーを探す</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item active" href="messages.html">	<!-- 操作できる要素を配置 -->
+                メッセージ	<!-- 画面に表示する内容 -->
+                <span id="unread-badge" class="unread-badge" style="display: none;">0</span>	<!-- 画面要素を配置 -->
+            </a>	<!-- 要素を閉じる -->
+            <a class="nav-item" href="profile.html">マイページ</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="ai-study.html">AI学習相談</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" id="nav-admin-btn" style="display:none;" href="admin.html">管理者</a>	<!-- 操作できる要素を配置 -->
+            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>	<!-- 操作できる要素を配置 -->
+        </nav>	<!-- 要素を閉じる -->
+    </header>	<!-- 要素を閉じる -->
 
-    <main class="container">
-        <div class="dm-card">
-            <div class="dm-header">
-                <h2>メッセージ一覧</h2>
-            </div>
-            <div id="partner-list">
-                <div class="loading-box">
-                    <div class="spinner"></div>
-                    <span>読み込み中...</span>
-                </div>
-            </div>
-        </div>
-    </main>
+    <main class="container">	<!-- ページの主内容を配置 -->
+        <div class="dm-card">	<!-- 画面要素を配置 -->
+            <div class="dm-header">	<!-- 画面要素を配置 -->
+                <h2>メッセージ一覧</h2>	<!-- 画面要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+            <div id="partner-list">	<!-- 画面要素を配置 -->
+                <div class="loading-box">	<!-- 画面要素を配置 -->
+                    <div class="spinner"></div>	<!-- 画面要素を配置 -->
+                    <span>読み込み中...</span>	<!-- 画面要素を配置 -->
+                </div>	<!-- 要素を閉じる -->
+            </div>	<!-- 要素を閉じる -->
+        </div>	<!-- 要素を閉じる -->
+    </main>	<!-- 要素を閉じる -->
 
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-links">
-                <a href="main.html">ホーム</a>
-                <a href="messages.html">メッセージ</a>
-                <a href="profile.html">マイページ</a>
-                <a href="terms.html">利用規約</a>
-                <a href="privacy.html">プライバシーポリシー</a>
-            </div>
-            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>
-        </div>
-    </footer>
+    <footer class="footer">	<!-- フッターを配置 -->
+        <div class="footer-container">	<!-- 画面要素を配置 -->
+            <div class="footer-links">	<!-- 画面要素を配置 -->
+                <a href="main.html">ホーム</a>	<!-- 操作できる要素を配置 -->
+                <a href="messages.html">メッセージ</a>	<!-- 操作できる要素を配置 -->
+                <a href="profile.html">マイページ</a>	<!-- 操作できる要素を配置 -->
+                <a href="terms.html">利用規約</a>	<!-- 操作できる要素を配置 -->
+                <a href="privacy.html">プライバシーポリシー</a>	<!-- 操作できる要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>	<!-- 画面要素を配置 -->
+        </div>	<!-- 要素を閉じる -->
+    </footer>	<!-- 要素を閉じる -->
 
     <script>
-        if (!localStorage.getItem("userEmail")) {
-            window.location.href = "index.html";
-        }
+        if (!localStorage.getItem("userEmail")) {	// 端末内の保存情報を扱う
+            window.location.href = "index.html";	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
 
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
-        const bgGradients = [
-            "linear-gradient(135deg, #1cbdc5 0%, #119299 100%)",
-            "linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)",
-            "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
-            "linear-gradient(135deg, #0d9488 0%, #115e59 100%)",
-            "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)"
-        ];
-        let unreadRequest = null;
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";	// GAS APIの接続先を設定
+        const bgGradients = [	// 定数を定義
+            "linear-gradient(135deg, #1cbdc5 0%, #119299 100%)",	// 処理を続ける
+            "linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)",	// 処理を続ける
+            "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",	// 処理を続ける
+            "linear-gradient(135deg, #0d9488 0%, #115e59 100%)",	// 処理を続ける
+            "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)"	// 処理を続ける
+        ];	// 処理を続ける
+        let unreadRequest = null;	// 状態を保持
 
-        async function postGas(payload, timeoutMs = 12000) {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify(payload),
-                    signal: controller.signal
-                });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                return await res.json();
-            } finally {
-                clearTimeout(timeoutId);
-            }
-        }
+        async function postGas(payload, timeoutMs = 12000) {	// 関数を定義
+            const controller = new AbortController();	// 定数を定義
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);	// 定数を定義
+            try {	// 失敗に備えて処理を始める
+                const res = await fetch(GAS_URL, {	// 定数を定義
+                    method: "POST",	// 処理を続ける
+                    body: JSON.stringify(payload),	// 処理を続ける
+                    signal: controller.signal	// 処理を続ける
+                });	// 処理を完了する
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);	// 条件に応じて処理を分ける
+                return await res.json();	// 結果を返す
+            } finally {	// 処理のまとまりを始める
+                clearTimeout(timeoutId);	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        function toggleMenu() {
-            document.getElementById("hud-menu-btn").classList.toggle("open");
-            document.getElementById("nav-links").classList.toggle("open");
-        }
+        function toggleMenu() {	// 関数を定義
+            document.getElementById("hud-menu-btn").classList.toggle("open");	// 画面表示を更新する
+            document.getElementById("nav-links").classList.toggle("open");	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
 
-        function closeMenu() {
-            document.getElementById("hud-menu-btn").classList.remove("open");
-            document.getElementById("nav-links").classList.remove("open");
-        }
+        function closeMenu() {	// 関数を定義
+            document.getElementById("hud-menu-btn").classList.remove("open");	// 画面表示を更新する
+            document.getElementById("nav-links").classList.remove("open");	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
 
-        async function loadChatPartners() {
-            const myEmail = localStorage.getItem("userEmail");
-            const listDiv = document.getElementById("partner-list");
+        async function loadChatPartners() {	// 関数を定義
+            const myEmail = localStorage.getItem("userEmail");	// 定数を定義
+            const listDiv = document.getElementById("partner-list");	// 定数を定義
 
             listDiv.innerHTML = `
                 <div class="loading-box">
@@ -514,159 +514,159 @@
                 </div>
             `;
 
-            try {
-                const result = await postGas({ mode: "getChatPartners", email: myEmail });
+            try {	// 失敗に備えて処理を始める
+                const result = await postGas({ mode: "getChatPartners", email: myEmail });	// 定数を定義
 
-                if (result.status === "success") {
-                    const partners = result.message;
-                    listDiv.innerHTML = "";
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    const partners = result.message;	// 定数を定義
+                    listDiv.innerHTML = "";	// 処理を続ける
 
-                    if (partners.length === 0) {
+                    if (partners.length === 0) {	// 条件に応じて処理を分ける
                         listDiv.innerHTML = `
                             <div class="empty-message">
                                 メッセージはまだありません。<br>
                                 ホーム画面から気になる人にチャットを送ってみましょう！
                             </div>
                         `;
-                    } else {
-                        partners.forEach((partner, index) => {
-                            const initial = partner.name ? partner.name.charAt(0) : "未";
-                            const avatarBg = bgGradients[index % bgGradients.length];
+                    } else {	// 処理のまとまりを始める
+                        partners.forEach((partner, index) => {	// 処理のまとまりを始める
+                            const initial = partner.name ? partner.name.charAt(0) : "未";	// 定数を定義
+                            const avatarBg = bgGradients[index % bgGradients.length];	// 定数を定義
 
-                            const item = document.createElement("div");
-                            item.className = "partner-item";
-                            item.onclick = () => openChat(partner.email);
+                            const item = document.createElement("div");	// 定数を定義
+                            item.className = "partner-item";	// 処理を続ける
+                            item.onclick = () => openChat(partner.email);	// 処理を完了する
 
-                            const avatarRing = document.createElement("div");
-                            avatarRing.className = "avatar-ring";
-                            const avatar = document.createElement("div");
-                            avatar.className = "partner-avatar";
-                            avatar.style.background = avatarBg;
-                            avatar.textContent = initial;
-                            avatarRing.appendChild(avatar);
+                            const avatarRing = document.createElement("div");	// 定数を定義
+                            avatarRing.className = "avatar-ring";	// 処理を続ける
+                            const avatar = document.createElement("div");	// 定数を定義
+                            avatar.className = "partner-avatar";	// 処理を続ける
+                            avatar.style.background = avatarBg;	// 処理を続ける
+                            avatar.textContent = initial;	// 処理を続ける
+                            avatarRing.appendChild(avatar);	// 処理を完了する
 
-                            const contentBox = document.createElement("div");
-                            contentBox.className = "partner-content-box";
-                            const name = document.createElement("div");
-                            name.className = "partner-name";
-                            name.textContent = partner.name;
-                            const email = document.createElement("div");
-                            email.className = "partner-email";
-                            email.textContent = partner.email;
-                            contentBox.append(name, email);
+                            const contentBox = document.createElement("div");	// 定数を定義
+                            contentBox.className = "partner-content-box";	// 処理を続ける
+                            const name = document.createElement("div");	// 定数を定義
+                            name.className = "partner-name";	// 処理を続ける
+                            name.textContent = partner.name;	// 処理を続ける
+                            const email = document.createElement("div");	// 定数を定義
+                            email.className = "partner-email";	// 処理を続ける
+                            email.textContent = partner.email;	// 処理を続ける
+                            contentBox.append(name, email);	// 処理を完了する
 
-                            const arrow = document.createElement("div");
-                            arrow.className = "arrow-badge";
-                            arrow.textContent = "開く ➔";
-                            item.append(avatarRing, contentBox, arrow);
+                            const arrow = document.createElement("div");	// 定数を定義
+                            arrow.className = "arrow-badge";	// 処理を続ける
+                            arrow.textContent = "開く ➔";	// 処理を続ける
+                            item.append(avatarRing, contentBox, arrow);	// 処理を完了する
 
-                            const deleteButton = document.createElement("button");
-                            deleteButton.type = "button";
-                            deleteButton.className = "partner-delete-button";
-                            deleteButton.innerText = "削除";
-                            deleteButton.addEventListener("click", event => {
-                                event.stopPropagation();
-                                deleteChatPartner(partner.email, deleteButton);
-                            });
-                            item.appendChild(deleteButton);
-                            listDiv.appendChild(item);
-                        });
-                    }
-                } else {
-                    listDiv.innerHTML = `<div class="empty-message">データの取得に失敗しました。</div>`;
-                }
-            } catch (e) {
-                console.error(e);
-                listDiv.innerHTML = `<div class="empty-message">通信エラーが発生しました。</div>`;
-            }
-        }
+                            const deleteButton = document.createElement("button");	// 定数を定義
+                            deleteButton.type = "button";	// 処理を続ける
+                            deleteButton.className = "partner-delete-button";	// 処理を続ける
+                            deleteButton.innerText = "削除";	// 処理を続ける
+                            deleteButton.addEventListener("click", event => {	// 操作イベントを登録
+                                event.stopPropagation();	// 処理を完了する
+                                deleteChatPartner(partner.email, deleteButton);	// 処理を完了する
+                            });	// 処理を完了する
+                            item.appendChild(deleteButton);	// 処理を完了する
+                            listDiv.appendChild(item);	// 処理を完了する
+                        });	// 処理を完了する
+                    }	// 処理のまとまりを閉じる
+                } else {	// 処理のまとまりを始める
+                    listDiv.innerHTML = `<div class="empty-message">データの取得に失敗しました。</div>`;	// 処理を続ける
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                console.error(e);	// 処理を完了する
+                listDiv.innerHTML = `<div class="empty-message">通信エラーが発生しました。</div>`;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        async function updateUnreadBadge() {
-            const myEmail = localStorage.getItem("userEmail");
-            const badge = document.getElementById("unread-badge");
-            if (!myEmail || !badge || unreadRequest) return unreadRequest;
+        async function updateUnreadBadge() {	// 関数を定義
+            const myEmail = localStorage.getItem("userEmail");	// 定数を定義
+            const badge = document.getElementById("unread-badge");	// 定数を定義
+            if (!myEmail || !badge || unreadRequest) return unreadRequest;	// 条件に応じて処理を分ける
 
-            unreadRequest = (async () => {
-                try {
-                    const result = await postGas({ mode: "getUnreadCount", email: myEmail });
+            unreadRequest = (async () => {	// 処理のまとまりを始める
+                try {	// 失敗に備えて処理を始める
+                    const result = await postGas({ mode: "getUnreadCount", email: myEmail });	// 定数を定義
 
-                    if (result.status === "success" && result.message) {
-                        const count = result.message.unreadCount || 0;
-                        if (count > 0) {
-                            badge.innerText = count > 99 ? "99+" : count;
-                            badge.style.display = "inline-block";
-                        } else {
-                            badge.style.display = "none";
-                        }
-                    }
-                } catch (e) {
-                    console.error("未読チェックエラー:", e);
-                } finally {
-                    unreadRequest = null;
-                }
-            })();
+                    if (result.status === "success" && result.message) {	// 条件に応じて処理を分ける
+                        const count = result.message.unreadCount || 0;	// 定数を定義
+                        if (count > 0) {	// 条件に応じて処理を分ける
+                            badge.innerText = count > 99 ? "99+" : count;	// 処理を続ける
+                            badge.style.display = "inline-block";	// 処理を続ける
+                        } else {	// 処理のまとまりを始める
+                            badge.style.display = "none";	// 処理を続ける
+                        }	// 処理のまとまりを閉じる
+                    }	// 処理のまとまりを閉じる
+                } catch (e) {	// 処理のまとまりを始める
+                    console.error("未読チェックエラー:", e);	// 処理を完了する
+                } finally {	// 処理のまとまりを始める
+                    unreadRequest = null;	// 処理を続ける
+                }	// 処理のまとまりを閉じる
+            })();	// 処理を完了する
 
-            return unreadRequest;
-        }
+            return unreadRequest;	// 結果を返す
+        }	// 処理のまとまりを閉じる
 
-        function openChat(email) {
-            localStorage.setItem("chatTarget", email);
-            location.href = 'chat.html';
-        }
+        function openChat(email) {	// 関数を定義
+            localStorage.setItem("chatTarget", email);	// 端末内の保存情報を扱う
+            location.href = 'chat.html';	// 処理を続ける
+        }	// 処理のまとまりを閉じる
 
-        async function deleteChatPartner(email, button) {
-            if (!confirm("この相手とのメッセージ一覧を削除しますか？\n自分の画面から非表示になります。相手の画面には影響しません。")) return;
+        async function deleteChatPartner(email, button) {	// 関数を定義
+            if (!confirm("この相手とのメッセージ一覧を削除しますか？\n自分の画面から非表示になります。相手の画面には影響しません。")) return;	// 条件に応じて処理を分ける
 
-            const originalText = button.innerText;
-            button.disabled = true;
-            button.innerText = "削除中...";
+            const originalText = button.innerText;	// 定数を定義
+            button.disabled = true;	// 処理を続ける
+            button.innerText = "削除中...";	// 処理を続ける
 
-            try {
-                const result = await postGas({
-                    mode: "deleteChatHistory",
-                    userId: localStorage.getItem("userEmail"),
-                    targetUserId: email
-                });
+            try {	// 失敗に備えて処理を始める
+                const result = await postGas({	// 定数を定義
+                    mode: "deleteChatHistory",	// 処理を続ける
+                    userId: localStorage.getItem("userEmail"),	// 端末内の保存情報を扱う
+                    targetUserId: email	// 処理を続ける
+                });	// 処理を完了する
 
-                if (result.status === "success") {
-                    await loadChatPartners();
-                } else {
-                    button.disabled = false;
-                    button.innerText = originalText;
-                    alert("リストの削除に失敗しました: " + result.message);
-                }
-            } catch (e) {
-                button.disabled = false;
-                button.innerText = originalText;
-                alert("通信エラーが発生しました。");
-            }
-        }
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    await loadChatPartners();	// 処理を完了する
+                } else {	// 処理のまとまりを始める
+                    button.disabled = false;	// 処理を続ける
+                    button.innerText = originalText;	// 処理を続ける
+                    alert("リストの削除に失敗しました: " + result.message);	// 処理結果を知らせる
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                button.disabled = false;	// 処理を続ける
+                button.innerText = originalText;	// 処理を続ける
+                alert("通信エラーが発生しました。");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = "index.html";
-        }
+        function logout() {	// 関数を定義
+            localStorage.clear();	// 端末内の保存情報を扱う
+            window.location.href = "index.html";	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
 
-        window.onload = () => {
-            document.getElementById("hud-menu-btn").classList.remove("open");
-            document.getElementById("nav-links").classList.remove("open");
+        window.onload = () => {	// 処理のまとまりを始める
+            document.getElementById("hud-menu-btn").classList.remove("open");	// 画面表示を更新する
+            document.getElementById("nav-links").classList.remove("open");	// 画面表示を更新する
 
-            const currentUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
-            const adminButton = document.getElementById("nav-admin-btn");
-            if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") {
-                adminButton.style.display = "inline-block";
-            }
+            const currentUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail");	// 定数を定義
+            const adminButton = document.getElementById("nav-admin-btn");	// 定数を定義
+            if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") {	// 端末内の保存情報を扱う
+                adminButton.style.display = "inline-block";	// 処理を続ける
+            }	// 処理のまとまりを閉じる
 
-            localStorage.removeItem("chatTarget");
+            localStorage.removeItem("chatTarget");	// 端末内の保存情報を扱う
 
-            loadChatPartners();
-            updateUnreadBadge();
+            loadChatPartners();	// 処理を完了する
+            updateUnreadBadge();	// 処理を完了する
 
-            setInterval(() => {
-                if (document.visibilityState === "visible") updateUnreadBadge();
-            }, 8000);
-        };
+            setInterval(() => {	// 時間を置いて処理する
+                if (document.visibilityState === "visible") updateUnreadBadge();	// 条件に応じて処理を分ける
+            }, 8000);	// 処理を完了する
+        };	// 処理のまとまりを閉じる
     </script>
-</body>
+</body>	<!-- 要素を閉じる -->
 
-</html>
+</html>	<!-- 要素を閉じる -->

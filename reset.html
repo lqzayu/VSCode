@@ -1,194 +1,194 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>パスワード再設定 - 平工マッチング</title>
-    <link rel="icon" href="icon-192.png">
+<!DOCTYPE html>	<!-- HTML文書として宣言 -->
+<html lang="ja">	<!-- 画面要素を配置 -->
+<head>	<!-- 画面要素を配置 -->
+    <meta charset="UTF-8">	<!-- 表示環境を設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">	<!-- 表示環境を設定 -->
+    <title>パスワード再設定 - 平工マッチング</title>	<!-- ページタイトルを設定 -->
+    <link rel="icon" href="icon-192.png">	<!-- 外部ファイルを読み込む -->
 
 
 
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100dvh;
-            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
-        }
-        .container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 24px;
-            box-sizing: border-box;
-        }
-        .card {
-            background-color: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            padding: 40px 32px;
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 20px 40px -4px rgba(24, 76, 92, 0.08);
-            width: 100%;
-            max-width: 400px;
-            box-sizing: border-box;
-            text-align: center;
-        }
-        h1 { font-size: 1.5rem; font-weight: 800; color: #1e293b; margin-bottom: 24px; }
-        input {
-            width: 100%;
-            padding: 14px 16px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            border-radius: 12px;
-            box-sizing: border-box;
-            font-size: 15px;
-            background-color: rgba(248, 250, 252, 0.8);
-            outline: none;
-        }
-        input:focus { border-color: #1cbdc5; background: #fff; }
-        button {
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 700;
-            border: none;
-            cursor: pointer;
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            color: white;
-        }
-        .message { min-height: 20px; margin-bottom: 16px; font-size: 13px; font-weight: 600; }
-        .success { color: #10b981; }
-        .error { color: #ef4444; }
-        a { color: #1cbdc5; font-size: 13px; font-weight: 600; text-decoration: none; }
+        body {	/* 対象要素のスタイルを始める */
+            margin: 0;	/* 見た目の設定を指定 */
+            padding: 0;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            min-height: 100dvh;	/* 見た目の設定を指定 */
+            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);	/* 見た目の設定を指定 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+        .container {	/* 対象要素のスタイルを始める */
+            flex: 1;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            justify-content: center;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            padding: 24px;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+        .card {	/* 対象要素のスタイルを始める */
+            background-color: rgba(255, 255, 255, 0.85);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            padding: 40px 32px;	/* 見た目の設定を指定 */
+            border-radius: 24px;	/* 見た目の設定を指定 */
+            border: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
+            box-shadow: 0 20px 40px -4px rgba(24, 76, 92, 0.08);	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            max-width: 400px;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+            text-align: center;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+        h1 { font-size: 1.5rem; font-weight: 800; color: #1e293b; margin-bottom: 24px; }	/* 見た目の設定を指定 */
+        input {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            padding: 14px 16px;	/* 見た目の設定を指定 */
+            margin-bottom: 16px;	/* 見た目の設定を指定 */
+            border: 1px solid rgba(0, 0, 0, 0.08);	/* 見た目の設定を指定 */
+            border-radius: 12px;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+            font-size: 15px;	/* 見た目の設定を指定 */
+            background-color: rgba(248, 250, 252, 0.8);	/* 見た目の設定を指定 */
+            outline: none;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+        input:focus { border-color: #1cbdc5; background: #fff; }	/* 見た目の設定を指定 */
+        button {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            padding: 14px;	/* 見た目の設定を指定 */
+            border-radius: 12px;	/* 見た目の設定を指定 */
+            font-size: 15px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            color: white;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+        .message { min-height: 20px; margin-bottom: 16px; font-size: 13px; font-weight: 600; }	/* 見た目の設定を指定 */
+        .success { color: #10b981; }	/* 見た目の設定を指定 */
+        .error { color: #ef4444; }	/* 見た目の設定を指定 */
+        a { color: #1cbdc5; font-size: 13px; font-weight: 600; text-decoration: none; }	/* 見た目の設定を指定 */
     </style>
 
 
 
-    <link rel="stylesheet" href="theme.css?v=20260917c">
+    <link rel="stylesheet" href="theme.css?v=20260917c">	<!-- 外部ファイルを読み込む -->
     <script src="ui.js"></script>
-</head>
-<body data-page="reset">
-    <div class="container">
-        <div class="card">
-            <h1>新しいパスワードを設定</h1>
-            <div id="form-area">
-                <input type="password" id="new-password" placeholder="新しいパスワード" maxlength="128" autocomplete="new-password">
-                <input type="password" id="confirm-password" placeholder="新しいパスワード（確認）" maxlength="128" autocomplete="new-password">
-                <p style="margin:-4px 2px 14px; color:#64748b; font-size:12px; line-height:1.65; text-align:left;">
-                    半角4文字以上で、英大文字・英小文字・数字・記号を各1文字以上含めてください。同じ数字4桁の繰り返しや、1234・4321のような4桁の連番は使用できません。
-                </p>
-                <div id="message" class="message"></div>
-                <button onclick="submitReset()">パスワードを更新する</button>
-            </div>
-            <div id="success-area" style="display:none;">
-                <p style="color:#10b981; font-weight:700;">パスワードを更新しました。</p>
-                <a href="index.html">ログイン画面に戻る</a>
-            </div>
-        </div>
-    </div>
+</head>	<!-- 要素を閉じる -->
+<body data-page="reset">	<!-- 画面要素を配置 -->
+    <div class="container">	<!-- 画面要素を配置 -->
+        <div class="card">	<!-- 画面要素を配置 -->
+            <h1>新しいパスワードを設定</h1>	<!-- 画面要素を配置 -->
+            <div id="form-area">	<!-- 画面要素を配置 -->
+                <input type="password" id="new-password" placeholder="新しいパスワード" maxlength="128" autocomplete="new-password">	<!-- 入力要素を配置 -->
+                <input type="password" id="confirm-password" placeholder="新しいパスワード（確認）" maxlength="128" autocomplete="new-password">	<!-- 入力要素を配置 -->
+                <p style="margin:-4px 2px 14px; color:#64748b; font-size:12px; line-height:1.65; text-align:left;">	<!-- 画面要素を配置 -->
+                    半角4文字以上で、英大文字・英小文字・数字・記号を各1文字以上含めてください。同じ数字4桁の繰り返しや、1234・4321のような4桁の連番は使用できません。	<!-- 画面に表示する内容 -->
+                </p>	<!-- 要素を閉じる -->
+                <div id="message" class="message"></div>	<!-- 画面要素を配置 -->
+                <button onclick="submitReset()">パスワードを更新する</button>	<!-- 操作できる要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+            <div id="success-area" style="display:none;">	<!-- 画面要素を配置 -->
+                <p style="color:#10b981; font-weight:700;">パスワードを更新しました。</p>	<!-- 画面要素を配置 -->
+                <a href="index.html">ログイン画面に戻る</a>	<!-- 操作できる要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+        </div>	<!-- 要素を閉じる -->
+    </div>	<!-- 要素を閉じる -->
 
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-links">
-                <a href="main.html">ホーム</a>
-                <a href="messages.html">メッセージ</a>
-                <a href="profile.html">マイページ</a>
-                <a href="terms.html">利用規約</a>
-                <a href="privacy.html">プライバシーポリシー</a>
-            </div>
-            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>
-        </div>
-    </footer>
+    <footer class="footer">	<!-- フッターを配置 -->
+        <div class="footer-container">	<!-- 画面要素を配置 -->
+            <div class="footer-links">	<!-- 画面要素を配置 -->
+                <a href="main.html">ホーム</a>	<!-- 操作できる要素を配置 -->
+                <a href="messages.html">メッセージ</a>	<!-- 操作できる要素を配置 -->
+                <a href="profile.html">マイページ</a>	<!-- 操作できる要素を配置 -->
+                <a href="terms.html">利用規約</a>	<!-- 操作できる要素を配置 -->
+                <a href="privacy.html">プライバシーポリシー</a>	<!-- 操作できる要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>	<!-- 画面要素を配置 -->
+        </div>	<!-- 要素を閉じる -->
+    </footer>	<!-- 要素を閉じる -->
 
 
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";	// GAS APIの接続先を設定
 
-        const params = new URLSearchParams(window.location.search);
-        const userId = params.get("id");
-        const token = params.get("token");
+        const params = new URLSearchParams(window.location.search);	// 定数を定義
+        const userId = params.get("id");	// 定数を定義
+        const token = params.get("token");	// 定数を定義
 
-        if (!userId || !token) {
-            document.getElementById("form-area").innerHTML = "<p style='color:#ef4444;'>無効なリンクです。パスワード再設定をやり直してください。</p>";
-        }
+        if (!userId || !token) {	// 条件に応じて処理を分ける
+            document.getElementById("form-area").innerHTML = "<p style='color:#ef4444;'>無効なリンクです。パスワード再設定をやり直してください。</p>";	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
 
-        function hasWeakNumberSequence(password) {
-            const numberRuns = String(password).match(/\d{4,}/g) || [];
-            return numberRuns.some(run => {
-                for (let i = 0; i <= run.length - 4; i++) {
-                    const digits = run.slice(i, i + 4).split("").map(Number);
-                    const same = digits.every(digit => digit === digits[0]);
-                    const ascending = digits.slice(1).every((digit, index) => digit === (digits[index] + 1) % 10);
-                    const descending = digits.slice(1).every((digit, index) => digit === (digits[index] + 9) % 10);
-                    if (same || ascending || descending) return true;
-                }
-                return false;
-            });
-        }
+        function hasWeakNumberSequence(password) {	// 関数を定義
+            const numberRuns = String(password).match(/\d{4,}/g) || [];	// 定数を定義
+            return numberRuns.some(run => {	// 結果を返す
+                for (let i = 0; i <= run.length - 4; i++) {	// 対象を順番に処理する
+                    const digits = run.slice(i, i + 4).split("").map(Number);	// 定数を定義
+                    const same = digits.every(digit => digit === digits[0]);	// 定数を定義
+                    const ascending = digits.slice(1).every((digit, index) => digit === (digits[index] + 1) % 10);	// 定数を定義
+                    const descending = digits.slice(1).every((digit, index) => digit === (digits[index] + 9) % 10);	// 定数を定義
+                    if (same || ascending || descending) return true;	// 条件に応じて処理を分ける
+                }	// 処理のまとまりを閉じる
+                return false;	// 結果を返す
+            });	// 処理を完了する
+        }	// 処理のまとまりを閉じる
 
-        function validatePassword(password) {
-            if (password.length < 4) return "パスワードは4文字以上で入力してください";
-            if (password.length > 128) return "パスワードは128文字以内で入力してください";
-            if (!/^[\x21-\x7E]+$/.test(password)) return "パスワードは半角英数字・記号のみ使用できます";
-            if (!/[A-Z]/.test(password)) return "パスワードに英大文字を1文字以上含めてください";
-            if (!/[a-z]/.test(password)) return "パスワードに英小文字を1文字以上含めてください";
-            if (!/[0-9]/.test(password)) return "パスワードに数字を1文字以上含めてください";
-            if (!/[^A-Za-z0-9]/.test(password)) return "パスワードに記号を1文字以上含めてください";
-            if (hasWeakNumberSequence(password)) return "同じ数字4桁の繰り返しや、1234・4321のような4桁の連番は使用できません";
-            return "";
-        }
+        function validatePassword(password) {	// 関数を定義
+            if (password.length < 4) return "パスワードは4文字以上で入力してください";	// 条件に応じて処理を分ける
+            if (password.length > 128) return "パスワードは128文字以内で入力してください";	// 条件に応じて処理を分ける
+            if (!/^[\x21-\x7E]+$/.test(password)) return "パスワードは半角英数字・記号のみ使用できます";	// 条件に応じて処理を分ける
+            if (!/[A-Z]/.test(password)) return "パスワードに英大文字を1文字以上含めてください";	// 条件に応じて処理を分ける
+            if (!/[a-z]/.test(password)) return "パスワードに英小文字を1文字以上含めてください";	// 条件に応じて処理を分ける
+            if (!/[0-9]/.test(password)) return "パスワードに数字を1文字以上含めてください";	// 条件に応じて処理を分ける
+            if (!/[^A-Za-z0-9]/.test(password)) return "パスワードに記号を1文字以上含めてください";	// 条件に応じて処理を分ける
+            if (hasWeakNumberSequence(password)) return "同じ数字4桁の繰り返しや、1234・4321のような4桁の連番は使用できません";	// 条件に応じて処理を分ける
+            return "";	// 結果を返す
+        }	// 処理のまとまりを閉じる
 
-        async function submitReset() {
-            const newPassword = document.getElementById("new-password").value;
-            const confirmPassword = document.getElementById("confirm-password").value;
-            const msgEl = document.getElementById("message");
+        async function submitReset() {	// 関数を定義
+            const newPassword = document.getElementById("new-password").value;	// 定数を定義
+            const confirmPassword = document.getElementById("confirm-password").value;	// 定数を定義
+            const msgEl = document.getElementById("message");	// 定数を定義
 
-            if (!newPassword || !confirmPassword) {
-                msgEl.textContent = "両方の欄を入力してください";
-                msgEl.className = "message error";
-                return;
-            }
-            const passwordError = validatePassword(newPassword);
-            if (passwordError) {
-                msgEl.textContent = passwordError;
-                msgEl.className = "message error";
-                return;
-            }
-            if (newPassword !== confirmPassword) {
-                msgEl.textContent = "パスワードが一致しません";
-                msgEl.className = "message error";
-                return;
-            }
+            if (!newPassword || !confirmPassword) {	// 条件に応じて処理を分ける
+                msgEl.textContent = "両方の欄を入力してください";	// 処理を続ける
+                msgEl.className = "message error";	// 処理を続ける
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+            const passwordError = validatePassword(newPassword);	// 定数を定義
+            if (passwordError) {	// 条件に応じて処理を分ける
+                msgEl.textContent = passwordError;	// 処理を続ける
+                msgEl.className = "message error";	// 処理を続ける
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
+            if (newPassword !== confirmPassword) {	// 条件に応じて処理を分ける
+                msgEl.textContent = "パスワードが一致しません";	// 処理を続ける
+                msgEl.className = "message error";	// 処理を続ける
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
 
-            msgEl.textContent = "処理中...";
-            msgEl.className = "message";
+            msgEl.textContent = "処理中...";	// 処理を続ける
+            msgEl.className = "message";	// 処理を続ける
 
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ mode: "resetPassword", userId, token, newPassword })
-                });
-                const result = await res.json();
+            try {	// 失敗に備えて処理を始める
+                const res = await fetch(GAS_URL, {	// 定数を定義
+                    method: "POST",	// 処理を続ける
+                    body: JSON.stringify({ mode: "resetPassword", userId, token, newPassword })	// 処理を続ける
+                });	// 処理を完了する
+                const result = await res.json();	// 定数を定義
 
-                if (result.status === "success") {
-                    document.getElementById("form-area").style.display = "none";
-                    document.getElementById("success-area").style.display = "block";
-                } else {
-                    msgEl.textContent = result.message;
-                    msgEl.className = "message error";
-                }
-            } catch (e) {
-                msgEl.textContent = "通信エラーが発生しました。";
-                msgEl.className = "message error";
-            }
-        }
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    document.getElementById("form-area").style.display = "none";	// 画面表示を更新する
+                    document.getElementById("success-area").style.display = "block";	// 画面表示を更新する
+                } else {	// 処理のまとまりを始める
+                    msgEl.textContent = result.message;	// 処理を続ける
+                    msgEl.className = "message error";	// 処理を続ける
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                msgEl.textContent = "通信エラーが発生しました。";	// 処理を続ける
+                msgEl.className = "message error";	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
     </script>
-</body>
-</html>
+</body>	<!-- 要素を閉じる -->
+</html>	<!-- 要素を閉じる -->

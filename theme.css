@@ -1,470 +1,470 @@
-:root {
- --ui-bg:#f5f4ee; --ui-paper:#fffefb; --ui-ink:#243c32;
- --ui-muted:#66736a; --ui-line:#dfe3d9; --ui-green:#254f3d;
- --ui-lime:#d8ef99; --ui-soft:#edf1e7; --ui-danger:#a84738;
- --ink:var(--ui-ink); --muted:var(--ui-muted); --line:var(--ui-line);
- --surface:var(--ui-bg); --paper:var(--ui-paper); --teal:var(--ui-green);
- --teal-dark:var(--ui-green); --navy:var(--ui-green); --coral:#cc9e74;
-}
-* { box-sizing:border-box; }
-body {
- margin:0; min-height:100dvh;
- background:
-  radial-gradient(circle at 8% 0%, rgba(216,239,153,.32), transparent 30rem),
-  radial-gradient(circle at 96% 12%, rgba(184,218,205,.28), transparent 26rem),
-  var(--ui-bg)!important;
- color:var(--ui-ink)!important;
- font-family:"Avenir Next","Hiragino Sans","Yu Gothic",sans-serif!important;
- -webkit-font-smoothing:antialiased; line-height:1.65;
-}
-body::before,body::after { content:none!important; }
-::selection { background:var(--ui-lime); color:var(--ui-ink); }
-button,input,textarea,select { font-family:inherit; }
-button,a,[onclick] { touch-action:manipulation; }
-button { cursor:pointer; }
-a { color:var(--ui-green); }
-button,a,input,select,textarea { transition:background .18s,border-color .18s,box-shadow .18s; }
-:focus-visible { outline:3px solid #8cae59!important; outline-offset:4px; }
-button:disabled { opacity:.5!important; cursor:wait; transform:none!important; }
-.navbar {
- min-height:82px; padding:18px clamp(20px,4vw,64px);
- background:var(--ui-bg)!important; border-bottom:1px solid var(--ui-line)!important;
- box-shadow:0 8px 28px rgba(36,60,50,.06)!important; backdrop-filter:saturate(1.1)!important;
- position:sticky; top:0; z-index:100;
- display:flex; align-items:center; justify-content:space-between; gap:18px;
-}
-.logo { display:flex; align-items:center; gap:12px; flex-shrink:0; font-size:18px!important; }
-.logo,.logo-text,.logo-text span {
- background:none!important; color:var(--ui-ink)!important;
- -webkit-text-fill-color:var(--ui-ink)!important; font-weight:800; letter-spacing:-.04em;
-}
-.logo::before {
- content:""; display:block; width:26px; height:30px; margin:0;
- border:2px solid var(--ui-green); border-radius:15px 15px 4px 4px;
- background:var(--ui-lime); box-shadow:5px 0 0 -1px var(--ui-bg),7px 0 0 -1px var(--ui-green);
- transform:rotate(-8deg);
-}
-.nav-links {
- display:flex; align-items:center; gap:4px; position:relative; z-index:101; pointer-events:auto;
-}
-.nav-links > a,
-.nav-links > button,
-.nav-links > .nav-item {
- position:relative; z-index:1; pointer-events:auto;
-}
-.nav-item {
- padding:10px 14px; font-size:12px; font-weight:700; color:var(--ui-muted);
- border:0; background:transparent; text-decoration:none; cursor:pointer;
- border-radius:8px; letter-spacing:0; white-space:nowrap;
-}
-.nav-item:hover,.nav-item.active { background:var(--ui-soft)!important; color:var(--ui-green)!important; box-shadow:none; }
-.btn-logout,.btn-back {
- border:1px solid var(--ui-line)!important; border-radius:8px!important;
- padding:10px 16px; background:transparent!important; color:var(--ui-green)!important;
- box-shadow:0 2px 8px rgba(36,60,50,.04)!important; font-size:12px; transform:none!important;
-}
-.btn-logout:hover,.btn-back:hover { background:var(--ui-soft)!important; }
-.unread-badge { background:#ae533d!important; box-shadow:none!important; }
-.hamburger-btn {
- display:none; flex-direction:column;
- position:relative; z-index:120!important; flex:0 0 48px; width:48px!important; height:48px!important;
- padding:10px!important; border:1px solid var(--ui-line)!important; border-radius:13px!important;
- background:var(--ui-paper)!important; box-shadow:0 5px 16px rgba(36,60,50,.11)!important;
- align-items:center; justify-content:center!important; gap:5px; isolation:isolate;
- -webkit-appearance:none; appearance:none; -webkit-tap-highlight-color:transparent;
- transform:translateZ(0); backface-visibility:hidden;
-}
-.hamburger-btn:active { background:var(--ui-soft)!important; box-shadow:0 2px 8px rgba(36,60,50,.1)!important; }
-.hamburger-btn span {
- display:block; width:22px!important; height:2px!important; flex:0 0 2px;
- background:var(--ui-green)!important; border-radius:99px!important;
- transform:translateZ(0); transform-origin:center; will-change:transform;
-}
-.hamburger-btn.open span:nth-child(1) { transform:translateY(7px) rotate(45deg)!important; }
-.hamburger-btn.open span:nth-child(2) { opacity:0!important; transform:scaleX(.2)!important; }
-.hamburger-btn.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg)!important; }
-.container { width:100%; max-width:1240px; margin:48px auto 72px; padding:0 32px; }
-.main-area,.main-content { min-width:0; }
-.sidebar { width:248px; gap:20px; top:106px; }
-.mypage-area {
- position:relative; z-index:1; cursor:pointer; pointer-events:auto;
- width:100%; padding:28px; border-radius:18px; background:var(--ui-green)!important;
- box-shadow:none!important; align-items:flex-start;
-}
-.mypage-area::after { background:var(--ui-lime)!important; opacity:.14; width:170px; height:170px; pointer-events:none; }
-.big-profile-icon { border:3px solid var(--ui-paper)!important; box-shadow:none!important; }
-#mypage-text { color:var(--ui-paper); font-size:16px; }
-#my-post-area {
- background:transparent!important; border:1px solid var(--ui-line)!important;
- border-radius:16px!important; padding:24px!important; box-shadow:none!important;
-}
-#my-post-area h4 { color:var(--ui-green)!important; }
-#search-area::before {
- content:"STUDY TOGETHER"; color:var(--ui-muted); font-size:10px;
- letter-spacing:.22em; font-weight:700; margin-bottom:14px;
-}
-#search-area h2 { font-size:clamp(24px,3vw,38px)!important; font-weight:800; letter-spacing:-.055em; }
-#search-area > div:first-child { margin-bottom:28px!important; }
-input:not([type="file"]),select,textarea {
- border:1px solid var(--ui-line)!important; border-radius:10px!important;
- background:var(--ui-paper)!important; color:var(--ui-ink)!important;
- box-shadow:none!important; font-size:16px;
-}
-input::placeholder,textarea::placeholder { color:#828b80; }
-input:focus,select:focus,textarea:focus { border-color:#70996a!important; box-shadow:0 0 0 3px #254f3d0c!important; }
-input[readonly] { background:var(--ui-soft)!important; }
-.search-input { min-height:58px; padding-left:52px!important; }
-.search-box-container { margin-bottom:30px; }
-.btn-refresh { background:var(--ui-paper)!important; border:1px solid var(--ui-line)!important; border-radius:10px; box-shadow:none!important; }
-.user-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
-.user-card {
- position:relative; min-height:280px; padding:26px; border:1px solid var(--ui-line)!important;
- border-radius:16px; background:var(--ui-paper)!important; box-shadow:0 10px 24px rgba(36,60,50,.05)!important;
-}
-.user-card::before { content:none!important; }
-.user-card:hover { transform:translateY(-3px); border-color:#9bb090!important; box-shadow:0 12px 30px #243c3209!important; }
-.user-card > div:first-child { flex-wrap:wrap; gap:8px; }
-.user-card h3 { font-size:20px; letter-spacing:-.035em; color:var(--ui-ink)!important; }
-.user-card p { font-size:14px; line-height:1.85; color:var(--ui-muted)!important; overflow-wrap:anywhere; }
-.user-badge { padding:5px 9px; background:var(--ui-soft)!important; color:var(--ui-green)!important; border-radius:5px; font-size:10px; }
-.countdown-badge { padding:5px 8px; background:#f5eee0; color:#82612c; border-radius:5px; font-size:10px; font-variant-numeric:tabular-nums; }
-.tag-badge { background:transparent!important; color:var(--ui-muted)!important; border:1px solid var(--ui-line); border-radius:5px; padding:4px 8px; }
-.tag-badge:hover { background:var(--ui-soft)!important; }
-.btn-match,.btn-search,#submit-btn,.btn-large,.btn-send,.btn-reload,.btn-submit-primary,[data-page="reset"] .card button {
- background:var(--ui-green)!important; color:var(--ui-paper)!important;
- border:1px solid var(--ui-green)!important; border-radius:10px!important;
- box-shadow:0 7px 16px rgba(37,79,61,.16)!important; font-weight:700; min-height:46px;
-}
-.btn-match:hover,.btn-search:hover,.btn-large:hover,.btn-send:hover,.btn-submit-primary:hover {
- background:#183c2b!important; transform:translateY(-1px);
-}
-.card-action-row { gap:8px; margin-top:12px; }
-.btn-card-action { background:transparent!important; border:1px solid var(--ui-line)!important; color:var(--ui-muted)!important; border-radius:8px; min-height:36px; }
-.btn-card-report:hover { color:var(--ui-danger)!important; border-color:#d6aea2!important; }
-.btn-card-block:hover { background:var(--ui-soft)!important; }
-.sidebar-form,.dm-card,.profile-card,.panel,.card,.login-card {
- border:1px solid var(--ui-line)!important; background:var(--ui-paper)!important;
- box-shadow:0 12px 32px rgba(36,60,50,.06)!important; border-radius:18px!important; backdrop-filter:none!important;
-}
-#recruit-form-area .sidebar-form { padding:36px; max-width:760px; }
-#form-title::before,.dm-header h2::before { display:none; }
-#form-title,.profile-card h2,.dm-header h2,.panel h2 { color:var(--ui-ink); letter-spacing:-.04em; }
-.loading-box { background:transparent; border:1px dashed var(--ui-line); box-shadow:none; border-radius:16px; color:var(--ui-muted); }
-.spinner { border-color:var(--ui-line)!important; border-top-color:var(--ui-green)!important; }
+:root {	/* 対象要素のスタイルを始める */
+ --ui-bg:#f5f4ee; --ui-paper:#fffefb; --ui-ink:#243c32;	/* 見た目の設定を指定 */
+ --ui-muted:#66736a; --ui-line:#dfe3d9; --ui-green:#254f3d;	/* 見た目の設定を指定 */
+ --ui-lime:#d8ef99; --ui-soft:#edf1e7; --ui-danger:#a84738;	/* 見た目の設定を指定 */
+ --ink:var(--ui-ink); --muted:var(--ui-muted); --line:var(--ui-line);	/* 見た目の設定を指定 */
+ --surface:var(--ui-bg); --paper:var(--ui-paper); --teal:var(--ui-green);	/* 見た目の設定を指定 */
+ --teal-dark:var(--ui-green); --navy:var(--ui-green); --coral:#cc9e74;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+* { box-sizing:border-box; }	/* 見た目の設定を指定 */
+body {	/* 対象要素のスタイルを始める */
+ margin:0; min-height:100dvh;	/* 見た目の設定を指定 */
+ background:	/* 見た目の設定を指定 */
+  radial-gradient(circle at 8% 0%, rgba(216,239,153,.32), transparent 30rem),	/* スタイルを設定 */
+  radial-gradient(circle at 96% 12%, rgba(184,218,205,.28), transparent 26rem),	/* スタイルを設定 */
+  var(--ui-bg)!important;	/* スタイルを設定 */
+ color:var(--ui-ink)!important;	/* 見た目の設定を指定 */
+ font-family:"Avenir Next","Hiragino Sans","Yu Gothic",sans-serif!important;	/* 見た目の設定を指定 */
+ -webkit-font-smoothing:antialiased; line-height:1.65;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+body::before,body::after { content:none!important; }	/* 見た目の設定を指定 */
+::selection { background:var(--ui-lime); color:var(--ui-ink); }	/* 見た目の設定を指定 */
+button,input,textarea,select { font-family:inherit; }	/* 見た目の設定を指定 */
+button,a,[onclick] { touch-action:manipulation; }	/* 見た目の設定を指定 */
+button { cursor:pointer; }	/* 見た目の設定を指定 */
+a { color:var(--ui-green); }	/* 見た目の設定を指定 */
+button,a,input,select,textarea { transition:background .18s,border-color .18s,box-shadow .18s; }	/* 見た目の設定を指定 */
+:focus-visible { outline:3px solid #8cae59!important; outline-offset:4px; }	/* 見た目の設定を指定 */
+button:disabled { opacity:.5!important; cursor:wait; transform:none!important; }	/* 見た目の設定を指定 */
+.navbar {	/* 対象要素のスタイルを始める */
+ min-height:82px; padding:18px clamp(20px,4vw,64px);	/* 見た目の設定を指定 */
+ background:var(--ui-bg)!important; border-bottom:1px solid var(--ui-line)!important;	/* 見た目の設定を指定 */
+ box-shadow:0 8px 28px rgba(36,60,50,.06)!important; backdrop-filter:saturate(1.1)!important;	/* 見た目の設定を指定 */
+ position:sticky; top:0; z-index:100;	/* 見た目の設定を指定 */
+ display:flex; align-items:center; justify-content:space-between; gap:18px;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.logo { display:flex; align-items:center; gap:12px; flex-shrink:0; font-size:18px!important; }	/* 見た目の設定を指定 */
+.logo,.logo-text,.logo-text span {	/* 対象要素のスタイルを始める */
+ background:none!important; color:var(--ui-ink)!important;	/* 見た目の設定を指定 */
+ -webkit-text-fill-color:var(--ui-ink)!important; font-weight:800; letter-spacing:-.04em;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.logo::before {	/* 対象要素のスタイルを始める */
+ content:""; display:block; width:26px; height:30px; margin:0;	/* 見た目の設定を指定 */
+ border:2px solid var(--ui-green); border-radius:15px 15px 4px 4px;	/* 見た目の設定を指定 */
+ background:var(--ui-lime); box-shadow:5px 0 0 -1px var(--ui-bg),7px 0 0 -1px var(--ui-green);	/* 見た目の設定を指定 */
+ transform:rotate(-8deg);	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.nav-links {	/* 対象要素のスタイルを始める */
+ display:flex; align-items:center; gap:4px; position:relative; z-index:101; pointer-events:auto;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.nav-links > a,	/* スタイルを設定 */
+.nav-links > button,	/* スタイルを設定 */
+.nav-links > .nav-item {	/* 対象要素のスタイルを始める */
+ position:relative; z-index:1; pointer-events:auto;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.nav-item {	/* 対象要素のスタイルを始める */
+ padding:10px 14px; font-size:12px; font-weight:700; color:var(--ui-muted);	/* 見た目の設定を指定 */
+ border:0; background:transparent; text-decoration:none; cursor:pointer;	/* 見た目の設定を指定 */
+ border-radius:8px; letter-spacing:0; white-space:nowrap;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.nav-item:hover,.nav-item.active { background:var(--ui-soft)!important; color:var(--ui-green)!important; box-shadow:none; }	/* 見た目の設定を指定 */
+.btn-logout,.btn-back {	/* 対象要素のスタイルを始める */
+ border:1px solid var(--ui-line)!important; border-radius:8px!important;	/* 見た目の設定を指定 */
+ padding:10px 16px; background:transparent!important; color:var(--ui-green)!important;	/* 見た目の設定を指定 */
+ box-shadow:0 2px 8px rgba(36,60,50,.04)!important; font-size:12px; transform:none!important;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.btn-logout:hover,.btn-back:hover { background:var(--ui-soft)!important; }	/* 見た目の設定を指定 */
+.unread-badge { background:#ae533d!important; box-shadow:none!important; }	/* 見た目の設定を指定 */
+.hamburger-btn {	/* 対象要素のスタイルを始める */
+ display:none; flex-direction:column;	/* 見た目の設定を指定 */
+ position:relative; z-index:120!important; flex:0 0 48px; width:48px!important; height:48px!important;	/* 見た目の設定を指定 */
+ padding:10px!important; border:1px solid var(--ui-line)!important; border-radius:13px!important;	/* 見た目の設定を指定 */
+ background:var(--ui-paper)!important; box-shadow:0 5px 16px rgba(36,60,50,.11)!important;	/* 見た目の設定を指定 */
+ align-items:center; justify-content:center!important; gap:5px; isolation:isolate;	/* 見た目の設定を指定 */
+ -webkit-appearance:none; appearance:none; -webkit-tap-highlight-color:transparent;	/* 見た目の設定を指定 */
+ transform:translateZ(0); backface-visibility:hidden;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.hamburger-btn:active { background:var(--ui-soft)!important; box-shadow:0 2px 8px rgba(36,60,50,.1)!important; }	/* 見た目の設定を指定 */
+.hamburger-btn span {	/* 対象要素のスタイルを始める */
+ display:block; width:22px!important; height:2px!important; flex:0 0 2px;	/* 見た目の設定を指定 */
+ background:var(--ui-green)!important; border-radius:99px!important;	/* 見た目の設定を指定 */
+ transform:translateZ(0); transform-origin:center; will-change:transform;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.hamburger-btn.open span:nth-child(1) { transform:translateY(7px) rotate(45deg)!important; }	/* 見た目の設定を指定 */
+.hamburger-btn.open span:nth-child(2) { opacity:0!important; transform:scaleX(.2)!important; }	/* 見た目の設定を指定 */
+.hamburger-btn.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg)!important; }	/* 見た目の設定を指定 */
+.container { width:100%; max-width:1240px; margin:48px auto 72px; padding:0 32px; }	/* 見た目の設定を指定 */
+.main-area,.main-content { min-width:0; }	/* 見た目の設定を指定 */
+.sidebar { width:248px; gap:20px; top:106px; }	/* 見た目の設定を指定 */
+.mypage-area {	/* 対象要素のスタイルを始める */
+ position:relative; z-index:1; cursor:pointer; pointer-events:auto;	/* 見た目の設定を指定 */
+ width:100%; padding:28px; border-radius:18px; background:var(--ui-green)!important;	/* 見た目の設定を指定 */
+ box-shadow:none!important; align-items:flex-start;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.mypage-area::after { background:var(--ui-lime)!important; opacity:.14; width:170px; height:170px; pointer-events:none; }	/* 見た目の設定を指定 */
+.big-profile-icon { border:3px solid var(--ui-paper)!important; box-shadow:none!important; }	/* 見た目の設定を指定 */
+#mypage-text { color:var(--ui-paper); font-size:16px; }	/* 見た目の設定を指定 */
+#my-post-area {	/* 対象要素のスタイルを始める */
+ background:transparent!important; border:1px solid var(--ui-line)!important;	/* 見た目の設定を指定 */
+ border-radius:16px!important; padding:24px!important; box-shadow:none!important;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+#my-post-area h4 { color:var(--ui-green)!important; }	/* 見た目の設定を指定 */
+#search-area::before {	/* 対象要素のスタイルを始める */
+ content:"STUDY TOGETHER"; color:var(--ui-muted); font-size:10px;	/* 見た目の設定を指定 */
+ letter-spacing:.22em; font-weight:700; margin-bottom:14px;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+#search-area h2 { font-size:clamp(24px,3vw,38px)!important; font-weight:800; letter-spacing:-.055em; }	/* 見た目の設定を指定 */
+#search-area > div:first-child { margin-bottom:28px!important; }	/* 見た目の設定を指定 */
+input:not([type="file"]),select,textarea {	/* 対象要素のスタイルを始める */
+ border:1px solid var(--ui-line)!important; border-radius:10px!important;	/* 見た目の設定を指定 */
+ background:var(--ui-paper)!important; color:var(--ui-ink)!important;	/* 見た目の設定を指定 */
+ box-shadow:none!important; font-size:16px;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+input::placeholder,textarea::placeholder { color:#828b80; }	/* 見た目の設定を指定 */
+input:focus,select:focus,textarea:focus { border-color:#70996a!important; box-shadow:0 0 0 3px #254f3d0c!important; }	/* 見た目の設定を指定 */
+input[readonly] { background:var(--ui-soft)!important; }	/* 見た目の設定を指定 */
+.search-input { min-height:58px; padding-left:52px!important; }	/* 見た目の設定を指定 */
+.search-box-container { margin-bottom:30px; }	/* 見た目の設定を指定 */
+.btn-refresh { background:var(--ui-paper)!important; border:1px solid var(--ui-line)!important; border-radius:10px; box-shadow:none!important; }	/* 見た目の設定を指定 */
+.user-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }	/* 見た目の設定を指定 */
+.user-card {	/* 対象要素のスタイルを始める */
+ position:relative; min-height:280px; padding:26px; border:1px solid var(--ui-line)!important;	/* 見た目の設定を指定 */
+ border-radius:16px; background:var(--ui-paper)!important; box-shadow:0 10px 24px rgba(36,60,50,.05)!important;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.user-card::before { content:none!important; }	/* 見た目の設定を指定 */
+.user-card:hover { transform:translateY(-3px); border-color:#9bb090!important; box-shadow:0 12px 30px #243c3209!important; }	/* 見た目の設定を指定 */
+.user-card > div:first-child { flex-wrap:wrap; gap:8px; }	/* 見た目の設定を指定 */
+.user-card h3 { font-size:20px; letter-spacing:-.035em; color:var(--ui-ink)!important; }	/* 見た目の設定を指定 */
+.user-card p { font-size:14px; line-height:1.85; color:var(--ui-muted)!important; overflow-wrap:anywhere; }	/* 見た目の設定を指定 */
+.user-badge { padding:5px 9px; background:var(--ui-soft)!important; color:var(--ui-green)!important; border-radius:5px; font-size:10px; }	/* 見た目の設定を指定 */
+.countdown-badge { padding:5px 8px; background:#f5eee0; color:#82612c; border-radius:5px; font-size:10px; font-variant-numeric:tabular-nums; }	/* 見た目の設定を指定 */
+.tag-badge { background:transparent!important; color:var(--ui-muted)!important; border:1px solid var(--ui-line); border-radius:5px; padding:4px 8px; }	/* 見た目の設定を指定 */
+.tag-badge:hover { background:var(--ui-soft)!important; }	/* 見た目の設定を指定 */
+.btn-match,.btn-search,#submit-btn,.btn-large,.btn-send,.btn-reload,.btn-submit-primary,[data-page="reset"] .card button {	/* 対象要素のスタイルを始める */
+ background:var(--ui-green)!important; color:var(--ui-paper)!important;	/* 見た目の設定を指定 */
+ border:1px solid var(--ui-green)!important; border-radius:10px!important;	/* 見た目の設定を指定 */
+ box-shadow:0 7px 16px rgba(37,79,61,.16)!important; font-weight:700; min-height:46px;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.btn-match:hover,.btn-search:hover,.btn-large:hover,.btn-send:hover,.btn-submit-primary:hover {	/* 対象要素のスタイルを始める */
+ background:#183c2b!important; transform:translateY(-1px);	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.card-action-row { gap:8px; margin-top:12px; }	/* 見た目の設定を指定 */
+.btn-card-action { background:transparent!important; border:1px solid var(--ui-line)!important; color:var(--ui-muted)!important; border-radius:8px; min-height:36px; }	/* 見た目の設定を指定 */
+.btn-card-report:hover { color:var(--ui-danger)!important; border-color:#d6aea2!important; }	/* 見た目の設定を指定 */
+.btn-card-block:hover { background:var(--ui-soft)!important; }	/* 見た目の設定を指定 */
+.sidebar-form,.dm-card,.profile-card,.panel,.card,.login-card {	/* 対象要素のスタイルを始める */
+ border:1px solid var(--ui-line)!important; background:var(--ui-paper)!important;	/* 見た目の設定を指定 */
+ box-shadow:0 12px 32px rgba(36,60,50,.06)!important; border-radius:18px!important; backdrop-filter:none!important;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+#recruit-form-area .sidebar-form { padding:36px; max-width:760px; }	/* 見た目の設定を指定 */
+#form-title::before,.dm-header h2::before { display:none; }	/* 見た目の設定を指定 */
+#form-title,.profile-card h2,.dm-header h2,.panel h2 { color:var(--ui-ink); letter-spacing:-.04em; }	/* 見た目の設定を指定 */
+.loading-box { background:transparent; border:1px dashed var(--ui-line); box-shadow:none; border-radius:16px; color:var(--ui-muted); }	/* 見た目の設定を指定 */
+.spinner { border-color:var(--ui-line)!important; border-top-color:var(--ui-green)!important; }	/* 見た目の設定を指定 */
 
-[data-page="index"] .login-container {
- display:grid; grid-template-columns:minmax(0,1fr) minmax(360px,440px);
- gap:64px; width:min(1120px,100%); margin:auto; padding:72px 40px; align-items:center;
-}
-[data-page="index"] .login-container::before {
- content:"HEIKO MATCHING\A\A学ぶ時間に、\A仲間がいる。\A\A気になる募集から、\A新しい会話をはじめよう。";
- white-space:pre-line; color:var(--ui-green); font-size:clamp(28px,3.5vw,48px);
- line-height:1.65; font-weight:700; letter-spacing:-.055em;
-}
-[data-page="index"] .login-card { width:100%; max-width:none; padding:44px 36px; text-align:left; border-top:6px solid var(--ui-lime)!important; }
-[data-page="index"] h1 { font-size:28px; margin:0 0 30px; color:var(--ui-ink); }
-[data-page="index"] .btn-flat { color:var(--ui-muted)!important; font-size:12px; }
-#face-login-btn,#face-register-btn { background:var(--ui-soft)!important; color:var(--ui-green)!important; border:1px solid var(--ui-line)!important; border-radius:10px; box-shadow:none!important; }
-.camera-box,.camera-box-mini { border-radius:14px; overflow:hidden; }
-[data-page="messages"] .container { max-width:880px; }
-.dm-header { padding:32px; border-bottom:1px solid var(--ui-line); background:var(--ui-paper); }
-.dm-header h2 { font-size:26px; }
-.partner-item { padding:24px 32px; border-bottom:1px solid var(--ui-line); }
-.partner-item:hover { background:var(--ui-soft)!important; transform:none; }
-.avatar-ring { background:var(--ui-soft)!important; box-shadow:none!important; }
-.partner-name { color:var(--ui-ink); }
-.partner-email { color:var(--ui-muted); }
-.arrow-badge { background:var(--ui-soft)!important; color:var(--ui-green)!important; border-radius:8px; box-shadow:none!important; }
-.chat-container { width:calc(100% - 48px); max-width:920px; margin:32px auto; border:1px solid var(--ui-line); border-radius:18px; overflow:hidden; box-shadow:0 14px 34px rgba(36,60,50,.07); }
-.chat-header { background:var(--ui-paper); border-bottom:1px solid var(--ui-line); color:var(--ui-ink); padding:22px; flex-wrap:wrap; }
-.chat-messages { background:var(--ui-bg); border:0; padding:28px; }
-.message-bubble { box-shadow:none; line-height:1.8; }
-.msg-my { background:var(--ui-green); color:var(--ui-paper); }
-.msg-partner { background:var(--ui-paper); color:var(--ui-ink); border:1px solid var(--ui-line); }
-.chat-input-area { background:var(--ui-paper); border-top:1px solid var(--ui-line); padding:18px; }
-.chat-input { min-width:0; }
-#block-user-btn { background:var(--ui-soft)!important; color:var(--ui-green)!important; }
-#report-user-btn { background:#f9ede7!important; color:var(--ui-danger)!important; }
-[data-page="profile"] .container { max-width:740px; }
-.profile-card { width:100%; padding:40px; }
-.profile-card h2 { font-size:28px; }
-.profile-image-group { padding:24px; border-radius:14px; background:var(--ui-soft); }
-.input-file-label,.btn-update-face { background:var(--ui-soft)!important; color:var(--ui-green)!important; border-radius:8px; }
-.btn-delete-image,.btn-delete-account { color:var(--ui-danger)!important; background:#f9ede7!important; border-radius:8px; }
-.crop-modal-content,.face-modal-content { background:var(--ui-paper); border-radius:18px; }
-.page-title-bar { padding:12px 0 28px; background:transparent; border:0; box-shadow:none; }
-.page-title-bar h1 { font-size:28px; letter-spacing:-.04em; }
-.panel { min-width:0; overflow-x:auto; padding:24px; }
-th { background:var(--ui-soft); color:var(--ui-muted); }
-td,th { border-bottom:1px solid var(--ui-line); }
-.panel h2 { border-bottom:1px solid var(--ui-line); }
-[data-page="reset"] .container { max-width:540px; }
-[data-page="reset"] .card { padding:40px; }
-[data-page="terms"],[data-page="privacy"] { max-width:850px; margin:auto; padding:48px 28px; }
-[data-page="terms"] h1,[data-page="privacy"] h1 { padding:24px 0; border-bottom:1px solid var(--ui-line); }
-[data-page="terms"] h2,[data-page="privacy"] h2 { background:var(--ui-soft); border-left:3px solid var(--ui-green); }
-.footer {
- padding:28px 20px;
- background:transparent!important;
- border-top:1px solid var(--ui-line);
- width:100%;
- margin-top:auto;
-}
-.footer-container {
- width:min(1200px,100%);
- margin:0 auto;
- display:flex;
- flex-direction:column;
- align-items:center;
- gap:12px;
-}
-.footer-links {
- display:flex;
- flex-wrap:wrap;
- justify-content:center;
- gap:10px 24px;
-}
-.footer-links a {
- color:var(--ui-muted)!important;
- text-decoration:none;
- font-size:13px;
- font-weight:700;
- padding:4px 8px;
- border-radius:6px;
-}
-.footer-links a:hover { color:var(--ui-green)!important; background:var(--ui-soft); }
-.copyright { color:var(--ui-muted)!important; font-size:.75rem; margin:0; font-weight:600; }
-.toast-notification { background:var(--ui-paper); border:1px solid var(--ui-line); border-radius:14px; box-shadow:0 12px 32px #243c3215; }
-.toast-icon { background:var(--ui-green); }
-.toast-title { color:var(--ui-green); }
-#ui-notice-root {
- position:fixed;
- top:22px;
- right:22px;
- z-index:10000;
- display:flex;
- flex-direction:column;
- align-items:flex-end;
- gap:10px;
- width:min(390px,calc(100vw - 32px));
- pointer-events:none;
-}
-.ui-notice {
- display:flex;
- align-items:center;
- gap:12px;
- width:100%;
- padding:14px 14px 14px 16px;
- border:1px solid var(--ui-line);
- border-radius:14px;
- background:var(--ui-paper);
- color:var(--ui-ink);
- box-shadow:0 16px 34px rgba(36,60,50,.16);
- opacity:0;
- transform:translateY(-10px) scale(.98);
- transition:opacity .22s ease,transform .22s ease;
- pointer-events:auto;
-}
-.ui-notice.is-visible { opacity:1; transform:translateY(0) scale(1); }
-.ui-notice.is-leaving { opacity:0; transform:translateY(-8px) scale(.98); }
-.ui-notice-icon {
- display:grid;
- place-items:center;
- flex:0 0 26px;
- width:26px;
- height:26px;
- border-radius:50%;
- background:var(--ui-soft);
- color:var(--ui-green);
- font-size:14px;
- font-weight:800;
-}
-.ui-notice-success { border-color:#c7dfbd; }
-.ui-notice-success .ui-notice-icon { background:#dff1d7; color:#3e7a43; }
-.ui-notice-error { border-color:#e8c7bd; }
-.ui-notice-error .ui-notice-icon { background:#f8e1da; color:var(--ui-danger); }
-.ui-notice-message { flex:1; min-width:0; font-size:13px; line-height:1.55; overflow-wrap:anywhere; }
-.ui-notice-close {
- flex:0 0 28px;
- width:28px;
- height:28px;
- padding:0;
- border:0;
- border-radius:8px;
- background:transparent;
- color:var(--ui-muted);
- font-size:20px;
- line-height:1;
- cursor:pointer;
-}
-.ui-notice-close:hover { background:var(--ui-soft); color:var(--ui-ink); }
-@media(max-width:1100px) and (min-width:769px) {
- .navbar { padding:16px 20px; gap:12px; flex-wrap:wrap; }
- .nav-item { padding:8px 9px; font-size:11px; }
- .user-grid { grid-template-columns:1fr; }
-}
-@media(max-width:768px) {
- .navbar { min-height:64px; padding:8px 16px 8px 20px; }
- .logo { font-size:16px!important; }
- .hamburger-btn { display:flex!important; }
- .nav-links {
-  position:fixed!important; left:0!important; width:100%!important;
-  z-index:119!important; flex-direction:column!important; align-items:center!important;
-  padding:20px 0!important; gap:6px!important;
-  opacity:0!important; pointer-events:none!important; transform:translateY(-10px)!important;
-  transition:transform .22s ease,opacity .22s ease!important;
-  top:64px!important; background:var(--ui-paper)!important; border:1px solid var(--ui-line);
-  border-top:0; border-radius:0 0 16px 16px; box-shadow:0 16px 30px rgba(36,60,50,.12);
- }
- .nav-links.open { opacity:1!important; pointer-events:auto!important; transform:translateY(0)!important; }
- .nav-links .nav-item,.nav-links .btn-logout {
-  width:min(82%,420px)!important; margin:0 auto!important; padding:11px 14px!important;
-  text-align:center!important;
- }
- .container { width:100%; padding:0 18px; margin:28px auto 44px; gap:26px; }
+[data-page="index"] .login-container {	/* 対象要素のスタイルを始める */
+ display:grid; grid-template-columns:minmax(0,1fr) minmax(360px,440px);	/* 見た目の設定を指定 */
+ gap:64px; width:min(1120px,100%); margin:auto; padding:72px 40px; align-items:center;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+[data-page="index"] .login-container::before {	/* 対象要素のスタイルを始める */
+ content:"HEIKO MATCHING\A\A学ぶ時間に、\A仲間がいる。\A\A気になる募集から、\A新しい会話をはじめよう。";	/* 見た目の設定を指定 */
+ white-space:pre-line; color:var(--ui-green); font-size:clamp(28px,3.5vw,48px);	/* 見た目の設定を指定 */
+ line-height:1.65; font-weight:700; letter-spacing:-.055em;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+[data-page="index"] .login-card { width:100%; max-width:none; padding:44px 36px; text-align:left; border-top:6px solid var(--ui-lime)!important; }	/* 見た目の設定を指定 */
+[data-page="index"] h1 { font-size:28px; margin:0 0 30px; color:var(--ui-ink); }	/* 見た目の設定を指定 */
+[data-page="index"] .btn-flat { color:var(--ui-muted)!important; font-size:12px; }	/* 見た目の設定を指定 */
+#face-login-btn,#face-register-btn { background:var(--ui-soft)!important; color:var(--ui-green)!important; border:1px solid var(--ui-line)!important; border-radius:10px; box-shadow:none!important; }	/* 見た目の設定を指定 */
+.camera-box,.camera-box-mini { border-radius:14px; overflow:hidden; }	/* 見た目の設定を指定 */
+[data-page="messages"] .container { max-width:880px; }	/* 見た目の設定を指定 */
+.dm-header { padding:32px; border-bottom:1px solid var(--ui-line); background:var(--ui-paper); }	/* 見た目の設定を指定 */
+.dm-header h2 { font-size:26px; }	/* 見た目の設定を指定 */
+.partner-item { padding:24px 32px; border-bottom:1px solid var(--ui-line); }	/* 見た目の設定を指定 */
+.partner-item:hover { background:var(--ui-soft)!important; transform:none; }	/* 見た目の設定を指定 */
+.avatar-ring { background:var(--ui-soft)!important; box-shadow:none!important; }	/* 見た目の設定を指定 */
+.partner-name { color:var(--ui-ink); }	/* 見た目の設定を指定 */
+.partner-email { color:var(--ui-muted); }	/* 見た目の設定を指定 */
+.arrow-badge { background:var(--ui-soft)!important; color:var(--ui-green)!important; border-radius:8px; box-shadow:none!important; }	/* 見た目の設定を指定 */
+.chat-container { width:calc(100% - 48px); max-width:920px; margin:32px auto; border:1px solid var(--ui-line); border-radius:18px; overflow:hidden; box-shadow:0 14px 34px rgba(36,60,50,.07); }	/* 見た目の設定を指定 */
+.chat-header { background:var(--ui-paper); border-bottom:1px solid var(--ui-line); color:var(--ui-ink); padding:22px; flex-wrap:wrap; }	/* 見た目の設定を指定 */
+.chat-messages { background:var(--ui-bg); border:0; padding:28px; }	/* 見た目の設定を指定 */
+.message-bubble { box-shadow:none; line-height:1.8; }	/* 見た目の設定を指定 */
+.msg-my { background:var(--ui-green); color:var(--ui-paper); }	/* 見た目の設定を指定 */
+.msg-partner { background:var(--ui-paper); color:var(--ui-ink); border:1px solid var(--ui-line); }	/* 見た目の設定を指定 */
+.chat-input-area { background:var(--ui-paper); border-top:1px solid var(--ui-line); padding:18px; }	/* 見た目の設定を指定 */
+.chat-input { min-width:0; }	/* 見た目の設定を指定 */
+#block-user-btn { background:var(--ui-soft)!important; color:var(--ui-green)!important; }	/* 見た目の設定を指定 */
+#report-user-btn { background:#f9ede7!important; color:var(--ui-danger)!important; }	/* 見た目の設定を指定 */
+[data-page="profile"] .container { max-width:740px; }	/* 見た目の設定を指定 */
+.profile-card { width:100%; padding:40px; }	/* 見た目の設定を指定 */
+.profile-card h2 { font-size:28px; }	/* 見た目の設定を指定 */
+.profile-image-group { padding:24px; border-radius:14px; background:var(--ui-soft); }	/* 見た目の設定を指定 */
+.input-file-label,.btn-update-face { background:var(--ui-soft)!important; color:var(--ui-green)!important; border-radius:8px; }	/* 見た目の設定を指定 */
+.btn-delete-image,.btn-delete-account { color:var(--ui-danger)!important; background:#f9ede7!important; border-radius:8px; }	/* 見た目の設定を指定 */
+.crop-modal-content,.face-modal-content { background:var(--ui-paper); border-radius:18px; }	/* 見た目の設定を指定 */
+.page-title-bar { padding:12px 0 28px; background:transparent; border:0; box-shadow:none; }	/* 見た目の設定を指定 */
+.page-title-bar h1 { font-size:28px; letter-spacing:-.04em; }	/* 見た目の設定を指定 */
+.panel { min-width:0; overflow-x:auto; padding:24px; }	/* 見た目の設定を指定 */
+th { background:var(--ui-soft); color:var(--ui-muted); }	/* 見た目の設定を指定 */
+td,th { border-bottom:1px solid var(--ui-line); }	/* 見た目の設定を指定 */
+.panel h2 { border-bottom:1px solid var(--ui-line); }	/* 見た目の設定を指定 */
+[data-page="reset"] .container { max-width:540px; }	/* 見た目の設定を指定 */
+[data-page="reset"] .card { padding:40px; }	/* 見た目の設定を指定 */
+[data-page="terms"],[data-page="privacy"] { max-width:850px; margin:auto; padding:48px 28px; }	/* 見た目の設定を指定 */
+[data-page="terms"] h1,[data-page="privacy"] h1 { padding:24px 0; border-bottom:1px solid var(--ui-line); }	/* 見た目の設定を指定 */
+[data-page="terms"] h2,[data-page="privacy"] h2 { background:var(--ui-soft); border-left:3px solid var(--ui-green); }	/* 見た目の設定を指定 */
+.footer {	/* 対象要素のスタイルを始める */
+ padding:28px 20px;	/* 見た目の設定を指定 */
+ background:transparent!important;	/* 見た目の設定を指定 */
+ border-top:1px solid var(--ui-line);	/* 見た目の設定を指定 */
+ width:100%;	/* 見た目の設定を指定 */
+ margin-top:auto;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.footer-container {	/* 対象要素のスタイルを始める */
+ width:min(1200px,100%);	/* 見た目の設定を指定 */
+ margin:0 auto;	/* 見た目の設定を指定 */
+ display:flex;	/* 見た目の設定を指定 */
+ flex-direction:column;	/* 見た目の設定を指定 */
+ align-items:center;	/* 見た目の設定を指定 */
+ gap:12px;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.footer-links {	/* 対象要素のスタイルを始める */
+ display:flex;	/* 見た目の設定を指定 */
+ flex-wrap:wrap;	/* 見た目の設定を指定 */
+ justify-content:center;	/* 見た目の設定を指定 */
+ gap:10px 24px;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.footer-links a {	/* 対象要素のスタイルを始める */
+ color:var(--ui-muted)!important;	/* 見た目の設定を指定 */
+ text-decoration:none;	/* 見た目の設定を指定 */
+ font-size:13px;	/* 見た目の設定を指定 */
+ font-weight:700;	/* 見た目の設定を指定 */
+ padding:4px 8px;	/* 見た目の設定を指定 */
+ border-radius:6px;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.footer-links a:hover { color:var(--ui-green)!important; background:var(--ui-soft); }	/* 見た目の設定を指定 */
+.copyright { color:var(--ui-muted)!important; font-size:.75rem; margin:0; font-weight:600; }	/* 見た目の設定を指定 */
+.toast-notification { background:var(--ui-paper); border:1px solid var(--ui-line); border-radius:14px; box-shadow:0 12px 32px #243c3215; }	/* 見た目の設定を指定 */
+.toast-icon { background:var(--ui-green); }	/* 見た目の設定を指定 */
+.toast-title { color:var(--ui-green); }	/* 見た目の設定を指定 */
+#ui-notice-root {	/* 対象要素のスタイルを始める */
+ position:fixed;	/* 見た目の設定を指定 */
+ top:22px;	/* 見た目の設定を指定 */
+ right:22px;	/* 見た目の設定を指定 */
+ z-index:10000;	/* 見た目の設定を指定 */
+ display:flex;	/* 見た目の設定を指定 */
+ flex-direction:column;	/* 見た目の設定を指定 */
+ align-items:flex-end;	/* 見た目の設定を指定 */
+ gap:10px;	/* 見た目の設定を指定 */
+ width:min(390px,calc(100vw - 32px));	/* 見た目の設定を指定 */
+ pointer-events:none;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.ui-notice {	/* 対象要素のスタイルを始める */
+ display:flex;	/* 見た目の設定を指定 */
+ align-items:center;	/* 見た目の設定を指定 */
+ gap:12px;	/* 見た目の設定を指定 */
+ width:100%;	/* 見た目の設定を指定 */
+ padding:14px 14px 14px 16px;	/* 見た目の設定を指定 */
+ border:1px solid var(--ui-line);	/* 見た目の設定を指定 */
+ border-radius:14px;	/* 見た目の設定を指定 */
+ background:var(--ui-paper);	/* 見た目の設定を指定 */
+ color:var(--ui-ink);	/* 見た目の設定を指定 */
+ box-shadow:0 16px 34px rgba(36,60,50,.16);	/* 見た目の設定を指定 */
+ opacity:0;	/* 見た目の設定を指定 */
+ transform:translateY(-10px) scale(.98);	/* 見た目の設定を指定 */
+ transition:opacity .22s ease,transform .22s ease;	/* 見た目の設定を指定 */
+ pointer-events:auto;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.ui-notice.is-visible { opacity:1; transform:translateY(0) scale(1); }	/* 見た目の設定を指定 */
+.ui-notice.is-leaving { opacity:0; transform:translateY(-8px) scale(.98); }	/* 見た目の設定を指定 */
+.ui-notice-icon {	/* 対象要素のスタイルを始める */
+ display:grid;	/* 見た目の設定を指定 */
+ place-items:center;	/* 見た目の設定を指定 */
+ flex:0 0 26px;	/* 見た目の設定を指定 */
+ width:26px;	/* 見た目の設定を指定 */
+ height:26px;	/* 見た目の設定を指定 */
+ border-radius:50%;	/* 見た目の設定を指定 */
+ background:var(--ui-soft);	/* 見た目の設定を指定 */
+ color:var(--ui-green);	/* 見た目の設定を指定 */
+ font-size:14px;	/* 見た目の設定を指定 */
+ font-weight:800;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.ui-notice-success { border-color:#c7dfbd; }	/* 見た目の設定を指定 */
+.ui-notice-success .ui-notice-icon { background:#dff1d7; color:#3e7a43; }	/* 見た目の設定を指定 */
+.ui-notice-error { border-color:#e8c7bd; }	/* 見た目の設定を指定 */
+.ui-notice-error .ui-notice-icon { background:#f8e1da; color:var(--ui-danger); }	/* 見た目の設定を指定 */
+.ui-notice-message { flex:1; min-width:0; font-size:13px; line-height:1.55; overflow-wrap:anywhere; }	/* 見た目の設定を指定 */
+.ui-notice-close {	/* 対象要素のスタイルを始める */
+ flex:0 0 28px;	/* 見た目の設定を指定 */
+ width:28px;	/* 見た目の設定を指定 */
+ height:28px;	/* 見た目の設定を指定 */
+ padding:0;	/* 見た目の設定を指定 */
+ border:0;	/* 見た目の設定を指定 */
+ border-radius:8px;	/* 見た目の設定を指定 */
+ background:transparent;	/* 見た目の設定を指定 */
+ color:var(--ui-muted);	/* 見た目の設定を指定 */
+ font-size:20px;	/* 見た目の設定を指定 */
+ line-height:1;	/* 見た目の設定を指定 */
+ cursor:pointer;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.ui-notice-close:hover { background:var(--ui-soft); color:var(--ui-ink); }	/* 見た目の設定を指定 */
+@media(max-width:1100px) and (min-width:769px) {	/* 表示条件を設定 */
+ .navbar { padding:16px 20px; gap:12px; flex-wrap:wrap; }	/* 見た目の設定を指定 */
+ .nav-item { padding:8px 9px; font-size:11px; }	/* 見た目の設定を指定 */
+ .user-grid { grid-template-columns:1fr; }	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+@media(max-width:768px) {	/* 表示条件を設定 */
+ .navbar { min-height:64px; padding:8px 16px 8px 20px; }	/* 見た目の設定を指定 */
+ .logo { font-size:16px!important; }	/* 見た目の設定を指定 */
+ .hamburger-btn { display:flex!important; }	/* 見た目の設定を指定 */
+ .nav-links {	/* 対象要素のスタイルを始める */
+  position:fixed!important; left:0!important; width:100%!important;	/* 見た目の設定を指定 */
+  z-index:119!important; flex-direction:column!important; align-items:center!important;	/* 見た目の設定を指定 */
+  padding:20px 0!important; gap:6px!important;	/* 見た目の設定を指定 */
+  opacity:0!important; pointer-events:none!important; transform:translateY(-10px)!important;	/* 見た目の設定を指定 */
+  transition:transform .22s ease,opacity .22s ease!important;	/* 見た目の設定を指定 */
+  top:64px!important; background:var(--ui-paper)!important; border:1px solid var(--ui-line);	/* 見た目の設定を指定 */
+  border-top:0; border-radius:0 0 16px 16px; box-shadow:0 16px 30px rgba(36,60,50,.12);	/* 見た目の設定を指定 */
+ }	/* スタイル定義を閉じる */
+ .nav-links.open { opacity:1!important; pointer-events:auto!important; transform:translateY(0)!important; }	/* 見た目の設定を指定 */
+ .nav-links .nav-item,.nav-links .btn-logout {	/* 対象要素のスタイルを始める */
+  width:min(82%,420px)!important; margin:0 auto!important; padding:11px 14px!important;	/* 見た目の設定を指定 */
+  text-align:center!important;	/* 見た目の設定を指定 */
+ }	/* スタイル定義を閉じる */
+ .container { width:100%; padding:0 18px; margin:28px auto 44px; gap:26px; }	/* 見た目の設定を指定 */
 
- [data-page="main"] > .container { align-items:stretch; }
- [data-page="main"] .main-area,
- [data-page="main"] .main-content,
- [data-page="main"] #search-area,
- [data-page="main"] #recruit-form-area {
-  width:100%; min-width:0; max-width:100%;
- }
- [data-page="main"] .user-grid { grid-template-columns:minmax(0,1fr); }
- .sidebar { position:static; width:100%; }
- .mypage-area { padding:22px; }
- .user-grid { grid-template-columns:1fr; }
- .user-card { padding:22px; min-height:260px; }
- [data-page="index"] .login-container { display:block; padding:36px 20px; max-width:480px; }
- [data-page="index"] .login-container::before { display:block; content:"学ぶ時間に、仲間がいる。"; font-size:24px; margin:0 0 26px; }
- [data-page="index"] .login-card { padding:30px 24px; }
- .profile-card,#recruit-form-area .sidebar-form { padding:24px; }
- .dm-header,.partner-item { padding:22px; }
- .chat-container { width:calc(100% - 24px); margin:16px auto; }
- .chat-messages { padding:16px; }
- .chat-header { padding:16px; font-size:13px; }
- .chat-input-area { padding:12px; gap:8px; }
- .message-bubble { max-width:86%; }
- .page-title-bar { gap:12px; flex-wrap:wrap; }
- .page-title-bar h1 { font-size:23px; }
- .panel { padding:18px; }
- .panel table { min-width:440px; }
- [data-page="reset"] .card { padding:26px; }
- .footer { padding:24px 16px; }
- .footer-links { gap:8px 12px; }
- #ui-notice-root { top:14px; right:16px; width:calc(100vw - 32px); }
-}
-@media(prefers-reduced-motion:reduce) {
- *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
-}
+ [data-page="main"] > .container { align-items:stretch; }	/* 見た目の設定を指定 */
+ [data-page="main"] .main-area,	/* スタイルを設定 */
+ [data-page="main"] .main-content,	/* スタイルを設定 */
+ [data-page="main"] #search-area,	/* スタイルを設定 */
+ [data-page="main"] #recruit-form-area {	/* 対象要素のスタイルを始める */
+  width:100%; min-width:0; max-width:100%;	/* 見た目の設定を指定 */
+ }	/* スタイル定義を閉じる */
+ [data-page="main"] .user-grid { grid-template-columns:minmax(0,1fr); }	/* 見た目の設定を指定 */
+ .sidebar { position:static; width:100%; }	/* 見た目の設定を指定 */
+ .mypage-area { padding:22px; }	/* 見た目の設定を指定 */
+ .user-grid { grid-template-columns:1fr; }	/* 見た目の設定を指定 */
+ .user-card { padding:22px; min-height:260px; }	/* 見た目の設定を指定 */
+ [data-page="index"] .login-container { display:block; padding:36px 20px; max-width:480px; }	/* 見た目の設定を指定 */
+ [data-page="index"] .login-container::before { display:block; content:"学ぶ時間に、仲間がいる。"; font-size:24px; margin:0 0 26px; }	/* 見た目の設定を指定 */
+ [data-page="index"] .login-card { padding:30px 24px; }	/* 見た目の設定を指定 */
+ .profile-card,#recruit-form-area .sidebar-form { padding:24px; }	/* 見た目の設定を指定 */
+ .dm-header,.partner-item { padding:22px; }	/* 見た目の設定を指定 */
+ .chat-container { width:calc(100% - 24px); margin:16px auto; }	/* 見た目の設定を指定 */
+ .chat-messages { padding:16px; }	/* 見た目の設定を指定 */
+ .chat-header { padding:16px; font-size:13px; }	/* 見た目の設定を指定 */
+ .chat-input-area { padding:12px; gap:8px; }	/* 見た目の設定を指定 */
+ .message-bubble { max-width:86%; }	/* 見た目の設定を指定 */
+ .page-title-bar { gap:12px; flex-wrap:wrap; }	/* 見た目の設定を指定 */
+ .page-title-bar h1 { font-size:23px; }	/* 見た目の設定を指定 */
+ .panel { padding:18px; }	/* 見た目の設定を指定 */
+ .panel table { min-width:440px; }	/* 見た目の設定を指定 */
+ [data-page="reset"] .card { padding:26px; }	/* 見た目の設定を指定 */
+ .footer { padding:24px 16px; }	/* 見た目の設定を指定 */
+ .footer-links { gap:8px 12px; }	/* 見た目の設定を指定 */
+ #ui-notice-root { top:14px; right:16px; width:calc(100vw - 32px); }	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+@media(prefers-reduced-motion:reduce) {	/* 表示条件を設定 */
+ *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
 
 
-.nav-guide-button {
- appearance:none; border:0; background:transparent; font:inherit;
-}
-.usage-intro-card {
- display:flex; align-items:center; justify-content:space-between; gap:30px;
- margin-bottom:34px; padding:30px 32px; border:1px solid #cdd8c2;
- border-radius:18px; background:var(--ui-green); color:var(--ui-paper);
-}
-.usage-intro-card > div { min-width:0; }
-.usage-intro-label,.usage-guide-kicker {
- display:block; margin-bottom:9px; color:var(--ui-lime); font-size:10px;
- font-weight:800; letter-spacing:.2em;
-}
-.usage-intro-card h1 {
- margin:0 0 8px; max-width:650px; color:var(--ui-paper); font-size:clamp(22px,3vw,34px);
- line-height:1.35; letter-spacing:-.05em;
-}
-.usage-intro-card p { margin:0; color:#dbe5de; font-size:13px; }
-.usage-intro-button {
- flex:0 0 auto; min-height:46px; padding:0 20px; border:1px solid var(--ui-lime);
- border-radius:10px; background:var(--ui-lime); color:var(--ui-green); font-weight:800;
-}
-.usage-intro-button:hover { background:#e5f7b2; }
-body.guide-open { overflow:hidden; }
-.usage-guide {
- position:fixed; inset:0; z-index:10000; display:grid; justify-items:end;
- visibility:hidden; opacity:0; pointer-events:none; transition:opacity .2s,visibility .2s;
-}
-.usage-guide.is-open { visibility:visible; opacity:1; pointer-events:auto; }
-.usage-guide-backdrop {
- position:absolute; inset:0; width:100%; height:100%; border:0;
- background:rgba(18,34,27,.56); backdrop-filter:blur(4px);
-}
-.usage-guide-panel {
- position:relative; z-index:1; width:min(760px,calc(100% - 24px)); height:100%;
- overflow-y:auto; border:0; border-left:1px solid var(--ui-line);
- background:var(--ui-bg); box-shadow:-18px 0 50px rgba(17,35,27,.17);
- transform:translateX(28px); transition:transform .25s ease;
-}
-.usage-guide.is-open .usage-guide-panel { transform:translateX(0); }
-.usage-guide-header {
- position:sticky; top:0; z-index:2; display:flex; justify-content:space-between; gap:24px;
- padding:30px 34px 26px; border-bottom:1px solid var(--ui-line);
- background:rgba(245,244,238,.96); backdrop-filter:blur(16px);
-}
-.usage-guide-header h2 { margin:0 0 7px; color:var(--ui-ink); font-size:28px; letter-spacing:-.05em; }
-.usage-guide-header p { margin:0; max-width:590px; color:var(--ui-muted); font-size:13px; }
-.usage-guide-close {
- flex:0 0 auto; width:42px; height:42px; border:1px solid var(--ui-line);
- border-radius:50%; background:var(--ui-paper); color:var(--ui-green); font-size:25px; line-height:1;
-}
-.usage-guide-close:hover { background:var(--ui-soft); }
-.usage-guide-body { padding:32px 34px 50px; }
-.usage-guide-flow { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
-.usage-step-card {
- display:flex; flex-direction:column; min-width:0; padding:20px;
- border:1px solid var(--ui-line); border-radius:14px; background:var(--ui-paper);
-}
-.usage-step-number { color:#8aa05f; font-size:11px; font-weight:900; letter-spacing:.12em; }
-.usage-step-card h3 { margin:20px 0 8px; color:var(--ui-ink); font-size:16px; }
-.usage-step-card p { margin:0 0 18px; color:var(--ui-muted); font-size:12px; line-height:1.8; }
-.usage-step-card a,.usage-step-card button {
- margin-top:auto; padding:0; border:0; background:transparent; color:var(--ui-green);
- font-size:12px; font-weight:800; text-align:left; text-decoration:none;
-}
-.usage-guide-section { margin-top:34px; padding-top:30px; border-top:1px solid var(--ui-line); }
-.usage-guide-section-title span,.usage-trial-box span {
- color:#71814d; font-size:10px; font-weight:800; letter-spacing:.12em;
-}
-.usage-guide-section-title h3,.usage-trial-box h3 {
- margin:7px 0 18px; color:var(--ui-ink); font-size:20px; letter-spacing:-.035em;
-}
-.usage-info-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
-.usage-info-grid > div { padding:18px; border-radius:12px; background:var(--ui-soft); }
-.usage-info-grid strong { color:var(--ui-green); font-size:13px; }
-.usage-info-grid p { margin:6px 0 0; color:var(--ui-muted); font-size:12px; line-height:1.75; }
-.usage-guide-note { padding:20px; border-left:4px solid var(--ui-lime); background:var(--ui-paper); }
-.usage-guide-note p { margin:0; color:var(--ui-muted); font-size:13px; }
-.usage-guide-note p + p { margin-top:10px; }
-.usage-guide-primary-link {
- display:inline-flex; margin-top:14px; padding:11px 16px; border-radius:9px;
- background:var(--ui-green); color:var(--ui-paper); font-size:12px; font-weight:800; text-decoration:none;
-}
-.usage-safety-section ul { margin:0; padding:20px 20px 20px 40px; border-radius:14px; background:#f5eee4; }
-.usage-safety-section li { color:#665f52; font-size:13px; line-height:1.8; }
-.usage-safety-section li + li { margin-top:7px; }
-.usage-trial-box {
- display:flex; align-items:center; justify-content:space-between; gap:24px;
- margin-top:34px; padding:24px; border-radius:14px; background:var(--ui-green); color:var(--ui-paper);
-}
-.usage-trial-box h3 { margin-bottom:6px; color:var(--ui-paper); }
-.usage-trial-box p { margin:0; color:#dbe5de; font-size:12px; }
-.usage-trial-box a {
- flex:0 0 auto; padding:11px 16px; border-radius:9px; background:var(--ui-lime);
- color:var(--ui-green); font-size:12px; font-weight:800; text-decoration:none;
-}
-@media(max-width:768px) {
- .usage-intro-card { align-items:flex-start; flex-direction:column; padding:24px; }
- .usage-intro-button { width:100%; }
- .usage-guide-panel { width:100%; }
- .usage-guide-header { padding:22px 20px 19px; }
- .usage-guide-header h2 { font-size:23px; }
- .usage-guide-body { padding:22px 18px 38px; }
- .usage-guide-flow,.usage-info-grid { grid-template-columns:1fr; }
- .usage-step-card { padding:20px; }
- .usage-step-card h3 { margin-top:10px; }
- .usage-trial-box { align-items:flex-start; flex-direction:column; }
- .usage-trial-box a { width:100%; text-align:center; }
-}
+.nav-guide-button {	/* 対象要素のスタイルを始める */
+ appearance:none; border:0; background:transparent; font:inherit;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.usage-intro-card {	/* 対象要素のスタイルを始める */
+ display:flex; align-items:center; justify-content:space-between; gap:30px;	/* 見た目の設定を指定 */
+ margin-bottom:34px; padding:30px 32px; border:1px solid #cdd8c2;	/* 見た目の設定を指定 */
+ border-radius:18px; background:var(--ui-green); color:var(--ui-paper);	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.usage-intro-card > div { min-width:0; }	/* 見た目の設定を指定 */
+.usage-intro-label,.usage-guide-kicker {	/* 対象要素のスタイルを始める */
+ display:block; margin-bottom:9px; color:var(--ui-lime); font-size:10px;	/* 見た目の設定を指定 */
+ font-weight:800; letter-spacing:.2em;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.usage-intro-card h1 {	/* 対象要素のスタイルを始める */
+ margin:0 0 8px; max-width:650px; color:var(--ui-paper); font-size:clamp(22px,3vw,34px);	/* 見た目の設定を指定 */
+ line-height:1.35; letter-spacing:-.05em;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.usage-intro-card p { margin:0; color:#dbe5de; font-size:13px; }	/* 見た目の設定を指定 */
+.usage-intro-button {	/* 対象要素のスタイルを始める */
+ flex:0 0 auto; min-height:46px; padding:0 20px; border:1px solid var(--ui-lime);	/* 見た目の設定を指定 */
+ border-radius:10px; background:var(--ui-lime); color:var(--ui-green); font-weight:800;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.usage-intro-button:hover { background:#e5f7b2; }	/* 見た目の設定を指定 */
+body.guide-open { overflow:hidden; }	/* 見た目の設定を指定 */
+.usage-guide {	/* 対象要素のスタイルを始める */
+ position:fixed; inset:0; z-index:10000; display:grid; justify-items:end;	/* 見た目の設定を指定 */
+ visibility:hidden; opacity:0; pointer-events:none; transition:opacity .2s,visibility .2s;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.usage-guide.is-open { visibility:visible; opacity:1; pointer-events:auto; }	/* 見た目の設定を指定 */
+.usage-guide-backdrop {	/* 対象要素のスタイルを始める */
+ position:absolute; inset:0; width:100%; height:100%; border:0;	/* 見た目の設定を指定 */
+ background:rgba(18,34,27,.56); backdrop-filter:blur(4px);	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.usage-guide-panel {	/* 対象要素のスタイルを始める */
+ position:relative; z-index:1; width:min(760px,calc(100% - 24px)); height:100%;	/* 見た目の設定を指定 */
+ overflow-y:auto; border:0; border-left:1px solid var(--ui-line);	/* 見た目の設定を指定 */
+ background:var(--ui-bg); box-shadow:-18px 0 50px rgba(17,35,27,.17);	/* 見た目の設定を指定 */
+ transform:translateX(28px); transition:transform .25s ease;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.usage-guide.is-open .usage-guide-panel { transform:translateX(0); }	/* 見た目の設定を指定 */
+.usage-guide-header {	/* 対象要素のスタイルを始める */
+ position:sticky; top:0; z-index:2; display:flex; justify-content:space-between; gap:24px;	/* 見た目の設定を指定 */
+ padding:30px 34px 26px; border-bottom:1px solid var(--ui-line);	/* 見た目の設定を指定 */
+ background:rgba(245,244,238,.96); backdrop-filter:blur(16px);	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.usage-guide-header h2 { margin:0 0 7px; color:var(--ui-ink); font-size:28px; letter-spacing:-.05em; }	/* 見た目の設定を指定 */
+.usage-guide-header p { margin:0; max-width:590px; color:var(--ui-muted); font-size:13px; }	/* 見た目の設定を指定 */
+.usage-guide-close {	/* 対象要素のスタイルを始める */
+ flex:0 0 auto; width:42px; height:42px; border:1px solid var(--ui-line);	/* 見た目の設定を指定 */
+ border-radius:50%; background:var(--ui-paper); color:var(--ui-green); font-size:25px; line-height:1;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.usage-guide-close:hover { background:var(--ui-soft); }	/* 見た目の設定を指定 */
+.usage-guide-body { padding:32px 34px 50px; }	/* 見た目の設定を指定 */
+.usage-guide-flow { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }	/* 見た目の設定を指定 */
+.usage-step-card {	/* 対象要素のスタイルを始める */
+ display:flex; flex-direction:column; min-width:0; padding:20px;	/* 見た目の設定を指定 */
+ border:1px solid var(--ui-line); border-radius:14px; background:var(--ui-paper);	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.usage-step-number { color:#8aa05f; font-size:11px; font-weight:900; letter-spacing:.12em; }	/* 見た目の設定を指定 */
+.usage-step-card h3 { margin:20px 0 8px; color:var(--ui-ink); font-size:16px; }	/* 見た目の設定を指定 */
+.usage-step-card p { margin:0 0 18px; color:var(--ui-muted); font-size:12px; line-height:1.8; }	/* 見た目の設定を指定 */
+.usage-step-card a,.usage-step-card button {	/* 対象要素のスタイルを始める */
+ margin-top:auto; padding:0; border:0; background:transparent; color:var(--ui-green);	/* 見た目の設定を指定 */
+ font-size:12px; font-weight:800; text-align:left; text-decoration:none;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.usage-guide-section { margin-top:34px; padding-top:30px; border-top:1px solid var(--ui-line); }	/* 見た目の設定を指定 */
+.usage-guide-section-title span,.usage-trial-box span {	/* 対象要素のスタイルを始める */
+ color:#71814d; font-size:10px; font-weight:800; letter-spacing:.12em;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.usage-guide-section-title h3,.usage-trial-box h3 {	/* 対象要素のスタイルを始める */
+ margin:7px 0 18px; color:var(--ui-ink); font-size:20px; letter-spacing:-.035em;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.usage-info-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }	/* 見た目の設定を指定 */
+.usage-info-grid > div { padding:18px; border-radius:12px; background:var(--ui-soft); }	/* 見た目の設定を指定 */
+.usage-info-grid strong { color:var(--ui-green); font-size:13px; }	/* 見た目の設定を指定 */
+.usage-info-grid p { margin:6px 0 0; color:var(--ui-muted); font-size:12px; line-height:1.75; }	/* 見た目の設定を指定 */
+.usage-guide-note { padding:20px; border-left:4px solid var(--ui-lime); background:var(--ui-paper); }	/* 見た目の設定を指定 */
+.usage-guide-note p { margin:0; color:var(--ui-muted); font-size:13px; }	/* 見た目の設定を指定 */
+.usage-guide-note p + p { margin-top:10px; }	/* 見た目の設定を指定 */
+.usage-guide-primary-link {	/* 対象要素のスタイルを始める */
+ display:inline-flex; margin-top:14px; padding:11px 16px; border-radius:9px;	/* 見た目の設定を指定 */
+ background:var(--ui-green); color:var(--ui-paper); font-size:12px; font-weight:800; text-decoration:none;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.usage-safety-section ul { margin:0; padding:20px 20px 20px 40px; border-radius:14px; background:#f5eee4; }	/* 見た目の設定を指定 */
+.usage-safety-section li { color:#665f52; font-size:13px; line-height:1.8; }	/* 見た目の設定を指定 */
+.usage-safety-section li + li { margin-top:7px; }	/* 見た目の設定を指定 */
+.usage-trial-box {	/* 対象要素のスタイルを始める */
+ display:flex; align-items:center; justify-content:space-between; gap:24px;	/* 見た目の設定を指定 */
+ margin-top:34px; padding:24px; border-radius:14px; background:var(--ui-green); color:var(--ui-paper);	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+.usage-trial-box h3 { margin-bottom:6px; color:var(--ui-paper); }	/* 見た目の設定を指定 */
+.usage-trial-box p { margin:0; color:#dbe5de; font-size:12px; }	/* 見た目の設定を指定 */
+.usage-trial-box a {	/* 対象要素のスタイルを始める */
+ flex:0 0 auto; padding:11px 16px; border-radius:9px; background:var(--ui-lime);	/* 見た目の設定を指定 */
+ color:var(--ui-green); font-size:12px; font-weight:800; text-decoration:none;	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */
+@media(max-width:768px) {	/* 表示条件を設定 */
+ .usage-intro-card { align-items:flex-start; flex-direction:column; padding:24px; }	/* 見た目の設定を指定 */
+ .usage-intro-button { width:100%; }	/* 見た目の設定を指定 */
+ .usage-guide-panel { width:100%; }	/* 見た目の設定を指定 */
+ .usage-guide-header { padding:22px 20px 19px; }	/* 見た目の設定を指定 */
+ .usage-guide-header h2 { font-size:23px; }	/* 見た目の設定を指定 */
+ .usage-guide-body { padding:22px 18px 38px; }	/* 見た目の設定を指定 */
+ .usage-guide-flow,.usage-info-grid { grid-template-columns:1fr; }	/* 見た目の設定を指定 */
+ .usage-step-card { padding:20px; }	/* 見た目の設定を指定 */
+ .usage-step-card h3 { margin-top:10px; }	/* 見た目の設定を指定 */
+ .usage-trial-box { align-items:flex-start; flex-direction:column; }	/* 見た目の設定を指定 */
+ .usage-trial-box a { width:100%; text-align:center; }	/* 見た目の設定を指定 */
+}	/* スタイル定義を閉じる */

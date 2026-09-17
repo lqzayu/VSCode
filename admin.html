@@ -1,730 +1,730 @@
-<!DOCTYPE html>
-<html lang="ja">
+<!DOCTYPE html>	<!-- HTML文書として宣言 -->
+<html lang="ja">	<!-- 画面要素を配置 -->
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理者ダッシュボード - 平工マッチング</title>
-    <link rel="icon" href="icon-192.png">
+<head>	<!-- 画面要素を配置 -->
+    <meta charset="UTF-8">	<!-- 表示環境を設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">	<!-- 表示環境を設定 -->
+    <title>管理者ダッシュボード - 平工マッチング</title>	<!-- ページタイトルを設定 -->
+    <link rel="icon" href="icon-192.png">	<!-- 外部ファイルを読み込む -->
 
     <style>
 
-        body {
-            margin: 0;
-            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            color: #1e293b;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-        }
+        body {	/* 対象要素のスタイルを始める */
+            margin: 0;	/* 見た目の設定を指定 */
+            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);	/* 見た目の設定を指定 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            min-height: 100vh;	/* 見た目の設定を指定 */
+            -webkit-font-smoothing: antialiased;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .navbar {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 14px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+        .navbar {	/* 対象要素のスタイルを始める */
+            background: rgba(255, 255, 255, 0.75);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            -webkit-backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            padding: 14px 5%;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            justify-content: space-between;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);	/* 見た目の設定を指定 */
+            position: sticky;	/* 見た目の設定を指定 */
+            top: 0;	/* 見た目の設定を指定 */
+            z-index: 100;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            cursor: pointer;
-        }
+        .logo {	/* 対象要素のスタイルを始める */
+            font-size: 1.4rem;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            letter-spacing: -0.03em;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            -webkit-background-clip: text;	/* 見た目の設定を指定 */
+            -webkit-text-fill-color: transparent;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .nav-links {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            gap: 8px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .nav-item {
-            cursor: pointer;
-            color: #64748b;
-            font-weight: 700;
-            font-size: 14px;
-            padding: 8px 16px;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            position: relative;
-        }
+        .nav-item {	/* 対象要素のスタイルを始める */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            color: #64748b;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            font-size: 14px;	/* 見た目の設定を指定 */
+            padding: 8px 16px;	/* 見た目の設定を指定 */
+            text-decoration: none;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            transition: all 0.2s ease;	/* 見た目の設定を指定 */
+            position: relative;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .nav-item:hover {
-            background-color: rgba(28, 189, 197, 0.06);
-            color: #1cbdc5;
-        }
+        .nav-item:hover {	/* 対象要素のスタイルを始める */
+            background-color: rgba(28, 189, 197, 0.06);	/* 見た目の設定を指定 */
+            color: #1cbdc5;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .nav-item.active {
-            color: #ef4444;
-            background-color: rgba(239, 68, 68, 0.1);
-        }
+        .nav-item.active {	/* 対象要素のスタイルを始める */
+            color: #ef4444;	/* 見た目の設定を指定 */
+            background-color: rgba(239, 68, 68, 0.1);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .unread-badge {
-            position: absolute;
-            top: 2px;
-            right: 4px;
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: #ffffff;
-            font-size: 10px;
-            font-weight: 800;
-            padding: 2px 6px;
-            border-radius: 10px;
-            line-height: 1;
-            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
-            min-width: 14px;
-            text-align: center;
-            box-sizing: border-box;
-        }
+        .unread-badge {	/* 対象要素のスタイルを始める */
+            position: absolute;	/* 見た目の設定を指定 */
+            top: 2px;	/* 見た目の設定を指定 */
+            right: 4px;	/* 見た目の設定を指定 */
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);	/* 見た目の設定を指定 */
+            color: #ffffff;	/* 見た目の設定を指定 */
+            font-size: 10px;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            padding: 2px 6px;	/* 見た目の設定を指定 */
+            border-radius: 10px;	/* 見た目の設定を指定 */
+            line-height: 1;	/* 見た目の設定を指定 */
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);	/* 見た目の設定を指定 */
+            min-width: 14px;	/* 見た目の設定を指定 */
+            text-align: center;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-logout {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: none;
-            background-color: #ef4444;
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
-            transition: all 0.2s;
-        }
+        .btn-logout {	/* 対象要素のスタイルを始める */
+            padding: 8px 16px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            background-color: #ef4444;	/* 見た目の設定を指定 */
+            color: #ffffff;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-logout:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
-        }
+        .btn-logout:hover {	/* 対象要素のスタイルを始める */
+            opacity: 0.9;	/* 見た目の設定を指定 */
+            transform: translateY(-1px);	/* 見た目の設定を指定 */
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .hamburger-btn {
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 24px;
-            height: 18px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            z-index: 110;
-        }
+        .hamburger-btn {	/* 対象要素のスタイルを始める */
+            display: none;	/* 見た目の設定を指定 */
+            flex-direction: column;	/* 見た目の設定を指定 */
+            justify-content: space-between;	/* 見た目の設定を指定 */
+            width: 24px;	/* 見た目の設定を指定 */
+            height: 18px;	/* 見た目の設定を指定 */
+            background: transparent;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            padding: 0;	/* 見た目の設定を指定 */
+            z-index: 110;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .hamburger-btn span {
-            width: 100%;
-            height: 2.5px;
-            background-color: #1e293b;
-            border-radius: 3px;
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-        }
+        .hamburger-btn span {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            height: 2.5px;	/* 見た目の設定を指定 */
+            background-color: #1e293b;	/* 見た目の設定を指定 */
+            border-radius: 3px;	/* 見た目の設定を指定 */
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
 
-        .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 24px;
-            flex: 1;
-            width: 100%;
-            box-sizing: border-box;
-        }
+        .container {	/* 対象要素のスタイルを始める */
+            max-width: 1200px;	/* 見た目の設定を指定 */
+            margin: 30px auto;	/* 見た目の設定を指定 */
+            padding: 0 24px;	/* 見た目の設定を指定 */
+            flex: 1;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .page-title-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 20px 28px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            margin-bottom: 24px;
-        }
+        .page-title-bar {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            justify-content: space-between;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            background: rgba(255, 255, 255, 0.8);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            -webkit-backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
+            padding: 20px 28px;	/* 見た目の設定を指定 */
+            border-radius: 16px;	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);	/* 見た目の設定を指定 */
+            border: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
+            margin-bottom: 24px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        h1 {
-            margin: 0;
-            font-size: 1.4rem;
-            color: #1e293b;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        h1 {	/* 対象要素のスタイルを始める */
+            margin: 0;	/* 見た目の設定を指定 */
+            font-size: 1.4rem;	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            display: flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            gap: 10px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-reload {
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 13.5px;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25);
-        }
+        .btn-reload {	/* 対象要素のスタイルを始める */
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
+            color: white;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            padding: 10px 20px;	/* 見た目の設定を指定 */
+            border-radius: 10px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            font-size: 13.5px;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.25);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-reload:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(28, 189, 197, 0.35);
-        }
+        .btn-reload:hover {	/* 対象要素のスタイルを始める */
+            transform: translateY(-1px);	/* 見た目の設定を指定 */
+            box-shadow: 0 6px 16px rgba(28, 189, 197, 0.35);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .online-summary {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-left: auto;
-            margin-right: 14px;
-            padding: 9px 14px;
-            border-radius: 12px;
-            background: #ecfdf5;
-            color: #166534;
-        }
+        .online-summary {	/* 対象要素のスタイルを始める */
+            display: flex;	/* 見た目の設定を指定 */
+            align-items: center;	/* 見た目の設定を指定 */
+            gap: 10px;	/* 見た目の設定を指定 */
+            margin-left: auto;	/* 見た目の設定を指定 */
+            margin-right: 14px;	/* 見た目の設定を指定 */
+            padding: 9px 14px;	/* 見た目の設定を指定 */
+            border-radius: 12px;	/* 見た目の設定を指定 */
+            background: #ecfdf5;	/* 見た目の設定を指定 */
+            color: #166534;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .online-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background: #22c55e;
-            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.14);
-        }
+        .online-dot {	/* 対象要素のスタイルを始める */
+            width: 9px;	/* 見た目の設定を指定 */
+            height: 9px;	/* 見た目の設定を指定 */
+            border-radius: 50%;	/* 見た目の設定を指定 */
+            background: #22c55e;	/* 見た目の設定を指定 */
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.14);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .online-summary strong {
-            font-size: 20px;
-            line-height: 1;
-        }
+        .online-summary strong {	/* 対象要素のスタイルを始める */
+            font-size: 20px;	/* 見た目の設定を指定 */
+            line-height: 1;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .online-summary span {
-            font-size: 12px;
-            font-weight: 700;
-        }
+        .online-summary span {	/* 対象要素のスタイルを始める */
+            font-size: 12px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-        }
+        .dashboard-grid {	/* 対象要素のスタイルを始める */
+            display: grid;	/* 見た目の設定を指定 */
+            grid-template-columns: 1fr 1fr;	/* 見た目の設定を指定 */
+            gap: 24px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 28px;
-            box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-sizing: border-box;
-        }
+        .panel {	/* 対象要素のスタイルを始める */
+            background: rgba(255, 255, 255, 0.85);	/* 見た目の設定を指定 */
+            backdrop-filter: blur(10px);	/* 見た目の設定を指定 */
+            -webkit-backdrop-filter: blur(10px);	/* 見た目の設定を指定 */
+            border-radius: 20px;	/* 見た目の設定を指定 */
+            padding: 28px;	/* 見た目の設定を指定 */
+            box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.02);	/* 見た目の設定を指定 */
+            border: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .panel h2 {
-            margin-top: 0;
-            font-size: 1.15rem;
-            font-weight: 800;
-            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
-            padding-bottom: 12px;
-            color: #1e293b;
-        }
+        .panel h2 {	/* 対象要素のスタイルを始める */
+            margin-top: 0;	/* 見た目の設定を指定 */
+            font-size: 1.15rem;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);	/* 見た目の設定を指定 */
+            padding-bottom: 12px;	/* 見た目の設定を指定 */
+            color: #1e293b;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 12px;
-            font-size: 13.5px;
-        }
+        table {	/* 対象要素のスタイルを始める */
+            width: 100%;	/* 見た目の設定を指定 */
+            border-collapse: collapse;	/* 見た目の設定を指定 */
+            margin-top: 12px;	/* 見た目の設定を指定 */
+            font-size: 13.5px;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        th, td {
-            padding: 12px 10px;
-            text-align: left;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
+        th, td {	/* 対象要素のスタイルを始める */
+            padding: 12px 10px;	/* 見た目の設定を指定 */
+            text-align: left;	/* 見た目の設定を指定 */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        th {
-            color: #64748b;
-            font-weight: 700;
-            background: rgba(248, 250, 252, 0.6);
-        }
+        th {	/* 対象要素のスタイルを始める */
+            color: #64748b;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            background: rgba(248, 250, 252, 0.6);	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-action-delete {
-            background: #ffe4e6;
-            color: #e11d48;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        .btn-action-delete {	/* 対象要素のスタイルを始める */
+            background: #ffe4e6;	/* 見た目の設定を指定 */
+            color: #e11d48;	/* 見た目の設定を指定 */
+            border: none;	/* 見た目の設定を指定 */
+            padding: 6px 12px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-action-delete:hover { background: #fecdd3; }
+        .btn-action-delete:hover { background: #fecdd3; }	/* 見た目の設定を指定 */
 
-        .btn-action-ban {
-            background: #fef2f2;
-            color: #dc2626;
-            border: 1px solid #fca5a5;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        .btn-action-ban {	/* 対象要素のスタイルを始める */
+            background: #fef2f2;	/* 見た目の設定を指定 */
+            color: #dc2626;	/* 見た目の設定を指定 */
+            border: 1px solid #fca5a5;	/* 見た目の設定を指定 */
+            padding: 6px 12px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-action-ban:hover { background: #dc2626; color: white; }
+        .btn-action-ban:hover { background: #dc2626; color: white; }	/* 見た目の設定を指定 */
 
-        .btn-action-unban {
-            background: #ecfdf5;
-            color: #059669;
-            border: 1px solid #a7f3d0;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        .btn-action-unban {	/* 対象要素のスタイルを始める */
+            background: #ecfdf5;	/* 見た目の設定を指定 */
+            color: #059669;	/* 見た目の設定を指定 */
+            border: 1px solid #a7f3d0;	/* 見た目の設定を指定 */
+            padding: 6px 12px;	/* 見た目の設定を指定 */
+            border-radius: 8px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .btn-action-unban:hover { background: #10b981; color: white; }
+        .btn-action-unban:hover { background: #10b981; color: white; }	/* 見た目の設定を指定 */
 
-        .status-badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 700;
-        }
+        .status-badge {	/* 対象要素のスタイルを始める */
+            display: inline-block;	/* 見た目の設定を指定 */
+            padding: 3px 8px;	/* 見た目の設定を指定 */
+            border-radius: 6px;	/* 見た目の設定を指定 */
+            font-size: 11px;	/* 見た目の設定を指定 */
+            font-weight: 700;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .badge-active { background: #dcfce7; color: #166534; }
-        .badge-inactive { background: #fee2e2; color: #991b1b; }
+        .badge-active { background: #dcfce7; color: #166534; }	/* 見た目の設定を指定 */
+        .badge-inactive { background: #fee2e2; color: #991b1b; }	/* 見た目の設定を指定 */
 
-        .footer {
-            background-color: transparent;
-            padding: 24px;
-            margin-top: auto;
-            width: 100%;
-            box-sizing: border-box;
-            text-align: center;
-        }
+        .footer {	/* 対象要素のスタイルを始める */
+            background-color: transparent;	/* 見た目の設定を指定 */
+            padding: 24px;	/* 見た目の設定を指定 */
+            margin-top: auto;	/* 見た目の設定を指定 */
+            width: 100%;	/* 見た目の設定を指定 */
+            box-sizing: border-box;	/* 見た目の設定を指定 */
+            text-align: center;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
 
-        .copyright { color: #8e8e8e; font-size: 0.75rem; margin: 0; }
+        .copyright { color: #8e8e8e; font-size: 0.75rem; margin: 0; }	/* 見た目の設定を指定 */
 
-        @media screen and (max-width: 768px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-            .container { padding: 0 16px; margin: 16px auto; }
-            .hamburger-btn { display: flex !important; }
-            .page-title-bar { flex-wrap: wrap; gap: 12px; }
-            .online-summary { order: 3; margin: 0; }
+        @media screen and (max-width: 768px) {	/* 表示条件を設定 */
+            .dashboard-grid { grid-template-columns: 1fr; }	/* 見た目の設定を指定 */
+            .container { padding: 0 16px; margin: 16px auto; }	/* 見た目の設定を指定 */
+            .hamburger-btn { display: flex !important; }	/* 見た目の設定を指定 */
+            .page-title-bar { flex-wrap: wrap; gap: 12px; }	/* 見た目の設定を指定 */
+            .online-summary { order: 3; margin: 0; }	/* 見た目の設定を指定 */
 
-            .nav-links {
-                position: fixed !important;
-                top: 54px !important;
-                left: 0 !important;
-                width: 100% !important;
-                background: rgba(255, 255, 255, 0.98) !important;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
-                flex-direction: column !important;
-                padding: 24px 0 !important;
-                gap: 8px !important;
-                z-index: 99 !important;
-                opacity: 0 !important;
-                pointer-events: none !important;
-                transform: translateY(-10px) !important;
-                transition: transform 0.3s ease, opacity 0.3s ease !important;
-            }
+            .nav-links {	/* 対象要素のスタイルを始める */
+                position: fixed !important;	/* 見た目の設定を指定 */
+                top: 54px !important;	/* 見た目の設定を指定 */
+                left: 0 !important;	/* 見た目の設定を指定 */
+                width: 100% !important;	/* 見た目の設定を指定 */
+                background: rgba(255, 255, 255, 0.98) !important;	/* 見た目の設定を指定 */
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;	/* 見た目の設定を指定 */
+                flex-direction: column !important;	/* 見た目の設定を指定 */
+                padding: 24px 0 !important;	/* 見た目の設定を指定 */
+                gap: 8px !important;	/* 見た目の設定を指定 */
+                z-index: 99 !important;	/* 見た目の設定を指定 */
+                opacity: 0 !important;	/* 見た目の設定を指定 */
+                pointer-events: none !important;	/* 見た目の設定を指定 */
+                transform: translateY(-10px) !important;	/* 見た目の設定を指定 */
+                transition: transform 0.3s ease, opacity 0.3s ease !important;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .nav-links.open {
-                opacity: 1 !important;
-                pointer-events: auto !important;
-                transform: translateY(0) !important;
-            }
+            .nav-links.open {	/* 対象要素のスタイルを始める */
+                opacity: 1 !important;	/* 見た目の設定を指定 */
+                pointer-events: auto !important;	/* 見た目の設定を指定 */
+                transform: translateY(0) !important;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .nav-item, .btn-logout {
-                width: 80% !important;
-                text-align: center !important;
-            }
+            .nav-item, .btn-logout {	/* 対象要素のスタイルを始める */
+                width: 80% !important;	/* 見た目の設定を指定 */
+                text-align: center !important;	/* 見た目の設定を指定 */
+            }	/* スタイル定義を閉じる */
 
-            .hamburger-btn.open span:nth-child(1) { transform: translateY(8px) rotate(45deg) !important; }
-            .hamburger-btn.open span:nth-child(2) { opacity: 0 !important; transform: scale(0) !important; }
-            .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) !important; }
-        }
+            .hamburger-btn.open span:nth-child(1) { transform: translateY(8px) rotate(45deg) !important; }	/* 見た目の設定を指定 */
+            .hamburger-btn.open span:nth-child(2) { opacity: 0 !important; transform: scale(0) !important; }	/* 見た目の設定を指定 */
+            .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) !important; }	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
     </style>
-    <link rel="stylesheet" href="theme.css?v=20260917c">
+    <link rel="stylesheet" href="theme.css?v=20260917c">	<!-- 外部ファイルを読み込む -->
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
-</head>
+</head>	<!-- 要素を閉じる -->
 
-<body data-page="admin">
+<body data-page="admin">	<!-- 画面要素を配置 -->
 
-    <header class="navbar">
-        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
+    <header class="navbar">	<!-- ヘッダーを配置 -->
+        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>	<!-- 画面要素を配置 -->
 
-        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
+        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">	<!-- 操作できる要素を配置 -->
+            <span></span>	<!-- 画面要素を配置 -->
+            <span></span>	<!-- 画面要素を配置 -->
+            <span></span>	<!-- 画面要素を配置 -->
+        </button>	<!-- 要素を閉じる -->
 
-        <nav class="nav-links" id="nav-links">
-            <a class="nav-item" href="main.html?guide=1">使い方</a>
-            <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>
-            <a class="nav-item" href="recruit.html">募集投稿</a>
-            <a class="nav-item" href="users.html">ユーザーを探す</a>
-            <a href="messages.html" class="nav-item">
-                メッセージ
-                <span id="unread-badge" class="unread-badge" style="display: none;">0</span>
-            </a>
-            <a href="profile.html" class="nav-item">マイページ</a>
-            <a href="ai-study.html" class="nav-item">AI学習相談</a>
-            <span class="nav-item active">管理者</span>
-            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>
-        </nav>
-    </header>
+        <nav class="nav-links" id="nav-links">	<!-- ナビゲーションを配置 -->
+            <a class="nav-item" href="main.html?guide=1">使い方</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="recruit.html">募集投稿</a>	<!-- 操作できる要素を配置 -->
+            <a class="nav-item" href="users.html">ユーザーを探す</a>	<!-- 操作できる要素を配置 -->
+            <a href="messages.html" class="nav-item">	<!-- 操作できる要素を配置 -->
+                メッセージ	<!-- 画面に表示する内容 -->
+                <span id="unread-badge" class="unread-badge" style="display: none;">0</span>	<!-- 画面要素を配置 -->
+            </a>	<!-- 要素を閉じる -->
+            <a href="profile.html" class="nav-item">マイページ</a>	<!-- 操作できる要素を配置 -->
+            <a href="ai-study.html" class="nav-item">AI学習相談</a>	<!-- 操作できる要素を配置 -->
+            <span class="nav-item active">管理者</span>	<!-- 画面要素を配置 -->
+            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>	<!-- 操作できる要素を配置 -->
+        </nav>	<!-- 要素を閉じる -->
+    </header>	<!-- 要素を閉じる -->
 
-    <main class="container">
-        <div class="page-title-bar">
-            <h1>🛡️ 管理者ダッシュボード</h1>
-            <div class="online-summary" aria-live="polite" title="90秒以内に操作した利用者を表示しています">
-                <span class="online-dot" aria-hidden="true"></span>
-                <span>オンライン</span>
-                <strong id="online-user-count">--</strong>
-                <span>人</span>
-            </div>
-            <button class="btn-reload" onclick="loadOverview()">データを更新</button>
-        </div>
+    <main class="container">	<!-- ページの主内容を配置 -->
+        <div class="page-title-bar">	<!-- 画面要素を配置 -->
+            <h1>🛡️ 管理者ダッシュボード</h1>	<!-- 画面要素を配置 -->
+            <div class="online-summary" aria-live="polite" title="90秒以内に操作した利用者を表示しています">	<!-- 画面要素を配置 -->
+                <span class="online-dot" aria-hidden="true"></span>	<!-- 画面要素を配置 -->
+                <span>オンライン</span>	<!-- 画面要素を配置 -->
+                <strong id="online-user-count">--</strong>	<!-- 画面要素を配置 -->
+                <span>人</span>	<!-- 画面要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+            <button class="btn-reload" onclick="loadOverview()">データを更新</button>	<!-- 操作できる要素を配置 -->
+        </div>	<!-- 要素を閉じる -->
 
-        <div class="dashboard-grid">
+        <div class="dashboard-grid">	<!-- 画面要素を配置 -->
 
-            <div class="panel">
-                <h2>👥 ユーザー管理一覧（IDクリックで代理ログイン）</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ユーザーID</th>
-                            <th>表示名</th>
-                            <th>ステータス</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="user-table-body">
-                        <tr><td colspan="4" style="text-align:center;">読み込み中...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-
-            <div class="panel">
-                <h2>📢 募集投稿一覧（強制削除）</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>投稿者</th>
-                            <th>内容</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="post-table-body">
-                        <tr><td colspan="3" style="text-align:center;">読み込み中...</td></tr>
-                    </tbody>
-                </table>
-            </div>
+            <div class="panel">	<!-- 画面要素を配置 -->
+                <h2>👥 ユーザー管理一覧（IDクリックで代理ログイン）</h2>	<!-- 画面要素を配置 -->
+                <table>	<!-- 画面要素を配置 -->
+                    <thead>	<!-- 画面要素を配置 -->
+                        <tr>	<!-- 画面要素を配置 -->
+                            <th>ユーザーID</th>	<!-- 画面要素を配置 -->
+                            <th>表示名</th>	<!-- 画面要素を配置 -->
+                            <th>ステータス</th>	<!-- 画面要素を配置 -->
+                            <th>操作</th>	<!-- 画面要素を配置 -->
+                        </tr>	<!-- 要素を閉じる -->
+                    </thead>	<!-- 要素を閉じる -->
+                    <tbody id="user-table-body">	<!-- 画面要素を配置 -->
+                        <tr><td colspan="4" style="text-align:center;">読み込み中...</td></tr>	<!-- 画面要素を配置 -->
+                    </tbody>	<!-- 要素を閉じる -->
+                </table>	<!-- 要素を閉じる -->
+            </div>	<!-- 要素を閉じる -->
 
 
-            <div class="panel">
-                <h2>🚨 通報一覧</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>日時</th>
-                            <th>対象</th>
-                            <th>理由</th>
-                            <th>内容</th>
-                            <th>対応</th>
-                        </tr>
-                    </thead>
-                    <tbody id="report-table-body">
-                        <tr><td colspan="5" style="text-align:center;">読み込み中...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </main>
+            <div class="panel">	<!-- 画面要素を配置 -->
+                <h2>📢 募集投稿一覧（強制削除）</h2>	<!-- 画面要素を配置 -->
+                <table>	<!-- 画面要素を配置 -->
+                    <thead>	<!-- 画面要素を配置 -->
+                        <tr>	<!-- 画面要素を配置 -->
+                            <th>投稿者</th>	<!-- 画面要素を配置 -->
+                            <th>内容</th>	<!-- 画面要素を配置 -->
+                            <th>操作</th>	<!-- 画面要素を配置 -->
+                        </tr>	<!-- 要素を閉じる -->
+                    </thead>	<!-- 要素を閉じる -->
+                    <tbody id="post-table-body">	<!-- 画面要素を配置 -->
+                        <tr><td colspan="3" style="text-align:center;">読み込み中...</td></tr>	<!-- 画面要素を配置 -->
+                    </tbody>	<!-- 要素を閉じる -->
+                </table>	<!-- 要素を閉じる -->
+            </div>	<!-- 要素を閉じる -->
 
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-links">
-                <a href="main.html">ホーム</a>
-                <a href="messages.html">メッセージ</a>
-                <a href="profile.html">マイページ</a>
-                <a href="terms.html">利用規約</a>
-                <a href="privacy.html">プライバシーポリシー</a>
-            </div>
-            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>
-        </div>
-    </footer>
+
+            <div class="panel">	<!-- 画面要素を配置 -->
+                <h2>🚨 通報一覧</h2>	<!-- 画面要素を配置 -->
+                <table>	<!-- 画面要素を配置 -->
+                    <thead>	<!-- 画面要素を配置 -->
+                        <tr>	<!-- 画面要素を配置 -->
+                            <th>日時</th>	<!-- 画面要素を配置 -->
+                            <th>対象</th>	<!-- 画面要素を配置 -->
+                            <th>理由</th>	<!-- 画面要素を配置 -->
+                            <th>内容</th>	<!-- 画面要素を配置 -->
+                            <th>対応</th>	<!-- 画面要素を配置 -->
+                        </tr>	<!-- 要素を閉じる -->
+                    </thead>	<!-- 要素を閉じる -->
+                    <tbody id="report-table-body">	<!-- 画面要素を配置 -->
+                        <tr><td colspan="5" style="text-align:center;">読み込み中...</td></tr>	<!-- 画面要素を配置 -->
+                    </tbody>	<!-- 要素を閉じる -->
+                </table>	<!-- 要素を閉じる -->
+            </div>	<!-- 要素を閉じる -->
+        </div>	<!-- 要素を閉じる -->
+    </main>	<!-- 要素を閉じる -->
+
+    <footer class="footer">	<!-- フッターを配置 -->
+        <div class="footer-container">	<!-- 画面要素を配置 -->
+            <div class="footer-links">	<!-- 画面要素を配置 -->
+                <a href="main.html">ホーム</a>	<!-- 操作できる要素を配置 -->
+                <a href="messages.html">メッセージ</a>	<!-- 操作できる要素を配置 -->
+                <a href="profile.html">マイページ</a>	<!-- 操作できる要素を配置 -->
+                <a href="terms.html">利用規約</a>	<!-- 操作できる要素を配置 -->
+                <a href="privacy.html">プライバシーポリシー</a>	<!-- 操作できる要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>	<!-- 画面要素を配置 -->
+        </div>	<!-- 要素を閉じる -->
+    </footer>	<!-- 要素を閉じる -->
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
-        const ADMIN_ID = "admin";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";	// GAS APIの接続先を設定
+        const ADMIN_ID = "admin";	// 定数を定義
 
-        const currentEmail = localStorage.getItem("userEmail");
-        const currentUserId = localStorage.getItem("userId") || currentEmail;
-        const isImpersonating = localStorage.getItem("isImpersonating");
-        const adminToken = localStorage.getItem("adminToken") || "";
-        let overviewLoading = false;
-        let unreadRequest = null;
-        let adminAccessDenied = false;
+        const currentEmail = localStorage.getItem("userEmail");	// 定数を定義
+        const currentUserId = localStorage.getItem("userId") || currentEmail;	// 定数を定義
+        const isImpersonating = localStorage.getItem("isImpersonating");	// 定数を定義
+        const adminToken = localStorage.getItem("adminToken") || "";	// 定数を定義
+        let overviewLoading = false;	// 状態を保持
+        let unreadRequest = null;	// 状態を保持
+        let adminAccessDenied = false;	// 状態を保持
 
-        async function postGas(payload, timeoutMs = 12000) {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify(payload),
-                    signal: controller.signal
-                });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                return await res.json();
-            } finally {
-                clearTimeout(timeoutId);
-            }
-        }
+        async function postGas(payload, timeoutMs = 12000) {	// 関数を定義
+            const controller = new AbortController();	// 定数を定義
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);	// 定数を定義
+            try {	// 失敗に備えて処理を始める
+                const res = await fetch(GAS_URL, {	// 定数を定義
+                    method: "POST",	// 処理を続ける
+                    body: JSON.stringify(payload),	// 処理を続ける
+                    signal: controller.signal	// 処理を続ける
+                });	// 処理を完了する
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);	// 条件に応じて処理を分ける
+                return await res.json();	// 結果を返す
+            } finally {	// 処理のまとまりを始める
+                clearTimeout(timeoutId);	// 処理を完了する
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        if (isImpersonating === "true") {
-            localStorage.setItem("userEmail", ADMIN_ID);
-            localStorage.setItem("userId", ADMIN_ID);
-            localStorage.setItem("userName", "管理者");
-            localStorage.removeItem("isImpersonating");
-        }
-        if ((currentUserId !== ADMIN_ID && currentEmail !== ADMIN_ID && isImpersonating !== "true") || !adminToken) {
-            adminAccessDenied = true;
-            alert("管理者権限が必要です。");
-            window.location.replace(currentEmail ? "main.html" : "index.html");
-        }
+        if (isImpersonating === "true") {	// 条件に応じて処理を分ける
+            localStorage.setItem("userEmail", ADMIN_ID);	// 端末内の保存情報を扱う
+            localStorage.setItem("userId", ADMIN_ID);	// 端末内の保存情報を扱う
+            localStorage.setItem("userName", "管理者");	// 端末内の保存情報を扱う
+            localStorage.removeItem("isImpersonating");	// 端末内の保存情報を扱う
+        }	// 処理のまとまりを閉じる
+        if ((currentUserId !== ADMIN_ID && currentEmail !== ADMIN_ID && isImpersonating !== "true") || !adminToken) {	// 条件に応じて処理を分ける
+            adminAccessDenied = true;	// 処理を続ける
+            alert("管理者権限が必要です。");	// 処理結果を知らせる
+            window.location.replace(currentEmail ? "main.html" : "index.html");	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
 
-        function toggleMenu() {
-            document.getElementById("hud-menu-btn").classList.toggle("open");
-            document.getElementById("nav-links").classList.toggle("open");
-        }
+        function toggleMenu() {	// 関数を定義
+            document.getElementById("hud-menu-btn").classList.toggle("open");	// 画面表示を更新する
+            document.getElementById("nav-links").classList.toggle("open");	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
 
-        async function updateUnreadBadge() {
-            const myEmail = localStorage.getItem("userEmail");
-            const badge = document.getElementById("unread-badge");
-            if (!myEmail || !badge || unreadRequest) return unreadRequest;
+        async function updateUnreadBadge() {	// 関数を定義
+            const myEmail = localStorage.getItem("userEmail");	// 定数を定義
+            const badge = document.getElementById("unread-badge");	// 定数を定義
+            if (!myEmail || !badge || unreadRequest) return unreadRequest;	// 条件に応じて処理を分ける
 
-            unreadRequest = (async () => {
-                try {
-                    const result = await postGas({ mode: "getUnreadCount", email: myEmail });
+            unreadRequest = (async () => {	// 処理のまとまりを始める
+                try {	// 失敗に備えて処理を始める
+                    const result = await postGas({ mode: "getUnreadCount", email: myEmail });	// 定数を定義
 
-                    if (result.status === "success" && result.message) {
-                        const count = result.message.unreadCount || 0;
-                        if (count > 0) {
-                            badge.innerText = count > 99 ? "99+" : count;
-                            badge.style.display = "inline-block";
-                        } else {
-                            badge.style.display = "none";
-                        }
-                    }
-                } catch (e) {
-                    console.error("未読チェックエラー:", e);
-                } finally {
-                    unreadRequest = null;
-                }
-            })();
+                    if (result.status === "success" && result.message) {	// 条件に応じて処理を分ける
+                        const count = result.message.unreadCount || 0;	// 定数を定義
+                        if (count > 0) {	// 条件に応じて処理を分ける
+                            badge.innerText = count > 99 ? "99+" : count;	// 処理を続ける
+                            badge.style.display = "inline-block";	// 処理を続ける
+                        } else {	// 処理のまとまりを始める
+                            badge.style.display = "none";	// 処理を続ける
+                        }	// 処理のまとまりを閉じる
+                    }	// 処理のまとまりを閉じる
+                } catch (e) {	// 処理のまとまりを始める
+                    console.error("未読チェックエラー:", e);	// 処理を完了する
+                } finally {	// 処理のまとまりを始める
+                    unreadRequest = null;	// 処理を続ける
+                }	// 処理のまとまりを閉じる
+            })();	// 処理を完了する
 
-            return unreadRequest;
-        }
+            return unreadRequest;	// 結果を返す
+        }	// 処理のまとまりを閉じる
 
-        async function loadOverview(silent = false) {
-            if (overviewLoading) return;
-            overviewLoading = true;
+        async function loadOverview(silent = false) {	// 関数を定義
+            if (overviewLoading) return;	// 条件に応じて処理を分ける
+            overviewLoading = true;	// 処理を続ける
 
-            const userBody = document.getElementById("user-table-body");
-            const postBody = document.getElementById("post-table-body");
+            const userBody = document.getElementById("user-table-body");	// 定数を定義
+            const postBody = document.getElementById("post-table-body");	// 定数を定義
 
-            if (!silent) {
-                userBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">読み込み中...</td></tr>`;
-                postBody.innerHTML = `<tr><td colspan="3" style="text-align:center;">読み込み中...</td></tr>`;
-            }
+            if (!silent) {	// 条件に応じて処理を分ける
+                userBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">読み込み中...</td></tr>`;	// 処理を続ける
+                postBody.innerHTML = `<tr><td colspan="3" style="text-align:center;">読み込み中...</td></tr>`;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
 
-            try {
-                const result = await postGas({ mode: "adminGetOverview", adminId: ADMIN_ID, adminToken: adminToken });
-                if (result.status === "success") {
-                    renderUsers(result.message.users);
-                    renderPosts(result.message.posts);
-                    updateOnlineCount(result.message.onlineCount);
-                    loadReports(silent);
-                } else if (!silent) {
-                    alert("取得失敗: " + result.message);
-                }
-            } catch (e) {
-                if (!silent) alert("通信エラーが発生しました");
-            } finally {
-                overviewLoading = false;
-            }
-        }
+            try {	// 失敗に備えて処理を始める
+                const result = await postGas({ mode: "adminGetOverview", adminId: ADMIN_ID, adminToken: adminToken });	// 定数を定義
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    renderUsers(result.message.users);	// 処理を完了する
+                    renderPosts(result.message.posts);	// 処理を完了する
+                    updateOnlineCount(result.message.onlineCount);	// 処理を完了する
+                    loadReports(silent);	// 処理を完了する
+                } else if (!silent) {	// 処理のまとまりを始める
+                    alert("取得失敗: " + result.message);	// 処理結果を知らせる
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                if (!silent) alert("通信エラーが発生しました");	// 条件に応じて処理を分ける
+            } finally {	// 処理のまとまりを始める
+                overviewLoading = false;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        function updateOnlineCount(count) {
-            const countEl = document.getElementById("online-user-count");
-            if (countEl) countEl.innerText = Number.isFinite(Number(count)) ? Number(count) : 0;
-        }
+        function updateOnlineCount(count) {	// 関数を定義
+            const countEl = document.getElementById("online-user-count");	// 定数を定義
+            if (countEl) countEl.innerText = Number.isFinite(Number(count)) ? Number(count) : 0;	// 条件に応じて処理を分ける
+        }	// 処理のまとまりを閉じる
 
-        function renderUsers(users) {
-            const userBody = document.getElementById("user-table-body");
-            userBody.innerHTML = "";
+        function renderUsers(users) {	// 関数を定義
+            const userBody = document.getElementById("user-table-body");	// 定数を定義
+            userBody.innerHTML = "";	// 処理を続ける
 
-            if (users.length === 0) {
-                userBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">ユーザーがいません</td></tr>`;
-                return;
-            }
+            if (users.length === 0) {	// 条件に応じて処理を分ける
+                userBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">ユーザーがいません</td></tr>`;	// 処理を続ける
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
 
-            users.forEach(u => {
-                const tr = document.createElement("tr");
-                const idCell = document.createElement("td");
-                const idButton = document.createElement("button");
-                idButton.type = "button";
-                idButton.style.cssText = "border:0;background:none;padding:0;color:#1cbdc5;cursor:pointer;text-decoration:underline;font:inherit;font-weight:700;";
-                idButton.title = "このユーザーとして代理ログインする";
-                idButton.textContent = `${u.userId} 🔗`;
-                idButton.addEventListener("click", () => impersonateUser(u.userId, u.name));
-                idCell.appendChild(idButton);
+            users.forEach(u => {	// 処理のまとまりを始める
+                const tr = document.createElement("tr");	// 定数を定義
+                const idCell = document.createElement("td");	// 定数を定義
+                const idButton = document.createElement("button");	// 定数を定義
+                idButton.type = "button";	// 処理を続ける
+                idButton.style.cssText = "border:0;background:none;padding:0;color:#1cbdc5;cursor:pointer;text-decoration:underline;font:inherit;font-weight:700;";	// 処理を続ける
+                idButton.title = "このユーザーとして代理ログインする";	// 処理を続ける
+                idButton.textContent = `${u.userId} 🔗`;	// 処理を続ける
+                idButton.addEventListener("click", () => impersonateUser(u.userId, u.name));	// 操作イベントを登録
+                idCell.appendChild(idButton);	// 処理を完了する
 
-                const nameCell = document.createElement("td");
-                nameCell.textContent = u.name;
+                const nameCell = document.createElement("td");	// 定数を定義
+                nameCell.textContent = u.name;	// 処理を続ける
 
-                const statusCell = document.createElement("td");
-                const statusBadge = document.createElement("span");
-                statusBadge.className = `status-badge ${u.isVerified ? "badge-active" : "badge-inactive"}`;
-                statusBadge.textContent = u.isVerified ? "正常" : "凍結/未認証";
-                statusCell.appendChild(statusBadge);
+                const statusCell = document.createElement("td");	// 定数を定義
+                const statusBadge = document.createElement("span");	// 定数を定義
+                statusBadge.className = `status-badge ${u.isVerified ? "badge-active" : "badge-inactive"}`;	// 処理を続ける
+                statusBadge.textContent = u.isVerified ? "正常" : "凍結/未認証";	// 処理を続ける
+                statusCell.appendChild(statusBadge);	// 処理を完了する
 
-                const actionCell = document.createElement("td");
-                if (u.userId === ADMIN_ID) {
-                    actionCell.textContent = "-";
-                } else {
-                    const actionButton = document.createElement("button");
-                    actionButton.className = u.isVerified ? "btn-action-ban" : "btn-action-unban";
-                    actionButton.textContent = u.isVerified ? "BAN (凍結)" : "BAN 解除";
-                    actionButton.addEventListener("click", () => toggleBanUser(u.userId, u.isVerified));
-                    actionCell.appendChild(actionButton);
-                }
+                const actionCell = document.createElement("td");	// 定数を定義
+                if (u.userId === ADMIN_ID) {	// 条件に応じて処理を分ける
+                    actionCell.textContent = "-";	// 処理を続ける
+                } else {	// 処理のまとまりを始める
+                    const actionButton = document.createElement("button");	// 定数を定義
+                    actionButton.className = u.isVerified ? "btn-action-ban" : "btn-action-unban";	// 処理を続ける
+                    actionButton.textContent = u.isVerified ? "BAN (凍結)" : "BAN 解除";	// 処理を続ける
+                    actionButton.addEventListener("click", () => toggleBanUser(u.userId, u.isVerified));	// 操作イベントを登録
+                    actionCell.appendChild(actionButton);	// 処理を完了する
+                }	// 処理のまとまりを閉じる
 
-                tr.append(idCell, nameCell, statusCell, actionCell);
-                userBody.appendChild(tr);
-            });
-        }
+                tr.append(idCell, nameCell, statusCell, actionCell);	// 処理を完了する
+                userBody.appendChild(tr);	// 処理を完了する
+            });	// 処理を完了する
+        }	// 処理のまとまりを閉じる
 
-        async function impersonateUser(targetUserId, targetUserName) {
-            if (!confirm(`ユーザー [ ${targetUserId} (${targetUserName}) ] として代理ログインしますか？`)) return;
+        async function impersonateUser(targetUserId, targetUserName) {	// 関数を定義
+            if (!confirm(`ユーザー [ ${targetUserId} (${targetUserName}) ] として代理ログインしますか？`)) return;	// 条件に応じて処理を分ける
 
-            try {
-                const result = await postGas({ mode: "getUserProfile", userId: targetUserId });
-                if (result.status !== "success" || !result.message) {
-                    alert("ユーザー情報を取得できませんでした。");
-                    return;
-                }
+            try {	// 失敗に備えて処理を始める
+                const result = await postGas({ mode: "getUserProfile", userId: targetUserId });	// 定数を定義
+                if (result.status !== "success" || !result.message) {	// 条件に応じて処理を分ける
+                    alert("ユーザー情報を取得できませんでした。");	// 処理結果を知らせる
+                    return;	// 結果を返す
+                }	// 処理のまとまりを閉じる
 
-                const profile = result.message;
-                localStorage.setItem("userEmail", targetUserId);
-                localStorage.setItem("userId", targetUserId);
-                localStorage.setItem("userName", String(profile.name || targetUserName || targetUserId));
-                localStorage.setItem("profileImage", String(profile.profileImage || ""));
-                localStorage.setItem("isImpersonating", "true");
-                window.location.href = "main.html";
-            } catch (error) {
-                alert("ユーザー情報の取得中に通信エラーが発生しました。");
-            }
-        }
+                const profile = result.message;	// 定数を定義
+                localStorage.setItem("userEmail", targetUserId);	// 端末内の保存情報を扱う
+                localStorage.setItem("userId", targetUserId);	// 端末内の保存情報を扱う
+                localStorage.setItem("userName", String(profile.name || targetUserName || targetUserId));	// 端末内の保存情報を扱う
+                localStorage.setItem("profileImage", String(profile.profileImage || ""));	// 端末内の保存情報を扱う
+                localStorage.setItem("isImpersonating", "true");	// 端末内の保存情報を扱う
+                window.location.href = "main.html";	// 画面表示を更新する
+            } catch (error) {	// 処理のまとまりを始める
+                alert("ユーザー情報の取得中に通信エラーが発生しました。");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        function renderPosts(posts) {
-            const postBody = document.getElementById("post-table-body");
-            postBody.innerHTML = "";
+        function renderPosts(posts) {	// 関数を定義
+            const postBody = document.getElementById("post-table-body");	// 定数を定義
+            postBody.innerHTML = "";	// 処理を続ける
 
-            if (posts.length === 0) {
-                postBody.innerHTML = `<tr><td colspan="3" style="text-align:center;">募集はありません</td></tr>`;
-                return;
-            }
+            if (posts.length === 0) {	// 条件に応じて処理を分ける
+                postBody.innerHTML = `<tr><td colspan="3" style="text-align:center;">募集はありません</td></tr>`;	// 処理を続ける
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
 
-            posts.forEach(p => {
-                const tr = document.createElement("tr");
-                const userCell = document.createElement("td");
-                const name = document.createElement("strong");
-                name.textContent = p.name;
-                const email = document.createElement("small");
-                email.style.color = "#64748b";
-                email.textContent = p.email;
-                userCell.append(name, document.createElement("br"), email);
+            posts.forEach(p => {	// 処理のまとまりを始める
+                const tr = document.createElement("tr");	// 定数を定義
+                const userCell = document.createElement("td");	// 定数を定義
+                const name = document.createElement("strong");	// 定数を定義
+                name.textContent = p.name;	// 処理を続ける
+                const email = document.createElement("small");	// 定数を定義
+                email.style.color = "#64748b";	// 処理を続ける
+                email.textContent = p.email;	// 処理を続ける
+                userCell.append(name, document.createElement("br"), email);	// 処理を完了する
 
-                const contentCell = document.createElement("td");
-                contentCell.textContent = p.content;
+                const contentCell = document.createElement("td");	// 定数を定義
+                contentCell.textContent = p.content;	// 処理を続ける
 
-                const actionCell = document.createElement("td");
-                const deleteButton = document.createElement("button");
-                deleteButton.className = "btn-action-delete";
-                deleteButton.textContent = "強制削除";
-                deleteButton.addEventListener("click", () => deletePost(p.email));
-                actionCell.appendChild(deleteButton);
+                const actionCell = document.createElement("td");	// 定数を定義
+                const deleteButton = document.createElement("button");	// 定数を定義
+                deleteButton.className = "btn-action-delete";	// 処理を続ける
+                deleteButton.textContent = "強制削除";	// 処理を続ける
+                deleteButton.addEventListener("click", () => deletePost(p.email));	// 操作イベントを登録
+                actionCell.appendChild(deleteButton);	// 処理を完了する
 
-                tr.append(userCell, contentCell, actionCell);
-                postBody.appendChild(tr);
-            });
-        }
+                tr.append(userCell, contentCell, actionCell);	// 処理を完了する
+                postBody.appendChild(tr);	// 処理を完了する
+            });	// 処理を完了する
+        }	// 処理のまとまりを閉じる
 
-        function escapeHtml(value) {
-            return String(value ?? "")
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
+        function escapeHtml(value) {	// 関数を定義
+            return String(value ?? "")	// 結果を返す
+                .replace(/&/g, "&amp;")	// 処理を続ける
+                .replace(/</g, "&lt;")	// 処理を続ける
+                .replace(/>/g, "&gt;")	// 処理を続ける
+                .replace(/"/g, "&quot;")	// 処理を続ける
+                .replace(/'/g, "&#039;");	// 処理を完了する
+        }	// 処理のまとまりを閉じる
 
-        async function loadReports(silent = false) {
-            const body = document.getElementById("report-table-body");
-            if (!body) return;
+        async function loadReports(silent = false) {	// 関数を定義
+            const body = document.getElementById("report-table-body");	// 定数を定義
+            if (!body) return;	// 条件に応じて処理を分ける
 
-            if (!silent) {
-                body.innerHTML = `<tr><td colspan="5" style="text-align:center;">読み込み中...</td></tr>`;
-            }
+            if (!silent) {	// 条件に応じて処理を分ける
+                body.innerHTML = `<tr><td colspan="5" style="text-align:center;">読み込み中...</td></tr>`;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
 
-            try {
-                const result = await postGas({ mode: "getReports", adminId: ADMIN_ID, adminToken: adminToken });
+            try {	// 失敗に備えて処理を始める
+                const result = await postGas({ mode: "getReports", adminId: ADMIN_ID, adminToken: adminToken });	// 定数を定義
 
-                if (result.status === "success") {
-                    renderReports(result.message);
-                } else {
-                    body.innerHTML = `<tr><td colspan="5" style="text-align:center;">取得失敗</td></tr>`;
-                }
-            } catch (e) {
-                body.innerHTML = `<tr><td colspan="5" style="text-align:center;">通信エラー</td></tr>`;
-            }
-        }
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    renderReports(result.message);	// 処理を完了する
+                } else {	// 処理のまとまりを始める
+                    body.innerHTML = `<tr><td colspan="5" style="text-align:center;">取得失敗</td></tr>`;	// 処理を続ける
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                body.innerHTML = `<tr><td colspan="5" style="text-align:center;">通信エラー</td></tr>`;	// 処理を続ける
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        function renderReports(reports) {
-            const body = document.getElementById("report-table-body");
-            body.innerHTML = "";
+        function renderReports(reports) {	// 関数を定義
+            const body = document.getElementById("report-table-body");	// 定数を定義
+            body.innerHTML = "";	// 処理を続ける
 
-            if (!reports || reports.length === 0) {
-                body.innerHTML = `<tr><td colspan="5" style="text-align:center;">通報はありません</td></tr>`;
-                return;
-            }
+            if (!reports || reports.length === 0) {	// 条件に応じて処理を分ける
+                body.innerHTML = `<tr><td colspan="5" style="text-align:center;">通報はありません</td></tr>`;	// 処理を続ける
+                return;	// 結果を返す
+            }	// 処理のまとまりを閉じる
 
-            reports.slice().reverse().forEach(report => {
-                const tr = document.createElement("tr");
-                const statuses = ["未対応", "確認中", "対応済み", "却下"];
-                const statusOptions = statuses.map(status =>
-                    `<option value="${status}" ${report.status === status ? "selected" : ""}>${status}</option>`
-                ).join("");
+            reports.slice().reverse().forEach(report => {	// 処理のまとまりを始める
+                const tr = document.createElement("tr");	// 定数を定義
+                const statuses = ["未対応", "確認中", "対応済み", "却下"];	// 定数を定義
+                const statusOptions = statuses.map(status =>	// 定数を定義
+                    `<option value="${status}" ${report.status === status ? "selected" : ""}>${status}</option>`	// 処理を続ける
+                ).join("");	// 処理を完了する
 
                 tr.innerHTML = `
                     <td>${escapeHtml(report.reportedAt)}</td>
@@ -738,90 +738,90 @@
                     </td>
                 `;
 
-                body.appendChild(tr);
-            });
-        }
+                body.appendChild(tr);	// 処理を完了する
+            });	// 処理を完了する
+        }	// 処理のまとまりを閉じる
 
-        async function updateReportStatus(reportId, status) {
-            const adminMemo = prompt("管理者メモを入力してください（任意）") || "";
+        async function updateReportStatus(reportId, status) {	// 関数を定義
+            const adminMemo = prompt("管理者メモを入力してください（任意）") || "";	// 定数を定義
 
-            try {
-                const result = await postGas({
-                    mode: "updateReportStatus",
-                    adminId: ADMIN_ID,
-                    adminToken: adminToken,
-                    reportId: reportId,
-                    status: status,
-                    adminMemo: adminMemo
-                });
+            try {	// 失敗に備えて処理を始める
+                const result = await postGas({	// 定数を定義
+                    mode: "updateReportStatus",	// 処理を続ける
+                    adminId: ADMIN_ID,	// 処理を続ける
+                    adminToken: adminToken,	// 処理を続ける
+                    reportId: reportId,	// 処理を続ける
+                    status: status,	// 処理を続ける
+                    adminMemo: adminMemo	// 処理を続ける
+                });	// 処理を完了する
 
-                if (result.status === "success") {
-                    loadReports();
-                } else {
-                    alert("通報の更新に失敗しました: " + result.message);
-                }
-            } catch (e) {
-                alert("通信エラーが発生しました。");
-            }
-        }
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    loadReports();	// 処理を完了する
+                } else {	// 処理のまとまりを始める
+                    alert("通報の更新に失敗しました: " + result.message);	// 処理結果を知らせる
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                alert("通信エラーが発生しました。");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        async function deletePost(targetEmail) {
-            if (!confirm("この投稿を強制削除しますか？")) return;
+        async function deletePost(targetEmail) {	// 関数を定義
+            if (!confirm("この投稿を強制削除しますか？")) return;	// 条件に応じて処理を分ける
 
-            try {
-                const result = await postGas({ mode: "adminDeletePost", adminId: ADMIN_ID, adminToken: adminToken, targetEmail: targetEmail });
-                if (result.status === "success") {
-                    alert("投稿を削除しました");
-                    loadOverview();
-                } else {
-                    alert("削除失敗: " + result.message);
-                }
-            } catch (e) {
-                alert("通信エラーが発生しました");
-            }
-        }
+            try {	// 失敗に備えて処理を始める
+                const result = await postGas({ mode: "adminDeletePost", adminId: ADMIN_ID, adminToken: adminToken, targetEmail: targetEmail });	// 定数を定義
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    alert("投稿を削除しました");	// 処理結果を知らせる
+                    loadOverview();	// 処理を完了する
+                } else {	// 処理のまとまりを始める
+                    alert("削除失敗: " + result.message);	// 処理結果を知らせる
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                alert("通信エラーが発生しました");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        async function toggleBanUser(targetUserId, isCurrentVerified) {
-            const actionName = isCurrentVerified ? "凍結（BAN）" : "BAN解除";
-            const confirmMsg = isCurrentVerified
-                ? `ユーザー [ ${targetUserId} ] を凍結（BAN）しますか？\n※ログイン不可になり、該当ユーザーの募集も削除されます。`
-                : `ユーザー [ ${targetUserId} ] のBANを解除しますか？\n※正常にログインできるようになります。`;
+        async function toggleBanUser(targetUserId, isCurrentVerified) {	// 関数を定義
+            const actionName = isCurrentVerified ? "凍結（BAN）" : "BAN解除";	// 定数を定義
+            const confirmMsg = isCurrentVerified	// 定数を定義
+                ? `ユーザー [ ${targetUserId} ] を凍結（BAN）しますか？\n※ログイン不可になり、該当ユーザーの募集も削除されます。`	// 処理を続ける
+                : `ユーザー [ ${targetUserId} ] のBANを解除しますか？\n※正常にログインできるようになります。`;	// 処理を続ける
 
-            if (!confirm(confirmMsg)) return;
+            if (!confirm(confirmMsg)) return;	// 条件に応じて処理を分ける
 
-            try {
-                const result = await postGas({ mode: "adminBanUser", adminId: ADMIN_ID, adminToken: adminToken, targetUserId: targetUserId });
-                if (result.status === "success") {
-                    alert(`ユーザーの${actionName}が完了しました`);
-                    loadOverview();
-                } else {
-                    alert("処理失敗: " + result.message);
-                }
-            } catch (e) {
-                alert("通信エラーが発生しました");
-            }
-        }
+            try {	// 失敗に備えて処理を始める
+                const result = await postGas({ mode: "adminBanUser", adminId: ADMIN_ID, adminToken: adminToken, targetUserId: targetUserId });	// 定数を定義
+                if (result.status === "success") {	// 条件に応じて処理を分ける
+                    alert(`ユーザーの${actionName}が完了しました`);	// 処理結果を知らせる
+                    loadOverview();	// 処理を完了する
+                } else {	// 処理のまとまりを始める
+                    alert("処理失敗: " + result.message);	// 処理結果を知らせる
+                }	// 処理のまとまりを閉じる
+            } catch (e) {	// 処理のまとまりを始める
+                alert("通信エラーが発生しました");	// 処理結果を知らせる
+            }	// 処理のまとまりを閉じる
+        }	// 処理のまとまりを閉じる
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = "index.html";
-        }
+        function logout() {	// 関数を定義
+            localStorage.clear();	// 端末内の保存情報を扱う
+            window.location.href = "index.html";	// 画面表示を更新する
+        }	// 処理のまとまりを閉じる
 
-        window.onload = () => {
-            if (adminAccessDenied) return;
-            document.getElementById("hud-menu-btn").classList.remove("open");
-            document.getElementById("nav-links").classList.remove("open");
+        window.onload = () => {	// 処理のまとまりを始める
+            if (adminAccessDenied) return;	// 条件に応じて処理を分ける
+            document.getElementById("hud-menu-btn").classList.remove("open");	// 画面表示を更新する
+            document.getElementById("nav-links").classList.remove("open");	// 画面表示を更新する
 
-            loadOverview();
-            updateUnreadBadge();
-            setInterval(() => {
-                if (document.visibilityState === "visible") updateUnreadBadge();
-            }, 8000);
-            setInterval(() => {
-                if (document.visibilityState === "visible") loadOverview(true);
-            }, 20000);
-        };
+            loadOverview();	// 処理を完了する
+            updateUnreadBadge();	// 処理を完了する
+            setInterval(() => {	// 時間を置いて処理する
+                if (document.visibilityState === "visible") updateUnreadBadge();	// 条件に応じて処理を分ける
+            }, 8000);	// 処理を完了する
+            setInterval(() => {	// 時間を置いて処理する
+                if (document.visibilityState === "visible") loadOverview(true);	// 条件に応じて処理を分ける
+            }, 20000);	// 処理を完了する
+        };	// 処理のまとまりを閉じる
     </script>
-</body>
+</body>	<!-- 要素を閉じる -->
 
-</html>
+</html>	<!-- 要素を閉じる -->

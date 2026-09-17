@@ -1,108 +1,109 @@
-<!DOCTYPE html>
-<html lang="ja">
+<!DOCTYPE html>	<!-- HTML文書として宣言 -->
+<html lang="ja">	<!-- 画面要素を配置 -->
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ユーザーを探す - 平工マッチング</title>
-    <link rel="icon" href="icon-192.png">
-    <link rel="stylesheet" href="theme.css?v=20260917c">
+<head>	<!-- 画面要素を配置 -->
+    <meta charset="UTF-8">	<!-- 表示環境を設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">	<!-- 表示環境を設定 -->
+    <title>ユーザーを探す - 平工マッチング</title>	<!-- ページタイトルを設定 -->
+    <link rel="icon" href="icon-192.png">	<!-- 外部ファイルを読み込む -->
+    <link rel="stylesheet" href="theme.css?v=20260917c">	<!-- 外部ファイルを読み込む -->
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
     <style>
-        .split-page { max-width:1120px; margin:0 auto; padding:46px 24px 80px; }
-        .split-hero, .search-panel { background:var(--ui-paper); border:1px solid var(--ui-line); border-radius:20px; box-shadow:0 12px 30px rgba(36,60,50,.06); }
-        .split-hero { padding:30px; margin-bottom:22px; background:linear-gradient(135deg,var(--ui-green),#47755b); color:#fff; }
-        .split-hero p { margin:0 0 8px; font-size:11px; letter-spacing:.18em; font-weight:800; opacity:.8; }
-        .split-hero h1 { margin:0; font-size:clamp(28px,4vw,44px); line-height:1.2; letter-spacing:-.06em; }
-        .split-hero small { display:block; margin-top:14px; color:rgba(255,255,255,.8); }
-        .search-panel { padding:22px; margin-bottom:20px; }
-        .search-row { display:flex; gap:10px; align-items:center; }
-        .search-row input { flex:1; min-height:48px; padding:10px 14px; }
-        .search-row button { min-height:48px; padding:0 16px; border:1px solid var(--ui-line); border-radius:10px; background:var(--ui-paper); color:var(--ui-green); font-weight:700; cursor:pointer; }
-        .user-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
-        .post-card { background:var(--ui-paper); border:1px solid var(--ui-line); border-radius:16px; padding:22px; box-shadow:0 10px 24px rgba(36,60,50,.05); }
-        .post-card h2 { margin:12px 0 8px; font-size:20px; letter-spacing:-.04em; }
-        .post-card p { color:var(--ui-muted); white-space:pre-wrap; overflow-wrap:anywhere; }
-        .post-meta { display:flex; justify-content:space-between; gap:8px; color:var(--ui-muted); font-size:12px; }
-        .countdown-badge { padding:5px 8px; background:#f5eee0; color:#82612c; border-radius:5px; font-size:11px; font-variant-numeric:tabular-nums; white-space:nowrap; }
-        .tag-list { display:flex; flex-wrap:wrap; gap:6px; margin:12px 0; }
-        .tag { border:0; padding:5px 9px; border-radius:99px; background:var(--ui-soft); color:var(--ui-green); font-size:11px; cursor:pointer; }
-        .quick-reaction-row, .card-actions { display:flex; flex-wrap:wrap; gap:7px; margin-top:14px; }
-        .quick-reaction-row button, .card-actions button { padding:8px 10px; border:1px solid var(--ui-line); border-radius:8px; background:var(--ui-paper); color:var(--ui-green); font-size:11px; cursor:pointer; }
-        .card-actions .primary { flex:1; background:var(--ui-green); color:#fff; border-color:var(--ui-green); }
-        .card-actions .danger { color:var(--ui-danger); }
-        .empty { padding:50px 10px; text-align:center; color:var(--ui-muted); }
-        .users-layout { display:grid; grid-template-columns:240px minmax(0,1fr); gap:22px; align-items:start; }
-        .users-sidebar { display:flex; flex-direction:column; gap:16px; position:sticky; top:104px; }
-        .profile-card { display:flex; flex-direction:column; align-items:center; gap:10px; padding:24px 18px; border-radius:18px; background:var(--ui-green); color:#fff; text-decoration:none; }
-        .profile-card img { width:84px; height:84px; border-radius:50%; object-fit:cover; border:3px solid var(--ui-paper); background:var(--ui-paper); }
-        .profile-card strong { font-size:16px; overflow-wrap:anywhere; text-align:center; }
-        .my-post-card { padding:18px; border:1px solid var(--ui-line); border-radius:16px; background:var(--ui-paper); box-shadow:0 10px 24px rgba(36,60,50,.05); }
-        .my-post-card h2 { margin:0 0 10px; font-size:14px; }
-        .my-post-card p { margin:7px 0; color:var(--ui-muted); font-size:12px; white-space:pre-wrap; overflow-wrap:anywhere; }
-        .my-post-meta { color:var(--ui-muted); font-size:11px; }
-        .toast-notification { position:fixed; right:22px; bottom:22px; z-index:200; display:flex; gap:12px; align-items:flex-start; width:min(360px,calc(100vw - 28px)); padding:14px; border:1px solid var(--ui-line); border-radius:14px; background:var(--ui-paper); box-shadow:0 12px 32px rgba(36,60,50,.16); cursor:pointer; opacity:0; pointer-events:none; transform:translateY(12px); transition:opacity .2s,transform .2s; }
-        .toast-notification.show { opacity:1; pointer-events:auto; transform:translateY(0); }
-        .toast-icon { display:grid; place-items:center; width:34px; height:34px; border-radius:10px; background:var(--ui-green); color:#fff; }
-        .toast-title { color:var(--ui-green); font-weight:800; font-size:12px; }
-        .toast-sender { font-weight:800; font-size:13px; }
-        .toast-text { color:var(--ui-muted); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .impersonate-bar { display:none; padding:10px; background:#fef08a; border-bottom:1px solid #fde047; color:#854d0e; text-align:center; font-size:13px; font-weight:700; }
-        .impersonate-bar button { margin-left:10px; padding:6px 10px; border:0; border-radius:7px; background:#854d0e; color:#fff; font-size:12px; font-weight:700; cursor:pointer; }
-        @media(max-width:760px){.split-page{padding:28px 14px 60px}.search-row{align-items:stretch;flex-direction:column}.user-grid{grid-template-columns:1fr}.post-meta{align-items:flex-start;flex-direction:column}.users-layout{grid-template-columns:1fr}.users-sidebar{position:static;display:grid;grid-template-columns:1fr 1fr}.profile-card{grid-row:span 2}.my-post-card{min-width:0}}
+        .split-page { max-width:1120px; margin:0 auto; padding:46px 24px 80px; }	/* 見た目の設定を指定 */
+        .split-hero, .search-panel { background:var(--ui-paper); border:1px solid var(--ui-line); border-radius:20px; box-shadow:0 12px 30px rgba(36,60,50,.06); }	/* 見た目の設定を指定 */
+        .split-hero { padding:30px; margin-bottom:22px; background:linear-gradient(135deg,var(--ui-green),#47755b); color:#fff; }	/* 見た目の設定を指定 */
+        .split-hero p { margin:0 0 8px; font-size:11px; letter-spacing:.18em; font-weight:800; opacity:.8; }	/* 見た目の設定を指定 */
+        .split-hero h1 { margin:0; font-size:clamp(28px,4vw,44px); line-height:1.2; letter-spacing:-.06em; }	/* 見た目の設定を指定 */
+        .split-hero small { display:block; margin-top:14px; color:rgba(255,255,255,.8); }	/* 見た目の設定を指定 */
+        .search-panel { padding:22px; margin-bottom:20px; }	/* 見た目の設定を指定 */
+        .search-row { display:flex; gap:10px; align-items:center; }	/* 見た目の設定を指定 */
+        .search-row input { flex:1; min-height:48px; padding:10px 14px; }	/* 見た目の設定を指定 */
+        .search-row button { min-height:48px; padding:0 16px; border:1px solid var(--ui-line); border-radius:10px; background:var(--ui-paper); color:var(--ui-green); font-weight:700; cursor:pointer; }	/* 見た目の設定を指定 */
+        .user-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }	/* 見た目の設定を指定 */
+        .post-card { background:var(--ui-paper); border:1px solid var(--ui-line); border-radius:16px; padding:22px; box-shadow:0 10px 24px rgba(36,60,50,.05); }	/* 見た目の設定を指定 */
+        .post-card h2 { margin:12px 0 8px; font-size:20px; letter-spacing:-.04em; }	/* 見た目の設定を指定 */
+        .post-card p { color:var(--ui-muted); white-space:pre-wrap; overflow-wrap:anywhere; }	/* 見た目の設定を指定 */
+        .post-meta { display:flex; justify-content:space-between; gap:8px; color:var(--ui-muted); font-size:12px; }	/* 見た目の設定を指定 */
+        .countdown-badge { padding:5px 8px; background:#f5eee0; color:#82612c; border-radius:5px; font-size:11px; font-variant-numeric:tabular-nums; white-space:nowrap; }	/* 見た目の設定を指定 */
+        .tag-list { display:flex; flex-wrap:wrap; gap:6px; margin:12px 0; }	/* 見た目の設定を指定 */
+        .tag { border:0; padding:5px 9px; border-radius:99px; background:var(--ui-soft); color:var(--ui-green); font-size:11px; cursor:pointer; }	/* 見た目の設定を指定 */
+        .quick-reaction-row, .card-actions { display:flex; flex-wrap:wrap; gap:7px; margin-top:14px; }	/* 見た目の設定を指定 */
+        .quick-reaction-row button, .card-actions button { padding:8px 10px; border:1px solid var(--ui-line); border-radius:8px; background:var(--ui-paper); color:var(--ui-green); font-size:11px; cursor:pointer; }	/* 見た目の設定を指定 */
+        .card-actions .primary { flex:1; background:var(--ui-green); color:#fff; border-color:var(--ui-green); }	/* 見た目の設定を指定 */
+        .card-actions .danger { color:var(--ui-danger); }	/* 見た目の設定を指定 */
+        .empty { padding:50px 10px; text-align:center; color:var(--ui-muted); }	/* 見た目の設定を指定 */
+        .users-layout { display:grid; grid-template-columns:240px minmax(0,1fr); gap:22px; align-items:start; }	/* 見た目の設定を指定 */
+        .users-sidebar { display:flex; flex-direction:column; gap:16px; position:sticky; top:104px; }	/* 見た目の設定を指定 */
+        .profile-card { display:flex; flex-direction:column; align-items:center; gap:10px; padding:24px 18px; border-radius:18px; background:linear-gradient(135deg,var(--ui-green),#47755b); color:#fff; text-decoration:none; box-shadow:0 12px 30px rgba(36,60,50,.12); }	/* 見た目の設定を指定 */
+        .profile-card img { width:84px; height:84px; border-radius:50%; object-fit:cover; border:3px solid var(--ui-paper); background:var(--ui-paper); }	/* 見た目の設定を指定 */
+        .profile-card strong { display:block; max-width:100%; font-size:16px; line-height:1.35; overflow-wrap:anywhere; text-align:center; color:#fff; }	/* 見た目の設定を指定 */
+        .my-post-card { padding:18px; border:1px solid var(--ui-line); border-radius:16px; background:var(--ui-paper); box-shadow:0 10px 24px rgba(36,60,50,.05); }	/* 見た目の設定を指定 */
+        .my-post-card h2 { margin:0 0 10px; font-size:14px; }	/* 見た目の設定を指定 */
+        .my-post-card p { margin:7px 0; color:var(--ui-muted); font-size:12px; white-space:pre-wrap; overflow-wrap:anywhere; }	/* 見た目の設定を指定 */
+        .my-post-meta { color:var(--ui-muted); font-size:11px; }	/* 見た目の設定を指定 */
+        .toast-notification { position:fixed; right:22px; bottom:22px; z-index:200; display:flex; gap:12px; align-items:flex-start; width:min(360px,calc(100vw - 28px)); padding:14px; border:1px solid var(--ui-line); border-radius:14px; background:var(--ui-paper); box-shadow:0 12px 32px rgba(36,60,50,.16); cursor:pointer; opacity:0; pointer-events:none; transform:translateY(12px); transition:opacity .2s,transform .2s; }	/* 見た目の設定を指定 */
+        .toast-notification.show { opacity:1; pointer-events:auto; transform:translateY(0); }	/* 見た目の設定を指定 */
+        .toast-icon { display:grid; place-items:center; width:34px; height:34px; border-radius:10px; background:var(--ui-green); color:#fff; }	/* 見た目の設定を指定 */
+        .toast-title { color:var(--ui-green); font-weight:800; font-size:12px; }	/* 見た目の設定を指定 */
+        .toast-sender { font-weight:800; font-size:13px; }	/* 見た目の設定を指定 */
+        .toast-text { color:var(--ui-muted); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }	/* 見た目の設定を指定 */
+        .impersonate-bar { display:none; padding:10px; background:#fef08a; border-bottom:1px solid #fde047; color:#854d0e; text-align:center; font-size:13px; font-weight:700; }	/* 見た目の設定を指定 */
+        .impersonate-bar button { margin-left:10px; padding:6px 10px; border:0; border-radius:7px; background:#854d0e; color:#fff; font-size:12px; font-weight:700; cursor:pointer; }	/* 見た目の設定を指定 */
+        @media(max-width:760px){.split-page{padding:28px 14px 60px}.search-row{align-items:stretch;flex-direction:column}.user-grid{grid-template-columns:1fr}.post-meta{align-items:flex-start;flex-direction:column}.users-layout{grid-template-columns:1fr}.users-sidebar{position:static;display:grid;grid-template-columns:1fr 1fr}.profile-card{grid-row:span 2}.my-post-card{min-width:0}}	/* 表示条件を設定 */
     </style>
-</head>
+</head>	<!-- 要素を閉じる -->
 
-<body data-page="users">
-    <div id="impersonate-bar" class="impersonate-bar">⚠️ 現在 <span id="impersonate-user-id"></span> として代理ログイン中です。<button type="button" onclick="exitImpersonation()">管理者ダッシュボードに戻る</button></div>
-    <div id="toast-notification" class="toast-notification" onclick="clickToast()"><div class="toast-icon">💬</div><div><div class="toast-title">新着メッセージ</div><div class="toast-sender" id="toast-sender-name">ユーザー</div><div class="toast-text" id="toast-text-body">メッセージが届きました</div></div></div>
-    <header class="navbar">
-        <div class="logo" onclick="location.href='users.html'">平工マッチング</div>
-        <button class="hamburger-btn" id="hud-menu-btn" type="button" onclick="toggleMenu()" aria-label="メニューを開く"><span></span><span></span><span></span></button>
-        <nav class="nav-links" id="nav-links">
-            <a class="nav-item" href="main.html?guide=1">使い方</a><a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a><a class="nav-item" href="recruit.html">募集投稿</a><a class="nav-item active" href="users.html">ユーザーを探す</a><a class="nav-item" href="messages.html">メッセージ <span id="unread-badge" class="unread-badge" style="display:none;">0</span></a><a class="nav-item" href="profile.html">マイページ</a><a class="nav-item" href="ai-study.html">AI学習相談</a><a class="nav-item" id="nav-admin-btn" style="display:none;color:#a84738;" href="admin.html">管理者</a><button type="button" class="btn-logout" onclick="logout();return false;">ログアウト</button>
-        </nav>
-    </header>
-    <main class="split-page">
-        <section class="split-hero"><p>FIND STUDY PARTNERS</p><h1>一緒に勉強できる人を探す。</h1><small>気になる募集を見つけたら、リアクションやチャットで相談を始められます。</small></section>
-        <div class="users-layout">
-            <aside class="users-sidebar">
-                <a class="profile-card" href="profile.html"><img id="profile-icon" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="プロフィール画像"><strong id="mypage-text">マイページ</strong><span style="font-size:11px;opacity:.75;">プロフィールを編集</span></a>
-                <section class="my-post-card"><h2>あなたの現在の募集</h2><div id="my-post-content" class="my-post-meta">読み込み中...</div></section>
-            </aside>
-            <div class="users-main">
-                <section class="search-panel"><div class="search-row"><input id="search-input" type="search" placeholder="教科・学科・内容・タグで検索"><button type="button" onclick="loadPosts()">更新</button></div></section>
-                <section id="user-list" class="user-grid"><div class="empty">募集を読み込み中...</div></section>
-            </div>
-        </div>
-    </main>
-    <footer class="footer"><div class="footer-container"><div class="footer-links"><a href="recruit.html">募集投稿</a><a href="users.html">ユーザーを探す</a><a href="messages.html">メッセージ</a><a href="profile.html">マイページ</a><a href="terms.html">利用規約</a><a href="privacy.html">プライバシーポリシー</a></div><p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p></div></footer>
+<body data-page="users">	<!-- 画面要素を配置 -->
+    <div id="impersonate-bar" class="impersonate-bar">⚠️ 現在 <span id="impersonate-user-id"></span> として代理ログイン中です。<button type="button" onclick="exitImpersonation()">管理者ダッシュボードに戻る</button></div>	<!-- 画面要素を配置 -->
+    <div id="toast-notification" class="toast-notification" onclick="clickToast()"><div class="toast-icon">💬</div><div><div class="toast-title">新着メッセージ</div><div class="toast-sender" id="toast-sender-name">ユーザー</div><div class="toast-text" id="toast-text-body">メッセージが届きました</div></div></div>	<!-- 画面要素を配置 -->
+    <header class="navbar">	<!-- ヘッダーを配置 -->
+        <div class="logo" onclick="location.href='users.html'">平工マッチング</div>	<!-- 画面要素を配置 -->
+        <button class="hamburger-btn" id="hud-menu-btn" type="button" onclick="toggleMenu()" aria-label="メニューを開く"><span></span><span></span><span></span></button>	<!-- 操作できる要素を配置 -->
+        <nav class="nav-links" id="nav-links">	<!-- ナビゲーションを配置 -->
+            <a class="nav-item" href="main.html?guide=1">使い方</a><a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a><a class="nav-item" href="recruit.html">募集投稿</a><a class="nav-item active" href="users.html">ユーザーを探す</a><a class="nav-item" href="messages.html">メッセージ <span id="unread-badge" class="unread-badge" style="display:none;">0</span></a><a class="nav-item" href="profile.html">マイページ</a><a class="nav-item" href="ai-study.html">AI学習相談</a><a class="nav-item" id="nav-admin-btn" style="display:none;color:#a84738;" href="admin.html">管理者</a><button type="button" class="btn-logout" onclick="logout();return false;">ログアウト</button>	<!-- 操作できる要素を配置 -->
+        </nav>	<!-- 要素を閉じる -->
+    </header>	<!-- 要素を閉じる -->
+    <main class="split-page">	<!-- ページの主内容を配置 -->
+        <section class="split-hero"><p>FIND STUDY PARTNERS</p><h1>一緒に勉強できる人を探す。</h1><small>気になる募集を見つけたら、リアクションやチャットで相談を始められます。</small></section>	<!-- 画面要素を配置 -->
+        <div class="users-layout">	<!-- 画面要素を配置 -->
+            <aside class="users-sidebar">	<!-- 画面要素を配置 -->
+                <a class="profile-card" href="profile.html"><img id="profile-icon" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="プロフィール画像"><strong id="mypage-text">マイページ</strong><span style="font-size:11px;opacity:.75;">プロフィールを編集</span></a>	<!-- 操作できる要素を配置 -->
+                <section class="my-post-card"><h2>あなたの現在の募集</h2><div id="my-post-content" class="my-post-meta">読み込み中...</div></section>	<!-- 画面要素を配置 -->
+            </aside>	<!-- 要素を閉じる -->
+            <div class="users-main">	<!-- 画面要素を配置 -->
+                <section class="search-panel"><div class="search-row"><input id="search-input" type="search" placeholder="教科・学科・内容・タグで検索"><button type="button" onclick="loadPosts()">更新</button></div></section>	<!-- 画面要素を配置 -->
+                <section id="user-list" class="user-grid"><div class="empty">募集を読み込み中...</div></section>	<!-- 画面要素を配置 -->
+            </div>	<!-- 要素を閉じる -->
+        </div>	<!-- 要素を閉じる -->
+    </main>	<!-- 要素を閉じる -->
+    <footer class="footer"><div class="footer-container"><div class="footer-links"><a href="recruit.html">募集投稿</a><a href="users.html">ユーザーを探す</a><a href="messages.html">メッセージ</a><a href="profile.html">マイページ</a><a href="terms.html">利用規約</a><a href="privacy.html">プライバシーポリシー</a></div><p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p></div></footer>	<!-- フッターを配置 -->
     <script>
-        const GAS_URL="https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
-        const userEmail=localStorage.getItem("userEmail")||""; const currentUserId=localStorage.getItem("userId")||userEmail; let posts=[]; let countdownTimer=null; let reloadScheduled=false; let lastMessageTime=0; let activeTargetEmail="";
-        if(!userEmail) location.href="index.html";
-        const adminButton=document.getElementById("nav-admin-btn"); if(adminButton&&(localStorage.getItem("userId")==="admin"||userEmail==="admin")&&localStorage.getItem("isImpersonating")!=="true") adminButton.style.display="inline-block";
-        function toggleMenu(){document.getElementById("nav-links").classList.toggle("open");document.getElementById("hud-menu-btn").classList.toggle("open");}
-        function logout(){localStorage.clear();location.href="index.html";}
-        function applyUserProfile(profile){if(!profile)return;const name=String(profile.name||profile.userId||"").trim()||"ユーザー";const image=String(profile.profileImage||"").trim();localStorage.setItem("userName",name);localStorage.setItem("profileImage",image);document.getElementById("mypage-text").textContent=name;document.getElementById("profile-icon").src=image||"https://cdn-icons-png.flaticon.com/512/149/149071.png";}
-        async function refreshUserProfile(){try{const result=await fetchGas({mode:"getUserProfile",userId:currentUserId},20000);applyUserProfile(result.message);}catch(e){if(e.name!=="AbortError")console.error("プロフィール情報の取得エラー:",e);}}
-        function escapeHtml(value){return String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
-        function duration(value){const n=Number(value);return [15,30,45,60,120,180,240,300,360,420,480,540,600,660,720,780,840,900,960,1020,1080,1140,1200,1260,1320,1380,1440].includes(n)?n:1440;}
-        async function fetchGas(payload,timeoutMs=20000){const read=["getRecruitments","getNotificationSummary","getUserProfile"].includes(payload.mode);let error;for(let i=0;i<(read?2:1);i++){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeoutMs);try{const res=await fetch(GAS_URL,{method:"POST",body:JSON.stringify(payload),signal:controller.signal});if(!res.ok)throw new Error("通信エラー");const result=await res.json();if(result.status!=="success")throw new Error(result.message||"処理に失敗しました");return result;}catch(e){error=e;if(i+1<(read?2:1))await new Promise(resolve=>setTimeout(resolve,1200));}finally{clearTimeout(timer);}}throw error;}
-        function render(){if(countdownTimer)clearInterval(countdownTimer);const list=document.getElementById("user-list");const key=document.getElementById("search-input").value.trim().toLowerCase();const filtered=posts.filter(item=>item.email!==userEmail&&(`${item.name} ${item.grade} ${item.dept} ${item.content} ${item.tags||""}`).toLowerCase().includes(key));if(!filtered.length){list.innerHTML='<div class="empty">該当する募集が見つかりませんでした。</div>';return;}list.innerHTML="";const fragment=document.createDocumentFragment();filtered.forEach(item=>{const card=document.createElement("article");card.className="post-card";const expiry=new Date(item.time).getTime()+duration(item.durationMinutes)*60000;const tags=(item.tags||"").split(/[,、\s]+/).filter(Boolean).map(tag=>`<button class="tag" type="button" data-tag="${escapeHtml(tag)}">#${escapeHtml(tag)}</button>`).join("");card.innerHTML=`<div class="post-meta"><span>${escapeHtml(item.grade)} ｜ ${escapeHtml(item.dept)}</span><span class="countdown-badge" data-expire="${expiry}">計算中...</span></div><h2>${escapeHtml(item.name)}</h2><p>${escapeHtml(item.content)}</p><div class="tag-list">${tags}</div><div class="quick-reaction-row"><button type="button" data-reaction="気になる！">👀 気になる！</button><button type="button" data-reaction="一緒に勉強したい！">✋ 一緒に勉強したい！</button><button type="button" data-reaction="質問したい！">❓ 質問したい！</button></div><div class="card-actions"><button class="primary" type="button" data-chat>チャットを始める</button><button class="danger" type="button" data-block>ブロック</button><button class="danger" type="button" data-report>通報</button></div>`;card.querySelector("[data-chat]").onclick=()=>{localStorage.setItem("chatTarget",item.email);location.href="chat.html";};card.querySelector("[data-block]").onclick=()=>blockUser(item.email,item.name);card.querySelector("[data-report]").onclick=()=>reportContent(item.email,item.content);card.querySelectorAll("[data-reaction]").forEach(btn=>btn.onclick=()=>sendReaction(item.email,item.name,btn.dataset.reaction,btn));card.querySelectorAll("[data-tag]").forEach(btn=>btn.onclick=()=>{document.getElementById("search-input").value=btn.dataset.tag;render();});fragment.appendChild(card);});list.appendChild(fragment);updateCountdown();countdownTimer=setInterval(updateCountdown,1000);}
-        function updateCountdown(){let expired=false;document.querySelectorAll("[data-expire]").forEach(el=>{const seconds=Math.ceil((Number(el.dataset.expire)-Date.now())/1000);if(seconds<=0){el.textContent="⏰ 終了";expired=true;return;}el.textContent=`⏳ 残り ${Math.floor(seconds/3600)}時間${String(Math.floor(seconds%3600/60)).padStart(2,"0")}分${String(seconds%60).padStart(2,"0")}秒`;});if(expired&&!reloadScheduled){reloadScheduled=true;setTimeout(()=>{loadPosts().finally(()=>{reloadScheduled=false;});},500);}}
-        function renderMyPost(){const box=document.getElementById("my-post-content");const post=[...posts].find(item=>item.email===userEmail);if(!post){box.className="my-post-meta";box.textContent="投稿している募集はありません。";return;}const tags=(post.tags||"").split(/[,、\s]+/).filter(Boolean).map(tag=>`<span class="tag">#${escapeHtml(tag)}</span>`).join("");box.className="my-post-content";box.innerHTML=`<div class="my-post-meta">${escapeHtml(post.grade)} ｜ ${escapeHtml(post.dept)}</div><p>${escapeHtml(post.content)}</p><div class="tag-list">${tags}</div><div class="my-post-meta">表示期限：${duration(post.durationMinutes)<60?duration(post.durationMinutes)+"分":duration(post.durationMinutes)/60+"時間"}</div>`;}
-        async function loadPosts(){document.getElementById("user-list").innerHTML='<div class="empty">募集を読み込み中...</div>';try{const result=await fetchGas({mode:"getRecruitments",email:userEmail});posts=Array.isArray(result.message)?[...result.message].reverse():[];renderMyPost();render();}catch(e){document.getElementById("user-list").innerHTML=`<div class="empty">${e.name==="AbortError"?"通信に時間がかかっています。":"募集を読み込めませんでした。"}</div>`;}}
-        async function sendReaction(target,name,reaction,button){const key=`quick-reaction:${userEmail}:${target}:${reaction}`;if(Date.now()-Number(sessionStorage.getItem(key)||0)<600000){showNotice("同じリアクションは少し時間をおいてから送れます","error");return;}button.disabled=true;try{await fetchGas({mode:"sendMessage",from:userEmail,to:target,text:`募集を見て「${reaction}」とリアクションしました。`});sessionStorage.setItem(key,String(Date.now()));button.textContent="送信しました ✓";showNotice(name+"さんにリアクションを送りました","success");}catch(e){button.disabled=false;showNotice(e.message||"リアクションを送信できませんでした","error");}}
-        function reason(){const value=prompt("通報理由を番号で入力してください。\n1: 嫌がらせ・迷惑行為\n2: 不適切な内容\n3: 性的な内容\n4: 脅迫・危険な発言\n5: 個人情報の掲載\n6: なりすまし\n7: スパム\n8: その他");return {1:"嫌がらせ・迷惑行為",2:"不適切な内容",3:"性的な内容",4:"脅迫・危険な発言",5:"個人情報の掲載",6:"なりすまし",7:"スパム",8:"その他"}[String(value||"").trim()]||"";}
-        async function reportContent(target,content){const reportReason=reason();if(!reportReason)return;try{await fetchGas({mode:"reportContent",reporterId:userEmail,targetUserId:target,targetType:"recruitment",targetId:target,targetContent:content,reason:reportReason,detail:prompt("詳細があれば入力してください（任意）")||""});showNotice("通報を受け付けました","success");}catch(e){showNotice(e.message||"通報に失敗しました","error");}}
-        async function blockUser(target,name){if(!confirm(`「${name}」さんをブロックしますか？`))return;try{await fetchGas({mode:"blockUser",blockerId:userEmail,blockedId:target});showNotice("ユーザーをブロックしました","success");loadPosts();}catch(e){showNotice(e.message||"ブロックに失敗しました","error");}}
-        function showToast(senderName,text){document.getElementById("toast-sender-name").textContent=String(senderName||"ユーザー").trim()||"ユーザー";document.getElementById("toast-text-body").textContent=String(text||"");document.getElementById("toast-notification").classList.add("show");setTimeout(()=>document.getElementById("toast-notification").classList.remove("show"),5000);}
-        function clickToast(){if(activeTargetEmail){localStorage.setItem("chatTarget",activeTargetEmail);location.href="chat.html";}}
-        function exitImpersonation(){localStorage.setItem("userEmail","admin");localStorage.setItem("userId","admin");localStorage.setItem("userName","管理者");localStorage.removeItem("isImpersonating");location.href="admin.html";}
-        async function updateNotificationSummary(){const badge=document.getElementById("unread-badge");if(!badge)return;try{const result=await fetchGas({mode:"getNotificationSummary",email:userEmail},20000);const count=result.message.unreadCount||0;badge.textContent=count>99?"99+":count;badge.style.display=count?"inline-block":"none";const latest=result.message.latestIncoming;if(latest&&lastMessageTime!==0&&latest.time>lastMessageTime){activeTargetEmail=latest.fromEmail;showToast(latest.fromName,latest.text);}if(latest)lastMessageTime=latest.time;}catch(e){if(e.name!=="AbortError")console.error("通知情報の取得エラー:",e);}}
-        document.getElementById("search-input").addEventListener("input",render);document.addEventListener("DOMContentLoaded",()=>{const name=localStorage.getItem("userName");const image=localStorage.getItem("profileImage");document.getElementById("mypage-text").textContent=name||currentUserId||"マイページ";document.getElementById("profile-icon").src=image&&image!=="null"?image:"https://cdn-icons-png.flaticon.com/512/149/149071.png";if(localStorage.getItem("isImpersonating")==="true"){document.getElementById("impersonate-user-id").textContent=`${name||"ユーザー"} (${userEmail})`;document.getElementById("impersonate-bar").style.display="block";}loadPosts();refreshUserProfile();updateNotificationSummary();setInterval(()=>{if(document.visibilityState==="visible")updateNotificationSummary();},8000);});
+        const GAS_URL="https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";	// GAS APIの接続先を設定
+        const userEmail=localStorage.getItem("userEmail")||""; const currentUserId=localStorage.getItem("userId")||userEmail; const postCacheKey=`users-posts:${userEmail}`; let posts=[]; let countdownTimer=null; let reloadScheduled=false; let postsRequest=null; let lastMessageTime=0; let activeTargetEmail="";	// 定数を定義
+        if(!userEmail) location.href="index.html";	// 条件に応じて処理を分ける
+        const adminButton=document.getElementById("nav-admin-btn"); if(adminButton&&(localStorage.getItem("userId")==="admin"||userEmail==="admin")&&localStorage.getItem("isImpersonating")!=="true") adminButton.style.display="inline-block";	// 定数を定義
+        function toggleMenu(){document.getElementById("nav-links").classList.toggle("open");document.getElementById("hud-menu-btn").classList.toggle("open");}	// 関数を定義
+        function logout(){localStorage.clear();location.href="index.html";}	// 関数を定義
+        function applyUserProfile(profile){if(!profile)return;const name=String(profile.name||profile.userId||"").trim()||"ユーザー";const image=String(profile.profileImage||"").trim();localStorage.setItem("userName",name);localStorage.setItem("profileImage",image);document.getElementById("mypage-text").textContent=name;document.getElementById("profile-icon").src=image||"https://cdn-icons-png.flaticon.com/512/149/149071.png";}	// 関数を定義
+        async function refreshUserProfile(){try{const result=await fetchGas({mode:"getUserProfile",userId:userEmail||currentUserId,email:userEmail},12000);applyUserProfile(result.message);}catch(e){if(e.name!=="AbortError")console.error("プロフィール情報の取得エラー:",e);}}	// 関数を定義
+        function escapeHtml(value){return String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}	// 関数を定義
+        function duration(value){const n=Number(value);return [15,30,45,60,120,180,240,300,360,420,480,540,600,660,720,780,840,900,960,1020,1080,1140,1200,1260,1320,1380,1440].includes(n)?n:1440;}	// 関数を定義
+        async function fetchGas(payload,timeoutMs=12000){const read=["getNotificationSummary","getUserProfile"].includes(payload.mode);let error;for(let i=0;i<(read?2:1);i++){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeoutMs);try{const res=await fetch(GAS_URL,{method:"POST",body:JSON.stringify(payload),signal:controller.signal});if(!res.ok)throw new Error("通信エラー");const result=await res.json();if(result.status!=="success")throw new Error(result.message||"処理に失敗しました");return result;}catch(e){error=e;if(i+1<(read?2:1))await new Promise(resolve=>setTimeout(resolve,800));}finally{clearTimeout(timer);}}throw error;}	// 関数を定義
+        function render(){if(countdownTimer)clearInterval(countdownTimer);const list=document.getElementById("user-list");const key=document.getElementById("search-input").value.trim().toLowerCase();const filtered=posts.filter(item=>item.email!==userEmail&&(`${item.name} ${item.grade} ${item.dept} ${item.content} ${item.tags||""}`).toLowerCase().includes(key));if(!filtered.length){list.innerHTML='<div class="empty">該当する募集が見つかりませんでした。</div>';return;}list.innerHTML="";const fragment=document.createDocumentFragment();filtered.forEach(item=>{const card=document.createElement("article");card.className="post-card";const expiry=new Date(item.time).getTime()+duration(item.durationMinutes)*60000;const tags=(item.tags||"").split(/[,、\s]+/).filter(Boolean).map(tag=>`<button class="tag" type="button" data-tag="${escapeHtml(tag)}">#${escapeHtml(tag)}</button>`).join("");card.innerHTML=`<div class="post-meta"><span>${escapeHtml(item.grade)} ｜ ${escapeHtml(item.dept)}</span><span class="countdown-badge" data-expire="${expiry}">計算中...</span></div><h2>${escapeHtml(item.name)}</h2><p>${escapeHtml(item.content)}</p><div class="tag-list">${tags}</div><div class="quick-reaction-row"><button type="button" data-reaction="気になる！">👀 気になる！</button><button type="button" data-reaction="一緒に勉強したい！">✋ 一緒に勉強したい！</button><button type="button" data-reaction="質問したい！">❓ 質問したい！</button></div><div class="card-actions"><button class="primary" type="button" data-chat>チャットを始める</button><button class="danger" type="button" data-block>ブロック</button><button class="danger" type="button" data-report>通報</button></div>`;card.querySelector("[data-chat]").onclick=()=>{localStorage.setItem("chatTarget",item.email);location.href="chat.html";};card.querySelector("[data-block]").onclick=()=>blockUser(item.email,item.name);card.querySelector("[data-report]").onclick=()=>reportContent(item.email,item.content);card.querySelectorAll("[data-reaction]").forEach(btn=>btn.onclick=()=>sendReaction(item.email,item.name,btn.dataset.reaction,btn));card.querySelectorAll("[data-tag]").forEach(btn=>btn.onclick=()=>{document.getElementById("search-input").value=btn.dataset.tag;render();});fragment.appendChild(card);});list.appendChild(fragment);updateCountdown();countdownTimer=setInterval(updateCountdown,1000);}	// 関数を定義
+        function updateCountdown(){let expired=false;document.querySelectorAll("[data-expire]").forEach(el=>{const seconds=Math.ceil((Number(el.dataset.expire)-Date.now())/1000);if(seconds<=0){el.textContent="⏰ 終了";expired=true;return;}el.textContent=`⏳ 残り ${Math.floor(seconds/3600)}時間${String(Math.floor(seconds%3600/60)).padStart(2,"0")}分${String(seconds%60).padStart(2,"0")}秒`;});if(expired&&!reloadScheduled){reloadScheduled=true;setTimeout(()=>{loadPosts().finally(()=>{reloadScheduled=false;});},500);}}	// 関数を定義
+        function renderMyPost(){const box=document.getElementById("my-post-content");const post=[...posts].find(item=>item.email===userEmail);if(!post){box.className="my-post-meta";box.textContent="投稿している募集はありません。";return;}const tags=(post.tags||"").split(/[,、\s]+/).filter(Boolean).map(tag=>`<span class="tag">#${escapeHtml(tag)}</span>`).join("");box.className="my-post-content";box.innerHTML=`<div class="my-post-meta">${escapeHtml(post.grade)} ｜ ${escapeHtml(post.dept)}</div><p>${escapeHtml(post.content)}</p><div class="tag-list">${tags}</div><div class="my-post-meta">表示期限：${duration(post.durationMinutes)<60?duration(post.durationMinutes)+"分":duration(post.durationMinutes)/60+"時間"}</div>`;}	// 関数を定義
+        function loadCachedPosts(){try{const cached=JSON.parse(localStorage.getItem(postCacheKey)||"null");if(!cached||!Array.isArray(cached.posts))return false;posts=cached.posts;renderMyPost();render();return true;}catch(e){localStorage.removeItem(postCacheKey);return false;}}	// 関数を定義
+        async function loadPosts(){if(postsRequest)return postsRequest;const hasCache=posts.length>0||loadCachedPosts();if(!hasCache)document.getElementById("user-list").innerHTML='<div class="empty">募集を読み込み中...</div>';postsRequest=(async()=>{try{const result=await fetchGas({mode:"getRecruitments",email:userEmail},12000);posts=Array.isArray(result.message)?[...result.message].reverse():[];localStorage.setItem(postCacheKey,JSON.stringify({savedAt:Date.now(),posts}));renderMyPost();render();}catch(e){if(!hasCache)document.getElementById("user-list").innerHTML=`<div class="empty">${e.name==="AbortError"?"通信に時間がかかっています。":"募集を読み込めませんでした。"}</div>`;}finally{postsRequest=null;}})();return postsRequest;}	// 関数を定義
+        async function sendReaction(target,name,reaction,button){const key=`quick-reaction:${userEmail}:${target}:${reaction}`;if(Date.now()-Number(sessionStorage.getItem(key)||0)<600000){showNotice("同じリアクションは少し時間をおいてから送れます","error");return;}button.disabled=true;try{await fetchGas({mode:"sendMessage",from:userEmail,to:target,text:`募集を見て「${reaction}」とリアクションしました。`});sessionStorage.setItem(key,String(Date.now()));button.textContent="送信しました ✓";showNotice(name+"さんにリアクションを送りました","success");}catch(e){button.disabled=false;showNotice(e.message||"リアクションを送信できませんでした","error");}}	// 関数を定義
+        function reason(){const value=prompt("通報理由を番号で入力してください。\n1: 嫌がらせ・迷惑行為\n2: 不適切な内容\n3: 性的な内容\n4: 脅迫・危険な発言\n5: 個人情報の掲載\n6: なりすまし\n7: スパム\n8: その他");return {1:"嫌がらせ・迷惑行為",2:"不適切な内容",3:"性的な内容",4:"脅迫・危険な発言",5:"個人情報の掲載",6:"なりすまし",7:"スパム",8:"その他"}[String(value||"").trim()]||"";}	// 関数を定義
+        async function reportContent(target,content){const reportReason=reason();if(!reportReason)return;try{await fetchGas({mode:"reportContent",reporterId:userEmail,targetUserId:target,targetType:"recruitment",targetId:target,targetContent:content,reason:reportReason,detail:prompt("詳細があれば入力してください（任意）")||""});showNotice("通報を受け付けました","success");}catch(e){showNotice(e.message||"通報に失敗しました","error");}}	// 関数を定義
+        async function blockUser(target,name){if(!confirm(`「${name}」さんをブロックしますか？`))return;try{await fetchGas({mode:"blockUser",blockerId:userEmail,blockedId:target});showNotice("ユーザーをブロックしました","success");loadPosts();}catch(e){showNotice(e.message||"ブロックに失敗しました","error");}}	// 関数を定義
+        function showToast(senderName,text){document.getElementById("toast-sender-name").textContent=String(senderName||"ユーザー").trim()||"ユーザー";document.getElementById("toast-text-body").textContent=String(text||"");document.getElementById("toast-notification").classList.add("show");setTimeout(()=>document.getElementById("toast-notification").classList.remove("show"),5000);}	// 関数を定義
+        function clickToast(){if(activeTargetEmail){localStorage.setItem("chatTarget",activeTargetEmail);location.href="chat.html";}}	// 関数を定義
+        function exitImpersonation(){localStorage.setItem("userEmail","admin");localStorage.setItem("userId","admin");localStorage.setItem("userName","管理者");localStorage.removeItem("isImpersonating");location.href="admin.html";}	// 関数を定義
+        async function updateNotificationSummary(){const badge=document.getElementById("unread-badge");if(!badge)return;try{const result=await fetchGas({mode:"getNotificationSummary",email:userEmail},20000);const count=result.message.unreadCount||0;badge.textContent=count>99?"99+":count;badge.style.display=count?"inline-block":"none";const latest=result.message.latestIncoming;if(latest&&lastMessageTime!==0&&latest.time>lastMessageTime){activeTargetEmail=latest.fromEmail;showToast(latest.fromName,latest.text);}if(latest)lastMessageTime=latest.time;}catch(e){if(e.name!=="AbortError")console.error("通知情報の取得エラー:",e);}}	// 関数を定義
+        document.getElementById("search-input").addEventListener("input",render);document.addEventListener("DOMContentLoaded",()=>{const name=localStorage.getItem("userName");const image=localStorage.getItem("profileImage");document.getElementById("mypage-text").textContent=name||currentUserId||"マイページ";document.getElementById("profile-icon").src=image&&image!=="null"?image:"https://cdn-icons-png.flaticon.com/512/149/149071.png";if(localStorage.getItem("isImpersonating")==="true"){document.getElementById("impersonate-user-id").textContent=`${name||"ユーザー"} (${userEmail})`;document.getElementById("impersonate-bar").style.display="block";}loadPosts();refreshUserProfile();updateNotificationSummary();setInterval(()=>{if(document.visibilityState==="visible")updateNotificationSummary();},8000);});	// 操作イベントを登録
     </script>
-</body>
-</html>
+</body>	<!-- 要素を閉じる -->
+</html>	<!-- 要素を閉じる -->
