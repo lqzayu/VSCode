@@ -4,7 +4,7 @@
  --ui-lime:#d8ef99; --ui-soft:#edf1e7; --ui-danger:#a84738;	/* 見た目の設定を指定 */
  --ink:var(--ui-ink); --muted:var(--ui-muted); --line:var(--ui-line);	/* 見た目の設定を指定 */
  --surface:var(--ui-bg); --paper:var(--ui-paper); --teal:var(--ui-green);	/* 見た目の設定を指定 */
- --teal-dark:var(--ui-green); --navy:var(--ui-green); --coral:#cc9e74;	/* 見た目の設定を指定 */
+ --teal-dark:var(--ui-green); --navy:var(--ui-green); --ui-green-deep:#47755b; --coral:#cc9e74;	/* 見た目の設定を指定 */
 }	/* スタイル定義を閉じる */
 
 .appearance-settings {	/* 外観設定欄の見た目を整える */
@@ -30,11 +30,11 @@
 }	/* 手動ライトモードの配色を閉じる */
 :root[data-theme="dark"] {	/* 手動ダークモードの配色を設定する */
  color-scheme:dark;	/* フォーム部品を暗色表示にする */
- --ui-bg:#141a17; --ui-paper:#202a24; --ui-ink:#edf4ed; --ui-muted:#aebdb2; --ui-line:#3a4a40; --ui-green:#8bc99d; --ui-lime:#cbe994; --ui-soft:#2b3a31; --ui-danger:#f09b87;	/* 暗色用の配色をまとめて設定する */
+ --ui-bg:#101522; --ui-paper:#1b2433; --ui-ink:#e8edf7; --ui-muted:#9aa8bd; --ui-line:#344156; --ui-green:#7dd3fc; --ui-lime:#c4b5fd; --ui-soft:#253147; --ui-danger:#fb7185; --ui-green-deep:#29415f;	/* 暗色用の配色をまとめて設定する */
  --ink:var(--ui-ink); --muted:var(--ui-muted); --line:var(--ui-line); --surface:var(--ui-bg); --paper:var(--ui-paper); --teal:var(--ui-green); --teal-dark:var(--ui-green); --navy:var(--ui-green);	/* 旧配色変数を暗色へ合わせる */
 }	/* 手動ダークモードの配色を閉じる */
 html[data-theme="dark"] body {	/* 手動ダークモードの背景を設定する */
- background:radial-gradient(circle at 8% 0%,rgba(139,201,157,.14),transparent 30rem),radial-gradient(circle at 96% 12%,rgba(203,233,148,.08),transparent 26rem),var(--ui-bg)!important; color:var(--ui-ink)!important;	/* 暗色背景と文字色を適用する */
+ background:radial-gradient(circle at 8% 0%,rgba(125,211,252,.16),transparent 30rem),radial-gradient(circle at 96% 12%,rgba(196,181,253,.11),transparent 26rem),var(--ui-bg)!important; color:var(--ui-ink)!important;	/* 暗色背景と文字色を適用する */
 }	/* 手動ダークモード背景の設定を閉じる */
 html[data-theme="dark"] .navbar,html[data-theme="dark"] .footer {	/* 手動ダークモードの共通領域を設定する */
  background:var(--ui-bg)!important; border-color:var(--ui-line)!important;	/* 共通領域を暗色表示にする */
@@ -52,7 +52,7 @@ html[data-theme="dark"] .profile-card {	/* 手動ダークモードのプロフ�
  background:var(--ui-paper)!important; color:var(--ui-ink)!important;	/* プロフィール欄を暗色表示にする */
 }	/* 手動ダークモードプロフィール欄の設定を閉じる */
 html[data-theme="dark"] body[data-page="users"] .profile-card {	/* ユーザー検索のプロフィール欄を緑色で保つ */
- background:linear-gradient(135deg,var(--ui-green),#47755b)!important; color:#fff!important;	/* 上部と同じ緑色を適用する */
+ background:linear-gradient(135deg,var(--ui-green),var(--ui-green-deep))!important; color:#fff!important;	/* 青系のアクセント背景を適用する */
 }	/* ユーザー検索プロフィール欄の設定を閉じる */
 html[data-theme="dark"] body[data-page="users"] .profile-card strong,html[data-theme="dark"] body[data-page="users"] #mypage-text {	/* ユーザー検索の表示名を見やすくする */
  color:#fff!important; -webkit-text-fill-color:#fff!important;	/* 緑背景用の文字色を適用する */
@@ -439,15 +439,16 @@ td,th { border-bottom:1px solid var(--ui-line); }	/* 見た目の設定を指定
 @media (prefers-color-scheme: dark) {	/* ユーザーのダークモード設定を反映 */
  :root {	/* 暗色用の配色を設定 */
   color-scheme:dark;	/* フォーム部品を暗色表示にする */
-  --ui-bg:#141a17;	/* ページ背景を設定 */
-  --ui-paper:#202a24;	/* カード背景を設定 */
-  --ui-ink:#edf4ed;	/* 基本文字色を設定 */
-  --ui-muted:#aebdb2;	/* 補助文字色を設定 */
-  --ui-line:#3a4a40;	/* 境界線の色を設定 */
-  --ui-green:#8bc99d;	/* 暗色用の緑色を設定 */
-  --ui-lime:#cbe994;	/* 強調色を設定 */
-  --ui-soft:#2b3a31;	/* 薄い背景色を設定 */
-  --ui-danger:#f09b87;	/* 警告色を設定 */
+  --ui-bg:#101522;	/* ページ背景を設定 */
+  --ui-paper:#1b2433;	/* カード背景を設定 */
+  --ui-ink:#e8edf7;	/* 基本文字色を設定 */
+  --ui-muted:#9aa8bd;	/* 補助文字色を設定 */
+  --ui-line:#344156;	/* 境界線の色を設定 */
+  --ui-green:#7dd3fc;	/* 暗色用のシアン色を設定 */
+  --ui-lime:#c4b5fd;	/* 暗色用のラベンダー色を設定 */
+  --ui-soft:#253147;	/* 薄い背景色を設定 */
+  --ui-danger:#fb7185;	/* 警告色を設定 */
+  --ui-green-deep:#29415f;	/* 暗色用の深い青色を設定 */
   --ink:var(--ui-ink);	/* 旧変数へ文字色を渡す */
   --muted:var(--ui-muted);	/* 旧変数へ補助文字色を渡す */
   --line:var(--ui-line);	/* 旧変数へ境界線色を渡す */
@@ -459,7 +460,7 @@ td,th { border-bottom:1px solid var(--ui-line); }	/* 見た目の設定を指定
  }	/* 配色変数の設定を閉じる */
 
  body {	/* ページ全体の暗色背景を設定 */
-  background:radial-gradient(circle at 8% 0%,rgba(139,201,157,.14),transparent 30rem),radial-gradient(circle at 96% 12%,rgba(203,233,148,.08),transparent 26rem),var(--ui-bg)!important;	/* 暗色背景を表示 */
+  background:radial-gradient(circle at 8% 0%,rgba(125,211,252,.16),transparent 30rem),radial-gradient(circle at 96% 12%,rgba(196,181,253,.11),transparent 26rem),var(--ui-bg)!important;	/* 暗色背景を表示 */
   color:var(--ui-ink)!important;	/* 暗色用文字色を適用 */
  }	/* ページ全体の設定を閉じる */
 
@@ -501,7 +502,7 @@ td,th { border-bottom:1px solid var(--ui-line); }	/* 見た目の設定を指定
   color:var(--ui-ink)!important;	/* 暗色用プロフィール文字を適用 */
  }	/* プロフィール編集カードの設定を閉じる */
  body[data-page="users"] .profile-card {	/* ユーザー検索のプロフィール領域を調整 */
-  background:linear-gradient(135deg,var(--ui-green),#47755b)!important;	/* 上部と同じ緑色を適用 */
+  background:linear-gradient(135deg,var(--ui-green),var(--ui-green-deep))!important;	/* 青系のアクセント背景を適用 */
   color:#fff!important;	/* 緑背景用の文字色を適用 */
  }	/* ユーザー検索のプロフィール設定を閉じる */
  body[data-page="users"] .profile-card strong,body[data-page="users"] #mypage-text {	/* ユーザー名を見やすくする */
@@ -646,7 +647,7 @@ body.guide-open { overflow:hidden; }	/* 見た目の設定を指定 */
  .message-meta,.message-tool-button { color:var(--ui-muted)!important; }	/* メッセージ補助文字を調整する */
  .message-tool-button:hover { color:var(--ui-green)!important; }	/* メッセージ操作色を調整する */
  .message-tool-button.unsend { color:#ff9d9d!important; }	/* 送信取り消し色を調整する */
- .message-bubble.is-unsent { background:#29322e!important; color:#aebdb2!important; border-color:#526257!important; }	/* 取り消し済み表示を暗色表示にする */
+ .message-bubble.is-unsent { background:#283345!important; color:#9aa8bd!important; border-color:#52647e!important; }	/* 取り消し済み表示を暗色表示にする */
  .impersonate-bar { background:#4a4020!important; border-color:#74652a!important; color:#f8e7a6!important; }	/* 代理ログイン表示を暗色表示にする */
  .impersonate-bar button { background:#f0d36c!important; color:#332b14!important; }	/* 代理ログイン解除ボタンを調整する */
  #user-name { background:var(--ui-soft)!important; color:var(--ui-muted)!important; border-color:var(--ui-line)!important; }	/* ユーザー名欄を暗色表示にする */
