@@ -601,6 +601,15 @@
             });	// 処理を完了する
         }	// 処理のまとまりを閉じる
 
+        function getAttachmentDisplayUrl(value) {	// 関数を定義
+            const url = String(value || "");	// 定数を定義
+            const queryMatch = url.match(/[?&]id=([^&]+)/);	// 定数を定義
+            const pathMatch = url.match(/\/d\/([^/]+)/);	// 定数を定義
+            const fileId = queryMatch ? queryMatch[1] : pathMatch ? pathMatch[1] : "";	// 定数を定義
+            if (!fileId || !url.includes("drive.google.com")) return url;	// 条件に応じて処理を分ける
+            return `https://drive.google.com/thumbnail?id=${encodeURIComponent(fileId)}&sz=w1200`;	// 結果を返す
+        }	// 処理のまとまりを閉じる
+
         function blobToDataUrl(blob) {	// 関数を定義
             return new Promise((resolve, reject) => {	// 結果を返す
                 const reader = new FileReader();	// 定数を定義
@@ -859,9 +868,10 @@
 
                                 const image = document.createElement("img");	// 定数を定義
                                 image.className = "message-attachment-image";	// 処理を続ける
-                                image.src = url;	// 処理を続ける
+                                image.src = getAttachmentDisplayUrl(url);	// 画像表示用URLを設定する
                                 image.alt = "添付画像";	// 処理を続ける
                                 image.loading = "lazy";	// 処理を続ける
+                                image.onerror = () => { image.alt = "画像を表示できません"; };	// 画像の読み込み失敗を表示する
                                 link.appendChild(image);	// 処理を完了する
                                 attachments.appendChild(link);	// 処理を完了する
                             });	// 処理を完了する
