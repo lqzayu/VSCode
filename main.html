@@ -1250,32 +1250,6 @@
                 padding: 22px;	/* 見た目の設定を指定 */
             }	/* スタイル定義を閉じる */
 
-            .main-tabs {	/* ホーム内のタブ欄を整える */
-                display: flex;	/* タブを横並びにする */
-                gap: 8px;	/* タブの間隔を設定する */
-                margin-bottom: 22px;	/* タブ欄の下に余白を作る */
-                padding: 6px;	/* タブ欄の内側に余白を作る */
-                border: 1px solid var(--line);	/* タブ欄の境界線を設定する */
-                border-radius: 14px;	/* タブ欄の角を丸くする */
-                background: var(--paper);	/* タブ欄の背景を設定する */
-            }	/* ホーム内のタブ欄の設定を閉じる */
-
-            .main-tab {	/* ホーム内のタブを整える */
-                flex: 1;	/* タブを均等な幅にする */
-                min-height: 44px;	/* タブを押しやすくする */
-                border: 0;	/* タブの標準境界線を消す */
-                border-radius: 10px;	/* タブの角を丸くする */
-                background: transparent;	/* 通常時の背景を透明にする */
-                color: var(--muted);	/* 通常時の文字色を設定する */
-                font-weight: 800;	/* タブ文字を見やすくする */
-                cursor: pointer;	/* クリックできることを示す */
-            }	/* ホーム内のタブの設定を閉じる */
-
-            .main-tab.active {	/* 選択中のタブを整える */
-                background: var(--teal);	/* 選択中の背景を設定する */
-                color: var(--paper);	/* 選択中の文字色を設定する */
-            }	/* 選択中のタブの設定を閉じる */
-
             .toast-notification {	/* 対象要素のスタイルを始める */
                 top: 76px;	/* 見た目の設定を指定 */
                 right: 12px;	/* 見た目の設定を指定 */
@@ -1351,10 +1325,6 @@
         </div>	<!-- 要素を閉じる -->
 
         <div class="main-area">	<!-- 画面要素を配置 -->
-            <div class="main-tabs" role="tablist" aria-label="ホーム画面の切り替え">	<!-- 募集機能の切り替え欄を配置する -->
-                <button type="button" id="tab-search-btn" class="main-tab active" role="tab" aria-selected="true" onclick="switchTab('search')">募集を探す</button>	<!-- 募集検索タブを配置する -->
-                <button type="button" id="tab-recruit-btn" class="main-tab" role="tab" aria-selected="false" onclick="switchTab('recruit')">募集を投稿する</button>	<!-- 募集投稿タブを配置する -->
-            </div>	<!-- 募集機能の切り替え欄を閉じる -->
             <section id="recruit-form-area" style="display: none;">	<!-- 画面要素を配置 -->
                 <div class="sidebar-form">	<!-- 画面要素を配置 -->
                     <h3 id="form-title">募集を投稿する</h3>	<!-- 画面要素を配置 -->
