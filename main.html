@@ -1293,8 +1293,8 @@
         <nav class="nav-links" id="nav-links">
             <button type="button" class="nav-item nav-guide-button" onclick="openUsageGuide(); closeMenu();">使い方</button>
             <a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header" class="nav-item">意見箱</a>
-            <span class="nav-item" id="tab-recruit-btn" onclick="switchTab('recruit'); closeMenu();">募集投稿</span>
-            <span class="nav-item active" id="tab-search-btn" onclick="switchTab('search'); closeMenu();">ユーザーを探す</span>
+            <a class="nav-item" href="recruit.html">募集投稿</a>
+            <a class="nav-item active" href="users.html">ユーザーを探す</a>
             <a class="nav-item" href="messages.html">
                 メッセージ
                 <span id="unread-badge" class="unread-badge" style="display: none;">0</span>
@@ -1540,6 +1540,11 @@
             window.location.href = "index.html";
         }
 
+        const legacyMainParams = new URLSearchParams(window.location.search);
+        if (!legacyMainParams.has("guide")) {
+            window.location.replace(legacyMainParams.get("tab") === "recruit" ? "recruit.html" : "users.html");
+        }
+
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
 
         let lastMessageTime = 0;
@@ -1548,30 +1553,44 @@
         let countdownTimer = null;
         let notificationRequest = null;
 
-        async function fetchGas(payload, timeoutMs = 15000) {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+        async function fetchGas(payload, timeoutMs = 20000) {
+            const readModes = ["getUserProfile", "getRecruitments", "getNotificationSummary"];
+            const canRetry = readModes.includes(payload && payload.mode);
+            const maxAttempts = canRetry ? 2 : 1;
+            let lastError;
 
-            try {
-                const res = await fetch(GAS_URL, {
-                    method: "POST",
-                    body: JSON.stringify(payload),
-                    signal: controller.signal
-                });
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-                if (!res.ok) {
-                    throw new Error(`GAS通信エラー（HTTP ${res.status}）`);
+                try {
+                    const res = await fetch(GAS_URL, {
+                        method: "POST",
+                        body: JSON.stringify(payload),
+                        signal: controller.signal
+                    });
+
+                    if (!res.ok) {
+                        throw new Error(`GAS通信エラー（HTTP ${res.status}）`);
+                    }
+
+                    const result = await res.json();
+                    if (!result || result.status !== "success") {
+                        throw new Error(result && result.message ? result.message : "GASからエラーが返されました");
+                    }
+
+                    return result;
+                } catch (error) {
+                    lastError = error;
+                    if (attempt + 1 < maxAttempts) {
+                        await new Promise(resolve => setTimeout(resolve, 1200));
+                    }
+                } finally {
+                    clearTimeout(timeoutId);
                 }
-
-                const result = await res.json();
-                if (!result || result.status !== "success") {
-                    throw new Error(result && result.message ? result.message : "GASからエラーが返されました");
-                }
-
-                return result;
-            } finally {
-                clearTimeout(timeoutId);
             }
+
+            throw lastError || new Error("GASとの通信に失敗しました");
         }
 
         function escapeHtml(value) {
@@ -1604,10 +1623,10 @@
         async function refreshUserProfile(userId) {
             if (!userId || userId === "admin") return;
             try {
-                const result = await fetchGas({ mode: "getUserProfile", userId: userId }, 10000);
+                const result = await fetchGas({ mode: "getUserProfile", userId: userId }, 20000);
                 applyUserProfile(result.message);
             } catch (e) {
-                console.error("プロフィール情報の取得エラー:", e);
+                if (!e || e.name !== "AbortError") console.error("プロフィール情報の取得エラー:", e);
             }
         }
 
@@ -1643,8 +1662,7 @@
 
         function showGuideDestination(mode) {
             closeUsageGuide();
-            switchTab(mode);
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            location.href = mode === "recruit" ? "recruit.html" : "users.html";
         }
 
         document.addEventListener("keydown", (event) => {
@@ -1652,6 +1670,10 @@
         });
 
         function switchTab(mode) {
+            if (!document.getElementById("tab-recruit-btn") || !document.getElementById("tab-search-btn")) {
+                location.href = mode === "recruit" ? "recruit.html" : "users.html";
+                return;
+            }
             document.getElementById("recruit-form-area").style.display = (mode === 'recruit') ? "block" : "none";
             document.getElementById("search-area").style.display = (mode === 'search') ? "block" : "none";
             document.getElementById("tab-recruit-btn").classList.toggle("active", mode === 'recruit');
@@ -1712,9 +1734,9 @@
                 renderFilteredRecruitments();
 
             } catch (e) {
-                console.error(e);
+                if (!e || e.name !== "AbortError") console.error(e);
                 const message = e && e.name === "AbortError"
-                    ? "GASの応答が15秒以内にありませんでした。Apps Scriptのデプロイ設定を確認してください。"
+                    ? "通信に時間がかかっています。しばらくしてから更新してください。"
                     : (e && e.message ? e.message : "原因不明のエラー");
                 listDiv.innerHTML = `<p style='color: #ef4444; font-size: 14px; grid-column: 1 / -1; text-align: center; padding: 40px 0;'>読み込みエラーが発生しました。<br><small>${escapeHtml(message)}</small></p>`;
             }
@@ -2088,7 +2110,7 @@
 
             notificationRequest = (async () => {
                 try {
-                    const result = await fetchGas({ mode: "getNotificationSummary", email: myEmail }, 10000);
+                    const result = await fetchGas({ mode: "getNotificationSummary", email: myEmail }, 20000);
                     const count = result.message.unreadCount || 0;
                     badge.innerText = count > 99 ? "99+" : count;
                     badge.style.display = count > 0 ? "inline-block" : "none";
@@ -2104,7 +2126,7 @@
                         showToast(msg.fromName, msg.text);
                     }
                 } catch (e) {
-                    console.error("通知情報の取得エラー:", e);
+                    if (!e || e.name !== "AbortError") console.error("通知情報の取得エラー:", e);
                 } finally {
                     notificationRequest = null;
                 }

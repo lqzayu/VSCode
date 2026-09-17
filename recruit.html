@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>募集投稿 - 平工マッチング</title>
+    <link rel="icon" href="icon-192.png">
+    <link rel="stylesheet" href="theme.css?v=20260917c">
+    <script src="ui.js"></script>
+    <script src="online.js?v=20260917b" defer></script>
+    <style>
+        .split-page { max-width: 900px; margin: 0 auto; padding: 46px 24px 80px; }
+        .split-hero, .recruit-card, .my-post-card { background:var(--ui-paper); border:1px solid var(--ui-line); border-radius:20px; box-shadow:0 12px 30px rgba(36,60,50,.06); }
+        .split-hero { padding:30px; margin-bottom:22px; background:linear-gradient(135deg,var(--ui-green),#47755b); color:#fff; }
+        .split-hero p { margin:0 0 8px; font-size:11px; letter-spacing:.18em; font-weight:800; opacity:.8; }
+        .split-hero h1 { margin:0; font-size:clamp(28px,4vw,44px); line-height:1.2; letter-spacing:-.06em; }
+        .split-hero small { display:block; margin-top:14px; color:rgba(255,255,255,.8); }
+        .recruit-layout { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr); gap:22px; align-items:start; }
+        .recruit-card, .my-post-card { padding:24px; }
+        .recruit-card h2, .my-post-card h2 { margin:0 0 18px; font-size:18px; letter-spacing:-.04em; }
+        .recruit-card label { display:block; margin:12px 0 6px; color:var(--ui-muted); font-size:12px; font-weight:700; }
+        .recruit-card input, .recruit-card select, .recruit-card textarea { width:100%; padding:11px 12px; }
+        .recruit-card textarea { resize:vertical; min-height:130px; }
+        .recruit-card button { width:100%; margin-top:18px; min-height:48px; border:0; border-radius:10px; background:var(--ui-green); color:#fff; font-weight:800; cursor:pointer; }
+        .recruit-card button:hover { background:#37674b; }
+        .my-post-empty { color:var(--ui-muted); font-size:13px; }
+        .my-post-content { color:var(--ui-ink); line-height:1.7; font-size:14px; }
+        .my-post-meta { color:var(--ui-muted); font-size:12px; }
+        .tag-list { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; }
+        .tag { padding:4px 8px; border-radius:99px; background:var(--ui-soft); color:var(--ui-green); font-size:11px; }
+        .delete-post { width:100%; margin-top:16px; padding:10px; border:1px solid #f1c8c3; border-radius:9px; background:#fff5f3; color:var(--ui-danger); font-weight:700; cursor:pointer; }
+        .page-links { display:flex; gap:10px; margin-top:22px; flex-wrap:wrap; }
+        .page-links a { padding:10px 14px; border:1px solid var(--ui-line); border-radius:9px; background:var(--ui-paper); text-decoration:none; font-size:12px; font-weight:700; }
+        @media (max-width:760px) { .split-page { padding:28px 14px 60px; } .recruit-layout { grid-template-columns:1fr; } }
+    </style>
+</head>
+
+<body data-page="recruit">
+    <header class="navbar">
+        <div class="logo" onclick="location.href='users.html'">平工マッチング</div>
+        <button class="hamburger-btn" id="hud-menu-btn" type="button" onclick="toggleMenu()" aria-label="メニューを開く"><span></span><span></span><span></span></button>
+        <nav class="nav-links" id="nav-links">
+            <a class="nav-item" href="main.html?guide=1">使い方</a>
+            <a class="nav-item active" href="recruit.html">募集投稿</a>
+            <a class="nav-item" href="users.html">ユーザーを探す</a>
+            <a class="nav-item" href="messages.html">メッセージ <span id="unread-badge" class="unread-badge" style="display:none;">0</span></a>
+            <a class="nav-item" href="profile.html">マイページ</a>
+            <a class="nav-item" href="ai-study.html">AI学習相談</a>
+            <a class="nav-item" id="nav-admin-btn" style="display:none;color:#a84738;" href="admin.html">管理者</a>
+            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>
+        </nav>
+    </header>
+
+    <main class="split-page">
+        <section class="split-hero"><p>CREATE A STUDY POST</p><h1>一緒に勉強する仲間を募集する。</h1><small>教科や時間を具体的に書くと、相談したい相手とつながりやすくなります。</small></section>
+        <div class="recruit-layout">
+            <section class="recruit-card">
+                <h2>募集を投稿する</h2>
+                <input type="text" id="user-name" placeholder="マイページで名前を設定してください" readonly>
+                <label for="rec-grade">学年</label>
+                <select id="rec-grade"><option>1年</option><option>2年</option><option>3年</option></select>
+                <label for="rec-dept">学科</label>
+                <select id="rec-dept"><option>機械工学科</option><option>電気工学科</option><option>制御工学科</option><option>土木環境工学科</option><option>情報工学科</option></select>
+                <label for="rec-content">勉強内容</label>
+                <textarea id="rec-content" maxlength="2000" placeholder="例：放課後に数学の問題を一緒に解きたい"></textarea>
+                <label for="rec-fixed-tag">おすすめタグから選ぶ</label>
+                <select id="rec-fixed-tag"><option value="">タグを1つ選ぶ（任意）</option><option>数学</option><option>英語</option><option>国語</option><option>理科</option><option>社会</option><option>専門科目</option><option>プログラミング</option><option>資格</option><option>定期テスト</option><option>課題</option><option>放課後</option><option>初心者歓迎</option></select>
+                <label for="rec-tags">関連タグ（任意）</label>
+                <input type="text" id="rec-tags" maxlength="500" placeholder="例：物理, 検定対策">
+                <label for="rec-duration">募集を表示する時間</label>
+                <select id="rec-duration"><option value="15">15分</option><option value="30">30分</option><option value="45">45分</option><option value="60">1時間</option><option value="120">2時間</option><option value="180">3時間</option><option value="240">4時間</option><option value="300">5時間</option><option value="360">6時間</option><option value="420">7時間</option><option value="480">8時間</option><option value="540">9時間</option><option value="600">10時間</option><option value="660">11時間</option><option value="720">12時間</option><option value="780">13時間</option><option value="840">14時間</option><option value="900">15時間</option><option value="960">16時間</option><option value="1020">17時間</option><option value="1080">18時間</option><option value="1140">19時間</option><option value="1200">20時間</option><option value="1260">21時間</option><option value="1320">22時間</option><option value="1380">23時間</option><option value="1440" selected>24時間</option></select>
+                <small style="display:block;margin-top:6px;color:var(--ui-muted);font-size:11px;">設定した時間を過ぎると募集一覧から自動的に非表示になります。</small>
+                <button id="submit-btn" type="button" onclick="submitRecruitment()">投稿する</button>
+            </section>
+            <aside class="my-post-card">
+                <h2>あなたの現在の募集</h2>
+                <div id="my-post-content" class="my-post-empty">読み込み中...</div>
+            </aside>
+        </div>
+        <div class="page-links"><a href="users.html">募集一覧を見る</a><a href="messages.html">メッセージを確認する</a></div>
+    </main>
+    <footer class="footer"><div class="footer-container"><div class="footer-links"><a href="recruit.html">募集投稿</a><a href="users.html">ユーザーを探す</a><a href="messages.html">メッセージ</a><a href="profile.html">マイページ</a><a href="terms.html">利用規約</a><a href="privacy.html">プライバシーポリシー</a></div><p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p></div></footer>
+
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
+        const userEmail = localStorage.getItem("userEmail") || "";
+        if (!userEmail) location.href = "index.html";
+        const adminButton = document.getElementById("nav-admin-btn");
+        if (adminButton && (localStorage.getItem("userId") === "admin" || userEmail === "admin") && localStorage.getItem("isImpersonating") !== "true") adminButton.style.display = "inline-block";
+
+        function toggleMenu() { document.getElementById("nav-links").classList.toggle("open"); document.getElementById("hud-menu-btn").classList.toggle("open"); }
+        function escapeHtml(value) { return String(value ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"); }
+        function getDuration(value) { const allowed=[15,30,45,60,120,180,240,300,360,420,480,540,600,660,720,780,840,900,960,1020,1080,1140,1200,1260,1320,1380,1440]; const n=Number(value); return allowed.includes(n)?n:1440; }
+        function durationLabel(value) { const n=getDuration(value); return n<60?n+"分":n/60+"時間"; }
+        function mergeTags(fixed, manual) { return [...new Set(`${fixed||""},${manual||""}`.split(/[,、\s]+/).map(v=>v.replace(/^#/,'').trim()).filter(Boolean))].join(", "); }
+        async function fetchGas(payload, timeoutMs=20000) {
+            const read = ["getRecruitments", "getNotificationSummary"].includes(payload.mode);
+            let lastError;
+            for (let attempt=0; attempt<(read?2:1); attempt++) {
+                const controller=new AbortController(); const timer=setTimeout(()=>controller.abort(),timeoutMs);
+                try { const res=await fetch(GAS_URL,{method:"POST",body:JSON.stringify(payload),signal:controller.signal}); if(!res.ok) throw new Error("通信エラー"); const result=await res.json(); if(result.status!=="success") throw new Error(result.message||"処理に失敗しました"); return result; }
+                catch(e) { lastError=e; if(attempt+1<(read?2:1)) await new Promise(resolve=>setTimeout(resolve,1200)); }
+                finally { clearTimeout(timer); }
+            }
+            throw lastError;
+        }
+        async function loadMyPost() {
+            const box=document.getElementById("my-post-content");
+            try { const result=await fetchGas({mode:"getRecruitments",email:userEmail}); const post=[...result.message].reverse().find(item=>item.email===userEmail); if(!post){box.className="my-post-empty";box.textContent="投稿している募集はありません。";return;} const tags=(post.tags||"").split(/[,、\s]+/).filter(Boolean).map(tag=>`<span class="tag">#${escapeHtml(tag)}</span>`).join(""); box.className="my-post-content"; box.innerHTML=`<div class="my-post-meta">${escapeHtml(post.grade)} ｜ ${escapeHtml(post.dept)}</div><p>${escapeHtml(post.content)}</p><div class="my-post-meta">表示期限：${durationLabel(post.durationMinutes)}</div><div class="tag-list">${tags}</div><button class="delete-post" type="button" onclick="deleteMyRecruitment()">この募集を削除する</button>`; }
+            catch(e) { box.className="my-post-empty"; box.textContent=e.name==="AbortError"?"読み込みに時間がかかっています。":"募集を読み込めませんでした。"; }
+        }
+        async function submitRecruitment() {
+            const content=document.getElementById("rec-content").value.trim(); if(!content){showNotice("募集内容を入力してください","error");return;}
+            const button=document.getElementById("submit-btn"); button.disabled=true; button.textContent="投稿中...";
+            try { const duration=getDuration(document.getElementById("rec-duration").value); await fetchGas({mode:"postRecruitment",name:localStorage.getItem("userName")||"ユーザー",grade:document.getElementById("rec-grade").value,dept:document.getElementById("rec-dept").value,content,tags:mergeTags(document.getElementById("rec-fixed-tag").value,document.getElementById("rec-tags").value),durationMinutes:duration,email:userEmail}); showNotice(durationLabel(duration)+"の募集を投稿しました","success"); document.getElementById("rec-content").value="";document.getElementById("rec-tags").value="";document.getElementById("rec-fixed-tag").value="";await loadMyPost(); }
+            catch(e) { showNotice(e.message||"投稿に失敗しました","error"); }
+            finally { button.disabled=false;button.textContent="投稿する"; }
+        }
+        async function deleteMyRecruitment() { if(!confirm("本当にこの募集を削除しますか？"))return; try{await fetchGas({mode:"deleteRecruitment",email:userEmail});showNotice("募集を削除しました","success");loadMyPost();}catch(e){showNotice(e.message||"削除に失敗しました","error");} }
+        function logout() { localStorage.clear(); location.href="index.html"; }
+        async function updateNotificationSummary(){const badge=document.getElementById("unread-badge");if(!badge)return;try{const result=await fetchGas({mode:"getNotificationSummary",email:userEmail},20000);const count=result.message.unreadCount||0;badge.textContent=count>99?"99+":count;badge.style.display=count?"inline-block":"none";}catch(e){}}
+        document.addEventListener("DOMContentLoaded",()=>{ document.getElementById("user-name").value=localStorage.getItem("userName")||""; loadMyPost();updateNotificationSummary();setInterval(()=>{if(document.visibilityState==="visible")updateNotificationSummary();},8000); });
+    </script>
+</body>
+</html>

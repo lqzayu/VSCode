@@ -8,7 +8,6 @@
     <link rel="icon" href="icon-192.png">
     <link rel="stylesheet" href="theme.css?v=20260917c">
     <script src="ui.js"></script>
-    <script src="common.js"></script>
     <script src="online.js?v=20260917b" defer></script>
     <style>
         .ai-page { max-width: 1080px; margin: 0 auto; padding: 46px 24px 80px; }
@@ -67,8 +66,8 @@
         </button>
         <nav class="nav-links" id="nav-links">
             <a class="nav-item" href="main.html?guide=1">使い方</a>
-            <a class="nav-item" href="main.html?tab=recruit">募集投稿</a>
-            <a class="nav-item" href="main.html?tab=search">ユーザーを探す</a>
+            <a class="nav-item" href="recruit.html">募集投稿</a>
+            <a class="nav-item" href="users.html">ユーザーを探す</a>
             <a class="nav-item" href="messages.html">メッセージ</a>
             <a class="nav-item" href="profile.html">マイページ</a>
             <a class="nav-item active" href="ai-study.html">AI学習相談</a>
@@ -139,6 +138,10 @@
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
         const currentUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";
+        const adminButton = document.getElementById("nav-admin-btn");
+        if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") {
+            adminButton.style.display = "inline-block";
+        }
         const stateKey = "ai-study-state:" + currentUserId;
         let sessionId = (crypto.randomUUID ? crypto.randomUUID() : "ai-" + Date.now());
         const history = [];
@@ -146,6 +149,8 @@
         let waiting = false;
         let consultationCompleted = false;
         let pendingRequest = null;
+        let aiComposing = false;
+        let aiEnterArmed = false;
 
         function createId() {
             return crypto.randomUUID ? crypto.randomUUID() : "ai-" + Date.now() + "-" + Math.random().toString(16).slice(2);
@@ -377,10 +382,26 @@
         }
 
         document.getElementById("ai-input").addEventListener("keydown", event => {
-            if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                sendStudyMessage();
+            if (event.key !== "Enter" || event.shiftKey) return;
+            if (aiComposing || event.isComposing || event.keyCode === 229) {
+                aiEnterArmed = true;
+                return;
             }
+            event.preventDefault();
+            if (!aiEnterArmed) {
+                aiEnterArmed = true;
+                document.getElementById("ai-status").textContent = "もう一度Enterで送信";
+                return;
+            }
+            aiEnterArmed = false;
+            sendStudyMessage();
+        });
+
+        document.getElementById("ai-input").addEventListener("compositionstart", () => {
+            aiComposing = true;
+        });
+        document.getElementById("ai-input").addEventListener("compositionend", () => {
+            aiComposing = false;
         });
 
         function restoreState() {
