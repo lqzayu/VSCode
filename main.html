@@ -1455,20 +1455,20 @@
                 <div class="usage-guide-flow" aria-label="基本的な利用手順">
                     <article class="usage-step-card">
                         <span class="usage-step-number">01</span>
-                        <h3>プロフィールを確認</h3>
-                        <p>マイページで表示名とプロフィール画像を設定します。募集にはこの表示名が使われます。</p>
+                        <h3>プロフィールを整える</h3>
+                        <p>マイページで表示名とプロフィール画像を設定します。表示名は募集やチャットに表示されます。</p>
                         <a href="profile.html">マイページを開く</a>
                     </article>
                     <article class="usage-step-card">
                         <span class="usage-step-number">02</span>
                         <h3>募集する・探す</h3>
-                        <p>勉強したい内容、学年、学科、タグを入力して投稿します。ほかの人の募集はキーワードやタグで検索できます。</p>
+                        <p>募集投稿とユーザー検索は別ページです。勉強内容、タグ、表示時間を設定して投稿できます。</p>
                         <button type="button" onclick="showGuideDestination('recruit')">募集を投稿する</button>
                     </article>
                     <article class="usage-step-card">
                         <span class="usage-step-number">03</span>
-                        <h3>チャットを始める</h3>
-                        <p>気になる募集の「チャットを始める」を押します。質問したい内容や、一緒に勉強できる時間を相談してください。</p>
+                        <h3>相談を始める</h3>
+                        <p>気になる募集にリアクションを送るか、チャットを始めます。AI学習相談では勉強方法も一緒に考えられます。</p>
                         <button type="button" onclick="showGuideDestination('search')">募集一覧を見る</button>
                     </article>
                 </div>
@@ -1476,25 +1476,66 @@
                 <section class="usage-guide-section">
                     <div class="usage-guide-section-title">
                         <span>募集について</span>
-                        <h3>投稿は24時間表示されます</h3>
+                        <h3>表示時間を自分で決められます</h3>
                     </div>
                     <div class="usage-info-grid">
-                        <div><strong>残り時間</strong><p>募集カードのカウントダウンで、表示終了までの時間を確認できます。</p></div>
-                        <div><strong>投稿の更新</strong><p>もう一度投稿すると、自分の現在の募集内容が新しい内容に更新されます。</p></div>
-                        <div><strong>手動削除</strong><p>募集を終了したい場合は、ホーム画面の「あなたの現在の募集」から削除できます。</p></div>
+                        <div><strong>表示時間</strong><p>15分・30分・45分、1時間以降は1時間刻みで、最大24時間まで選べます。</p></div>
+                        <div><strong>タグ検索</strong><p>おすすめタグと自由入力タグを組み合わせて、募集を見つけやすくできます。タグを押すと絞り込めます。</p></div>
+                        <div><strong>残り時間と削除</strong><p>募集一覧では残り時間を確認できます。募集投稿ページから自分の募集を手動削除できます。</p></div>
+                    </div>
+                    <a class="usage-guide-primary-link" href="recruit.html">募集投稿ページを開く</a>
+                    <a class="usage-guide-primary-link" href="users.html">ユーザー検索ページを開く</a>
+                </section>
+
+                <section class="usage-guide-section">
+                    <div class="usage-guide-section-title">
+                        <span>募集一覧の機能</span>
+                        <h3>気になる相手へすぐ反応できます</h3>
+                    </div>
+                    <div class="usage-guide-note">
+                        <p><strong>クイックリアクション：</strong>「気になる！」「一緒に勉強したい！」「質問したい！」をワンタップで送れます。</p>
+                        <p><strong>チャット：</strong>募集内容を見て詳しく相談したいときは「チャットを始める」を押します。</p>
+                        <p><strong>ブロック・通報：</strong>相手との接触を止めたいときはブロック、不適切な投稿は通報を使います。</p>
                     </div>
                 </section>
 
                 <section class="usage-guide-section">
                     <div class="usage-guide-section-title">
                         <span>メッセージと通知</span>
-                        <h3>新着メッセージを確認する</h3>
+                        <h3>チャットを安全・便利に使う</h3>
                     </div>
                     <div class="usage-guide-note">
-                        <p><strong>アプリ内：</strong>上部の「メッセージ」から会話一覧を開けます。未読がある場合は件数が表示されます。</p>
+                        <p><strong>メッセージ一覧：</strong>上部の「メッセージ」から会話相手を選べます。未読件数も表示されます。</p>
+                        <p><strong>チャット機能：</strong>画像添付、送信取り消し、チャット履歴の削除、メッセージ一覧からの削除に対応しています。</p>
+                        <p><strong>PC操作：</strong>入力欄では日本語変換を確定してから送信してください。送信ボタンも利用できます。</p>
                         <p><strong>LINE通知：</strong>LINE公式アカウントへ、自分のユーザーIDまたは登録メールアドレスを送信すると連携できます。</p>
                     </div>
                     <a class="usage-guide-primary-link" href="messages.html">メッセージ一覧を開く</a>
+                </section>
+
+                <section class="usage-guide-section">
+                    <div class="usage-guide-section-title">
+                        <span>AI学習相談</span>
+                        <h3>自分に合う勉強方法を見つける</h3>
+                    </div>
+                    <div class="usage-guide-note">
+                        <p>教科、目標、苦手なこと、勉強できる時間を入力すると、AIが追加質問をしてから勉強方法と具体的な行動を提案します。</p>
+                        <p>通常は「追加質問」→「最終提案」の2回で相談が完了します。回答後は「役に立った／合わなかった」で評価できます。</p>
+                        <p>AI相談は1日5回までです。個人情報、パスワード、住所、電話番号は入力しないでください。</p>
+                    </div>
+                    <a class="usage-guide-primary-link" href="ai-study.html">AI学習相談を開く</a>
+                </section>
+
+                <section class="usage-guide-section">
+                    <div class="usage-guide-section-title">
+                        <span>アカウントと認証</span>
+                        <h3>登録情報を安全に管理する</h3>
+                    </div>
+                    <div class="usage-guide-note">
+                        <p><strong>パスワード：</strong>半角4文字以上で、英大文字・英小文字・数字・記号を各1文字以上含めます。1111や1234のような推測されやすい数字列は使えません。</p>
+                        <p><strong>顔認証：</strong>マイページから顔情報を更新できます。明るい場所で正面を向き、カメラへのアクセスを許可してください。</p>
+                        <p><strong>パスワード再設定：</strong>ログイン画面の再設定手続きから、登録メールアドレスを使って更新できます。</p>
+                    </div>
                 </section>
 
                 <section class="usage-guide-section usage-safety-section">
@@ -1503,7 +1544,7 @@
                         <h3>困ったときは一人で抱え込まない</h3>
                     </div>
                     <ul>
-                        <li>住所、電話番号、パスワードなどの個人情報は投稿・送信しないでください。</li>
+                        <li>住所、電話番号、パスワード、顔認証情報などの個人情報は投稿・送信しないでください。</li>
                         <li>不快なメッセージや不適切な募集は「通報」を使って運営へ知らせてください。</li>
                         <li>相手とのやり取りを止めたい場合は「ブロック」を使えます。解除はマイページから行えます。</li>
                         <li>緊急性がある内容は、サービス内だけで解決せず先生や身近な大人へ相談してください。</li>
@@ -1525,9 +1566,11 @@
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-links">
-                <a href="main.html">ホーム</a>
+                <a href="users.html">ユーザーを探す</a>
+                <a href="recruit.html">募集投稿</a>
                 <a href="messages.html">メッセージ</a>
                 <a href="profile.html">マイページ</a>
+                <a href="ai-study.html">AI学習相談</a>
                 <a href="terms.html">利用規約</a>
                 <a href="privacy.html">プライバシーポリシー</a>
             </div>
