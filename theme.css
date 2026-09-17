@@ -7,6 +7,37 @@
  --teal-dark:var(--ui-green); --navy:var(--ui-green); --ui-green-deep:#47755b; --coral:#cc9e74;	/* 見た目の設定を指定 */
 }	/* スタイル定義を閉じる */
 
+html[data-theme="dark"] .usage-intro-card {	/* 手動ダークモードの告知バナーを調整する */
+ background:linear-gradient(135deg,#172a46 0%,#203b5c 58%,#312f5f 100%)!important; border-color:#3d5d7d!important;	/* 落ち着いた青紫の背景を適用する */
+ color:#f4f7fb!important;	/* バナー全体の文字色を調整する */
+}	/* 手動ダークモード告知バナーの設定を閉じる */
+html[data-theme="dark"] .usage-intro-card h1 {	/* 手動ダークモードのバナー見出しを調整する */
+ color:#f4f7fb!important;	/* 見出しを明るく表示する */
+}	/* 手動ダークモードバナー見出しの設定を閉じる */
+html[data-theme="dark"] .usage-intro-card p {	/* 手動ダークモードのバナー説明を調整する */
+ color:#c7d5e6!important;	/* 説明文を読みやすく表示する */
+}	/* 手動ダークモードバナー説明の設定を閉じる */
+html[data-theme="dark"] .usage-intro-label {	/* 手動ダークモードのバナーラベルを調整する */
+ color:#c4b5fd!important;	/* ラベルにラベンダー色を使う */
+}	/* 手動ダークモードバナーラベルの設定を閉じる */
+html[data-theme="dark"] .usage-intro-button {	/* 手動ダークモードのバナーボタンを調整する */
+ background:#d8d1ff!important; border-color:#d8d1ff!important; color:#243654!important;	/* 明るい紫のボタンを適用する */
+}	/* 手動ダークモードバナーボタンの設定を閉じる */
+html[data-theme="dark"] .usage-intro-button:hover {	/* 手動ダークモードのバナーボタン操作色を調整する */
+ background:#eeeaff!important; border-color:#eeeaff!important;	/* 操作時に少し明るくする */
+}	/* 手動ダークモードバナーボタン操作色の設定を閉じる */
+
+@media (prefers-color-scheme: dark) {	/* 端末が暗色設定の場合に処理する */
+ html:not([data-theme="light"]) .usage-intro-card {	/* 自動または手動ダークモードの告知バナーを調整する */
+  background:linear-gradient(135deg,#172a46 0%,#203b5c 58%,#312f5f 100%)!important; border-color:#3d5d7d!important; color:#f4f7fb!important;	/* 落ち着いた青紫の背景を適用する */
+ }	/* 自動または手動ダークモード告知バナーの設定を閉じる */
+ html:not([data-theme="light"]) .usage-intro-card h1 { color:#f4f7fb!important; }	/* 自動または手動ダークモードの見出しを明るくする */
+ html:not([data-theme="light"]) .usage-intro-card p { color:#c7d5e6!important; }	/* 自動または手動ダークモードの説明文を明るくする */
+ html:not([data-theme="light"]) .usage-intro-label { color:#c4b5fd!important; }	/* 自動または手動ダークモードのラベルを紫色にする */
+ html:not([data-theme="light"]) .usage-intro-button { background:#d8d1ff!important; border-color:#d8d1ff!important; color:#243654!important; }	/* 自動または手動ダークモードのボタンを調整する */
+ html:not([data-theme="light"]) .usage-intro-button:hover { background:#eeeaff!important; border-color:#eeeaff!important; }	/* 自動または手動ダークモードの操作色を調整する */
+}	/* 端末が暗色設定の場合の告知バナー補正を閉じる */
+
 .appearance-settings {	/* 外観設定欄の見た目を整える */
  margin-top:28px; padding:20px; border:1px solid var(--ui-line); border-radius:14px; background:var(--ui-soft); text-align:left;	/* 外観設定欄を配置する */
 }	/* 外観設定欄の設定を閉じる */
@@ -61,10 +92,10 @@ html[data-theme="dark"] .msg-partner,html[data-theme="dark"] .message-bubble:not
  background:var(--ui-paper)!important; color:var(--ui-ink)!important;	/* 相手側表示を暗色表示にする */
 }	/* 手動ダークモード相手側表示の設定を閉じる */
 html[data-theme="dark"] .ai-messages {	/* 手動ダークモードのAI履歴を設定する */
- background:rgba(43,58,49,.72)!important;	/* AI履歴を暗色表示にする */
+ background:rgba(37,49,71,.78)!important;	/* AI履歴を暗色表示にする */
 }	/* 手動ダークモードAI履歴の設定を閉じる */
 html[data-theme="dark"] .usage-guide-header {	/* 手動ダークモードの使い方見出しを設定する */
- background:rgba(20,26,23,.96)!important;	/* 使い方見出しを暗色表示にする */
+ background:rgba(16,21,34,.96)!important;	/* 使い方見出しを暗色表示にする */
 }	/* 手動ダークモード使い方見出しの設定を閉じる */
 
 @media (prefers-color-scheme: dark) {	/* 端末が暗色設定の場合に処理する */
@@ -517,14 +548,14 @@ td,th { border-bottom:1px solid var(--ui-line); }	/* 見た目の設定を指定
   color:var(--ui-ink)!important;	/* 暗色用相手文字を適用 */
  }	/* 相手側表示の設定を閉じる */
  .ai-messages {	/* AI相談の履歴背景を調整 */
-  background:rgba(43,58,49,.72)!important;	/* 暗色用履歴背景を適用 */
+  background:rgba(37,49,71,.78)!important;	/* 暗色用履歴背景を適用 */
  }	/* AI相談履歴の設定を閉じる */
  .countdown-badge {	/* 残り時間表示を調整 */
   background:#4a3d22!important;	/* 暗色用時間背景を適用 */
   color:#f2d48f!important;	/* 暗色用時間文字を適用 */
  }	/* 残り時間表示の設定を閉じる */
  .usage-guide-header {	/* 使い方の見出しを調整 */
-  background:rgba(20,26,23,.96)!important;	/* 暗色用見出し背景を適用 */
+  background:rgba(16,21,34,.96)!important;	/* 暗色用見出し背景を適用 */
  }	/* 使い方見出しの設定を閉じる */
  .usage-safety-section ul {	/* 安全案内の背景を調整 */
   background:#3b3329!important;	/* 暗色用安全案内背景を適用 */
