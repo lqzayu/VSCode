@@ -1005,6 +1005,8 @@
             } catch (e) {	// 処理のまとまりを始める
                 alert("送信できませんでした: " + (e.message || "通信エラー"));	// 処理結果を知らせる
                 tempBubble.remove();	// 処理を完了する
+                selectedAttachments = [];	// 失敗した添付画像を次回送信へ持ち越さない
+                renderAttachmentPreview();	// 添付画像の表示をリセットする
             } finally {	// 処理のまとまりを始める
                 if (sendBtn) {	// 条件に応じて処理を分ける
                     sendBtn.disabled = false;	// 処理を続ける
