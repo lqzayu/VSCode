@@ -35,9 +35,12 @@
         .ai-bubble.user { align-self:flex-end; color:#fff; background:var(--ui-green); border-bottom-right-radius:5px; }	/* 見た目の設定を指定 */
         .ai-bubble.model { align-self:flex-start; color:var(--ui-ink); background:var(--ui-paper); border:1px solid var(--ui-line); border-bottom-left-radius:5px; }	/* 見た目の設定を指定 */
         .ai-bubble.loading { color:var(--ui-muted); font-size:13px; }	/* 見た目の設定を指定 */
-        .ai-feedback { display:flex; gap:7px; margin-top:10px; }	/* 見た目の設定を指定 */
-        .ai-feedback button { padding:6px 9px; border:1px solid var(--ui-line); border-radius:8px; background:var(--ui-paper); color:var(--ui-muted); font-size:11px; cursor:pointer; }	/* 見た目の設定を指定 */
+        .ai-feedback { display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin-top:10px; }	/* 評価ボタンを折り返して表示 */
+        .ai-feedback-question { width:100%; color:var(--ui-muted); font-size:11px; }	/* 評価理由の案内を表示 */
+        .ai-feedback-saved { color:var(--ui-green); font-size:11px; font-weight:700; }	/* 評価の保存完了を表示 */
+        .ai-feedback button { padding:6px 9px; border:1px solid var(--ui-line); border-radius:8px; background:var(--ui-paper); color:var(--ui-muted); font-size:11px; cursor:pointer; }	/* 評価ボタンの見た目を整える */
         .ai-feedback button:hover { border-color:#8cae59; color:var(--ui-green); }	/* 見た目の設定を指定 */
+        .ai-feedback button:disabled { opacity:.55; cursor:wait; }	/* 保存中のボタンを押せなくする */
         .ai-compose { padding:18px 22px 22px; border-top:1px solid var(--ui-line); }	/* 見た目の設定を指定 */
         .ai-compose-row { display:flex; gap:10px; align-items:flex-end; }	/* 見た目の設定を指定 */
         .ai-compose textarea { flex:1; min-height:54px; max-height:150px; resize:vertical; padding:12px; }	/* 見た目の設定を指定 */
@@ -225,11 +228,11 @@
                 const helpful = document.createElement("button");	// 定数を定義
                 helpful.type = "button";	// 処理を続ける
                 helpful.textContent = "役に立った";	// 処理を続ける
-                helpful.onclick = () => sendFeedback(responseId, "helpful", feedback);	// 処理を完了する
+                helpful.onclick = () => sendFeedback(responseId, "helpful", feedback, "helpful", "役に立った");	// 良い評価を保存する
                 const notHelpful = document.createElement("button");	// 定数を定義
                 notHelpful.type = "button";	// 処理を続ける
                 notHelpful.textContent = "もう少し合う方法がいい";	// 処理を続ける
-                notHelpful.onclick = () => sendFeedback(responseId, "not_helpful", feedback);	// 処理を完了する
+                notHelpful.onclick = () => showFeedbackReasons(responseId, feedback);	// 合わなかった理由を表示する
                 feedback.append(helpful, notHelpful);	// 処理を完了する
                 bubble.appendChild(feedback);	// 処理を完了する
             }	// 処理のまとまりを閉じる
@@ -363,20 +366,46 @@
             requestAi(request);	// 処理を完了する
         }	// 処理のまとまりを閉じる
 
-        async function sendFeedback(responseId, rating, container) {	// 関数を定義
+        function showFeedbackReasons(responseId, container) {	// 評価理由の選択肢を表示する
+            if (!container || container.dataset.saved) return;	// 保存済みなら処理しない
+            const reasons = [	// 評価理由を用意する
+                { code: "too_difficult", label: "難しすぎる" },	// 難易度が高い場合
+                { code: "too_easy", label: "簡単すぎる" },	// 難易度が低い場合
+                { code: "not_matched", label: "自分の状況に合わない" },	// 状況に合わない場合
+                { code: "another_method", label: "別の方法を試したい" }	// 違う方法を求める場合
+            ];	// 評価理由の定義を終える
+            container.replaceChildren();	// 最初の評価ボタンを消す
+            const question = document.createElement("span");	// 案内文を作る
+            question.className = "ai-feedback-question";	// 案内文の見た目を設定する
+            question.textContent = "どの点が合いませんでしたか？";	// 質問を表示する
+            container.appendChild(question);	// 案内文を追加する
+            reasons.forEach(reason => {	// 理由ごとにボタンを作る
+                const button = document.createElement("button");	// 理由ボタンを作る
+                button.type = "button";	// 送信ボタンとして扱わない
+                button.textContent = reason.label;	// 理由名を表示する
+                button.onclick = () => sendFeedback(responseId, "not_helpful", container, reason.code, reason.label);	// 選んだ理由を保存する
+                container.appendChild(button);	// 理由ボタンを追加する
+            });	// 理由ボタンの作成を終える
+        }	// 理由選択の処理を閉じる
+
+        async function sendFeedback(responseId, rating, container, reason, comment) {	// 評価と理由を保存する
             if (!container || container.dataset.saved) return;	// 条件に応じて処理を分ける
             container.dataset.saved = "true";	// 処理を続ける
+            container.querySelectorAll("button").forEach(button => button.disabled = true);	// 保存中はボタンを押せなくする
             try {	// 失敗に備えて処理を始める
-                const result = await postGas({ mode: "aiStudyFeedback", userId: currentUserId, responseId, rating });	// 定数を定義
+                const result = await postGas({ mode: "aiStudyFeedback", userId: currentUserId, responseId, rating, reason, comment });	// 評価内容を送る
                 if (result.status === "success") {	// 条件に応じて処理を分ける
-                    container.textContent = "評価を保存しました";	// 処理を続ける
-                    showNotice("評価を保存しました", "success");	// 処理結果を知らせる
+                    container.className = "ai-feedback ai-feedback-saved";	// 保存済みの見た目に変える
+                    container.textContent = "評価を保存しました。次回の提案に反映します";	// 反映予定を知らせる
+                    showNotice("評価を保存しました。次回の提案に反映します", "success");	// 処理結果を知らせる
                 } else {	// 処理のまとまりを始める
                     delete container.dataset.saved;	// 処理を続ける
+                    container.querySelectorAll("button").forEach(button => button.disabled = false);	// ボタンを押せる状態に戻す
                     showNotice(result.message || "評価を保存できませんでした", "error");	// 処理結果を知らせる
                 }	// 処理のまとまりを閉じる
             } catch (error) {	// 処理のまとまりを始める
                 delete container.dataset.saved;	// 処理を続ける
+                container.querySelectorAll("button").forEach(button => button.disabled = false);	// ボタンを押せる状態に戻す
                 showNotice("評価を保存できませんでした", "error");	// 処理結果を知らせる
             }	// 処理のまとまりを閉じる
         }	// 処理のまとまりを閉じる
