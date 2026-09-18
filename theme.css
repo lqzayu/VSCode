@@ -423,12 +423,16 @@ td,th { border-bottom:1px solid var(--ui-line); }	/* 見た目の設定を指定
   position:fixed!important; left:0!important; width:100%!important;	/* 見た目の設定を指定 */
   z-index:119!important; flex-direction:column!important; align-items:center!important;	/* 見た目の設定を指定 */
   padding:20px 0!important; gap:6px!important;	/* 見た目の設定を指定 */
-  opacity:0!important; pointer-events:none!important; transform:translateY(-10px)!important;	/* 見た目の設定を指定 */
+  opacity:0!important; visibility:hidden!important; pointer-events:none!important; transform:translateY(-10px)!important;	/* 閉じている間は表示とタップ判定を無効にする */
   transition:transform .22s ease,opacity .22s ease!important;	/* 見た目の設定を指定 */
   top:64px!important; background:var(--ui-paper)!important; border:1px solid var(--ui-line);	/* 見た目の設定を指定 */
   border-top:0; border-radius:0 0 16px 16px; box-shadow:0 16px 30px rgba(36,60,50,.12);	/* 見た目の設定を指定 */
  }	/* スタイル定義を閉じる */
- .nav-links.open { opacity:1!important; pointer-events:auto!important; transform:translateY(0)!important; }	/* 見た目の設定を指定 */
+ .nav-links:not(.open),	/* 閉じたメニュー本体を指定する */
+ .nav-links:not(.open) > a,	/* 閉じたメニュー内のリンクを指定する */
+ .nav-links:not(.open) > button,	/* 閉じたメニュー内のボタンを指定する */
+ .nav-links:not(.open) > .nav-item { pointer-events:none!important; }	/* 閉じたメニュー内のタップ判定を消す */
+ .nav-links.open { opacity:1!important; visibility:visible!important; pointer-events:auto!important; transform:translateY(0)!important; }	/* 開いたメニューだけ操作できるようにする */
  .nav-links .nav-item,.nav-links .btn-logout {	/* 対象要素のスタイルを始める */
   width:min(82%,420px)!important; margin:0 auto!important; padding:11px 14px!important;	/* 見た目の設定を指定 */
   text-align:center!important;	/* 見た目の設定を指定 */
