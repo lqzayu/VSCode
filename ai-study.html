@@ -393,7 +393,7 @@
             container.dataset.saved = "true";	// 処理を続ける
             container.querySelectorAll("button").forEach(button => button.disabled = true);	// 保存中はボタンを押せなくする
             try {	// 失敗に備えて処理を始める
-                const result = await postGas({ mode: "aiStudyFeedback", userId: currentUserId, responseId, rating, reason, comment });	// 評価内容を送る
+                const result = await postGas({ mode: "aiStudyFeedback", userId: currentUserId, responseId, rating, reason, comment }, 20000, 1);	// 評価を重複送信せず保存する
                 if (result.status === "success") {	// 条件に応じて処理を分ける
                     container.className = "ai-feedback ai-feedback-saved";	// 保存済みの見た目に変える
                     container.textContent = "評価を保存しました。次回の提案に反映します";	// 反映予定を知らせる
@@ -466,6 +466,7 @@
 
         if (!currentUserId) {	// 条件に応じて処理を分ける
             showNotice("ログインしてから利用してください", "error");	// 処理結果を知らせる
+            window.location.replace("index.html");	// 未ログインならログイン画面へ戻す
         } else {	// 処理のまとまりを始める
             restoreState();	// 処理を完了する
         }	// 処理のまとまりを閉じる

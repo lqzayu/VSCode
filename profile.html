@@ -13,7 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" crossorigin="anonymous"></script>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/face_mesh.js" crossorigin="anonymous"></script>
 
 
 
@@ -491,7 +491,7 @@
 
             <div class="profile-image-group">	<!-- 画面要素を配置 -->
                 <img id="profile-icon" class="big-profile-icon"
-                    src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="icon">
+                    src="avatar-default.svg" alt="プロフィール画像">
 
                 <div class="image-btn-group">	<!-- 画面要素を配置 -->
                     <label for="image-input" class="input-file-label">画像を選択</label>	<!-- 画面要素を配置 -->
@@ -575,7 +575,10 @@
 
 
     <script>
-        const DEFAULT_AVATAR = "https://cdn-icons-png.flaticon.com/512/149/149071.png";	// 定数を定義
+        if (!localStorage.getItem("userEmail")) {	// ログイン状態を確認する
+            window.location.replace("index.html");	// 未ログインならログイン画面へ戻す
+        }	// ログイン確認を閉じる
+        const DEFAULT_AVATAR = "avatar-default.svg";	// 初期プロフィール画像を設定する
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";	// GAS APIの接続先を設定
 
         let cropper = null;	// 状態を保持
@@ -589,6 +592,8 @@
         let lastFaceSeen = 0;	// 状態を保持
         let cameraSession = 0;	// 状態を保持
         let unreadRequest = null;	// 状態を保持
+        let unreadPollTimer = null;	// 未読確認の定期処理を保持する
+        let faceCountdownTimer = null;	// 顔撮影までのタイマーを保持する
         const faceCheckInterval = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? 100 : 66;	// 定数を定義
 
         function compactFaceLandmarks(landmarks) {	// 関数を定義
@@ -778,7 +783,7 @@
                 });	// 処理を完了する
                 if (result.status === "success") {	// 条件に応じて処理を分ける
                     alert("ユーザー情報を削除しました。");	// 処理結果を知らせる
-                    localStorage.clear();	// 端末内の保存情報を扱う
+                    clearHeikoSession();	// 外観設定を残してログイン情報を消す
                     window.location.href = "index.html";	// 画面表示を更新する
                 } else {	// 処理のまとまりを始める
                     alert("削除に失敗しました: " + result.message);	// 処理結果を知らせる
@@ -856,7 +861,7 @@
         }	// 処理のまとまりを閉じる
 
         function logout() {	// 関数を定義
-            localStorage.clear();	// 端末内の保存情報を扱う
+            clearHeikoSession();	// 外観設定を残してログイン情報を消す
             window.location.href = "index.html";	// 画面表示を更新する
         }	// 処理のまとまりを閉じる
 
@@ -959,7 +964,7 @@
 
         function initFaceMesh() {	// 関数を定義
             if (faceMesh) return;	// 条件に応じて処理を分ける
-            faceMesh = new FaceMesh({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}` });	// 処理を完了する
+            faceMesh = new FaceMesh({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/${file}` });	// 同じ版の顔認識ファイルを読み込む
             faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });	// 処理を完了する
             faceMesh.onResults((results) => {	// 処理のまとまりを始める
                 if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {	// 条件に応じて処理を分ける
@@ -1022,12 +1027,14 @@
                 let seconds = 3;	// 状態を保持
                 document.getElementById('face-status').innerText = `${seconds}秒後に自動で顔スキャンを実行します...`;	// 処理を続ける
 
-                const timer = setInterval(async () => {	// 定数を定義
+                clearInterval(faceCountdownTimer);	// 古い撮影タイマーを止める
+                faceCountdownTimer = setInterval(async () => {	// 撮影までの時間を数える
                     seconds--;	// 処理を続ける
                     if (seconds > 0) {	// 条件に応じて処理を分ける
                         document.getElementById('face-status').innerText = `${seconds}秒後に自動で顔スキャンを実行します...`;	// 処理を続ける
                     } else {	// 処理のまとまりを始める
-                        clearInterval(timer);	// 処理を完了する
+                        clearInterval(faceCountdownTimer);	// 撮影タイマーを止める
+                        faceCountdownTimer = null;	// タイマー情報を破棄する
                         await captureAndSaveFace(myEmail);	// 処理を完了する
                     }	// 処理のまとまりを閉じる
                 }, 1000);	// 処理を完了する
@@ -1078,6 +1085,8 @@
 
         function stopFaceCamera() {	// 関数を定義
             cameraSession++;	// 処理を続ける
+            clearInterval(faceCountdownTimer);	// 撮影前のタイマーを止める
+            faceCountdownTimer = null;	// タイマー情報を破棄する
             stopFaceLoop();	// 処理を完了する
             if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); }	// 条件に応じて処理を分ける
             videoStream = null;	// 処理を続ける
@@ -1093,6 +1102,29 @@
             stopFaceCamera();	// 処理を完了する
             document.getElementById('faceModal').style.display = "none";	// 画面表示を更新する
         }	// 処理のまとまりを閉じる
+
+        function startUnreadPoll() {	// 未読確認を開始する
+            if (unreadPollTimer) return;	// 二重開始を防ぐ
+            unreadPollTimer = setInterval(() => {	// 定期処理を登録する
+                if (document.visibilityState === "visible") updateUnreadBadge();	// 表示中だけ確認する
+            }, 8000);	// 八秒ごとに確認する
+        }	// 処理のまとまりを閉じる
+
+        function stopProfileTasks() {	// 画面を離れた時の処理を止める
+            clearInterval(unreadPollTimer);	// 未読確認を止める
+            unreadPollTimer = null;	// タイマー情報を破棄する
+            stopFaceCamera();	// カメラと顔検出を止める
+        }	// 処理のまとまりを閉じる
+
+        document.addEventListener("visibilitychange", () => {	// 表示状態の変化を監視する
+            if (document.visibilityState === "visible") {	// 画面へ戻った場合に処理する
+                updateUnreadBadge();	// 未読数を更新する
+                startUnreadPoll();	// 定期確認を再開する
+            } else {	// 画面が隠れた場合に処理する
+                stopProfileTasks();	// 不要な処理を止める
+            }	// 表示状態の確認を閉じる
+        });	// 監視処理を登録する
+        window.addEventListener("pagehide", stopProfileTasks);	// ページを離れた時に処理を止める
 
         window.onload = () => {	// 処理のまとまりを始める
             document.getElementById("hud-menu-btn").classList.remove("open");	// 画面表示を更新する
@@ -1116,9 +1148,7 @@
 
             syncProfileFromServer();	// 処理を完了する
             updateUnreadBadge();	// 処理を完了する
-            setInterval(() => {	// 時間を置いて処理する
-                if (document.visibilityState === "visible") updateUnreadBadge();	// 条件に応じて処理を分ける
-            }, 8000);	// 処理を完了する
+            startUnreadPoll();	// 未読確認を開始する
             loadBlockedUsers();	// 処理を完了する
         };	// 処理のまとまりを閉じる
     </script>

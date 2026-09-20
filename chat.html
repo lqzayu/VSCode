@@ -444,10 +444,13 @@
         let lastMessagesSignature = "";	// 状態を保持
         let chatPollTimer = null;	// 状態を保持
         const MAX_ATTACHMENTS = 8;	// 定数を定義
-        const MAX_ATTACHMENT_BYTES = 360 * 1024;	// 定数を定義
+        const MAX_ATTACHMENT_BYTES = 300 * 1024;	// 一枚の通信量を抑える
+        const MAX_TOTAL_ATTACHMENT_BYTES = 1800 * 1024;	// 一回の送信量を安全な範囲に抑える
         let selectedAttachments = [];	// 状態を保持
         let isMessageComposing = false;	// 状態を保持
         let unreadRequest = null;	// 状態を保持
+        let markReadRequest = null;	// 既読処理の重複通信を防ぐ
+        let unreadPollTimer = null;	// 未読確認の定期処理を保持する
 
         function toggleMenu() {	// 関数を定義
             document.getElementById("hud-menu-btn").classList.toggle("open");	// 画面表示を更新する
@@ -455,7 +458,7 @@
         }	// 処理のまとまりを閉じる
 
         function logout() {	// 関数を定義
-            localStorage.clear();	// 端末内の保存情報を扱う
+            clearHeikoSession();	// 外観設定を残してログイン情報を消す
             window.location.href = "index.html";	// 画面表示を更新する
         }	// 処理のまとまりを閉じる
 
@@ -731,6 +734,11 @@
                 for (const file of filesToAdd) {	// 対象を順番に処理する
                     if (!file.type.startsWith("image/")) continue;	// 条件に応じて処理を分ける
                     const compressed = await compressImageFile(file);	// 定数を定義
+                    const totalBytes = selectedAttachments.reduce((sum, item) => sum + (Number(item.size) || 0), 0);	// 現在の合計容量を求める
+                    if (totalBytes + compressed.size > MAX_TOTAL_ATTACHMENT_BYTES) {	// 通信が不安定になる容量を超える場合に止める
+                        alert("画像の合計容量が大きいため、ここまでを添付しました。残りは分けて送信してください。");	// 分割送信を案内する
+                        break;	// 追加処理を終了する
+                    }	// 容量確認を閉じる
                     selectedAttachments.push(compressed);	// 処理を完了する
                 }	// 処理のまとまりを閉じる
                 renderAttachmentPreview();	// 処理を完了する
@@ -934,15 +942,17 @@
         }	// 処理のまとまりを閉じる
 
         async function markAsRead() {	// 関数を定義
-            try {	// 失敗に備えて処理を始める
-                await postChat({	// 処理のまとまりを始める
-                    mode: "markAsRead",	// 処理を続ける
-                    myEmail: myEmail,	// 処理を続ける
-                    targetEmail: targetEmail	// 処理を続ける
-                });	// 処理を完了する
-            } catch (e) {	// 処理のまとまりを始める
-                console.error("既読処理エラー:", e);	// 処理を完了する
-            }	// 処理のまとまりを閉じる
+            if (markReadRequest) return markReadRequest;	// 実行中なら同じ処理を待つ
+            markReadRequest = postChat({	// 既読処理を開始する
+                mode: "markAsRead",	// 処理を続ける
+                myEmail: myEmail,	// 処理を続ける
+                targetEmail: targetEmail	// 処理を続ける
+            }).catch(e => {	// 通信失敗を処理する
+                console.error("既読処理エラー:", e);	// エラーを記録する
+            }).finally(() => {	// 通信終了後に後始末する
+                markReadRequest = null;	// 次の既読処理を許可する
+            });	// 既読処理を閉じる
+            return markReadRequest;	// 実行中の処理を返す
         }	// 処理のまとまりを閉じる
 
         async function updateUnreadBadge() {	// 関数を定義
@@ -1005,8 +1015,7 @@
             } catch (e) {	// 処理のまとまりを始める
                 alert("送信できませんでした: " + (e.message || "通信エラー"));	// 処理結果を知らせる
                 tempBubble.remove();	// 処理を完了する
-                selectedAttachments = [];	// 失敗した添付画像を次回送信へ持ち越さない
-                renderAttachmentPreview();	// 添付画像の表示をリセットする
+                textInput.value = text;	// 再送できるよう本文を戻す
             } finally {	// 処理のまとまりを始める
                 if (sendBtn) {	// 条件に応じて処理を分ける
                     sendBtn.disabled = false;	// 処理を続ける
@@ -1020,16 +1029,45 @@
             chatPollTimer = setTimeout(async () => {	// 時間を置いて処理する
                 if (document.visibilityState === "visible") {	// 条件に応じて処理を分ける
                     await loadMessages();	// 処理を完了する
+                    if (document.visibilityState === "visible") scheduleChatPoll();	// 表示中なら次の確認を予約する
                 }	// 処理のまとまりを閉じる
-                scheduleChatPoll();	// 処理を完了する
             }, 5000);	// 処理を完了する
+        }	// 処理のまとまりを閉じる
+
+        function startUnreadPoll() {	// 未読確認を開始する
+            if (unreadPollTimer) return;	// 二重開始を防ぐ
+            unreadPollTimer = setInterval(() => {	// 定期処理を登録する
+                if (document.visibilityState === "visible") updateUnreadBadge();	// 表示中だけ確認する
+            }, 8000);	// 八秒ごとに確認する
+        }	// 処理のまとまりを閉じる
+
+        function stopPagePolling() {	// 画面を離れた時の定期処理を止める
+            clearTimeout(chatPollTimer);	// チャット確認を止める
+            chatPollTimer = null;	// タイマー情報を破棄する
+            clearInterval(unreadPollTimer);	// 未読確認を止める
+            unreadPollTimer = null;	// タイマー情報を破棄する
         }	// 処理のまとまりを閉じる
 
         document.addEventListener("visibilitychange", () => {	// 操作イベントを登録
             if (document.visibilityState === "visible") {	// 条件に応じて処理を分ける
                 loadMessages();	// 処理を完了する
+                updateUnreadBadge();	// 未読数を更新する
+                scheduleChatPoll();	// チャット確認を再開する
+                startUnreadPoll();	// 未読確認を再開する
+            } else {	// 画面が隠れた場合に処理する
+                stopPagePolling();	// 不要な定期通信を止める
             }	// 処理のまとまりを閉じる
         });	// 処理を完了する
+
+        window.addEventListener("pagehide", stopPagePolling);	// ページを離れた時に通信を止める
+        window.addEventListener("pageshow", event => {	// 履歴から戻った場合に処理する
+            if (event.persisted) {	// 画面が復元された場合だけ再開する
+                loadMessages();	// 最新メッセージを取得する
+                updateUnreadBadge();	// 未読数を更新する
+                scheduleChatPoll();	// チャット確認を再開する
+                startUnreadPoll();	// 未読確認を再開する
+            }	// 復元処理を閉じる
+        });	// ページ復元処理を登録する
 
         window.onload = async () => {	// 処理のまとまりを始める
             document.getElementById("hud-menu-btn").classList.remove("open");	// 画面表示を更新する
@@ -1044,9 +1082,7 @@
             await loadMessages();	// 処理を完了する
             updateUnreadBadge();	// 処理を完了する
             scheduleChatPoll();	// 処理を完了する
-            setInterval(() => {	// 時間を置いて処理する
-                if (document.visibilityState === "visible") updateUnreadBadge();	// 条件に応じて処理を分ける
-            }, 8000);	// 処理を完了する
+            startUnreadPoll();	// 未読確認を開始する
         };	// 処理のまとまりを閉じる
     </script>
 </body>	<!-- 要素を閉じる -->

@@ -34,6 +34,11 @@ function applyThemePreference(value, save = true) {	// 外観設定を画面へ�
 applyThemePreference(readThemePreference(), false);	// ページ表示前に外観設定を反映する
 window.applyThemePreference = applyThemePreference;	// ページ側から外観設定を変更できるようにする
 window.getThemePreference = readThemePreference;	// ページ側から外観設定を確認できるようにする
+const HEIKO_SESSION_KEYS = ["userId", "userEmail", "userName", "profileImage", "adminToken", "isImpersonating", "chatTarget"];	// ログアウト時に消す情報をまとめる
+function clearHeikoSession() {	// 外観設定を残してログイン情報だけ消す
+    HEIKO_SESSION_KEYS.forEach(key => localStorage.removeItem(key));	// 認証情報を一件ずつ削除する
+}	// 処理のまとまりを閉じる
+window.clearHeikoSession = clearHeikoSession;	// 各ページから共通処理を使えるようにする
 document.addEventListener("DOMContentLoaded", () => {	// 画面の読み込み完了後に処理する
     const selector = document.getElementById("theme-preference");	// 外観設定の選択欄を取得する
     if (selector) selector.value = readThemePreference();	// 保存済みの外観設定を選択欄へ表示する

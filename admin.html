@@ -483,6 +483,9 @@
         let overviewLoading = false;	// 状態を保持
         let unreadRequest = null;	// 状態を保持
         let adminAccessDenied = false;	// 状態を保持
+        let reportsRequest = null;	// 通報一覧の重複通信を防ぐ
+        let unreadPollTimer = null;	// 未読確認の定期処理を保持する
+        let overviewPollTimer = null;	// 管理画面更新の定期処理を保持する
 
         async function postGas(payload, timeoutMs = 12000) {	// 関数を定義
             const controller = new AbortController();	// 定数を定義
@@ -563,7 +566,7 @@
                     renderUsers(result.message.users);	// 処理を完了する
                     renderPosts(result.message.posts);	// 処理を完了する
                     updateOnlineCount(result.message.onlineCount);	// 処理を完了する
-                    loadReports(silent);	// 処理を完了する
+                    await loadReports(silent);	// 通報一覧の更新完了も待つ
                 } else if (!silent) {	// 処理のまとまりを始める
                     alert("取得失敗: " + result.message);	// 処理結果を知らせる
                 }	// 処理のまとまりを閉じる
@@ -689,7 +692,17 @@
                 .replace(/'/g, "&#039;");	// 処理を完了する
         }	// 処理のまとまりを閉じる
 
-        async function loadReports(silent = false) {	// 関数を定義
+        async function loadReports(silent = false) {	// 通報一覧の読み込みを一度だけ実行する
+            if (reportsRequest) return reportsRequest;	// 実行中なら同じ通信の完了を待つ
+            reportsRequest = loadReportsOnce(silent);	// 新しい読み込みを開始する
+            try {	// 完了まで通信情報を保持する
+                return await reportsRequest;	// 読み込み結果を返す
+            } finally {	// 成否にかかわらず後始末する
+                reportsRequest = null;	// 次の読み込みを許可する
+            }	// 後始末を閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function loadReportsOnce(silent = false) {	// 通報一覧を実際に取得する
             const body = document.getElementById("report-table-body");	// 定数を定義
             if (!body) return;	// 条件に応じて処理を分ける
 
@@ -722,21 +735,24 @@
             reports.slice().reverse().forEach(report => {	// 処理のまとまりを始める
                 const tr = document.createElement("tr");	// 定数を定義
                 const statuses = ["未対応", "確認中", "対応済み", "却下"];	// 定数を定義
-                const statusOptions = statuses.map(status =>	// 定数を定義
-                    `<option value="${status}" ${report.status === status ? "selected" : ""}>${status}</option>`	// 処理を続ける
-                ).join("");	// 処理を完了する
-
                 tr.innerHTML = `
                     <td>${escapeHtml(report.reportedAt)}</td>
                     <td>${escapeHtml(report.targetUserId)}<br><small>${escapeHtml(report.targetType)}</small></td>
                     <td>${escapeHtml(report.reason)}</td>
                     <td style="max-width:260px; white-space:pre-wrap; word-break:break-word;">${escapeHtml(report.targetContent || report.detail || "—")}</td>
-                    <td>
-                        <select onchange="updateReportStatus('${escapeHtml(report.reportId)}', this.value)">
-                            ${statusOptions}
-                        </select>
-                    </td>
+                    <td class="report-status-cell"></td>
                 `;
+
+                const select = document.createElement("select");	// 状態選択欄を安全に作る
+                statuses.forEach(status => {	// 選択肢を順番に追加する
+                    const option = document.createElement("option");	// 選択肢を作る
+                    option.value = status;	// 状態の値を設定する
+                    option.textContent = status;	// 状態名を表示する
+                    option.selected = report.status === status;	// 現在の状態を選択する
+                    select.appendChild(option);	// 選択欄へ追加する
+                });	// 選択肢の作成を終える
+                select.addEventListener("change", () => updateReportStatus(String(report.reportId || ""), select.value));	// 状態変更を処理する
+                tr.querySelector(".report-status-cell").appendChild(select);	// 選択欄を表へ配置する
 
                 body.appendChild(tr);	// 処理を完了する
             });	// 処理を完了する
@@ -803,9 +819,40 @@
         }	// 処理のまとまりを閉じる
 
         function logout() {	// 関数を定義
-            localStorage.clear();	// 端末内の保存情報を扱う
+            clearHeikoSession();	// 外観設定を残してログイン情報を消す
             window.location.href = "index.html";	// 画面表示を更新する
         }	// 処理のまとまりを閉じる
+
+        function startAdminPolling() {	// 管理画面の定期更新を開始する
+            if (!unreadPollTimer) {	// 未読確認が未開始の場合に処理する
+                unreadPollTimer = setInterval(() => {	// 未読確認を登録する
+                    if (document.visibilityState === "visible") updateUnreadBadge();	// 表示中だけ確認する
+                }, 8000);	// 八秒ごとに確認する
+            }	// 未読確認の設定を閉じる
+            if (!overviewPollTimer) {	// 管理情報更新が未開始の場合に処理する
+                overviewPollTimer = setInterval(() => {	// 管理情報更新を登録する
+                    if (document.visibilityState === "visible") loadOverview(true);	// 表示中だけ更新する
+                }, 20000);	// 二十秒ごとに更新する
+            }	// 管理情報更新の設定を閉じる
+        }	// 処理のまとまりを閉じる
+
+        function stopAdminPolling() {	// 管理画面の定期更新を停止する
+            clearInterval(unreadPollTimer);	// 未読確認を止める
+            clearInterval(overviewPollTimer);	// 管理情報更新を止める
+            unreadPollTimer = null;	// 未読タイマー情報を破棄する
+            overviewPollTimer = null;	// 管理タイマー情報を破棄する
+        }	// 処理のまとまりを閉じる
+
+        document.addEventListener("visibilitychange", () => {	// 表示状態の変化を監視する
+            if (document.visibilityState === "visible" && !adminAccessDenied) {	// 管理画面へ戻った場合に処理する
+                loadOverview(true);	// 最新情報を取得する
+                updateUnreadBadge();	// 未読数を更新する
+                startAdminPolling();	// 定期更新を再開する
+            } else {	// 画面が隠れた場合に処理する
+                stopAdminPolling();	// 不要な定期通信を止める
+            }	// 表示状態の確認を閉じる
+        });	// 監視処理を登録する
+        window.addEventListener("pagehide", stopAdminPolling);	// ページを離れた時に通信を止める
 
         window.onload = () => {	// 処理のまとまりを始める
             if (adminAccessDenied) return;	// 条件に応じて処理を分ける
@@ -814,12 +861,7 @@
 
             loadOverview();	// 処理を完了する
             updateUnreadBadge();	// 処理を完了する
-            setInterval(() => {	// 時間を置いて処理する
-                if (document.visibilityState === "visible") updateUnreadBadge();	// 条件に応じて処理を分ける
-            }, 8000);	// 処理を完了する
-            setInterval(() => {	// 時間を置いて処理する
-                if (document.visibilityState === "visible") loadOverview(true);	// 条件に応じて処理を分ける
-            }, 20000);	// 処理を完了する
+            startAdminPolling();	// 定期更新を開始する
         };	// 処理のまとまりを閉じる
     </script>
 </body>	<!-- 要素を閉じる -->

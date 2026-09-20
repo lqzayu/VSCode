@@ -4,8 +4,8 @@
   "description": "高校生向け学習支援サービス",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0284c7",
+  "background_color": "#f5f4ee",
+  "theme_color": "#254f3d",
   "icons": [
     {
       "src": "icon-192.png",

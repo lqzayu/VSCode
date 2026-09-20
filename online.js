@@ -3,6 +3,7 @@
     const HEARTBEAT_INTERVAL_MS = 30 * 1000;	// 定数を定義
     let heartbeatTimer = null;	// 状態を保持
     let heartbeatRequest = null;	// 状態を保持
+    let heartbeatController = null;	// 実行中の通信を保持する
 
     function getCurrentUserId() {	// 関数を定義
         return localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";	// 端末内の保存情報を扱う
@@ -58,18 +59,19 @@
         if (!userId || document.visibilityState !== "visible" || heartbeatRequest) return heartbeatRequest;	// 条件に応じて処理を分ける
 
         heartbeatRequest = (async () => {	// 処理のまとまりを始める
-            const controller = new AbortController();	// 定数を定義
-            const timeoutId = setTimeout(() => controller.abort(), 8000);	// 定数を定義
+            heartbeatController = new AbortController();	// 停止できる通信を用意する
+            const timeoutId = setTimeout(() => heartbeatController.abort(), 8000);	// 一定時間で通信を止める
             try {	// 失敗に備えて処理を始める
                 await fetch(ONLINE_GAS_URL, {	// APIへリクエストを送る
                     method: "POST",	// 処理を続ける
                     body: JSON.stringify({ mode: "heartbeat", userId: userId }),	// 処理を続ける
-                    signal: controller.signal	// 処理を続ける
+                    signal: heartbeatController.signal	// 停止制御を通信へ渡す
                 });	// 処理を完了する
             } catch (error) {	// 処理のまとまりを始める
-                console.debug("オンライン状態を更新できませんでした。", error);	// 処理を完了する
+                if (error.name !== "AbortError") console.debug("オンライン状態を更新できませんでした。", error);	// 通常の通信失敗だけを記録する
             } finally {	// 処理のまとまりを始める
                 clearTimeout(timeoutId);	// 処理を完了する
+                heartbeatController = null;	// 通信情報を破棄する
                 heartbeatRequest = null;	// 処理を続ける
             }	// 処理のまとまりを閉じる
         })();	// 処理を完了する
@@ -84,15 +86,14 @@
     }	// 処理のまとまりを閉じる
 
     function stopHeartbeat() {	// 関数を定義
-        if (!heartbeatTimer) return;	// 条件に応じて処理を分ける
-        clearInterval(heartbeatTimer);	// 処理を完了する
+        if (heartbeatTimer) clearInterval(heartbeatTimer);	// 定期更新があれば停止する
         heartbeatTimer = null;	// 処理を続ける
+        if (heartbeatController) heartbeatController.abort();	// 画面を離れた後の通信を止める
     }	// 処理のまとまりを閉じる
 
     function handleVisibilityChange() {	// 関数を定義
         if (document.visibilityState === "visible") {	// 条件に応じて処理を分ける
             startHeartbeat();	// 処理を完了する
-            sendHeartbeat();	// 処理を完了する
         } else {	// 処理のまとまりを始める
             stopHeartbeat();	// 処理を完了する
         }	// 処理のまとまりを閉じる

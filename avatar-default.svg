@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+  <title id="title">初期プロフィール画像</title>
+  <defs>
+    <linearGradient id="background" x1="24" y1="20" x2="168" y2="172" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#36a58a"/>
+      <stop offset="1" stop-color="#254f3d"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="96" fill="url(#background)"/>
+  <circle cx="96" cy="72" r="34" fill="#f7faf8"/>
+  <path d="M42 166c4-34 24-52 54-52s50 18 54 52" fill="#f7faf8"/>
+</svg>

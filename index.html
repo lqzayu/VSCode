@@ -15,7 +15,7 @@
     <link rel="icon" href="icon-192.png">
 	<!-- 外部ファイルを読み込む -->
 
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/face_mesh.js" crossorigin="anonymous"></script>
 
     <style>
         body {
@@ -1051,6 +1051,8 @@
 	// 状態を保持
         let faceLoginTimer = null;
 	// 状態を保持
+        let faceRegisterTimer = null;
+	// 顔登録の撮影タイマーを保持
         let savedFeaturesText = "";
 	// 状態を保持
         let isCapturing = false;
@@ -1317,7 +1319,7 @@
 	// 条件に応じて処理を分ける
             faceMesh = new FaceMesh({
 	// 処理のまとまりを始める
-                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/${file}`
 	// 処理を続ける
             });
 	// 処理を完了する
@@ -1513,6 +1515,16 @@
 	// 処理を完了する
             collectingFaceSamples = false;
 	// 処理を続ける
+            isCapturing = false;
+	// 撮影中の状態を解除する
+            if (faceRegisterTimer !== null) {
+	// 顔登録タイマーがある場合に処理する
+                clearInterval(faceRegisterTimer);
+	// 顔登録タイマーを止める
+                faceRegisterTimer = null;
+	// タイマー情報を破棄する
+            }
+	// 顔登録タイマーの処理を閉じる
             if (faceLoginTimer !== null) {
 	// 条件に応じて処理を分ける
                 clearTimeout(faceLoginTimer);
@@ -1673,8 +1685,10 @@
             authStatus.style.color = "#e67e22";
 	// 処理を続ける
 
-            const timer = setInterval(() => {
-	// 定数を定義
+            clearInterval(faceRegisterTimer);
+	// 古い撮影タイマーを止める
+            faceRegisterTimer = setInterval(() => {
+	// 顔登録までの時間を数える
                 seconds--;
 	// 処理を続ける
                 if (seconds > 0) {
@@ -1683,8 +1697,10 @@
 	// 処理を続ける
                 } else {
 	// 処理のまとまりを始める
-                    clearInterval(timer);
-	// 処理を完了する
+                    clearInterval(faceRegisterTimer);
+	// 顔登録タイマーを止める
+                    faceRegisterTimer = null;
+	// タイマー情報を破棄する
                     captureFace();
 	// 処理を完了する
                 }
@@ -2216,6 +2232,8 @@
 	// 処理を完了する
         }
 	// 処理のまとまりを閉じる
+        window.addEventListener('pagehide', stopCamera);
+	// ページを離れた時にカメラを停止する
     </script>
 </body>
 	<!-- 要素を閉じる -->

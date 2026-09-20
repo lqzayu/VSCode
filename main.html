@@ -1620,6 +1620,8 @@
         let allOtherPosts = [];	// 状態を保持
         let countdownTimer = null;	// 状態を保持
         let notificationRequest = null;	// 状態を保持
+        let recruitmentsRequest = null;	// 募集一覧の重複通信を防ぐ
+        let notificationPollTimer = null;	// 通知確認の定期処理を保持する
 
         async function fetchGas(payload, timeoutMs = 20000) {	// 関数を定義
             const readModes = ["getUserProfile", "getRecruitments", "getNotificationSummary"];	// 定数を定義
@@ -1639,17 +1641,22 @@
                     });	// 処理を完了する
 
                     if (!res.ok) {	// 条件に応じて処理を分ける
-                        throw new Error(`GAS通信エラー（HTTP ${res.status}）`);	// エラーを通知する
+                        const httpError = new Error(`GAS通信エラー（HTTP ${res.status}）`);	// HTTPエラーを作る
+                        httpError.retryable = res.status >= 500;	// サーバー側の一時エラーだけ再試行する
+                        throw httpError;	// エラーを通知する
                     }	// 処理のまとまりを閉じる
 
                     const result = await res.json();	// 定数を定義
                     if (!result || result.status !== "success") {	// 条件に応じて処理を分ける
-                        throw new Error(result && result.message ? result.message : "GASからエラーが返されました");	// エラーを通知する
+                        const responseError = new Error(result && result.message ? result.message : "GASからエラーが返されました");	// APIエラーを作る
+                        responseError.retryable = false;	// 入力や権限のエラーは再送しない
+                        throw responseError;	// エラーを通知する
                     }	// 処理のまとまりを閉じる
 
                     return result;	// 結果を返す
                 } catch (error) {	// 処理のまとまりを始める
                     lastError = error;	// 処理を続ける
+                    if (error.retryable === false) break;	// 再試行しても直らないエラーは終了する
                     if (attempt + 1 < maxAttempts) {	// 条件に応じて処理を分ける
                         await new Promise(resolve => setTimeout(resolve, 1200));	// 時間を置いて処理する
                     }	// 処理のまとまりを閉じる
@@ -1684,7 +1691,7 @@
             if (nameInput) nameInput.value = userName;	// 条件に応じて処理を分ける
             if (mypageText) mypageText.innerText = userName || "マイページ";	// 条件に応じて処理を分ける
             if (profileIcon) {	// 条件に応じて処理を分ける
-                profileIcon.src = profileImage || "https://cdn-icons-png.flaticon.com/512/149/149071.png";	// 処理を続ける
+                profileIcon.src = profileImage || "avatar-default.svg";	// 保存画像か初期画像を表示する
             }	// 処理のまとまりを閉じる
         }	// 処理のまとまりを閉じる
 
@@ -1756,7 +1763,17 @@
             }	// 処理のまとまりを閉じる
         }	// 処理のまとまりを閉じる
 
-        async function loadRecruitments() {	// 関数を定義
+        async function loadRecruitments() {	// 募集一覧の読み込みを一度だけ実行する
+            if (recruitmentsRequest) return recruitmentsRequest;	// 実行中なら同じ通信の完了を待つ
+            recruitmentsRequest = loadRecruitmentsOnce();	// 新しい読み込みを開始する
+            try {	// 完了まで通信情報を保持する
+                return await recruitmentsRequest;	// 読み込み結果を返す
+            } finally {	// 成否にかかわらず後始末する
+                recruitmentsRequest = null;	// 次の読み込みを許可する
+            }	// 後始末を閉じる
+        }	// 処理のまとまりを閉じる
+
+        async function loadRecruitmentsOnce() {	// 募集一覧を実際に取得する
             const myEmail = localStorage.getItem("userEmail");	// 定数を定義
             const listDiv = document.getElementById("user-list");	// 定数を定義
             const myPostContentDiv = document.getElementById("my-post-content");	// 定数を定義
@@ -1778,7 +1795,13 @@
                 listDiv.innerHTML = "";	// 処理を続ける
                 myPostContentDiv.innerHTML = "投稿している募集はありません。";	// 処理を続ける
 
-                const items = [...result.message].reverse();	// 定数を定義
+                const now = Date.now();	// 現在時刻を取得する
+                const items = [...result.message].reverse().filter(item => {	// 期限内の募集だけを残す
+                    const postTime = new Date(item.time).getTime();	// 投稿日時を数値へ変換する
+                    if (!Number.isFinite(postTime)) return true;	// 日時不明の既存データは表示を維持する
+                    const expireTime = postTime + getRecruitmentDurationMinutes(item.durationMinutes) * 60 * 1000;	// 投稿ごとの終了時刻を求める
+                    return expireTime > now;	// 期限切れの投稿を画面から除外する
+                });	// 募集の整理を終える
                 const myPosts = items.filter(item => item.email === myEmail);	// 定数を定義
                 allOtherPosts = items.filter(item => item.email !== myEmail);	// 処理を完了する
 
@@ -2227,9 +2250,34 @@
         }	// 処理のまとまりを閉じる
 
         function logout() {	// 関数を定義
-            localStorage.clear();	// 端末内の保存情報を扱う
+            clearHeikoSession();	// 外観設定を残してログイン情報を消す
             window.location.href = "index.html";	// 画面表示を更新する
         }	// 処理のまとまりを閉じる
+
+        function startMainPolling() {	// ホーム画面の定期処理を開始する
+            if (notificationPollTimer) return;	// 二重開始を防ぐ
+            notificationPollTimer = setInterval(() => {	// 通知確認を登録する
+                if (document.visibilityState === "visible") updateNotificationSummary();	// 表示中だけ確認する
+            }, 8000);	// 八秒ごとに確認する
+        }	// 処理のまとまりを閉じる
+
+        function stopMainPolling() {	// ホーム画面の定期処理を停止する
+            clearInterval(notificationPollTimer);	// 通知確認を止める
+            notificationPollTimer = null;	// タイマー情報を破棄する
+            clearInterval(countdownTimer);	// 募集の表示タイマーを止める
+            countdownTimer = null;	// タイマー情報を破棄する
+        }	// 処理のまとまりを閉じる
+
+        document.addEventListener("visibilitychange", () => {	// 表示状態の変化を監視する
+            if (document.visibilityState === "visible") {	// 画面へ戻った場合に処理する
+                updateNotificationSummary();	// 通知を更新する
+                startCountdownTimer();	// 募集ごとの残り時間を再開する
+                startMainPolling();	// 通知確認を再開する
+            } else {	// 画面が隠れた場合に処理する
+                stopMainPolling();	// 不要な定期処理を止める
+            }	// 表示状態の確認を閉じる
+        });	// 監視処理を登録する
+        window.addEventListener("pagehide", stopMainPolling);	// ページを離れた時に処理を止める
 
         function exitImpersonation() {	// 関数を定義
             localStorage.setItem("userEmail", "admin");	// 端末内の保存情報を扱う
@@ -2270,7 +2318,7 @@
             if (profileImage && profileImage !== "null") {	// 条件に応じて処理を分ける
                 document.getElementById("profile-icon").src = profileImage;	// 処理を続ける
             } else {	// 処理のまとまりを始める
-                document.getElementById("profile-icon").src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";	// 処理を続ける
+                document.getElementById("profile-icon").src = "avatar-default.svg";	// 初期プロフィール画像を表示する
             }	// 処理のまとまりを閉じる
 
             loadRecruitments();	// 処理を完了する
@@ -2284,9 +2332,7 @@
                 requestAnimationFrame(openUsageGuide);	// 処理を完了する
             }	// 処理のまとまりを閉じる
 
-            setInterval(() => {	// 時間を置いて処理する
-                if (document.visibilityState === "visible") updateNotificationSummary();	// 条件に応じて処理を分ける
-            }, 8000);	// 処理を完了する
+            startMainPolling();	// 通知確認を開始する
         });	// 処理を完了する
     </script>
 </body>	<!-- 要素を閉じる -->

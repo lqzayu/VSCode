@@ -170,11 +170,15 @@
             msgEl.textContent = "処理中...";	// 処理を続ける
             msgEl.className = "message";	// 処理を続ける
 
+            const controller = new AbortController();	// 長時間止まる通信を制御する
+            const timeoutId = setTimeout(() => controller.abort(), 20000);	// 二十秒で通信を中止する
             try {	// 失敗に備えて処理を始める
                 const res = await fetch(GAS_URL, {	// 定数を定義
                     method: "POST",	// 処理を続ける
-                    body: JSON.stringify({ mode: "resetPassword", userId, token, newPassword })	// 処理を続ける
+                    body: JSON.stringify({ mode: "resetPassword", userId, token, newPassword }),	// 処理を続ける
+                    signal: controller.signal	// 通信停止の制御を渡す
                 });	// 処理を完了する
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);	// HTTPエラーを通信失敗として扱う
                 const result = await res.json();	// 定数を定義
 
                 if (result.status === "success") {	// 条件に応じて処理を分ける
@@ -185,8 +189,10 @@
                     msgEl.className = "message error";	// 処理を続ける
                 }	// 処理のまとまりを閉じる
             } catch (e) {	// 処理のまとまりを始める
-                msgEl.textContent = "通信エラーが発生しました。";	// 処理を続ける
+                msgEl.textContent = e.name === "AbortError" ? "通信に時間がかかっています。もう一度お試しください。" : "通信エラーが発生しました。";	// 状況に合う案内を表示する
                 msgEl.className = "message error";	// 処理を続ける
+            } finally {	// 通信終了後に後始末する
+                clearTimeout(timeoutId);	// 通信タイマーを止める
             }	// 処理のまとまりを閉じる
         }	// 処理のまとまりを閉じる
     </script>
