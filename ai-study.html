@@ -252,9 +252,11 @@
                 const controller = new AbortController();	// 定数を定義
                 const timer = setTimeout(() => controller.abort(), timeoutMs || 45000);	// 定数を定義
                 try {	// 失敗に備えて処理を始める
-                    const response = await fetch(GAS_URL, { method: "POST", body: JSON.stringify(payload), signal: controller.signal });	// 定数を定義
+                    const response = await fetch(GAS_URL, { method: "POST", body: JSON.stringify({ ...payload, sessionToken: localStorage.getItem("sessionToken") || "" }), signal: controller.signal });	// 本人確認情報を付けて送信する
                     if (!response.ok) throw new Error("HTTP " + response.status);	// 条件に応じて処理を分ける
-                    return await response.json();	// 結果を返す
+                    const result = await response.json();	// 応答内容を読み込む
+                    if (handleHeikoSessionResponse(result)) throw new Error("ログインの有効期限が切れました");	// ログイン切れを共通処理する
+                    return result;	// 結果を返す
                 } catch (error) {	// 処理のまとまりを始める
                     lastError = error;	// 処理を続ける
                     if (attempt + 1 < (attempts || 2)) await wait(1500 * (attempt + 1));	// 条件に応じて処理を分ける
@@ -464,8 +466,9 @@
             }	// 処理のまとまりを閉じる
         }	// 処理のまとまりを閉じる
 
-        if (!currentUserId) {	// 条件に応じて処理を分ける
+        if (!currentUserId || !localStorage.getItem("sessionToken")) {	// ログイン情報と本人確認情報を確認する
             showNotice("ログインしてから利用してください", "error");	// 処理結果を知らせる
+            clearHeikoSession();	// 不完全なログイン情報を消す
             window.location.replace("index.html");	// 未ログインならログイン画面へ戻す
         } else {	// 処理のまとまりを始める
             restoreState();	// 処理を完了する

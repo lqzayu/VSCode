@@ -1831,6 +1831,8 @@
 	// 端末内の保存情報を扱う
                         localStorage.setItem("profileImage", result.message.profileImage || "");
 	// 端末内の保存情報を扱う
+                        localStorage.setItem("sessionToken", result.message.sessionToken || "");
+	// 通常ユーザー用のログイン情報を保存する
                         if (result.message.adminToken) localStorage.setItem("adminToken", result.message.adminToken);
 	// 端末内の保存情報を扱う
                         else localStorage.removeItem("adminToken");
@@ -1908,6 +1910,8 @@
 	// 端末内の保存情報を扱う
                     localStorage.setItem("profileImage", result.message.profileImage || "");
 	// 端末内の保存情報を扱う
+                    localStorage.setItem("sessionToken", result.message.sessionToken || "");
+	// 通常ユーザー用のログイン情報を保存する
                     if (result.message.adminToken) localStorage.setItem("adminToken", result.message.adminToken);
 	// 端末内の保存情報を扱う
                     else localStorage.removeItem("adminToken");

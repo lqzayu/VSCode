@@ -34,11 +34,19 @@ function applyThemePreference(value, save = true) {	// 外観設定を画面へ�
 applyThemePreference(readThemePreference(), false);	// ページ表示前に外観設定を反映する
 window.applyThemePreference = applyThemePreference;	// ページ側から外観設定を変更できるようにする
 window.getThemePreference = readThemePreference;	// ページ側から外観設定を確認できるようにする
-const HEIKO_SESSION_KEYS = ["userId", "userEmail", "userName", "profileImage", "adminToken", "isImpersonating", "chatTarget"];	// ログアウト時に消す情報をまとめる
+const HEIKO_SESSION_KEYS = ["userId", "userEmail", "userName", "profileImage", "sessionToken", "adminSessionToken", "adminToken", "isImpersonating", "chatTarget"];	// ログアウト時に消す情報をまとめる
 function clearHeikoSession() {	// 外観設定を残してログイン情報だけ消す
     HEIKO_SESSION_KEYS.forEach(key => localStorage.removeItem(key));	// 認証情報を一件ずつ削除する
 }	// 処理のまとまりを閉じる
 window.clearHeikoSession = clearHeikoSession;	// 各ページから共通処理を使えるようにする
+function handleHeikoSessionResponse(result) {	// APIからログイン切れが返った場合に処理する
+    const message = result && result.status === "error" ? String(result.message || "") : "";	// エラー内容を取得する
+    if (!message.includes("ログインの有効期限")) return false;	// 通常のエラーはそのまま扱う
+    clearHeikoSession();	// 期限切れのログイン情報を消す
+    window.location.replace("index.html");	// ログイン画面へ戻す
+    return true;	// ログイン切れを処理したことを返す
+}	// ログイン切れ処理を閉じる
+window.handleHeikoSessionResponse = handleHeikoSessionResponse;	// 各ページからログイン切れ処理を使えるようにする
 document.addEventListener("DOMContentLoaded", () => {	// 画面の読み込み完了後に処理する
     const selector = document.getElementById("theme-preference");	// 外観設定の選択欄を取得する
     if (selector) selector.value = readThemePreference();	// 保存済みの外観設定を選択欄へ表示する

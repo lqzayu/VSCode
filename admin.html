@@ -507,6 +507,8 @@
             localStorage.setItem("userEmail", ADMIN_ID);	// 端末内の保存情報を扱う
             localStorage.setItem("userId", ADMIN_ID);	// 端末内の保存情報を扱う
             localStorage.setItem("userName", "管理者");	// 端末内の保存情報を扱う
+            localStorage.setItem("sessionToken", localStorage.getItem("adminSessionToken") || "");	// 管理者本人のログイン情報を戻す
+            localStorage.removeItem("adminSessionToken");	// 退避した情報を消す
             localStorage.removeItem("isImpersonating");	// 端末内の保存情報を扱う
         }	// 処理のまとまりを閉じる
         if ((currentUserId !== ADMIN_ID && currentEmail !== ADMIN_ID && isImpersonating !== "true") || !adminToken) {	// 条件に応じて処理を分ける
@@ -631,17 +633,19 @@
             if (!confirm(`ユーザー [ ${targetUserId} (${targetUserName}) ] として代理ログインしますか？`)) return;	// 条件に応じて処理を分ける
 
             try {	// 失敗に備えて処理を始める
-                const result = await postGas({ mode: "getUserProfile", userId: targetUserId });	// 定数を定義
+                const result = await postGas({ mode: "getUserProfile", userId: targetUserId, adminId: ADMIN_ID, adminToken: adminToken });	// 管理者認証付きでプロフィールを取得する
                 if (result.status !== "success" || !result.message) {	// 条件に応じて処理を分ける
                     alert("ユーザー情報を取得できませんでした。");	// 処理結果を知らせる
                     return;	// 結果を返す
                 }	// 処理のまとまりを閉じる
 
                 const profile = result.message;	// 定数を定義
+                localStorage.setItem("adminSessionToken", localStorage.getItem("sessionToken") || "");	// 管理者本人のログイン情報を退避する
                 localStorage.setItem("userEmail", targetUserId);	// 端末内の保存情報を扱う
                 localStorage.setItem("userId", targetUserId);	// 端末内の保存情報を扱う
                 localStorage.setItem("userName", String(profile.name || targetUserName || targetUserId));	// 端末内の保存情報を扱う
                 localStorage.setItem("profileImage", String(profile.profileImage || ""));	// 端末内の保存情報を扱う
+                localStorage.setItem("sessionToken", String(profile.sessionToken || ""));	// 代理ログイン用の本人確認情報を保存する
                 localStorage.setItem("isImpersonating", "true");	// 端末内の保存情報を扱う
                 window.location.href = "main.html";	// 画面表示を更新する
             } catch (error) {	// 処理のまとまりを始める

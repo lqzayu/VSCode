@@ -6,6 +6,7 @@
     let heartbeatController = null;	// 実行中の通信を保持する
 
     function getCurrentUserId() {	// 関数を定義
+        if (!localStorage.getItem("sessionToken")) return "";	// 本人確認情報がなければ更新しない
         return localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";	// 端末内の保存情報を扱う
     }	// 処理のまとまりを閉じる
 
@@ -14,6 +15,8 @@
         localStorage.setItem("userId", "admin");	// 端末内の保存情報を扱う
         localStorage.setItem("userName", "管理者");	// 端末内の保存情報を扱う
         localStorage.setItem("profileImage", "");	// 端末内の保存情報を扱う
+        localStorage.setItem("sessionToken", localStorage.getItem("adminSessionToken") || "");	// 管理者本人のログイン情報を戻す
+        localStorage.removeItem("adminSessionToken");	// 退避した情報を消す
         localStorage.removeItem("isImpersonating");	// 端末内の保存情報を扱う
         window.location.href = "admin.html";	// 画面表示を更新する
     }	// 処理のまとまりを閉じる
@@ -62,11 +65,15 @@
             heartbeatController = new AbortController();	// 停止できる通信を用意する
             const timeoutId = setTimeout(() => heartbeatController.abort(), 8000);	// 一定時間で通信を止める
             try {	// 失敗に備えて処理を始める
-                await fetch(ONLINE_GAS_URL, {	// APIへリクエストを送る
+                const response = await fetch(ONLINE_GAS_URL, {	// APIへリクエストを送る
                     method: "POST",	// 処理を続ける
-                    body: JSON.stringify({ mode: "heartbeat", userId: userId }),	// 処理を続ける
+                    body: JSON.stringify({ mode: "heartbeat", userId: userId, sessionToken: localStorage.getItem("sessionToken") || "" }),	// 本人確認情報を付けて送信する
                     signal: heartbeatController.signal	// 停止制御を通信へ渡す
                 });	// 処理を完了する
+                if (response.ok) {	// 応答を読み込める場合に処理する
+                    const result = await response.json();	// ログイン状態を確認する
+                    if (window.handleHeikoSessionResponse) window.handleHeikoSessionResponse(result);	// ログイン切れを共通処理する
+                }	// 応答確認を閉じる
             } catch (error) {	// 処理のまとまりを始める
                 if (error.name !== "AbortError") console.debug("オンライン状態を更新できませんでした。", error);	// 通常の通信失敗だけを記録する
             } finally {	// 処理のまとまりを始める

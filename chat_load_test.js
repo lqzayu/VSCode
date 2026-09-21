@@ -15,8 +15,10 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpf
 export default function () {	// 必要な機能を読み込む
   const payload = JSON.stringify({	// 定数を定義
     mode: 'sendMessage',	// 処理を続ける
-    from: 'test_user_A',	// 処理を続ける
-    to: 'test_user_B',	// 処理を続ける
+    from: __ENV.TEST_USER_ID || 'test_user_A',	// 試験用の送信者を指定する
+    to: __ENV.TEST_TARGET_ID || 'test_user_B',	// 試験用の送信先を指定する
+    sessionToken: __ENV.SESSION_TOKEN || '',	// 試験用の本人確認情報を指定する
+    requestId: `load-${__VU}-${__ITER}-${Date.now()}`,	// 二重送信防止用のIDを付ける
     text: `負荷テストメッセージ [VU: ${__VU}, Iter: ${__ITER}]`	// 処理を続ける
   });	// 処理を完了する
 

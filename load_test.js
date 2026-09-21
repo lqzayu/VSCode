@@ -15,7 +15,8 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpf
 export default function () {	// 必要な機能を読み込む
   const payload = JSON.stringify({	// 定数を定義
     mode: 'getRecruitments',	// 処理を続ける
-    email: 'admin'	// 処理を続ける
+    email: __ENV.TEST_USER_ID || 'admin',	// 試験用ユーザーIDを指定する
+    sessionToken: __ENV.SESSION_TOKEN || ''	// 試験用の本人確認情報を指定する
   });	// 処理を完了する
 
   const params = {	// 定数を定義

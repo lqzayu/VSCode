@@ -463,7 +463,8 @@
     </footer>	<!-- 要素を閉じる -->
 
     <script>
-        if (!localStorage.getItem("userEmail")) {	// 端末内の保存情報を扱う
+        if (!localStorage.getItem("userEmail") || !localStorage.getItem("sessionToken")) {	// ログイン情報と本人確認情報を確認する
+            clearHeikoSession();	// 不完全なログイン情報を消す
             window.location.href = "index.html";	// 画面表示を更新する
         }	// 処理のまとまりを閉じる
 
@@ -485,11 +486,13 @@
             try {	// 失敗に備えて処理を始める
                 const res = await fetch(GAS_URL, {	// 定数を定義
                     method: "POST",	// 処理を続ける
-                    body: JSON.stringify(payload),	// 処理を続ける
+                    body: JSON.stringify({ ...payload, sessionToken: localStorage.getItem("sessionToken") || "" }),	// 本人確認情報を付けて送信する
                     signal: controller.signal	// 処理を続ける
                 });	// 処理を完了する
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);	// 条件に応じて処理を分ける
-                return await res.json();	// 結果を返す
+                const result = await res.json();	// 応答内容を読み込む
+                if (handleHeikoSessionResponse(result)) throw new Error("ログインの有効期限が切れました");	// ログイン切れを共通処理する
+                return result;	// 結果を返す
             } finally {	// 処理のまとまりを始める
                 clearTimeout(timeoutId);	// 処理を完了する
             }	// 処理のまとまりを閉じる

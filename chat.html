@@ -436,6 +436,10 @@
     </footer>	<!-- 要素を閉じる -->
 
     <script>
+        if (!localStorage.getItem("userEmail") || !localStorage.getItem("sessionToken")) {	// ログイン情報と本人確認情報を確認する
+            clearHeikoSession();	// 不完全なログイン情報を消す
+            window.location.replace("index.html");	// 未ログインならログイン画面へ戻す
+        }	// ログイン確認を閉じる
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";	// GAS APIの接続先を設定
 
         const myEmail = localStorage.getItem("userEmail");	// 定数を定義
@@ -447,9 +451,16 @@
         const MAX_ATTACHMENT_BYTES = 300 * 1024;	// 一枚の通信量を抑える
         const MAX_TOTAL_ATTACHMENT_BYTES = 1800 * 1024;	// 一回の送信量を安全な範囲に抑える
         let selectedAttachments = [];	// 状態を保持
+        let pendingSendRequestId = "";	// 通信再試行でも同じ送信IDを使う
         let isMessageComposing = false;	// 状態を保持
         let unreadRequest = null;	// 状態を保持
         let markReadRequest = null;	// 既読処理の重複通信を防ぐ
+
+        function createRequestId() {	// 二重送信防止用のIDを作る
+            if (window.crypto && typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();	// 対応ブラウザでは安全なUUIDを使う
+            const randomPart = Math.random().toString(36).slice(2);	// 古いブラウザ向けの乱数部分を作る
+            return `msg-${Date.now()}-${randomPart}`;	// 時刻と乱数を組み合わせて返す
+        }	// 送信IDの作成を閉じる
         let unreadPollTimer = null;	// 未読確認の定期処理を保持する
 
         function toggleMenu() {	// 関数を定義
@@ -469,12 +480,13 @@
             try {	// 失敗に備えて処理を始める
                 const res = await fetch(GAS_URL, {	// 定数を定義
                     method: "POST",	// 処理を続ける
-                    body: JSON.stringify(payload),	// 処理を続ける
+                    body: JSON.stringify({ ...payload, sessionToken: localStorage.getItem("sessionToken") || "" }),	// 本人確認情報を付けて送信する
                     signal: controller.signal	// 処理を続ける
                 });	// 処理を完了する
 
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);	// 条件に応じて処理を分ける
                 const result = await res.json();	// 定数を定義
+                if (handleHeikoSessionResponse(result)) throw new Error("ログインの有効期限が切れました");	// ログイン切れを共通処理する
                 if (!result || result.status !== "success") {	// 条件に応じて処理を分ける
                     throw new Error(result && result.message ? result.message : "GASからエラーが返されました");	// エラーを通知する
                 }	// 処理のまとまりを閉じる
@@ -987,6 +999,7 @@
             }));	// 処理を完了する
 
             if (!text && outgoingAttachments.length === 0) return;	// 条件に応じて処理を分ける
+            if (!pendingSendRequestId) pendingSendRequestId = createRequestId();	// 新しい送信IDを一度だけ作る
 
             textInput.value = "";	// 処理を続ける
             if (sendBtn) {	// 条件に応じて処理を分ける
@@ -1006,9 +1019,11 @@
                     from: myEmail,	// 処理を続ける
                     to: targetEmail,	// 処理を続ける
                     text: text,	// 処理を続ける
+                    requestId: pendingSendRequestId,	// 二重送信防止用のIDを送る
                     attachments: outgoingAttachments	// 処理を続ける
                 });	// 処理を完了する
 
+                pendingSendRequestId = "";	// 送信成功後に次のIDを作れるようにする
                 selectedAttachments = [];	// 処理を続ける
                 renderAttachmentPreview();	// 処理を完了する
                 await loadMessages();	// 処理を完了する

@@ -1538,7 +1538,7 @@
                         <p><strong>メッセージ一覧：</strong>上部の「メッセージ」から会話相手を選べます。未読件数も表示されます。</p>	<!-- 画面要素を配置 -->
                         <p><strong>チャット機能：</strong>画像添付、送信取り消し、チャット履歴の削除、メッセージ一覧からの削除に対応しています。</p>	<!-- 画面要素を配置 -->
                         <p><strong>PC操作：</strong>入力欄では日本語変換を確定してから送信してください。送信ボタンも利用できます。</p>	<!-- 画面要素を配置 -->
-                        <p><strong>LINE通知：</strong>LINE公式アカウントへ、自分のユーザーIDまたは登録メールアドレスを送信すると連携できます。</p>	<!-- 画面要素を配置 -->
+                        <p><strong>LINE通知：</strong>マイページで一時的な連携コードを発行し、10分以内にLINE公式アカウントへ送信すると連携できます。</p>	<!-- 安全なLINE連携手順を表示する -->
                     </div>	<!-- 要素を閉じる -->
                     <a class="usage-guide-primary-link" href="messages.html">メッセージ一覧を開く</a>	<!-- 操作できる要素を配置 -->
                 </section>	<!-- 要素を閉じる -->
@@ -1609,7 +1609,8 @@
     </footer>	<!-- 要素を閉じる -->
 
     <script>
-        if (!localStorage.getItem("userEmail")) {	// 端末内の保存情報を扱う
+        if (!localStorage.getItem("userEmail") || !localStorage.getItem("sessionToken")) {	// ログイン情報と本人確認情報を確認する
+            clearHeikoSession();	// 不完全なログイン情報を消す
             window.location.href = "index.html";	// 画面表示を更新する
         }	// 処理のまとまりを閉じる
 
@@ -1622,6 +1623,11 @@
         let notificationRequest = null;	// 状態を保持
         let recruitmentsRequest = null;	// 募集一覧の重複通信を防ぐ
         let notificationPollTimer = null;	// 通知確認の定期処理を保持する
+
+        function createRequestId(prefix = "msg") {	// 二重送信防止用のIDを作る
+            if (window.crypto && typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();	// 対応ブラウザでは安全なUUIDを使う
+            return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}`;	// 古いブラウザ向けのIDを返す
+        }	// 送信IDの作成を閉じる
 
         async function fetchGas(payload, timeoutMs = 20000) {	// 関数を定義
             const readModes = ["getUserProfile", "getRecruitments", "getNotificationSummary"];	// 定数を定義
@@ -1636,7 +1642,7 @@
                 try {	// 失敗に備えて処理を始める
                     const res = await fetch(GAS_URL, {	// 定数を定義
                         method: "POST",	// 処理を続ける
-                        body: JSON.stringify(payload),	// 処理を続ける
+                        body: JSON.stringify({ ...payload, sessionToken: localStorage.getItem("sessionToken") || "" }),	// 本人確認情報を付けて送信する
                         signal: controller.signal	// 処理を続ける
                     });	// 処理を完了する
 
@@ -1647,6 +1653,7 @@
                     }	// 処理のまとまりを閉じる
 
                     const result = await res.json();	// 定数を定義
+                    if (handleHeikoSessionResponse(result)) throw new Error("ログインの有効期限が切れました");	// ログイン切れを共通処理する
                     if (!result || result.status !== "success") {	// 条件に応じて処理を分ける
                         const responseError = new Error(result && result.message ? result.message : "GASからエラーが返されました");	// APIエラーを作る
                         responseError.retryable = false;	// 入力や権限のエラーは再送しない
@@ -2000,6 +2007,7 @@
             if (!myUserId || !reaction || !button) return;	// 条件に応じて処理を分ける
 
             const cooldownKey = `quick-reaction:${myUserId}:${targetUserId}:${reaction}`;	// 定数を定義
+            const requestKey = cooldownKey + ":request";	// 再試行用の送信ID保存名を作る
             const lastSent = Number(sessionStorage.getItem(cooldownKey) || 0);	// 定数を定義
             if (Date.now() - lastSent < 10 * 60 * 1000) {	// 条件に応じて処理を分ける
                 alert("同じリアクションは、少し時間をおいてから送れます。");	// 処理結果を知らせる
@@ -2007,6 +2015,8 @@
             }	// 処理のまとまりを閉じる
 
             const originalText = button.innerText;	// 定数を定義
+            const requestId = sessionStorage.getItem(requestKey) || createRequestId("reaction");	// 再試行時は同じ送信IDを使う
+            sessionStorage.setItem(requestKey, requestId);	// 送信が完了するまでIDを保持する
             button.disabled = true;	// 処理を続ける
             button.innerText = "送信中...";	// 処理を続ける
 
@@ -2015,11 +2025,13 @@
                     mode: "sendMessage",	// 処理を続ける
                     from: myUserId,	// 処理を続ける
                     to: targetUserId,	// 処理を続ける
+                    requestId: requestId,	// 二重送信防止用のIDを送る
                     text: `募集を見て「${reaction}」とリアクションしました。`	// 処理を続ける
                 });	// 処理を完了する
 
                 if (result.status === "success") {	// 条件に応じて処理を分ける
                     sessionStorage.setItem(cooldownKey, String(Date.now()));	// 端末内の保存情報を扱う
+                    sessionStorage.removeItem(requestKey);	// 送信成功後に再試行用IDを消す
                     button.innerText = "送信しました ✓";	// 処理を続ける
                     alert(`${targetName}さんにリアクションを送りました。`);	// 処理結果を知らせる
                 } else {	// 処理のまとまりを始める
@@ -2283,6 +2295,8 @@
             localStorage.setItem("userEmail", "admin");	// 端末内の保存情報を扱う
             localStorage.setItem("userId", "admin");	// 端末内の保存情報を扱う
             localStorage.setItem("userName", "管理者");	// 端末内の保存情報を扱う
+            localStorage.setItem("sessionToken", localStorage.getItem("adminSessionToken") || "");	// 管理者本人のログイン情報を戻す
+            localStorage.removeItem("adminSessionToken");	// 退避した情報を消す
             localStorage.removeItem("isImpersonating");	// 端末内の保存情報を扱う
             window.location.href = "admin.html";	// 画面表示を更新する
         }	// 処理のまとまりを閉じる
