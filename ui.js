@@ -47,6 +47,64 @@ function handleHeikoSessionResponse(result) {	// APIからログイン切れが�
     return true;	// ログイン切れを処理したことを返す
 }	// ログイン切れ処理を閉じる
 window.handleHeikoSessionResponse = handleHeikoSessionResponse;	// 各ページからログイン切れ処理を使えるようにする
+
+(function installUsageLogging() {	// GAS通信を利用ログへ記録する仕組みを準備する
+    const nativeFetch = window.fetch.bind(window);	// 元の通信関数を保存する
+    const ignoredModes = new Set(["recordUsageLog", "heartbeat", "login", "register", "verifyEmail", "resendVerificationCode", "forgotPassword", "resetPassword", "verify_face_1toN", "verify_face_for_user"]);	// 記録しない処理をまとめる
+
+    function parsePayload(body) {	// 通信本文からJSONを読み取る
+        if (typeof body !== "string") return null;	// JSON文字列以外は対象外にする
+        try {	// JSONの読み込みを試す
+            const payload = JSON.parse(body);	// 通信本文をオブジェクトへ変換する
+            return payload && typeof payload === "object" ? payload : null;	// オブジェクトだけ返す
+        } catch (error) {	// 壊れたJSONに備える
+            return null;	// 読み込み失敗を無視する
+        }	// JSON読み込みを閉じる
+    }	// 本文解析を閉じる
+
+    function getRequestUrl(input) {	// fetchの入力からURLを取得する
+        return typeof input === "string" ? input : input && input.url ? input.url : "";	// URL文字列を返す
+    }	// URL取得を閉じる
+
+    function sendUsageLog(url, payload, result, durationMs, errorMessage) {	// 利用イベントをGASへ送る
+        const sessionToken = localStorage.getItem("sessionToken") || "";	// 現在のセッションを取得する
+        const userId = localStorage.getItem("userId") || payload.userId || "";	// 本人のUserIDを取得する
+        if (!sessionToken || !userId || payload.adminToken) return;	// 未ログインまたは管理者操作は記録しない
+        const logPayload = {	// ログ保存用の本文を作る
+            mode: "recordUsageLog",	// ログ保存モードを指定する
+            userId: String(userId).slice(0, 64),	// UserIDを短くして送る
+            sourceMode: String(payload.mode || "unknown").slice(0, 80),	// 元のAPIモードを送る
+            result: result,	// 成否を送る
+            durationMs: Math.round(durationMs),	// 処理時間を送る
+            errorMessage: String(errorMessage || "").slice(0, 300),	// エラー内容を短く送る
+            sessionToken: sessionToken	// 本人確認情報を送る
+        };	// ログ本文の定義を閉じる
+        nativeFetch(url, { method: "POST", body: JSON.stringify(logPayload) }).catch(() => {});	// ログ失敗で本来の操作を止めない
+    }	// 利用ログ送信を閉じる
+
+    window.fetch = async function (input, init = {}) {	// すべてのGAS通信を確認する
+        const url = getRequestUrl(input);	// 通信先URLを取得する
+        const payload = parsePayload(init.body);	// 通信本文を取得する
+        const shouldLog = Boolean(payload && payload.mode && url.includes("script.google.com/macros/") && !ignoredModes.has(payload.mode) && !payload.adminToken);	// 記録対象か確認する
+        const startedAt = performance.now();	// 通信開始時刻を保存する
+
+        try {	// 通信を実行する
+            const response = await nativeFetch(input, init);	// 元のfetchで通信する
+            if (shouldLog) {	// 記録対象の場合に処理する
+                const copy = response.clone();	// 本来の処理を邪魔しない複製を作る
+                copy.json().then(result => {	// GASの応答を読み込む
+                    const status = result && result.status === "success" ? "success" : "error";	// 応答から成否を判定する
+                    sendUsageLog(url, payload, status, performance.now() - startedAt, status === "error" ? result.message : "");	// 結果を保存する
+                }).catch(error => sendUsageLog(url, payload, "error", performance.now() - startedAt, error.message));	// JSON読込失敗を保存する
+            }	// 記録対象の処理を閉じる
+            return response;	// 元の応答を返す
+        } catch (error) {	// 通信失敗に備える
+            if (shouldLog) sendUsageLog(url, payload, "error", performance.now() - startedAt, error.message);	// 通信エラーを保存する
+            throw error;	// 元のエラーを呼び出し元へ返す
+        }	// 通信処理を閉じる
+    };	// fetchの差し替えを完了する
+})();	// 利用ログ記録の準備を完了する
+
 document.addEventListener("DOMContentLoaded", () => {	// 画面の読み込み完了後に処理する
     const selector = document.getElementById("theme-preference");	// 外観設定の選択欄を取得する
     if (selector) selector.value = readThemePreference();	// 保存済みの外観設定を選択欄へ表示する

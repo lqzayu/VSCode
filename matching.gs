@@ -13,6 +13,8 @@ const USER_SESSION_DURATION_MS = 6 * 60 * 60 * 1000;	// 通常ログインの有
 
 const LINE_ACCESS_TOKEN = PropertiesService.getScriptProperties().getProperty("LINE_ACCESS_TOKEN") || "";	// 定数を定義
 const GEMINI_MODEL = PropertiesService.getScriptProperties().getProperty("GEMINI_MODEL") || "gemini-3.5-flash-lite";	// 定数を定義
+const USAGE_LOG_HEADERS = ["記録日時", "日付", "匿名ユーザーキー", "機能", "操作", "結果", "処理時間(ms)", "エラー内容"]; // 利用ログの見出しを定義する
+const DAILY_ANALYSIS_HEADERS = ["日付", "ユニーク利用者数", "イベント数", "成功数", "失敗数", "ログイン関連数", "募集関連数", "チャット関連数", "AI相談数", "顔認証関連数", "LINE関連数", "通報・ブロック関連数", "エラー数", "平均処理時間(ms)", "処理時間合計(ms)", "処理時間件数", "最終更新", "利用者キーJSON"]; // 日別分析の見出しを定義する
 
 function doPost(e) {	// 関数を定義
   try {	// 失敗に備えて処理を始める
@@ -93,7 +95,7 @@ function doPost(e) {	// 関数を定義
     const mode = data.mode;	// 定数を定義
 
     const publicModes = ["register", "verifyEmail", "resendVerificationCode", "login", "verify_face_1toN", "verify_face_for_user", "forgotPassword", "resetPassword"];	// ログイン前に使える処理を限定する
-    const adminModes = ["adminGetOverview", "adminDeletePost", "adminBanUser", "getReports", "updateReportStatus"];	// 管理者認証を個別に確認する処理をまとめる
+    const adminModes = ["adminGetOverview", "adminDeletePost", "adminBanUser", "getReports", "updateReportStatus", "getDailyAnalysis"];	// 管理者認証を個別に確認する処理をまとめる
     if (!publicModes.includes(mode) && !adminModes.includes(mode)) {	// 通常ユーザー向け処理を確認する
       const actorId = getRequestActorId(mode, data);	// 処理を行う本人のIDを取得する
       const adminProfileRequest = mode === "getUserProfile" && isAdminRequest(data);	// 管理者の代理ログイン用取得か確認する
@@ -110,6 +112,37 @@ function doPost(e) {	// 関数を定義
       touchOnlineUser(onlineSheet, userId);	// 処理を完了する
       return createRes("success", "HEARTBEAT_OK");	// 結果を返す
     }	// 処理のまとまりを閉じる
+
+    if (mode === "registerAndroidDevice") {	// Android端末の通知先を登録する
+      const userId = cleanCell(data.userId);	// ログイン中のユーザーIDを取得する
+      const fcmToken = cleanCell(data.fcmToken).slice(0, 4096);	// FCMトークンを安全な長さに収める
+      const platform = cleanCell(data.platform).slice(0, 32) || "android";	// 端末種別を保存する
+      if (!userId || !userExists(sheetUser, userId)) return createRes("error", "ユーザーが見つかりません");	// ユーザーの存在を確認する
+      if (!fcmToken || fcmToken.length < 20) return createRes("error", "通知設定を確認できませんでした");	// 空のトークンを拒否する
+
+      const deviceSheet = getOrCreateSheet(ss, "Android通知", ["UserID", "FCMトークン", "プラットフォーム", "更新日時", "状態"]);	// Android通知用シートを用意する
+      upsertAndroidDeviceToken(deviceSheet, userId, fcmToken, platform);	// 同じ端末は更新し、複数端末は保持する
+      return createRes("success", "ANDROID_DEVICE_REGISTERED");	// 登録結果を返す
+    }	// Android端末登録を閉じる
+
+    if (mode === "unregisterAndroidDevice") {	// Android端末の通知先を解除する
+      const userId = cleanCell(data.userId);	// ログイン中のユーザーIDを取得する
+      const fcmToken = cleanCell(data.fcmToken).slice(0, 4096);	// FCMトークンを取得する
+      if (!userId || !fcmToken) return createRes("error", "通知設定を確認できませんでした");	// 不正な解除情報を拒否する
+      const deviceSheet = ss.getSheetByName("Android通知");	// Android通知用シートを取得する
+      if (deviceSheet && deviceSheet.getLastRow() > 1) revokeAndroidDeviceToken(deviceSheet, userId, fcmToken);	// 対象端末だけを無効化する
+      return createRes("success", "ANDROID_DEVICE_UNREGISTERED");	// 解除結果を返す
+    }	// Android端末解除を閉じる
+
+    if (mode === "recordUsageLog") {	// 利用ログを保存する
+      const saved = saveUsageLog(ss, data);	// 利用ログと日別集計を更新する
+      return createRes("success", saved);	// 保存結果を返す
+    }	// 利用ログ保存を閉じる
+
+    if (mode === "getDailyAnalysis") {	// 管理者向けの日別分析を返す
+      if (!isAdminRequest(data)) return createRes("error", "管理者権限がありません。再ログインしてください");	// 管理者以外を拒否する
+      return createRes("success", getDailyAnalysisRows(ss, data.days));	// 日別分析を返す
+    }	// 日別分析取得を閉じる
 
     if (mode === "createLineLinkCode") {	// LINE連携用の一時コードを発行する
       const userId = cleanCell(data.userId);	// ログイン中のユーザーIDを取得する
@@ -872,6 +905,9 @@ function doPost(e) {	// 関数を定義
         const lineNoticeText = `💬【平工マッチング】新着メッセージ\n\n${senderName} さんからメッセージが届きました：\n「${messageText || "画像が送信されました"}」${attachmentNotice}`;	// 定数を定義
         sendLineNotification(recipientLineId, lineNoticeText);	// 処理を完了する
       }	// 処理のまとまりを閉じる
+
+      const pushBody = `${senderName} さんからメッセージが届きました：${messageText || "画像が送信されました"}`.slice(0, 240);	// Android通知本文を短く整える
+      sendAndroidPushNotification(ss, toUser, "平工マッチング：新着メッセージ", pushBody, fromUser);	// Android端末へ通知する
 
       return createRes("success", "SENT");	// 結果を返す
     }	// 処理のまとまりを閉じる
@@ -1744,6 +1780,9 @@ function getAdminTokenSecret() {	// 関数を定義
 function getRequestActorId(mode, data) {	// 処理ごとの本人IDを取得する
   const actorFields = {	// 本人確認に使う項目をまとめる
     heartbeat: "userId",	// オンライン更新の本人を指定する
+    registerAndroidDevice: "userId",	// Android通知先の登録者を指定する
+    unregisterAndroidDevice: "userId",	// Android通知先の解除者を指定する
+    recordUsageLog: "userId",	// 利用ログ保存者を指定する
     createLineLinkCode: "userId",	// LINE連携コードの発行者を指定する
     getUserProfile: data.userId ? "userId" : "email",	// プロフィール取得者を指定する
     aiStudyChat: "userId",	// AI相談者を指定する
@@ -1867,6 +1906,136 @@ function getOrCreateSheet(ss, name, headers) {	// 関数を定義
   if (sheet.getLastRow() === 0) sheet.getRange(1, 1, 1, headers.length).setValues([headers]);	// 保存データを読み込む
   return sheet;	// 結果を返す
 }	// 処理のまとまりを閉じる
+
+function initializeUsageAnalytics() {	// 利用ログ用シートを手動で準備する
+  const ss = SpreadsheetApp.getActiveSpreadsheet();	// 現在のスプレッドシートを取得する
+  ensureUsageSheets(ss);	// 必要なシートと見出しを作る
+  return "利用ログと日別分析シートを準備しました";	// 実行結果を返す
+}	// 初期化処理を閉じる
+
+function ensureUsageSheets(ss) {	// 利用分析用のシートを準備する
+  const usageSheet = getOrCreateSheet(ss, "利用ログ", USAGE_LOG_HEADERS);	// 生ログの保存先を用意する
+  const dailySheet = getOrCreateSheet(ss, "日別分析", DAILY_ANALYSIS_HEADERS);	// 日別集計の保存先を用意する
+  return { usageSheet: usageSheet, dailySheet: dailySheet };	// 用意したシートを返す
+}	// シート準備を閉じる
+
+function saveUsageLog(ss, data) {	// 利用イベントを保存する
+  const userId = cleanCell(data && data.userId);	// 操作したユーザーIDを取得する
+  if (!isSafeIdentifier(userId)) return { saved: false, skipped: true };	// 不正なユーザーIDは記録しない
+
+  const sourceMode = safeSheetText(data && data.sourceMode, 80) || "unknown";	// 元のAPIモードを保存する
+  const result = ["success", "error", "started"].includes(cleanCell(data && data.result)) ? cleanCell(data.result) : "unknown";	// 結果の種類を整える
+  const rawDuration = Number(data && data.durationMs);	// 処理時間を数値に変換する
+  const durationMs = Number.isFinite(rawDuration) ? Math.max(0, Math.min(600000, Math.round(rawDuration))) : 0;	// 異常な処理時間を制限する
+  const errorMessage = safeSheetText(data && data.errorMessage, 300);	// エラー内容を短く保存する
+  const recordedAt = new Date();	// 記録時刻を作る
+  const dateKey = Utilities.formatDate(recordedAt, Session.getScriptTimeZone(), "yyyy-MM-dd");	// 日本時間の日付を作る
+  const userKey = createUsageUserKey(userId);	// 個人情報を直接保存しないキーを作る
+  const sheets = ensureUsageSheets(ss);	// 保存先シートを準備する
+  const lock = LockService.getScriptLock();	// 同時保存を防ぐロックを取得する
+  let locked = false;	// ロック取得状態を保持する
+
+  try {	// 保存処理を開始する
+    locked = lock.tryLock(1500);	// 短時間だけロックを待つ
+    if (!locked) return { saved: false, skipped: true };	// 混雑時は本来の操作を止めずに終了する
+    sheets.usageSheet.appendRow([recordedAt, dateKey, userKey, getUsageFeatureLabel(sourceMode), sourceMode, result, durationMs, errorMessage]);	// 生ログを追加する
+    upsertDailyAnalysis(sheets.dailySheet, dateKey, userKey, sourceMode, result, durationMs, recordedAt);	// 日別集計を更新する
+    return { saved: true, dateKey: dateKey };	// 保存結果を返す
+  } catch (error) {	// ログ保存の失敗に備える
+    console.error("利用ログ保存失敗", error);	// 管理者向けに失敗を記録する
+    return { saved: false, skipped: true };	// 本来の画面操作は成功扱いにする
+  } finally {	// 保存処理の最後に実行する
+    if (locked && lock.hasLock()) lock.releaseLock();	// 取得したロックを解放する
+  }	// 保存処理を閉じる
+}	// 利用ログ保存を閉じる
+
+function createUsageUserKey(userId) {	// ユーザーIDを分析用の匿名キーへ変換する
+  const signature = Utilities.computeHmacSha256Signature(cleanCell(userId), getUserTokenSecret());	// 署名鍵で一方向変換する
+  return Utilities.base64EncodeWebSafe(signature).slice(0, 22);	// 短い匿名キーを返す
+}	// 匿名キー作成を閉じる
+
+function getUsageFeatureLabel(sourceMode) {	// APIモードを分析用の機能名へ変換する
+  const mode = cleanCell(sourceMode);	// モード名を整える
+  if (["login", "register", "verifyEmail", "forgotPassword", "resetPassword", "resendVerificationCode"].includes(mode)) return "ログイン";	// 認証系をまとめる
+  if (["verify_face_for_user", "verify_face_1toN", "updateFaceFeatures"].includes(mode)) return "顔認証";	// 顔認証系をまとめる
+  if (["getRecruitments", "postRecruitment", "deleteRecruitment"].includes(mode)) return "募集";	// 募集系をまとめる
+  if (["sendMessage", "getMessages", "getChatPartners", "markAsRead", "unsendMessage", "deleteChatHistory", "getUnreadCount", "getNotificationSummary", "getLatestIncomingMessage"].includes(mode)) return "チャット";	// チャット系をまとめる
+  if (["aiStudyChat", "aiStudyFeedback"].includes(mode)) return "AI相談";	// AI系をまとめる
+  if (mode === "createLineLinkCode") return "LINE";	// LINE連携をまとめる
+  if (["reportContent", "getReports", "updateReportStatus", "blockUser", "unblockUser", "getBlockedUsers"].includes(mode)) return "通報・ブロック";	// 安全機能をまとめる
+  return "その他";	// 未分類の操作をまとめる
+}	// 機能名変換を閉じる
+
+function upsertDailyAnalysis(sheet, dateKey, userKey, sourceMode, result, durationMs, updatedAt) {	// 日別分析の1行を追加または更新する
+  const lastRow = sheet.getLastRow();	// 日別分析の最終行を取得する
+  const rows = lastRow > 1 ? sheet.getRange(2, 1, lastRow - 1, DAILY_ANALYSIS_HEADERS.length).getValues() : [];	// 既存の日別データを読み込む
+  let rowIndex = rows.findIndex(row => cleanCell(row[0]) === dateKey);	// 同じ日付の行を探す
+  let values;	// 保存する行を保持する
+
+  if (rowIndex < 0) {	// 新しい日付の場合に処理する
+    values = Array(DAILY_ANALYSIS_HEADERS.length).fill(0);	// 空の集計行を作る
+    values[0] = dateKey;	// 日付を保存する
+    values[16] = updatedAt;	// 最終更新時刻を保存する
+    values[17] = "[]";	// 利用者キーの一覧を初期化する
+    rowIndex = lastRow + 1;	// シート上の行番号を作る
+  } else {	// 既存の日付の場合に処理する
+    values = rows[rowIndex].slice(0, DAILY_ANALYSIS_HEADERS.length);	// 既存の集計値をコピーする
+    rowIndex += 2;	// シート上の行番号へ変換する
+  }	// 日付行の準備を閉じる
+
+  const userKeys = parseUsageUserKeys(values[17]);	// 既存の匿名ユーザー一覧を読む
+  if (userKey && !userKeys.includes(userKey)) userKeys.push(userKey);	// 新しい利用者を追加する
+  values[1] = userKeys.length;	// ユニーク利用者数を更新する
+  values[2] = Number(values[2] || 0) + 1;	// イベント数を増やす
+  if (result === "success") values[3] = Number(values[3] || 0) + 1;	// 成功数を増やす
+  if (result === "error") values[4] = Number(values[4] || 0) + 1;	// 失敗数を増やす
+
+  const feature = getUsageFeatureLabel(sourceMode);	// 機能名を取得する
+  const featureColumnMap = { "ログイン": 5, "募集": 6, "チャット": 7, "AI相談": 8, "顔認証": 9, "LINE": 10, "通報・ブロック": 11 };	// 機能ごとの列番号を定義する
+  if (featureColumnMap[feature]) values[featureColumnMap[feature]] = Number(values[featureColumnMap[feature]] || 0) + 1;	// 機能別イベント数を増やす
+  if (result === "error") values[12] = Number(values[12] || 0) + 1;	// エラー数を増やす
+  if (durationMs > 0) {	// 処理時間がある場合に集計する
+    values[14] = Number(values[14] || 0) + durationMs;	// 処理時間の合計を増やす
+    values[15] = Number(values[15] || 0) + 1;	// 処理時間の件数を増やす
+    values[13] = Math.round(values[14] / values[15]);	// 平均処理時間を更新する
+  }	// 処理時間集計を閉じる
+  values[16] = updatedAt;	// 最終更新時刻を更新する
+  values[17] = JSON.stringify(userKeys.slice(-500));	// 匿名キー一覧を保存する
+  sheet.getRange(rowIndex, 1, 1, DAILY_ANALYSIS_HEADERS.length).setValues([values]);	// 日別分析を保存する
+}	// 日別分析更新を閉じる
+
+function parseUsageUserKeys(value) {	// 匿名キー一覧を読み込む
+  try {	// JSONの読み込みを試す
+    const parsed = JSON.parse(cleanCell(value) || "[]");	// JSONを配列へ変換する
+    return Array.isArray(parsed) ? parsed.filter(item => typeof item === "string").slice(-500) : [];	// 安全な文字列だけ返す
+  } catch (error) {	// 壊れたJSONに備える
+    return [];	// 空の一覧を返す
+  }	// 読み込み処理を閉じる
+}	// 匿名キー一覧の読み込みを閉じる
+
+function getDailyAnalysisRows(ss, days) {	// 日別分析を管理者向けの形式で返す
+  const sheet = ss.getSheetByName("日別分析");	// 日別分析シートを取得する
+  if (!sheet || sheet.getLastRow() <= 1) return [];	// データがなければ空配列を返す
+  const limit = Math.max(1, Math.min(90, Number(days) || 30));	// 取得日数を制限する
+  const rows = sheet.getRange(2, 1, sheet.getLastRow() - 1, DAILY_ANALYSIS_HEADERS.length).getValues();	// 日別データを読み込む
+  return rows.slice(-limit).reverse().map(row => ({	// 新しい日付から返す
+    date: cleanCell(row[0]),	// 日付を返す
+    uniqueUsers: Number(row[1]) || 0,	// ユニーク利用者数を返す
+    events: Number(row[2]) || 0,	// イベント数を返す
+    successes: Number(row[3]) || 0,	// 成功数を返す
+    failures: Number(row[4]) || 0,	// 失敗数を返す
+    loginCount: Number(row[5]) || 0,	// ログイン関連数を返す
+    recruitmentCount: Number(row[6]) || 0,	// 募集関連数を返す
+    chatCount: Number(row[7]) || 0,	// チャット関連数を返す
+    aiCount: Number(row[8]) || 0,	// AI相談数を返す
+    faceCount: Number(row[9]) || 0,	// 顔認証関連数を返す
+    lineCount: Number(row[10]) || 0,	// LINE関連数を返す
+    moderationCount: Number(row[11]) || 0,	// 通報・ブロック関連数を返す
+    errorCount: Number(row[12]) || 0,	// エラー数を返す
+    averageDurationMs: Number(row[13]) || 0,	// 平均処理時間を返す
+    updatedAt: row[16] || ""	// 最終更新時刻を返す
+  }));	// 日別データの変換を完了する
+}	// 日別分析取得を閉じる
 
 function ensureUserSessionColumn(sheetUser) {	// ログイン世代の保存列を用意する
   if (sheetUser.getMaxColumns() < 13) sheetUser.insertColumnsAfter(sheetUser.getMaxColumns(), 13 - sheetUser.getMaxColumns());	// M列まで不足している列を増やす
@@ -2161,6 +2330,149 @@ function generateLineLinkCode(linkSheet) {	// 重複しにくいLINE連携コー
   }	// コード作成を閉じる
   return Utilities.getUuid().replace(/-/g, "").slice(0, 8).toUpperCase();	// 重複が続いた場合はUUIDから作る
 }	// 処理のまとまりを閉じる
+
+function upsertAndroidDeviceToken(deviceSheet, userId, fcmToken, platform) {	// Android端末の通知トークンを追加または更新する
+  const now = new Date();	// 更新時刻を作る
+  if (deviceSheet.getLastRow() > 1) {	// 登録済み端末を確認する
+    const rows = deviceSheet.getRange(2, 1, deviceSheet.getLastRow() - 1, 5).getValues();	// 登録済み端末を読み込む
+    for (let i = 0; i < rows.length; i++) {	// 端末を順番に確認する
+      if (cleanCell(rows[i][1]) !== fcmToken) continue;	// 同じFCMトークンだけを更新する
+      deviceSheet.getRange(i + 2, 1, 1, 5).setValues([[userId, safeSheetText(fcmToken, 4096), safeSheetText(platform, 32), now, "有効"]]);	// 端末情報を最新化する
+      return;	// 更新が完了したら終了する
+    }	// 登録済み端末の確認を閉じる
+  }	// 既存端末の確認を閉じる
+  deviceSheet.appendRow([userId, safeSheetText(fcmToken, 4096), safeSheetText(platform, 32), now, "有効"]);	// 新しい端末を追加する
+}	// Android端末登録を閉じる
+
+function getFcmServiceAccount() {	// GAS側に保存したFCMサービスアカウント設定を読み込む
+  const properties = PropertiesService.getScriptProperties();	// スクリプトプロパティを取得する
+  const jsonText = properties.getProperty("FCM_SERVICE_ACCOUNT_JSON") || "";	// JSON形式の設定を取得する
+  let account = null;	// サービスアカウント情報を保持する
+  if (jsonText) {	// JSON設定がある場合に解析する
+    try {	// 壊れたJSONに備える
+      account = JSON.parse(jsonText);	// サービスアカウントを解析する
+    } catch (e) {	// 解析できない設定は無効として扱う
+      console.error("FCM_SERVICE_ACCOUNT_JSONの解析に失敗しました", e);	// 管理者向けに原因を記録する
+      return null;	// 通知を送信せずに終了する
+    }	// 解析処理を閉じる
+  }	// JSON設定の確認を閉じる
+
+  const projectId = cleanCell((account && account.project_id) || properties.getProperty("FCM_PROJECT_ID"));	// FirebaseプロジェクトIDを取得する
+  const clientEmail = cleanCell((account && account.client_email) || properties.getProperty("FCM_CLIENT_EMAIL"));	// サービスアカウントのメールアドレスを取得する
+  const privateKey = String((account && account.private_key) || properties.getProperty("FCM_PRIVATE_KEY") || "").replace(/\\n/g, "\n");	// 改行を復元した秘密鍵を取得する
+  if (!projectId || !clientEmail || !privateKey) return null;	// 設定がない間は通知機能を無効にする
+  return { projectId: projectId, clientEmail: clientEmail, privateKey: privateKey };	// 必要な設定だけを返す
+}	// FCM設定取得を閉じる
+
+function base64UrlEncode(value) {	// JWT用のBase64URL文字列を作る
+  const bytes = typeof value === "string" ? Utilities.newBlob(value).getBytes() : value;	// 文字列またはバイト列を統一する
+  return Utilities.base64EncodeWebSafe(bytes).replace(/=+$/g, "");	// JWTの形式に合わせてパディングを除く
+}	// Base64URL変換を閉じる
+
+function getFcmAccessToken(account) {	// Firebase HTTP v1 API用のアクセストークンを取得する
+  const cache = CacheService.getScriptCache();	// 短時間のトークンキャッシュを取得する
+  const cached = cache.get("fcm-access-token");	// 保存済みトークンを確認する
+  if (cached) return cached;	// 有効期限内なら再利用する
+
+  try {	// Google OAuth APIの失敗に備える
+    const issuedAt = Math.floor(Date.now() / 1000);	// JWT発行時刻を秒で作る
+    const header = base64UrlEncode(JSON.stringify({ alg: "RS256", typ: "JWT" }));	// JWTヘッダーを作る
+    const claim = base64UrlEncode(JSON.stringify({
+      iss: account.clientEmail,
+      scope: "https://www.googleapis.com/auth/firebase.messaging",
+      aud: "https://oauth2.googleapis.com/token",
+      iat: issuedAt,
+      exp: issuedAt + 3600
+    }));	// OAuth用JWTの本文を作る
+    const unsignedJwt = header + "." + claim;	// 署名前のJWTを作る
+    const signature = base64UrlEncode(Utilities.computeRsaSha256Signature(unsignedJwt, account.privateKey));	// サービスアカウント秘密鍵で署名する
+    const assertion = unsignedJwt + "." + signature;	// 署名済みJWTを作る
+    const response = UrlFetchApp.fetch("https://oauth2.googleapis.com/token", {	// アクセストークンを要求する
+      method: "post",
+      contentType: "application/x-www-form-urlencoded",
+      payload: {
+        grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+        assertion: assertion
+      },
+      muteHttpExceptions: true
+    });	// OAuth応答を取得する
+    if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {	// エラー応答を確認する
+      console.error("FCMアクセストークン取得失敗", response.getResponseCode(), response.getContentText().slice(0, 500));	// 詳細をログに残す
+      return "";	// 通知を送信せずに終了する
+    }	// エラー応答の確認を閉じる
+    const token = cleanCell(JSON.parse(response.getContentText()).access_token);	// アクセストークンを読み込む
+    if (token) cache.put("fcm-access-token", token, 3300);	// 期限前にキャッシュする
+    return token;	// トークンを返す
+  } catch (error) {	// 通信または解析エラーに備える
+    console.error("FCMアクセストークン取得エラー", error);	// 通知処理だけを失敗させる
+    return "";	// チャット保存結果には影響させない
+  }	// アクセストークン取得を閉じる
+}	// FCMアクセストークン取得を閉じる
+
+function sendAndroidPushNotification(ss, toUserId, title, body, chatTargetUserId) {	// Android端末へチャット通知を送信する
+  const account = getFcmServiceAccount();	// FCM設定を取得する
+  if (!account) return;	// 設定前はWeb版の動作を変更しない
+  const deviceSheet = ss.getSheetByName("Android通知");	// 登録済み端末のシートを取得する
+  if (!deviceSheet || deviceSheet.getLastRow() <= 1) return;	// 通知先がなければ終了する
+  const accessToken = getFcmAccessToken(account);	// FCM API用の認証トークンを取得する
+  if (!accessToken) return;	// 認証できない場合はチャット成功を優先する
+
+  const rows = deviceSheet.getRange(2, 1, deviceSheet.getLastRow() - 1, 5).getValues();	// 通知先を読み込む
+  const targets = rows.filter(row => cleanCell(row[0]) === cleanCell(toUserId) && cleanCell(row[1]) && cleanCell(row[4]) !== "無効");	// 対象ユーザーの有効端末だけに絞る
+  const endpoint = "https://fcm.googleapis.com/v1/projects/" + encodeURIComponent(account.projectId) + "/messages:send";	// FCM送信先を作る
+  targets.forEach(row => {	// 複数端末へ順番に送信する
+    const payload = {
+      message: {
+        token: cleanCell(row[1]),
+        notification: {
+          title: cleanCell(title).slice(0, 100),
+          body: cleanCell(body).slice(0, 240)
+        },
+        data: {
+          type: "chat_message",
+          title: cleanCell(title).slice(0, 100),
+          body: cleanCell(body).slice(0, 240),
+          openChat: "true",
+          chatTargetUserId: cleanCell(chatTargetUserId)
+        },
+        android: { priority: "HIGH" }
+      }
+    };	// Androidアプリが通知タップ先を判断できるデータを作る
+    try {	// 端末ごとの送信失敗に備える
+      const response = UrlFetchApp.fetch(endpoint, {	// FCMへ通知を送信する
+        method: "post",
+        contentType: "application/json",
+        headers: { Authorization: "Bearer " + accessToken },
+        payload: JSON.stringify(payload),
+        muteHttpExceptions: true
+      });	// FCM応答を取得する
+      const code = response.getResponseCode();	// 応答コードを取得する
+      if (code < 200 || code >= 300) {	// 送信失敗を確認する
+        const responseText = response.getContentText();	// エラー内容を取得する
+        console.error("FCM通知送信失敗", code, responseText.slice(0, 500));	// 送信失敗を記録する
+        if (/UNREGISTERED|INVALID_ARGUMENT/.test(responseText)) markAndroidDeviceTokenInvalid(deviceSheet, row[1]);	// 期限切れトークンを無効化する
+      }	// 送信失敗確認を閉じる
+    } catch (error) {	// 端末単位の通信エラーに備える
+      console.error("FCM通知送信エラー", error);	// チャット送信には影響させない
+    }	// 端末送信を閉じる
+  });	// 端末送信を完了する
+}	// Android通知送信を閉じる
+
+function markAndroidDeviceTokenInvalid(deviceSheet, fcmToken) {	// 無効になったFCMトークンを次回送信対象から外す
+  if (!deviceSheet || deviceSheet.getLastRow() <= 1) return;	// シートがなければ終了する
+  const tokens = deviceSheet.getRange(2, 2, deviceSheet.getLastRow() - 1, 1).getValues();	// トークン一覧を取得する
+  const index = tokens.findIndex(row => cleanCell(row[0]) === cleanCell(fcmToken));	// 対象トークンを探す
+  if (index >= 0) deviceSheet.getRange(index + 2, 5).setValue("無効");	// 対象端末を無効化する
+}	// 無効トークン処理を閉じる
+
+function revokeAndroidDeviceToken(deviceSheet, userId, fcmToken) {	// ログアウトしたユーザーの端末通知を無効化する
+  const rows = deviceSheet.getRange(2, 1, deviceSheet.getLastRow() - 1, 5).getValues();	// 登録端末を読み込む
+  rows.forEach((row, index) => {	// 対象端末を順番に確認する
+    if (cleanCell(row[0]) === cleanCell(userId) && cleanCell(row[1]) === cleanCell(fcmToken)) {	// 本人の同じトークンだけを対象にする
+      deviceSheet.getRange(index + 2, 5).setValue("無効");	// 次回以降の通知対象から外す
+    }	// 対象確認を閉じる
+  });	// 端末確認を完了する
+}	// Android端末解除を閉じる
 
 function sendLineNotification(toUserId, messageText) {	// 関数を定義
   if (!LINE_ACCESS_TOKEN || LINE_ACCESS_TOKEN.includes("ここに")) return;	// 条件に応じて処理を分ける
