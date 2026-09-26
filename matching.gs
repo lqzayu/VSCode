@@ -2411,14 +2411,27 @@ function getFcmAccessToken(account) {	// Firebase HTTP v1 API用のアクセス�
 
 function sendAndroidPushNotification(ss, toUserId, title, body, chatTargetUserId) {	// Android端末へチャット通知を送信する
   const account = getFcmServiceAccount();	// FCM設定を取得する
-  if (!account) return;	// 設定前はWeb版の動作を変更しない
+  if (!account) {	// FCM設定がない場合を記録する
+    recordAndroidPushLog(ss, toUserId, "設定不足", "FCM_SERVICE_ACCOUNT_JSONまたはFCM設定プロパティがありません");	// 診断情報を残す
+    return;	// 設定前はWeb版の動作を変更しない
+  }	// FCM設定確認を閉じる
   const deviceSheet = ss.getSheetByName("Android通知");	// 登録済み端末のシートを取得する
-  if (!deviceSheet || deviceSheet.getLastRow() <= 1) return;	// 通知先がなければ終了する
+  if (!deviceSheet || deviceSheet.getLastRow() <= 1) {	// 通知先がない場合を記録する
+    recordAndroidPushLog(ss, toUserId, "送信先なし", "Android通知シートに端末登録がありません");	// 診断情報を残す
+    return;	// 通知先がなければ終了する
+  }	// 通知先確認を閉じる
   const accessToken = getFcmAccessToken(account);	// FCM API用の認証トークンを取得する
-  if (!accessToken) return;	// 認証できない場合はチャット成功を優先する
+  if (!accessToken) {	// FCM認証に失敗した場合を記録する
+    recordAndroidPushLog(ss, toUserId, "認証失敗", "FCMアクセストークンを取得できませんでした");	// 診断情報を残す
+    return;	// 認証できない場合はチャット成功を優先する
+  }	// FCM認証確認を閉じる
 
   const rows = deviceSheet.getRange(2, 1, deviceSheet.getLastRow() - 1, 5).getValues();	// 通知先を読み込む
   const targets = rows.filter(row => cleanCell(row[0]) === cleanCell(toUserId) && cleanCell(row[1]) && cleanCell(row[4]) !== "無効");	// 対象ユーザーの有効端末だけに絞る
+  if (targets.length === 0) {	// 対象端末がない場合を記録する
+    recordAndroidPushLog(ss, toUserId, "送信先なし", "対象UserIDの有効なFCMトークンがありません");	// 診断情報を残す
+    return;	// 送信先がなければ終了する
+  }	// 対象端末確認を閉じる
   const endpoint = "https://fcm.googleapis.com/v1/projects/" + encodeURIComponent(account.projectId) + "/messages:send";	// FCM送信先を作る
   targets.forEach(row => {	// 複数端末へ順番に送信する
     const payload = {
@@ -2450,13 +2463,26 @@ function sendAndroidPushNotification(ss, toUserId, title, body, chatTargetUserId
       if (code < 200 || code >= 300) {	// 送信失敗を確認する
         const responseText = response.getContentText();	// エラー内容を取得する
         console.error("FCM通知送信失敗", code, responseText.slice(0, 500));	// 送信失敗を記録する
+        recordAndroidPushLog(ss, toUserId, "送信失敗", `${code}: ${responseText.slice(0, 500)}`);	// 診断情報を残す
         if (/UNREGISTERED|INVALID_ARGUMENT/.test(responseText)) markAndroidDeviceTokenInvalid(deviceSheet, row[1]);	// 期限切れトークンを無効化する
+      } else {	// 送信成功を記録する
+        recordAndroidPushLog(ss, toUserId, "送信成功", `HTTP ${code}`);	// 診断情報を残す
       }	// 送信失敗確認を閉じる
     } catch (error) {	// 端末単位の通信エラーに備える
       console.error("FCM通知送信エラー", error);	// チャット送信には影響させない
+      recordAndroidPushLog(ss, toUserId, "送信エラー", String(error && error.message ? error.message : error).slice(0, 500));	// 診断情報を残す
     }	// 端末送信を閉じる
   });	// 端末送信を完了する
 }	// Android通知送信を閉じる
+
+function recordAndroidPushLog(ss, toUserId, status, detail) {	// Android通知の診断結果を記録する
+  try {	// 診断記録の失敗でチャットを止めない
+    const logSheet = getOrCreateSheet(ss, "Android通知ログ", ["記録日時", "対象UserID", "結果", "詳細"]);	// 診断用シートを用意する
+    logSheet.appendRow([new Date(), safeSheetText(toUserId, 128), safeSheetText(status, 32), safeSheetText(detail, 1000)]);	// 診断結果を追加する
+  } catch (error) {	// 記録自体の失敗を処理する
+    console.error("Android通知ログの記録失敗", error);	// GAS実行ログへ残す
+  }	// 診断記録を閉じる
+}	// Android通知診断を閉じる
 
 function markAndroidDeviceTokenInvalid(deviceSheet, fcmToken) {	// 無効になったFCMトークンを次回送信対象から外す
   if (!deviceSheet || deviceSheet.getLastRow() <= 1) return;	// シートがなければ終了する

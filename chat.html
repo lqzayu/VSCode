@@ -366,6 +366,97 @@
         }	/* スタイル定義を閉じる */
     </style>
     <link rel="stylesheet" href="theme.css?v=20260918e">	<!-- 外部ファイルを読み込む -->
+    <style id="chat-fixed-layout">
+        /*
+         * チャット本文だけをスクロール領域にし、上部の相手情報と
+         * 下部の入力欄を画面内の同じ位置に固定する。
+         * theme.css の共通レイアウトより後に適用するため、ここで定義する。
+         */
+        html,
+        body[data-page="chat"] {
+            height: 100dvh;
+        }
+
+        body[data-page="chat"] {
+            min-height: 100dvh;
+            overflow: hidden;
+        }
+
+        body[data-page="chat"] > .navbar,
+        body[data-page="chat"] > .footer {
+            flex: 0 0 auto;
+        }
+
+        body[data-page="chat"] > .chat-container {
+            flex: 1 1 auto;
+            min-height: 0;
+            height: auto;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        body[data-page="chat"] .chat-header {
+            flex: 0 0 auto;
+            min-height: 0;
+        }
+
+        body[data-page="chat"] .chat-header > #chat-title {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        body[data-page="chat"] .chat-header-actions {
+            flex: 0 0 auto;
+        }
+
+        body[data-page="chat"] .chat-messages {
+            flex: 1 1 auto;
+            min-height: 0;
+            overscroll-behavior: contain;
+            scrollbar-gutter: stable;
+        }
+
+        body[data-page="chat"] .chat-input-area {
+            flex: 0 0 auto;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            align-items: stretch;
+        }
+
+        body[data-page="chat"] .attachment-preview {
+            flex: 0 0 auto;
+            width: 100%;
+        }
+
+        body[data-page="chat"] .chat-message-input-row {
+            flex: 0 0 auto;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        body[data-page="chat"] .chat-input {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        body[data-page="chat"] .btn-send,
+        body[data-page="chat"] .btn-attach {
+            flex: 0 0 auto;
+        }
+
+        @media screen and (max-width: 600px) {
+            body[data-page="chat"] > .chat-container {
+                width: 100%;
+                padding: 12px;
+            }
+
+            body[data-page="chat"] .chat-input-area {
+                padding-bottom: max(12px, env(safe-area-inset-bottom));
+            }
+        }
+    </style>
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
 </head>	<!-- 要素を閉じる -->
