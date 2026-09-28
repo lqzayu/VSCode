@@ -163,6 +163,24 @@ function doPost(e) {	// 関数を定義
       return createRes("success", { code: code, expiresAt: expiresAt.getTime() });	// コードと期限を返す
     }	// LINE連携コード発行を閉じる
 
+    if (mode === "unlinkLineAccount") {	// LINE連携を解除する
+      const userId = cleanCell(data.userId);	// 解除対象のユーザーIDを取得する
+      if (!userExists(sheetUser, userId)) return createRes("error", "ユーザーが見つかりません");	// ユーザーの存在を確認する
+      const userRows = sheetUser.getDataRange().getValues();	// ユーザー情報を読み込む
+      const userRowIndex = userRows.findIndex((row, index) => index > 0 && cleanCell(row[0]) === userId);	// 対象ユーザーの行を探す
+      if (userRowIndex < 1) return createRes("error", "ユーザーが見つかりません");	// 対象がない場合は処理を終了する
+      sheetUser.getRange(userRowIndex + 1, 12).setValue("");	// ユーザーシートのLINE UserIDを解除する
+      if (sheetLineLink && sheetLineLink.getLastRow() > 1) {	// 連携コードシートがある場合に処理する
+        const linkRows = sheetLineLink.getRange(2, 1, sheetLineLink.getLastRow() - 1, 4).getValues();	// 連携コードの履歴を読み込む
+        const staleRanges = [];	// 無効化対象のセルを保持する
+        for (let i = 0; i < linkRows.length; i++) {	// 連携コードを順番に確認する
+          if (cleanCell(linkRows[i][0]) === userId && cleanCell(linkRows[i][3]) === "未使用") staleRanges.push(`D${i + 2}`);	// 未使用のコードだけを無効化対象にする
+        }	// 連携コードの確認を閉じる
+        if (staleRanges.length > 0) sheetLineLink.getRangeList(staleRanges).setValue("無効");	// 解除後に未使用コードを使えなくする
+      }	// 連携コードの処理を閉じる
+      return createRes("success", "LINE_UNLINKED");	// 解除結果を返す
+    }	// LINE連携解除を閉じる
+
     if (mode === "getUserProfile") {	// 条件に応じて処理を分ける
       const identifiers = [data.userId, data.email].map(value => String(value || "").trim()).filter(Boolean);	// 定数を定義
       if (identifiers.length === 0 || !sheetUser || sheetUser.getLastRow() <= 1) {	// 条件に応じて処理を分ける
@@ -181,7 +199,8 @@ function doPost(e) {	// 関数を定義
         userId: cleanCell(userRow[0]),	// 処理を続ける
         email: cleanCell(userRow[5]) || cleanCell(userRow[0]),	// 処理を続ける
         name: cleanCell(userRow[2]),	// 処理を続ける
-        profileImage: cleanCell(userRow[4])	// 処理を続ける
+        profileImage: cleanCell(userRow[4]),	// 処理を続ける
+        lineLinked: Boolean(cleanCell(userRow[11]))	// LINE UserIDが保存されているかを返す
       };	// プロフィール情報を閉じる
       if (isAdminRequest(data)) profileResult.sessionToken = createUserSessionToken(cleanCell(userRow[0]), cleanCell(userRow[12]));	// 代理ログイン用の本人トークンを発行する
       return createRes("success", profileResult);	// プロフィールを返す
@@ -1784,6 +1803,7 @@ function getRequestActorId(mode, data) {	// 処理ごとの本人IDを取得す�
     unregisterAndroidDevice: "userId",	// Android通知先の解除者を指定する
     recordUsageLog: "userId",	// 利用ログ保存者を指定する
     createLineLinkCode: "userId",	// LINE連携コードの発行者を指定する
+    unlinkLineAccount: "userId",	// LINE連携解除の本人を指定する
     getUserProfile: data.userId ? "userId" : "email",	// プロフィール取得者を指定する
     aiStudyChat: "userId",	// AI相談者を指定する
     aiStudyFeedback: "userId",	// AI評価者を指定する
@@ -1961,7 +1981,7 @@ function getUsageFeatureLabel(sourceMode) {	// APIモードを分析用の機能
   if (["getRecruitments", "postRecruitment", "deleteRecruitment"].includes(mode)) return "募集";	// 募集系をまとめる
   if (["sendMessage", "getMessages", "getChatPartners", "markAsRead", "unsendMessage", "deleteChatHistory", "getUnreadCount", "getNotificationSummary", "getLatestIncomingMessage"].includes(mode)) return "チャット";	// チャット系をまとめる
   if (["aiStudyChat", "aiStudyFeedback"].includes(mode)) return "AI相談";	// AI系をまとめる
-  if (mode === "createLineLinkCode") return "LINE";	// LINE連携をまとめる
+  if (["createLineLinkCode", "unlinkLineAccount"].includes(mode)) return "LINE";	// LINE連携をまとめる
   if (["reportContent", "getReports", "updateReportStatus", "blockUser", "unblockUser", "getBlockedUsers"].includes(mode)) return "通報・ブロック";	// 安全機能をまとめる
   return "その他";	// 未分類の操作をまとめる
 }	// 機能名変換を閉じる

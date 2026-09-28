@@ -522,6 +522,8 @@
             <button class="btn-update-face" onclick="startFaceUpdate()">顔認証情報をアップデートする</button>	<!-- 操作できる要素を配置 -->
             <br>	<!-- 画面要素を配置 -->
             <button id="line-link-button" class="btn-large" type="button" onclick="createLineLinkCode()">LINE通知を連携する</button>	<!-- LINE連携コードを発行する -->
+            <button id="line-unlink-button" class="btn-delete-account" type="button" onclick="unlinkLineAccount()" style="display:none; margin-top:8px;">LINE連携を解除する</button>	<!-- LINE連携を解除する -->
+            <div id="line-link-status" style="margin-top:8px; color:#64748b; font-size:13px;" aria-live="polite">連携状態を確認中...</div>	<!-- LINE連携状態を表示する -->
             <div id="line-link-result" style="display:none; margin:12px 0 4px; padding:14px; border-radius:12px; background:rgba(28,189,197,.1); color:var(--ui-ink,#1e293b); line-height:1.7;"></div>	<!-- 発行した連携コードを表示する -->
             <br>	<!-- 画面要素を配置 -->
             <button class="btn-delete-account" onclick="deleteAccount()">ユーザー情報を削除する</button>	<!-- 操作できる要素を配置 -->
@@ -643,6 +645,18 @@
             }	// 処理のまとまりを閉じる
         }	// 処理のまとまりを閉じる
 
+        let lineLinked = false;	// LINE連携状態を保持する
+
+        function updateLineLinkUI() {	// LINE連携状態に応じて表示を切り替える
+            const linkButton = document.getElementById("line-link-button");	// 連携ボタンを取得する
+            const unlinkButton = document.getElementById("line-unlink-button");	// 解除ボタンを取得する
+            const status = document.getElementById("line-link-status");	// 状態表示欄を取得する
+            if (!linkButton || !unlinkButton || !status) return;	// 要素がなければ処理を終了する
+            linkButton.style.display = lineLinked ? "none" : "";	// 連携済みなら発行ボタンを隠す
+            unlinkButton.style.display = lineLinked ? "" : "none";	// 連携済みなら解除ボタンを表示する
+            status.textContent = lineLinked ? "LINE連携中です。LINE通知を受け取れます。" : "LINE未連携です。";	// 状態を表示する
+        }	// LINE連携状態の表示切り替えを閉じる
+
         async function createLineLinkCode() {	// LINE連携用の一時コードを発行する
             const button = document.getElementById("line-link-button");	// 発行ボタンを取得する
             const resultBox = document.getElementById("line-link-result");	// 結果表示欄を取得する
@@ -667,6 +681,28 @@
             }	// 後始末を閉じる
         }	// 処理のまとまりを閉じる
 
+        async function unlinkLineAccount() {	// LINE連携を解除する
+            if (!confirm("LINE連携を解除しますか？解除後はLINE通知が届かなくなります。")) return;	// 本人の確認を受ける
+            const button = document.getElementById("line-unlink-button");	// 解除ボタンを取得する
+            const resultBox = document.getElementById("line-link-result");	// 結果表示欄を取得する
+            const originalText = button.textContent;	// 元のボタン表示を保存する
+            button.disabled = true;	// 二重操作を防ぐ
+            button.textContent = "解除中...";	// 処理中であることを表示する
+            try {	// 通信失敗に備えて処理する
+                const result = await postGas({ mode: "unlinkLineAccount", userId: localStorage.getItem("userId") || localStorage.getItem("userEmail") });	// 解除APIを呼び出す
+                if (result.status !== "success") throw new Error(result.message || "LINE連携を解除できませんでした");	// 結果を確認する
+                lineLinked = false;	// 連携状態を更新する
+                updateLineLinkUI();	// 表示を更新する
+                resultBox.textContent = "LINE連携を解除しました。";	// 完了メッセージを表示する
+                resultBox.style.display = "block";	// 結果欄を表示する
+            } catch (error) {	// 解除に失敗した場合に処理する
+                alert(error.message || "LINE連携を解除できませんでした");	// エラーを知らせる
+            } finally {	// 通信終了後に処理する
+                button.disabled = false;	// 解除ボタンを戻す
+                button.textContent = originalText;	// 元の表示へ戻す
+            }	// 後始末を閉じる
+        }	// LINE連携解除を閉じる
+
         function toggleMenu() {	// 関数を定義
             document.getElementById("hud-menu-btn").classList.toggle("open");	// 画面表示を更新する
             document.getElementById("nav-links").classList.toggle("open");	// 画面表示を更新する
@@ -682,11 +718,13 @@
 
                 const name = String(result.message.name || result.message.userId || "").trim();	// 定数を定義
                 const image = String(result.message.profileImage || "").trim();	// 定数を定義
+                lineLinked = result.message.lineLinked === true;	// LINE連携状態を受け取る
                 localStorage.setItem("userName", name);	// 端末内の保存情報を扱う
                 localStorage.setItem("profileImage", image);	// 端末内の保存情報を扱う
 
                 document.getElementById("username-input").value = name;	// 処理を続ける
                 document.getElementById("profile-icon").src = image || DEFAULT_AVATAR;	// 処理を続ける
+                updateLineLinkUI();	// LINE連携状態の表示を更新する
             } catch (e) {	// 処理のまとまりを始める
                 console.error("プロフィール情報の同期エラー:", e);	// 処理を完了する
             }	// 処理のまとまりを閉じる
