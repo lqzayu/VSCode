@@ -48,6 +48,134 @@ function handleHeikoSessionResponse(result) {	// APIからログイン切れが�
 }	// ログイン切れ処理を閉じる
 window.handleHeikoSessionResponse = handleHeikoSessionResponse;	// 各ページからログイン切れ処理を使えるようにする
 
+function installPageRefreshButton() {	// 各ページのヘッダーへ更新ボタンを追加する
+    if (!document.body) return;	// ページ本体がない場合は処理しない
+    if (document.getElementById("heiko-page-refresh")) return;	// 二重追加を防ぐ
+
+    const navbar = document.querySelector(".navbar");	// 共通ヘッダーを取得する
+
+    const button = document.createElement("button");	// 更新ボタンを作る
+    button.id = "heiko-page-refresh";	// 更新ボタンを識別する
+    button.type = "button";	// フォーム送信を防ぐ
+    button.className = "heiko-page-refresh";	// 共通スタイルを適用する
+    if (!navbar) button.classList.add("is-floating");	// 共通ヘッダーがないページでは右上へ固定する
+    button.setAttribute("aria-label", "ページを更新");	// 読み上げ用の説明を設定する
+    button.innerHTML = "<span aria-hidden=\"true\">↻</span><span>更新</span>";	// ボタンの表示内容を設定する
+    button.addEventListener("click", () => {	// 更新ボタンの操作を受け取る
+        button.disabled = true;	// 連続操作を防ぐ
+        button.classList.add("is-loading");	// 更新中の見た目へ変更する
+        button.querySelector("span").textContent = "⟳";	// 更新中の記号を表示する
+        window.location.reload();	// 現在のページを再読み込みする
+    });	// 操作イベントの登録を終える
+    (navbar || document.body).appendChild(button);	// ヘッダーまたはページ右上へボタンを追加する
+}	// 更新ボタンの追加処理を閉じる
+
+function prefetchHeikoPages() {	// 主要ページをバックグラウンドで先読みする
+    if (!document.body || document.body.dataset.page !== "main") return;	// ホーム画面だけで実行する
+
+    const pages = [	// 先読みするページをまとめる
+        "messages.html",	// メッセージ一覧を先読みする
+        "chat.html",	// チャット画面を先読みする
+        "profile.html",	// マイページを先読みする
+        "ai-study.html",	// AI相談画面を先読みする
+        "admin.html",	// 管理者画面を先読みする
+        "privacy.html",	// プライバシーポリシーを先読みする
+        "terms.html"	// 利用規約を先読みする
+    ];	// 先読み対象の定義を終える
+
+    const cacheKey = "heiko-prefetched-pages-v20260930";	// 先読み済み状態の保存名を決める
+    try {	// sessionStorageの利用を試す
+        if (sessionStorage.getItem(cacheKey) === "1") return;	// 同じタブでは再実行しない
+        sessionStorage.setItem(cacheKey, "1");	// 先読み開始済みとして保存する
+    } catch (error) {	// 保存できない環境に備える
+        console.warn("ページ先読み状態を保存できませんでした。", error);	// 保存失敗を記録する
+    }	// sessionStorage処理を閉じる
+
+    Promise.allSettled(pages.map(page => {	// ページを並列で取得する
+        return fetch(page, { cache: "force-cache", credentials: "same-origin" }).then(response => {	// HTMLをキャッシュへ読み込む
+            if (!response.ok) throw new Error(`${page}: HTTP ${response.status}`);	// 取得失敗を検出する
+            return response.text();	// 本文を最後まで読み込む
+        });	// ページ取得を完了する
+    })).then(results => {	// 先読み結果を受け取る
+        const failed = results.filter(result => result.status === "rejected").length;	// 失敗したページ数を数える
+        if (failed > 0) console.info(`ページ先読み: ${pages.length - failed}/${pages.length}件完了`);	// 部分的な失敗だけ記録する
+    });	// 並列先読みを完了する
+}	// ページ先読み処理を閉じる
+
+function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加する
+    if (document.getElementById("heiko-shared-ui-style")) return;	// スタイルの二重追加を防ぐ
+
+    const style = document.createElement("style");	// style要素を作る
+    style.id = "heiko-shared-ui-style";	// style要素を識別する
+    style.textContent = `
+        .heiko-page-refresh {
+            display: inline-flex;
+            width: auto;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            min-height: 36px;
+            padding: 7px 11px;
+            margin-left: 8px;
+            border: 1px solid var(--ui-line, rgba(28, 189, 197, .25));
+            border-radius: 10px;
+            background: var(--ui-paper, rgba(255, 255, 255, .86));
+            color: var(--ui-ink, #164e63);
+            font: inherit;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(15, 78, 88, .08);
+            transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+            white-space: nowrap;
+        }
+        .heiko-page-refresh:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 7px 16px rgba(15, 78, 88, .13);
+        }
+        .heiko-page-refresh:focus-visible {
+            outline: 3px solid rgba(28, 189, 197, .28);
+            outline-offset: 2px;
+        }
+        .heiko-page-refresh span:first-child {
+            display: inline-block;
+            font-size: 18px;
+            line-height: 12px;
+        }
+        .heiko-page-refresh.is-loading span:first-child {
+            animation: heiko-refresh-spin .8s linear infinite;
+        }
+        .heiko-page-refresh:disabled {
+            opacity: .7;
+            cursor: wait;
+        }
+        .heiko-page-refresh.is-floating {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 1000;
+        }
+        @keyframes heiko-refresh-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @media (max-width: 760px) {
+            .heiko-page-refresh {
+                min-width: 40px;
+                min-height: 40px;
+                padding: 7px 9px;
+                margin-left: 5px;
+                border-radius: 11px;
+            }
+            .heiko-page-refresh span:last-child {
+                display: none;
+            }
+        }
+    `;	// 共通スタイルを定義する
+    document.head.appendChild(style);	// style要素をページへ追加する
+}	// 共通スタイル追加処理を閉じる
+
 (function installUsageLogging() {	// GAS通信を利用ログへ記録する仕組みを準備する
     const nativeFetch = window.fetch.bind(window);	// 元の通信関数を保存する
     const ignoredModes = new Set(["recordUsageLog", "heartbeat", "login", "register", "verifyEmail", "resendVerificationCode", "forgotPassword", "resetPassword", "verify_face_1toN", "verify_face_for_user"]);	// 記録しない処理をまとめる
@@ -108,6 +236,11 @@ window.handleHeikoSessionResponse = handleHeikoSessionResponse;	// 各ページ�
 document.addEventListener("DOMContentLoaded", () => {	// 画面の読み込み完了後に処理する
     const selector = document.getElementById("theme-preference");	// 外観設定の選択欄を取得する
     if (selector) selector.value = readThemePreference();	// 保存済みの外観設定を選択欄へ表示する
+    installHeikoSharedStyles();	// 共通ボタンのスタイルを読み込む
+    installPageRefreshButton();	// ページ上部へ更新ボタンを追加する
+    if (document.body && document.body.dataset.page === "main") {	// ホーム画面だけ先読みを開始する
+        window.setTimeout(prefetchHeikoPages, 80);	// 初期表示を優先して少し遅らせる
+    }	// ホーム画面の先読み条件を閉じる
 });	// 読み込み完了時の処理を登録する
 
 (function () {	// 処理のまとまりを始める
