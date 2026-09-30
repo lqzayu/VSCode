@@ -91,6 +91,15 @@ html[data-theme="dark"] body[data-page="users"] .profile-card strong,html[data-t
 html[data-theme="dark"] .msg-partner,html[data-theme="dark"] .message-bubble:not(.msg-my),html[data-theme="dark"] .partner-item:hover {	/* 手動ダークモードの相手側表示を設定する */
  background:var(--ui-paper)!important; color:var(--ui-ink)!important;	/* 相手側表示を暗色表示にする */
 }	/* 手動ダークモード相手側表示の設定を閉じる */
+html[data-theme="dark"] .message-action-button {
+ background:rgba(30,41,59,.72)!important; color:#cbd5e1!important;
+}
+html[data-theme="dark"] .message-action-menu {
+ background:rgba(24,34,51,.94)!important; border-color:rgba(148,163,184,.28)!important;
+}
+html[data-theme="dark"] .message-action-menu button { color:#e2e8f0!important; }
+html[data-theme="dark"] .message-action-menu button.danger { color:#ff9d9d!important; }
+html[data-theme="dark"] .message-action-menu-title { color:#94a3b8!important; }
 html[data-theme="dark"] .ai-messages {	/* 手動ダークモードのAI履歴を設定する */
  background:rgba(37,49,71,.78)!important;	/* AI履歴を暗色表示にする */
 }	/* 手動ダークモードAI履歴の設定を閉じる */
