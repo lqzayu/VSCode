@@ -831,12 +831,12 @@
             if (!unreadPollTimer) {	// 未読確認が未開始の場合に処理する
                 unreadPollTimer = setInterval(() => {	// 未読確認を登録する
                     if (document.visibilityState === "visible") updateUnreadBadge();	// 表示中だけ確認する
-                }, 8000);	// 八秒ごとに確認する
+                }, 20000);	// 未読数は二十秒ごとに確認する
             }	// 未読確認の設定を閉じる
             if (!overviewPollTimer) {	// 管理情報更新が未開始の場合に処理する
                 overviewPollTimer = setInterval(() => {	// 管理情報更新を登録する
                     if (document.visibilityState === "visible") loadOverview(true);	// 表示中だけ更新する
-                }, 20000);	// 二十秒ごとに更新する
+                }, 30000);	// 管理情報は三十秒ごとに更新する
             }	// 管理情報更新の設定を閉じる
         }	// 処理のまとまりを閉じる
 

@@ -1,7 +1,8 @@
 (() => {	// 処理のまとまりを始める
     const ONLINE_GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";	// 定数を定義
-    const HEARTBEAT_INTERVAL_MS = 30 * 1000;	// 定数を定義
+    const HEARTBEAT_INTERVAL_MS = 45 * 1000;	// オンライン更新の通信回数を抑える
     let heartbeatTimer = null;	// 状態を保持
+    let heartbeatStartTimer = null;	// 初回送信を少し遅らせるタイマーを保持する
     let heartbeatRequest = null;	// 状態を保持
     let heartbeatController = null;	// 実行中の通信を保持する
 
@@ -87,12 +88,17 @@
     }	// 処理のまとまりを閉じる
 
     function startHeartbeat() {	// 関数を定義
-        if (!getCurrentUserId() || heartbeatTimer) return;	// 条件に応じて処理を分ける
-        sendHeartbeat();	// 処理を完了する
+        if (!getCurrentUserId() || heartbeatTimer || heartbeatStartTimer) return;	// 二重開始を防ぐ
+        heartbeatStartTimer = setTimeout(() => {	// 初期画面の通信後にオンライン更新を始める
+            heartbeatStartTimer = null;	// 初回タイマー情報を破棄する
+            sendHeartbeat();	// 最初のオンライン更新を送る
+        }, 1800);	// 募集などの初期通信を優先する
         heartbeatTimer = setInterval(sendHeartbeat, HEARTBEAT_INTERVAL_MS);	// 時間を置いて処理する
     }	// 処理のまとまりを閉じる
 
     function stopHeartbeat() {	// 関数を定義
+        if (heartbeatStartTimer) clearTimeout(heartbeatStartTimer);	// 初回送信の予約を止める
+        heartbeatStartTimer = null;	// 初回タイマー情報を破棄する
         if (heartbeatTimer) clearInterval(heartbeatTimer);	// 定期更新があれば停止する
         heartbeatTimer = null;	// 処理を続ける
         if (heartbeatController) heartbeatController.abort();	// 画面を離れた後の通信を止める

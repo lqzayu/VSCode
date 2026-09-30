@@ -1175,7 +1175,7 @@
             if (unreadPollTimer) return;	// 二重開始を防ぐ
             unreadPollTimer = setInterval(() => {	// 定期処理を登録する
                 if (document.visibilityState === "visible") updateUnreadBadge();	// 表示中だけ確認する
-            }, 8000);	// 八秒ごとに確認する
+            }, 30000);	// マイページでは三十秒ごとに確認する
         }	// 処理のまとまりを閉じる
 
         function stopProfileTasks() {	// 画面を離れた時の処理を止める

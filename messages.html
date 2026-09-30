@@ -666,7 +666,7 @@
             if (unreadPollTimer) return;	// 二重開始を防ぐ
             unreadPollTimer = setInterval(() => {	// 定期処理を登録する
                 if (document.visibilityState === "visible") updateUnreadBadge();	// 表示中だけ確認する
-            }, 8000);	// 八秒ごとに確認する
+            }, 20000);	// 未読確認を二十秒ごとにまとめる
         }	// 処理のまとまりを閉じる
 
         function stopUnreadPoll() {	// 未読確認を停止する
@@ -691,7 +691,7 @@
             }	// 復元処理を閉じる
         });	// ページ復元処理を登録する
 
-        window.onload = () => {	// 処理のまとまりを始める
+        window.onload = async () => {	// 初期通信の順番を制御する
             document.getElementById("hud-menu-btn").classList.remove("open");	// 画面表示を更新する
             document.getElementById("nav-links").classList.remove("open");	// 画面表示を更新する
 
@@ -703,8 +703,8 @@
 
             localStorage.removeItem("chatTarget");	// 端末内の保存情報を扱う
 
-            loadChatPartners();	// 処理を完了する
-            updateUnreadBadge();	// 処理を完了する
+            await loadChatPartners();	// 最初にメッセージ一覧を表示する
+            updateUnreadBadge();	// 一覧表示後に未読数を更新する
 
             startUnreadPoll();	// 未読確認を開始する
         };	// 処理のまとまりを閉じる

@@ -2270,7 +2270,7 @@
             if (notificationPollTimer) return;	// 二重開始を防ぐ
             notificationPollTimer = setInterval(() => {	// 通知確認を登録する
                 if (document.visibilityState === "visible") updateNotificationSummary();	// 表示中だけ確認する
-            }, 8000);	// 八秒ごとに確認する
+            }, 20000);	// 通知確認を二十秒ごとにまとめる
         }	// 処理のまとまりを閉じる
 
         function stopMainPolling() {	// ホーム画面の定期処理を停止する
@@ -2335,9 +2335,12 @@
                 document.getElementById("profile-icon").src = "avatar-default.svg";	// 初期プロフィール画像を表示する
             }	// 処理のまとまりを閉じる
 
-            loadRecruitments();	// 処理を完了する
-            refreshUserProfile(currentUserId);	// 処理を完了する
-            updateNotificationSummary();	// 処理を完了する
+            loadRecruitments().finally(() => {	// 最初に募集一覧の表示を優先する
+                Promise.allSettled([	// 背景で必要な情報を並列更新する
+                    refreshUserProfile(currentUserId),	// 最新のプロフィールを取得する
+                    updateNotificationSummary()	// 最新の通知情報を取得する
+                ]);	// 背景更新を開始する
+            });	// 初期通信の順番を閉じる
 
             const pageParams = new URLSearchParams(window.location.search);	// 定数を定義
             const requestedTab = pageParams.get("tab");	// 定数を定義

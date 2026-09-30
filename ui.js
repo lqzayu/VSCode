@@ -178,7 +178,10 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
 
 (function installUsageLogging() {	// GAS通信を利用ログへ記録する仕組みを準備する
     const nativeFetch = window.fetch.bind(window);	// 元の通信関数を保存する
-    const ignoredModes = new Set(["recordUsageLog", "heartbeat", "login", "register", "verifyEmail", "resendVerificationCode", "forgotPassword", "resetPassword", "verify_face_1toN", "verify_face_for_user"]);	// 記録しない処理をまとめる
+    const ignoredModes = new Set(["recordUsageLog", "recordUsageLogs", "heartbeat", "login", "register", "verifyEmail", "resendVerificationCode", "forgotPassword", "resetPassword", "verify_face_1toN", "verify_face_for_user"]);	// 記録しない処理をまとめる
+    const usageLogQueue = [];	// 利用ログを一時的にまとめる
+    let usageLogTimer = null;	// まとめて送るタイマーを保持する
+    let usageLogUrl = "";	// 実際に使われたGASのURLを保持する
 
     function parsePayload(body) {	// 通信本文からJSONを読み取る
         if (typeof body !== "string") return null;	// JSON文字列以外は対象外にする
@@ -194,21 +197,42 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
         return typeof input === "string" ? input : input && input.url ? input.url : "";	// URL文字列を返す
     }	// URL取得を閉じる
 
-    function sendUsageLog(url, payload, result, durationMs, errorMessage) {	// 利用イベントをGASへ送る
+    function flushUsageLogs() {	// たまった利用ログを一度に送る
         const sessionToken = localStorage.getItem("sessionToken") || "";	// 現在のセッションを取得する
-        const userId = localStorage.getItem("userId") || payload.userId || "";	// 本人のUserIDを取得する
-        if (!sessionToken || !userId || payload.adminToken) return;	// 未ログインまたは管理者操作は記録しない
+        const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";	// 本人のUserIDを取得する
+        if (!sessionToken || !userId || usageLogQueue.length === 0) return;	// 送る情報がなければ終了する
+        if (usageLogTimer) clearTimeout(usageLogTimer);	// 予約済みの送信を解除する
+        usageLogTimer = null;	// タイマー情報を破棄する
+        const events = usageLogQueue.splice(0, 20);	// 一度に送る件数を制限する
         const logPayload = {	// ログ保存用の本文を作る
-            mode: "recordUsageLog",	// ログ保存モードを指定する
+            mode: "recordUsageLogs",	// 一括保存モードを指定する
             userId: String(userId).slice(0, 64),	// UserIDを短くして送る
-            sourceMode: String(payload.mode || "unknown").slice(0, 80),	// 元のAPIモードを送る
-            result: result,	// 成否を送る
-            durationMs: Math.round(durationMs),	// 処理時間を送る
-            errorMessage: String(errorMessage || "").slice(0, 300),	// エラー内容を短く送る
+            events: events,	// まとめた利用ログを送る
             sessionToken: sessionToken	// 本人確認情報を送る
         };	// ログ本文の定義を閉じる
-        nativeFetch(url, { method: "POST", body: JSON.stringify(logPayload) }).catch(() => {});	// ログ失敗で本来の操作を止めない
-    }	// 利用ログ送信を閉じる
+        nativeFetch(usageLogUrl || window.HEIKO_GAS_URL || "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec", {	// 元の通信と同じGASへログを送る
+            method: "POST",	// POST通信を使う
+            body: JSON.stringify(logPayload),	// ログ本文をJSONへ変換する
+            keepalive: true	// 画面移動直前でも送信を続ける
+        }).catch(() => {});	// ログ失敗で本来の操作を止めない
+        if (usageLogQueue.length > 0) usageLogTimer = setTimeout(flushUsageLogs, 1500);	// 残りがあれば続けて送る
+    }	// 一括送信を閉じる
+
+    function queueUsageLog(url, payload, result, durationMs, errorMessage) {	// 利用ログを送信待ちへ追加する
+        if (!payload || payload.adminToken) return;	// 管理者操作は記録しない
+        if (url) usageLogUrl = url;	// 通信に使ったGASのURLを保存する
+        usageLogQueue.push({	// 利用イベントを追加する
+            sourceMode: String(payload.mode || "unknown").slice(0, 80),	// 元のAPIモードを保存する
+            result: result,	// 成否を保存する
+            durationMs: Math.round(durationMs),	// 処理時間を保存する
+            errorMessage: String(errorMessage || "").slice(0, 300)	// エラー内容を短く保存する
+        });	// 利用イベントの追加を閉じる
+        if (usageLogQueue.length >= 10 || result === "error") {	// 件数が多い場合や失敗時は早めに送る
+            flushUsageLogs();	// たまったログを送る
+        } else if (!usageLogTimer) {	// 通常時は一定時間まとめる
+            usageLogTimer = setTimeout(flushUsageLogs, 20000);	// 二十秒後に一括送信する
+        }	// 送信時期の判定を閉じる
+    }	// ログ追加処理を閉じる
 
     window.fetch = async function (input, init = {}) {	// すべてのGAS通信を確認する
         const url = getRequestUrl(input);	// 通信先URLを取得する
@@ -222,15 +246,19 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
                 const copy = response.clone();	// 本来の処理を邪魔しない複製を作る
                 copy.json().then(result => {	// GASの応答を読み込む
                     const status = result && result.status === "success" ? "success" : "error";	// 応答から成否を判定する
-                    sendUsageLog(url, payload, status, performance.now() - startedAt, status === "error" ? result.message : "");	// 結果を保存する
-                }).catch(error => sendUsageLog(url, payload, "error", performance.now() - startedAt, error.message));	// JSON読込失敗を保存する
+                    queueUsageLog(url, payload, status, performance.now() - startedAt, status === "error" ? result.message : "");	// 結果を保存する
+                }).catch(error => queueUsageLog(url, payload, "error", performance.now() - startedAt, error.message));	// JSON読込失敗を保存する
             }	// 記録対象の処理を閉じる
             return response;	// 元の応答を返す
         } catch (error) {	// 通信失敗に備える
-            if (shouldLog) sendUsageLog(url, payload, "error", performance.now() - startedAt, error.message);	// 通信エラーを保存する
+            if (shouldLog) queueUsageLog(url, payload, "error", performance.now() - startedAt, error.message);	// 通信エラーを保存する
             throw error;	// 元のエラーを呼び出し元へ返す
         }	// 通信処理を閉じる
     };	// fetchの差し替えを完了する
+
+    document.addEventListener("visibilitychange", () => {	// 画面が隠れる前にログを送る
+        if (document.visibilityState === "hidden") flushUsageLogs();	// 未送信ログを一括送信する
+    });	// 表示状態の監視を閉じる
 })();	// 利用ログ記録の準備を完了する
 
 document.addEventListener("DOMContentLoaded", () => {	// 画面の読み込み完了後に処理する
@@ -239,7 +267,11 @@ document.addEventListener("DOMContentLoaded", () => {	// 画面の読み込み�
     installHeikoSharedStyles();	// 共通ボタンのスタイルを読み込む
     installPageRefreshButton();	// ページ上部へ更新ボタンを追加する
     if (document.body && document.body.dataset.page === "main") {	// ホーム画面だけ先読みを開始する
-        window.setTimeout(prefetchHeikoPages, 80);	// 初期表示を優先して少し遅らせる
+        if ("requestIdleCallback" in window) {	// ブラウザが待機時間を通知できる場合に処理する
+            window.requestIdleCallback(prefetchHeikoPages, { timeout: 3000 });	// 初期通信が落ち着いてから先読みする
+        } else {	// 待機時間通知に対応していない場合に処理する
+            window.setTimeout(prefetchHeikoPages, 1800);	// 初期表示の後に先読みする
+        }	// 先読み開始方法の判定を閉じる
     }	// ホーム画面の先読み条件を閉じる
 });	// 読み込み完了時の処理を登録する
 

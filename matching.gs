@@ -30,17 +30,19 @@ function doPost(e) {	// 関数を定義
       return createRes("error", "JSONの形式が正しくありません");	// 結果を返す
     }	// 処理のまとまりを閉じる
 
-    const ss = SpreadsheetApp.getActiveSpreadsheet();	// 定数を定義
+    const ss = SpreadsheetApp.getActiveSpreadsheet();	// 現在のスプレッドシートを取得する
+    const sheetsByName = {};	// シートを名前から取り出す一覧を用意する
+    ss.getSheets().forEach(sheet => { sheetsByName[sheet.getName()] = sheet; });	// 一度の取得で全シートを整理する
 
-    const sheetUser = ss.getSheetByName("シート1");	// 定数を定義
-    const sheetRecruit = ss.getSheetByName("募集");	// 定数を定義
-    const sheetChat = ss.getSheetByName("チャット");	// 定数を定義
-    const sheetChatCopy = ss.getSheetByName("chat-copy");	// 定数を定義
-    const sheetOnline = ss.getSheetByName("オンライン状況");	// 定数を定義
-    const sheetHiddenChat = ss.getSheetByName("チャット非表示");	// 定数を定義
-    const sheetBlock = ss.getSheetByName("ブロック");	// 定数を定義
-    const sheetReport = ss.getSheetByName("通報");	// 定数を定義
-    const sheetLineLink = ss.getSheetByName("LINE連携");	// LINE連携コードの保存先を取得する
+    const sheetUser = sheetsByName["シート1"] || null;	// ユーザーシートを取得する
+    const sheetRecruit = sheetsByName["募集"] || null;	// 募集シートを取得する
+    const sheetChat = sheetsByName["チャット"] || null;	// チャットシートを取得する
+    const sheetChatCopy = sheetsByName["chat-copy"] || null;	// チャットバックアップを取得する
+    const sheetOnline = sheetsByName["オンライン状況"] || null;	// オンライン状況を取得する
+    const sheetHiddenChat = sheetsByName["チャット非表示"] || null;	// 非表示履歴を取得する
+    const sheetBlock = sheetsByName["ブロック"] || null;	// ブロック情報を取得する
+    const sheetReport = sheetsByName["通報"] || null;	// 通報情報を取得する
+    const sheetLineLink = sheetsByName["LINE連携"] || null;	// LINE連携コードの保存先を取得する
 
     if (Array.isArray(data.events)) {	// 条件に応じて処理を分ける
       const lineData = data;	// 定数を定義
@@ -106,7 +108,7 @@ function doPost(e) {	// 関数を定義
 
     if (mode === "heartbeat") {	// 条件に応じて処理を分ける
       const userId = String(data.userId || "").trim();	// 定数を定義
-      if (!userId || !userExists(sheetUser, userId)) return createRes("error", "ユーザーが見つかりません");	// 条件に応じて処理を分ける
+      if (!userId) return createRes("error", "ユーザーが見つかりません");	// 共通認証後もIDが空なら拒否する
 
       const onlineSheet = sheetOnline || getOrCreateSheet(ss, "オンライン状況", ["UserID", "最終アクセス"]);	// 定数を定義
       touchOnlineUser(onlineSheet, userId);	// 処理を完了する
@@ -138,6 +140,11 @@ function doPost(e) {	// 関数を定義
       const saved = saveUsageLog(ss, data);	// 利用ログと日別集計を更新する
       return createRes("success", saved);	// 保存結果を返す
     }	// 利用ログ保存を閉じる
+
+    if (mode === "recordUsageLogs") {	// まとめて届いた利用ログを保存する
+      const saved = saveUsageLogs(ss, data);	// 複数件を一度のシート更新で保存する
+      return createRes("success", saved);	// 一括保存結果を返す
+    }	// 一括ログ保存を閉じる
 
     if (mode === "getDailyAnalysis") {	// 管理者向けの日別分析を返す
       if (!isAdminRequest(data)) return createRes("error", "管理者権限がありません。再ログインしてください");	// 管理者以外を拒否する
@@ -1802,6 +1809,7 @@ function getRequestActorId(mode, data) {	// 処理ごとの本人IDを取得す�
     registerAndroidDevice: "userId",	// Android通知先の登録者を指定する
     unregisterAndroidDevice: "userId",	// Android通知先の解除者を指定する
     recordUsageLog: "userId",	// 利用ログ保存者を指定する
+    recordUsageLogs: "userId",	// 一括利用ログの保存者を指定する
     createLineLinkCode: "userId",	// LINE連携コードの発行者を指定する
     unlinkLineAccount: "userId",	// LINE連携解除の本人を指定する
     getUserProfile: data.userId ? "userId" : "email",	// プロフィール取得者を指定する
@@ -1867,7 +1875,7 @@ function getUserIdFromSessionToken(token) {	// ログイントークンを検証
     const payload = JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(parts[0])).getDataAsString());	// トークン本文を読み込む
     if (!payload || !cleanCell(payload.userId) || Date.now() > Number(payload.expiresAt || 0)) return "";	// 本人IDと期限を確認する
     if (CacheService.getScriptCache().get("revoked-user-" + cleanCell(payload.userId))) return "";	// 凍結または削除済みユーザーを拒否する
-    return { userId: cleanCell(payload.userId), version: cleanCell(payload.version) };	// 確認できた本人IDとログイン世代を返す
+    return { userId: cleanCell(payload.userId), version: cleanCell(payload.version), cacheKey: "auth-session-" + parts[1].slice(0, 48) };	// 本人IDと短時間キャッシュ用のキーを返す
   } catch (error) {	// 読み込みに失敗した場合に処理する
     return "";	// 無効なトークンとして扱う
   }	// 検証処理を閉じる
@@ -1876,11 +1884,15 @@ function getUserIdFromSessionToken(token) {	// ログイントークンを検証
 function isAuthenticatedUserRequest(data, actorId, sheetUser) {	// リクエストが本人のものか確認する
   const tokenSession = getUserIdFromSessionToken(data && data.sessionToken);	// トークンの本人IDとログイン世代を取得する
   if (!tokenSession || tokenSession.userId !== cleanCell(actorId)) return false;	// 操作者と本人IDが違う場合は拒否する
+  const authCache = CacheService.getScriptCache();	// 短時間の認証結果を取得する
+  if (authCache.get(tokenSession.cacheKey) === "1") return true;	// 直前に確認済みならシートの再読込を省く
   if (!sheetUser || sheetUser.getLastRow() <= 1) return false;	// ユーザー情報を確認できない場合は拒否する
   const width = Math.min(13, sheetUser.getMaxColumns());	// 現在のシート列数に収める
   const rows = sheetUser.getRange(2, 1, sheetUser.getLastRow() - 1, width).getValues();	// ユーザーIDと利用状態とログイン世代を読み込む
   const userRow = rows.find(row => cleanCell(row[0]) === tokenSession.userId);	// ログイン中のユーザーを探す
-  return Boolean(userRow && userRow[6] === true && cleanCell(userRow[12]) === tokenSession.version);	// 利用可能で世代が一致するユーザーだけ許可する
+  const authenticated = Boolean(userRow && userRow[6] === true && cleanCell(userRow[12]) === tokenSession.version);	// 利用可能で世代が一致するか確認する
+  if (authenticated) authCache.put(tokenSession.cacheKey, "1", 60);	// 成功した認証を一分間だけ再利用する
+  return authenticated;	// 本人確認の結果を返す
 }	// 処理のまとまりを閉じる
 
 function createAdminSessionToken() {	// 関数を定義
@@ -1968,6 +1980,84 @@ function saveUsageLog(ss, data) {	// 利用イベントを保存する
     if (locked && lock.hasLock()) lock.releaseLock();	// 取得したロックを解放する
   }	// 保存処理を閉じる
 }	// 利用ログ保存を閉じる
+
+function saveUsageLogs(ss, data) {	// 複数の利用イベントを一度に保存する
+  const userId = cleanCell(data && data.userId);	// 操作したユーザーIDを取得する
+  if (!isSafeIdentifier(userId)) return { saved: false, skipped: true };	// 不正なユーザーIDは記録しない
+  const sourceEvents = Array.isArray(data && data.events) ? data.events.slice(0, 20) : [];	// 一度に扱う件数を制限する
+  if (sourceEvents.length === 0) return { saved: false, skipped: true };	// 空のログは保存しない
+
+  const recordedAt = new Date();	// サーバー側の記録時刻を作る
+  const dateKey = Utilities.formatDate(recordedAt, Session.getScriptTimeZone(), "yyyy-MM-dd");	// 日本時間の日付を作る
+  const userKey = createUsageUserKey(userId);	// 個人情報を直接保存しないキーを作る
+  const events = sourceEvents.map(event => {	// 各イベントを安全な値へ整える
+    const sourceMode = safeSheetText(event && event.sourceMode, 80) || "unknown";	// 元のAPIモードを整える
+    const result = ["success", "error", "started"].includes(cleanCell(event && event.result)) ? cleanCell(event.result) : "unknown";	// 成否を整える
+    const rawDuration = Number(event && event.durationMs);	// 処理時間を数値へ変換する
+    const durationMs = Number.isFinite(rawDuration) ? Math.max(0, Math.min(600000, Math.round(rawDuration))) : 0;	// 異常な処理時間を制限する
+    const errorMessage = safeSheetText(event && event.errorMessage, 300);	// エラー内容を短くする
+    return { sourceMode: sourceMode, result: result, durationMs: durationMs, errorMessage: errorMessage };	// 整えたイベントを返す
+  });	// イベントの整理を閉じる
+  const sheets = ensureUsageSheets(ss);	// 保存先シートを準備する
+  const lock = LockService.getScriptLock();	// 同時保存を防ぐロックを取得する
+  let locked = false;	// ロック取得状態を保持する
+
+  try {	// 一括保存を開始する
+    locked = lock.tryLock(1500);	// 短時間だけロックを待つ
+    if (!locked) return { saved: false, skipped: true };	// 混雑時は画面操作を止めずに終了する
+    const rows = events.map(event => [recordedAt, dateKey, userKey, getUsageFeatureLabel(event.sourceMode), event.sourceMode, event.result, event.durationMs, event.errorMessage]);	// シートへ保存する行を作る
+    const firstRow = Math.max(2, sheets.usageSheet.getLastRow() + 1);	// 追記する先頭行を求める
+    sheets.usageSheet.getRange(firstRow, 1, rows.length, USAGE_LOG_HEADERS.length).setValues(rows);	// 生ログを一度に追加する
+    upsertDailyAnalysisBatch(sheets.dailySheet, dateKey, userKey, events, recordedAt);	// 日別集計を一度だけ更新する
+    return { saved: true, count: rows.length, dateKey: dateKey };	// 一括保存結果を返す
+  } catch (error) {	// 一括保存の失敗に備える
+    console.error("利用ログ一括保存失敗", error);	// 管理者向けに失敗を記録する
+    return { saved: false, skipped: true };	// 本来の操作へ影響させない
+  } finally {	// 保存処理の最後に実行する
+    if (locked && lock.hasLock()) lock.releaseLock();	// 取得したロックを解放する
+  }	// ロック処理を閉じる
+}	// 一括ログ保存を閉じる
+
+function upsertDailyAnalysisBatch(sheet, dateKey, userKey, events, updatedAt) {	// 複数イベントを日別集計へ反映する
+  const lastRow = sheet.getLastRow();	// 日別分析の最終行を取得する
+  const rows = lastRow > 1 ? sheet.getRange(2, 1, lastRow - 1, DAILY_ANALYSIS_HEADERS.length).getValues() : [];	// 既存の日別データを読み込む
+  let rowIndex = rows.findIndex(row => cleanCell(row[0]) === dateKey);	// 同じ日付の行を探す
+  let values;	// 保存する集計行を保持する
+
+  if (rowIndex < 0) {	// 新しい日付の場合に処理する
+    values = Array(DAILY_ANALYSIS_HEADERS.length).fill(0);	// 空の集計行を作る
+    values[0] = dateKey;	// 日付を保存する
+    values[17] = "[]";	// 利用者キー一覧を初期化する
+    rowIndex = lastRow + 1;	// 追加先の行番号を作る
+  } else {	// 既存の日付の場合に処理する
+    values = rows[rowIndex].slice(0, DAILY_ANALYSIS_HEADERS.length);	// 現在の集計値をコピーする
+    rowIndex += 2;	// シート上の行番号へ変換する
+  }	// 集計行の準備を閉じる
+
+  const userKeys = parseUsageUserKeys(values[17]);	// 既存の匿名ユーザー一覧を読む
+  if (userKey && !userKeys.includes(userKey)) userKeys.push(userKey);	// 新しい利用者を追加する
+  values[1] = userKeys.length;	// ユニーク利用者数を更新する
+  const featureColumnMap = { "ログイン": 5, "募集": 6, "チャット": 7, "AI相談": 8, "顔認証": 9, "LINE": 10, "通報・ブロック": 11 };	// 機能ごとの列番号を定義する
+
+  events.forEach(event => {	// 受け取ったイベントを集計する
+    values[2] = Number(values[2] || 0) + 1;	// イベント数を増やす
+    if (event.result === "success") values[3] = Number(values[3] || 0) + 1;	// 成功数を増やす
+    if (event.result === "error") values[4] = Number(values[4] || 0) + 1;	// 失敗数を増やす
+    const feature = getUsageFeatureLabel(event.sourceMode);	// 機能名を取得する
+    const featureColumn = featureColumnMap[feature];	// 機能の保存列を取得する
+    if (featureColumn) values[featureColumn] = Number(values[featureColumn] || 0) + 1;	// 機能別イベント数を増やす
+    if (event.result === "error") values[12] = Number(values[12] || 0) + 1;	// エラー数を増やす
+    if (event.durationMs > 0) {	// 処理時間がある場合に集計する
+      values[14] = Number(values[14] || 0) + event.durationMs;	// 処理時間の合計を増やす
+      values[15] = Number(values[15] || 0) + 1;	// 処理時間の件数を増やす
+    }	// 処理時間の集計を閉じる
+  });	// イベントごとの集計を閉じる
+
+  values[13] = values[15] > 0 ? Math.round(values[14] / values[15]) : 0;	// 平均処理時間を更新する
+  values[16] = updatedAt;	// 最終更新時刻を保存する
+  values[17] = JSON.stringify(userKeys.slice(-500));	// 匿名ユーザー一覧を保存する
+  sheet.getRange(rowIndex, 1, 1, DAILY_ANALYSIS_HEADERS.length).setValues([values]);	// 日別集計を一度だけ保存する
+}	// 一括日別集計を閉じる
 
 function createUsageUserKey(userId) {	// ユーザーIDを分析用の匿名キーへ変換する
   const signature = Utilities.computeHmacSha256Signature(cleanCell(userId), getUserTokenSecret());	// 署名鍵で一方向変換する
