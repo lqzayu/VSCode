@@ -1629,7 +1629,7 @@
             return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}`;	// 古いブラウザ向けのIDを返す
         }	// 送信IDの作成を閉じる
 
-        async function fetchGas(payload, timeoutMs = 20000) {	// 関数を定義
+        async function fetchGas(payload, timeoutMs = 12000) {	// 関数を定義
             const readModes = ["getUserProfile", "getRecruitments", "getNotificationSummary"];	// 定数を定義
             const canRetry = readModes.includes(payload && payload.mode);	// 定数を定義
             const maxAttempts = canRetry ? 2 : 1;	// 定数を定義
@@ -1663,8 +1663,8 @@
                     return result;	// 結果を返す
                 } catch (error) {	// 処理のまとまりを始める
                     lastError = error;	// 処理を続ける
-                    if (error.retryable === false) break;	// 再試行しても直らないエラーは終了する
-                    if (attempt + 1 < maxAttempts) {	// 条件に応じて処理を分ける
+                    if (error.retryable !== true) break;	// 通信切断や入力エラーは再試行せず終了する
+                    if (attempt + 1 < maxAttempts) {	// サーバー側の一時エラーだけ再試行する
                         await new Promise(resolve => setTimeout(resolve, 1200));	// 時間を置いて処理する
                     }	// 処理のまとまりを閉じる
                 } finally {	// 処理のまとまりを始める
@@ -2335,12 +2335,9 @@
                 document.getElementById("profile-icon").src = "avatar-default.svg";	// 初期プロフィール画像を表示する
             }	// 処理のまとまりを閉じる
 
-            loadRecruitments().finally(() => {	// 最初に募集一覧の表示を優先する
-                Promise.allSettled([	// 背景で必要な情報を並列更新する
-                    refreshUserProfile(currentUserId),	// 最新のプロフィールを取得する
-                    updateNotificationSummary()	// 最新の通知情報を取得する
-                ]);	// 背景更新を開始する
-            });	// 初期通信の順番を閉じる
+            loadRecruitments();	// 募集一覧の取得を開始する
+            window.setTimeout(() => refreshUserProfile(currentUserId), 250);	// 少し間を空けてプロフィールを取得する
+            window.setTimeout(() => updateNotificationSummary(), 500);	// 少し間を空けて通知を取得する
 
             const pageParams = new URLSearchParams(window.location.search);	// 定数を定義
             const requestedTab = pageParams.get("tab");	// 定数を定義
