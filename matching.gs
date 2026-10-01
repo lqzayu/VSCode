@@ -115,6 +115,14 @@ function doPost(e) {	// 関数を定義
       return createRes("success", "HEARTBEAT_OK");	// 結果を返す
     }	// 処理のまとまりを閉じる
 
+    if (mode === "firebaseCustomToken") {	// Firebase用の短期ログイントークンを発行する
+      const userId = cleanCell(data.userId);	// トークン対象のユーザーIDを取得する
+      if (!userId || !userExists(sheetUser, userId)) return createRes("error", "ユーザーが見つかりません");	// 存在しないユーザーには発行しない
+      const token = createFirebaseCustomToken(userId);	// Firebaseのカスタムトークンを作る
+      if (!token) return createRes("error", "Firebase接続の設定がまだ完了していません");	// 設定不足を案内する
+      return createRes("success", { token: token, expiresIn: 3600 });	// 短時間だけ使えるトークンを返す
+    }	// Firebaseトークン発行を閉じる
+
     if (mode === "registerAndroidDevice") {	// Android端末の通知先を登録する
       const userId = cleanCell(data.userId);	// ログイン中のユーザーIDを取得する
       const fcmToken = cleanCell(data.fcmToken).slice(0, 4096);	// FCMトークンを安全な長さに収める
@@ -846,6 +854,20 @@ function doPost(e) {	// 関数を定義
       }	// 処理のまとまりを閉じる
       return createRes("success", "NOT_FOUND");	// 結果を返す
     }	// 処理のまとまりを閉じる
+
+    if (mode === "notifyFirebaseMessage") {	// Firebase本文メッセージのLINE通知だけを処理する
+      const fromUser = cleanCell(data.from);	// 送信者を取得する
+      const toUser = cleanCell(data.to);	// 受信者を取得する
+      const messageText = cleanCell(data.text).slice(0, 2000);	// 通知本文を安全な長さにする
+      if (!fromUser || !toUser || fromUser === toUser || !messageText) return createRes("error", "通知情報が正しくありません");	// 不正な通知を拒否する
+      const userRows = sheetUser && sheetUser.getLastRow() > 1 ? sheetUser.getDataRange().getValues() : [];	// ユーザー情報を取得する
+      const senderRow = findUserRow(userRows, fromUser);	// 送信者を確認する
+      const recipientRow = findUserRow(userRows, toUser);	// 受信者を確認する
+      if (!senderRow || !recipientRow || isBlockedBetween(sheetBlock, fromUser, toUser)) return createRes("error", "通知対象を確認できません");	// 存在しない相手やブロック中は通知しない
+      const recipientLineId = cleanCell(recipientRow[11]);	// 受信者のLINE IDを取得する
+      if (recipientLineId) sendLineNotification(recipientLineId, `💬【平工マッチング】新着メッセージ\n\n${getUserDisplayName(senderRow, fromUser)} さんからメッセージが届きました：\n「${messageText}」`);	// LINEへ通知する
+      return createRes("success", "NOTIFIED");	// 通知完了を返す
+    }	// Firebase本文通知を閉じる
 
     if (mode === "sendMessage") {	// 条件に応じて処理を分ける
       if (!sheetChat) return createRes("error", "チャットシートが存在しません");	// 条件に応じて処理を分ける
@@ -1806,6 +1828,7 @@ function getAdminTokenSecret() {	// 関数を定義
 function getRequestActorId(mode, data) {	// 処理ごとの本人IDを取得する
   const actorFields = {	// 本人確認に使う項目をまとめる
     heartbeat: "userId",	// オンライン更新の本人を指定する
+    firebaseCustomToken: "userId",	// Firebaseトークン発行者を指定する
     registerAndroidDevice: "userId",	// Android通知先の登録者を指定する
     unregisterAndroidDevice: "userId",	// Android通知先の解除者を指定する
     recordUsageLog: "userId",	// 利用ログ保存者を指定する
@@ -1821,6 +1844,7 @@ function getRequestActorId(mode, data) {	// 処理ごとの本人IDを取得す�
     postRecruitment: "email",	// 募集投稿者を指定する
     deleteRecruitment: "email",	// 募集削除者を指定する
     sendMessage: "from",	// メッセージ送信者を指定する
+    notifyFirebaseMessage: "from",	// Firebase本文通知の送信者を指定する
     getMessages: "user1",	// チャット閲覧者を指定する
     unsendMessage: "userId",	// 送信取消者を指定する
     deleteChatHistory: "userId",	// 履歴削除者を指定する
@@ -1838,6 +1862,43 @@ function getRequestActorId(mode, data) {	// 処理ごとの本人IDを取得す�
   const field = actorFields[mode];	// 処理に対応する項目を取得する
   return field ? cleanCell(data && data[field]) : "";	// 本人IDを返す
 }	// 処理のまとまりを閉じる
+
+function createFirebaseCustomToken(userId) {	// Firebase Authentication用のJWTを作る
+  try {	// 設定不足や署名エラーに備える
+    const raw = PropertiesService.getScriptProperties().getProperty("FIREBASE_SERVICE_ACCOUNT_JSON");	// サービスアカウント設定を取得する
+    if (!raw) return "";	// 設定がない場合は発行しない
+
+    const account = JSON.parse(raw);	// サービスアカウント情報を読み込む
+    const clientEmail = cleanCell(account.client_email);	// 署名者のメールアドレスを取得する
+    const privateKey = cleanCell(account.private_key).replace(/\\n/g, "\n");	// 改行を戻した秘密鍵を取得する
+    if (!clientEmail || !privateKey || !cleanCell(account.project_id)) return "";	// 必須設定がなければ発行しない
+
+    const now = Math.floor(Date.now() / 1000);	// 現在時刻を秒で取得する
+    const header = { alg: "RS256", typ: "JWT" };	// JWTの署名方式を指定する
+    const payload = {	// Firebaseカスタムトークンの内容を作る
+      iss: clientEmail,	// トークンの発行者を指定する
+      sub: clientEmail,	// Firebaseが要求する主体を指定する
+      aud: "https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit",	// Firebase Authenticationの宛先を指定する
+      iat: now,	// 発行時刻を指定する
+      exp: now + 3600,	// 一時間後に期限切れにする
+      uid: firebaseUserUid(userId),	// Web側と同じユーザーUIDを指定する
+      claims: { userId: cleanCell(userId).slice(0, 64) }	// 画面で使わない補助情報を付ける
+    };	// JWT本文を閉じる
+
+    const encodedHeader = base64UrlEncode(JSON.stringify(header));	// JWTヘッダーをURL用Base64にする
+    const encodedPayload = base64UrlEncode(JSON.stringify(payload));	// JWT本文をURL用Base64にする
+    const signingInput = encodedHeader + "." + encodedPayload;	// 署名対象を作る
+    const signature = Utilities.computeRsaSha256Signature(signingInput, privateKey);	// サービスアカウントで署名する
+    return signingInput + "." + Utilities.base64EncodeWebSafe(signature).replace(/=+$/g, "");	// 完成したJWTを返す
+  } catch (error) {	// 発行に失敗した場合は内部情報を返さない
+    console.error("Firebaseカスタムトークン発行失敗", error);	// 管理者向けログへ記録する
+    return "";	// 失敗として扱う
+  }	// 発行処理を閉じる
+}	// Firebaseカスタムトークン作成を閉じる
+
+function firebaseUserUid(userId) {	// Firebase用のUIDをユーザーIDから作る
+  return "u_" + base64UrlEncode(cleanCell(userId));	// 同じ入力から常に同じUIDを返す
+}	// Firebase UID作成を閉じる
 
 function getUserTokenSecret() {	// 通常ユーザー用の署名鍵を取得する
   const properties = PropertiesService.getScriptProperties();	// スクリプト設定を取得する

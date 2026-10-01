@@ -540,6 +540,11 @@
     </style>
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
+    <script>window.HEIKO_FIREBASE_CHAT_ENABLED = true;</script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+    <script src="firebase-chat.js"></script>
 </head>	<!-- 要素を閉じる -->
 
 <body data-page="chat">	<!-- 画面要素を配置 -->
@@ -629,6 +634,11 @@
         let markReadRequest = null;	// 既読処理の重複通信を防ぐ
         let openMessageActionMenu = null;	// 開いているメッセージ操作メニュー
         let messageActionMenuInstalled = false;	// メニュー外タップ監視の登録状態
+        let gasMessages = [];	// GASから取得した画像付き・旧形式メッセージを保持する
+        let firebaseMessages = [];	// Firebaseから取得した本文メッセージを保持する
+        let firebaseUnsubscribe = null;	// Firebase購読解除関数を保持する
+        let firebaseReady = false;	// Firebaseチャットが利用可能かを保持する
+        let firebaseSetupRequest = null;	// Firebase初期化の重複通信を防ぐ
 
         function createRequestId() {	// 二重送信防止用のIDを作る
             if (window.crypto && typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();	// 対応ブラウザでは安全なUUIDを使う
@@ -669,6 +679,101 @@
                 clearTimeout(timeoutId);	// 処理を完了する
             }	// 処理のまとまりを閉じる
         }	// 処理のまとまりを閉じる
+
+        async function setupFirebaseChat() {	// Firebaseチャットを初期化する
+            if (!window.HeikoFirebaseChat || !window.HeikoFirebaseChat.enabled || firebaseSetupRequest) return firebaseSetupRequest;	// 利用できない場合は何もしない
+            firebaseSetupRequest = (async () => {	// 初期化処理を一度だけ実行する
+                try {	// 設定や通信エラーに備える
+                    const result = await postChat({ mode: "firebaseCustomToken", userId: myEmail }, 15000);	// GASから短期トークンを取得する
+                    const token = result && result.message && result.message.token;	// トークンを取り出す
+                    if (!token || !await window.HeikoFirebaseChat.signIn(token, myEmail)) return false;	// Firebaseへログインする
+                    firebaseReady = true;	// Firebaseチャットを利用可能にする
+                    if (firebaseUnsubscribe) firebaseUnsubscribe();	// 古い購読があれば解除する
+                    firebaseUnsubscribe = window.HeikoFirebaseChat.subscribe(myEmail, targetEmail, messages => {	// 会話をリアルタイム購読する
+                        firebaseMessages = Array.isArray(messages) ? messages : [];	// 受け取ったメッセージを保存する
+                        renderMessages(mergeMessages(gasMessages, firebaseMessages));	// GAS分とまとめて表示する
+                        if (firebaseMessages.some(message => message.to === myEmail && !message.isRead && !message.isUnsent)) {	// 未読がある場合に処理する
+                            window.HeikoFirebaseChat.markAsRead(myEmail, targetEmail).catch(error => console.warn("Firebase既読更新失敗", error));	// 既読更新を行う
+                        }	// 未読処理を閉じる
+                    }, error => {	// Firebaseの購読エラーを処理する
+                        firebaseReady = false;	// 次回送信からGASへ戻す
+                        console.warn("Firebaseチャット購読失敗", error);	// 原因を開発者向けログへ残す
+                    });	// 購読処理を閉じる
+                    return true;	// 初期化成功を返す
+                } catch (error) {	// Firebaseが使えない場合に処理する
+                    firebaseReady = false;	// GASフォールバックを使う
+                    console.warn("Firebaseチャットを利用できないためGASへ切り替えます", error);	// 切り替え理由を記録する
+                    return false;	// 初期化失敗を返す
+                }	// 初期化処理を閉じる
+            })();	// 初期化を開始する
+            return firebaseSetupRequest;	// 実行中の初期化を返す
+        }	// Firebaseチャット初期化を閉じる
+
+        function mergeMessages(...groups) {	// 複数の保存先のメッセージをまとめる
+            const merged = new Map();	// メッセージIDごとの重複を防ぐ
+            groups.flat().forEach(message => {	// 各保存先のメッセージを確認する
+                if (!message || !message.messageId) return;	// IDがないデータは表示しない
+                const previous = merged.get(String(message.messageId));	// 既存メッセージを取得する
+                merged.set(String(message.messageId), previous && previous.storage === "firebase" ? previous : message);	// Firebase側の最新値を優先する
+            });	// 統合処理を閉じる
+            return Array.from(merged.values()).sort((a, b) => Number(a.sentAt || 0) - Number(b.sentAt || 0));	// 時刻順で返す
+        }	// メッセージ統合を閉じる
+
+        function renderMessages(messages) {	// メッセージ一覧を画面へ描画する
+            const listDiv = document.getElementById("message-list");	// 表示先を取得する
+            if (!listDiv) return;	// 表示先がなければ終了する
+            const tempMsgs = listDiv.querySelectorAll(".temp-msg");	// 送信中表示を確認する
+            const signature = JSON.stringify(messages);	// 変更確認用の文字列を作る
+            if (signature === lastMessagesSignature && tempMsgs.length === 0) return;	// 変更がなければ再描画しない
+            lastMessagesSignature = signature;	// 最新の表示状態を保存する
+            if (messages.length === 0 && tempMsgs.length === 0) {	// メッセージがない場合に処理する
+                listDiv.innerHTML = `<div style="text-align: center; color: #94a3b8; font-size: 13px;">メッセージ履歴はありません</div>`;	// 空表示を出す
+                return;	// 描画を終える
+            }	// 空表示処理を閉じる
+            listDiv.innerHTML = "";	// 古い表示を消す
+            messages.forEach(msg => {	// メッセージごとに画面を作る
+                const wrapper = document.createElement("div");	// 外側の要素を作る
+                wrapper.style.cssText = `display:flex; flex-direction:column; align-items:${msg.from === myEmail ? "flex-end" : "flex-start"}; gap:4px;`;	// 表示位置を設定する
+                const bubble = document.createElement("div");	// 本文の吹き出しを作る
+                bubble.className = `message-bubble ${msg.from === myEmail ? "msg-my" : "msg-partner"}`;	// 自分と相手の見た目を分ける
+                if (msg.isUnsent) bubble.classList.add("is-unsent");	// 取り消し表示を付ける
+                bubble.innerText = msg.text;	// 本文を安全に表示する
+                wrapper.appendChild(bubble);	// 吹き出しを追加する
+                if (Array.isArray(msg.attachments) && msg.attachments.length > 0 && !msg.isUnsent) {	// 添付画像がある場合に処理する
+                    const attachments = document.createElement("div");	// 画像一覧を作る
+                    attachments.className = "message-attachments";	// 画像一覧の見た目を設定する
+                    msg.attachments.slice(0, MAX_ATTACHMENTS).forEach(url => {	// 最大枚数まで画像を表示する
+                        if (typeof url !== "string" || !url.startsWith("http")) return;	// 不正なURLは表示しない
+                        const link = document.createElement("a");	// 画像リンクを作る
+                        link.href = url;	// 元画像のURLを設定する
+                        link.target = "_blank";	// 新しいタブで開く
+                        link.rel = "noopener noreferrer";	// 開いたページから戻れないようにする
+                        const image = document.createElement("img");	// 画像要素を作る
+                        image.className = "message-attachment-image";	// 画像の見た目を設定する
+                        image.src = getAttachmentDisplayUrl(url);	// 表示用URLを設定する
+                        image.alt = "添付画像";	// 代替文字を設定する
+                        image.loading = "lazy";	// 必要な時だけ読み込む
+                        image.onerror = () => { image.alt = "画像を表示できません"; };	// 読み込み失敗を表示する
+                        link.appendChild(image);	// リンクへ画像を追加する
+                        attachments.appendChild(link);	// 画像一覧へ追加する
+                    });	// 画像表示を閉じる
+                    if (attachments.childElementCount > 0) wrapper.appendChild(attachments);	// 画像があれば本文へ追加する
+                }	// 添付処理を閉じる
+                const meta = document.createElement("div");	// 日時と操作欄を作る
+                meta.className = "message-meta";	// メタ情報の見た目を設定する
+                const time = formatMessageTime(msg.sentAt);	// 表示用時刻を作る
+                if (time) { const timeText = document.createElement("span"); timeText.innerText = time; meta.appendChild(timeText); }	// 時刻を追加する
+                if (msg.from === myEmail && !msg.isUnsent && msg.isRead) { const readText = document.createElement("span"); readText.innerText = "既読"; meta.appendChild(readText); }	// 既読表示を追加する
+                const tools = document.createElement("div");	// 操作ボタンの領域を作る
+                tools.className = "message-tools";	// 操作欄の見た目を設定する
+                if (!msg.isUnsent) { const actionButton = document.createElement("button"); actionButton.type = "button"; actionButton.className = "message-action-button"; actionButton.innerText = "•••"; actionButton.setAttribute("aria-label", "メッセージの操作"); actionButton.setAttribute("title", "メッセージの操作"); actionButton.addEventListener("click", event => { event.stopPropagation(); showMessageActionMenu(msg, actionButton); }); tools.appendChild(actionButton); }	// 操作メニューを追加する
+                if (tools.childElementCount > 0) meta.appendChild(tools);	// 操作欄を追加する
+                if (meta.childElementCount > 0) wrapper.appendChild(meta);	// メタ情報を追加する
+                listDiv.appendChild(wrapper);	// メッセージを一覧へ追加する
+                if (!msg.isUnsent) installMessageLongPress(wrapper, msg);	// 長押し操作を登録する
+            });	// 描画を閉じる
+            listDiv.scrollTop = listDiv.scrollHeight;	// 最新位置へ移動する
+        }	// メッセージ描画を閉じる
 
         if (!myEmail || !targetEmail) {	// 条件に応じて処理を分ける
             alert("不正なアクセスです");	// 処理結果を知らせる
@@ -736,7 +841,7 @@
             };
 
             if (msg.from === myEmail && !msg.isUnsent) {
-                addAction("送信を取り消す", "↶", "danger", () => unsendMessage(msg.messageId, null));
+                addAction("送信を取り消す", "↶", "danger", () => unsendMessage(msg.messageId, null, msg));
             }
             if (msg.from !== myEmail && !msg.isUnsent) {
                 addAction("このメッセージを通報", "!", "danger", () => reportMessage(msg.text, msg.messageId));
@@ -1045,7 +1150,7 @@
             sendMessage();	// 処理を完了する
         });	// 処理を完了する
 
-        async function unsendMessage(messageId, button) {	// 関数を定義
+        async function unsendMessage(messageId, button, message = null) {	// 関数を定義
             if (!messageId) return;	// 条件に応じて処理を分ける
             if (!confirm("このメッセージの送信を取り消しますか？")) return;	// 条件に応じて処理を分ける
 
@@ -1056,11 +1161,11 @@
             }	// 処理のまとまりを閉じる
 
             try {	// 失敗に備えて処理を始める
-                await postChat({	// 処理のまとまりを始める
-                    mode: "unsendMessage",	// 処理を続ける
-                    userId: myEmail,	// 処理を続ける
-                    messageId: messageId	// 処理を続ける
-                });	// 処理を完了する
+                if (message && message.storage === "firebase" && firebaseReady) {	// Firebaseの本文を取り消す
+                    await window.HeikoFirebaseChat.unsendMessage(myEmail, targetEmail, messageId);	// Firebase側を更新する
+                } else {	// 旧形式のメッセージはGASを使う
+                    await postChat({ mode: "unsendMessage", userId: myEmail, messageId: messageId });	// GAS側を更新する
+                }	// 保存先の分岐を閉じる
                 await loadMessages();	// 処理を完了する
             } catch (e) {	// 処理のまとまりを始める
                 if (button) {	// 条件に応じて処理を分ける
@@ -1081,6 +1186,7 @@
             }	// 処理のまとまりを閉じる
 
             try {	// 失敗に備えて処理を始める
+                if (firebaseReady) await window.HeikoFirebaseChat.hideConversation(myEmail, targetEmail);	// Firebase側も自分の画面から非表示にする
                 await postChat({	// 処理のまとまりを始める
                     mode: "deleteChatHistory",	// 処理を続ける
                     userId: myEmail,	// 処理を続ける
@@ -1217,6 +1323,25 @@
             return messagesRequest;	// 結果を返す
         }	// 処理のまとまりを閉じる
 
+        async function loadMessages() {	// GASとFirebaseのメッセージをまとめて読み込む
+            if (messagesRequest) return messagesRequest;	// 実行中なら同じ処理を待つ
+            messagesRequest = (async () => {	// 読み込みを一度だけ実行する
+                try {	// 通信失敗に備える
+                    const result = await postChat({ mode: "getMessages", user1: myEmail, user2: targetEmail });	// GASから画像付き履歴を取得する
+                    if (result.status !== "success") return;	// 失敗時は表示を変えない
+                    gasMessages = Array.isArray(result.message) ? result.message.map(message => ({ ...message, storage: "gas" })) : [];	// GASの履歴を保存する
+                    const messages = mergeMessages(gasMessages, firebaseMessages);	// 二つの保存先をまとめる
+                    if (messages.some(message => message.to !== myEmail && !message.isRead && !message.isUnsent)) markAsRead();	// 受信メッセージを既読にする
+                    renderMessages(messages);	// 最新の一覧を描画する
+                } catch (error) {	// 読み込み失敗を記録する
+                    console.error("メッセージ取得エラー:", error);	// 開発者向けログに残す
+                } finally {	// 通信終了後に処理する
+                    messagesRequest = null;	// 次の読み込みを許可する
+                }	// 読み込み処理を閉じる
+            })();	// 読み込みを開始する
+            return messagesRequest;	// 実行中の読み込みを返す
+        }	// メッセージ読み込みを閉じる
+
         async function markAsRead() {	// 関数を定義
             if (markReadRequest) return markReadRequest;	// 実行中なら同じ処理を待つ
             markReadRequest = postChat({	// 既読処理を開始する
@@ -1278,20 +1403,41 @@
             listDiv.scrollTop = listDiv.scrollHeight;	// 処理を続ける
 
             try {	// 失敗に備えて処理を始める
-                const result = await postChat({	// 定数を定義
-                    mode: "sendMessage",	// 処理を続ける
-                    from: myEmail,	// 処理を続ける
-                    to: targetEmail,	// 処理を続ける
-                    text: text,	// 処理を続ける
-                    requestId: pendingSendRequestId,	// 二重送信防止用のIDを送る
-                    attachments: outgoingAttachments	// 処理を続ける
-                });	// 処理を完了する
+                if (firebaseReady && outgoingAttachments.length === 0) {	// 本文だけならFirebaseを優先する
+                    const firebaseSend = window.HeikoFirebaseChat.sendText(myEmail, targetEmail, pendingSendRequestId, text);	// Firebase送信を開始する
+                    const firebaseTimeout = new Promise((resolve, reject) => setTimeout(() => reject(new Error("Firebaseの応答がありません")), 8000));	// 通信停止時にGASへ切り替える
+                    await Promise.race([firebaseSend, firebaseTimeout]);	// 先に終わった結果を使う
+                    firebaseMessages = mergeMessages(firebaseMessages, [{ messageId: pendingSendRequestId, from: myEmail, to: targetEmail, text: text, sentAt: Date.now(), isRead: false, isUnsent: false, storage: "firebase", attachments: [] }]);	// 送信直後の表示を補う
+                    renderMessages(mergeMessages(gasMessages, firebaseMessages));	// 送信結果をすぐ表示する
+                    postChat({ mode: "notifyFirebaseMessage", from: myEmail, to: targetEmail, text: text }).catch(error => console.warn("Firebase本文のLINE通知失敗", error));	// LINE通知は画面表示を待たずに送る
+                } else {	// 画像付きまたはFirebase停止時はGASを使う
+                    await postChat({	// 画像を含むメッセージをGASへ保存する
+                        mode: "sendMessage",	// 処理を続ける
+                        from: myEmail,	// 処理を続ける
+                        to: targetEmail,	// 処理を続ける
+                        text: text,	// 処理を続ける
+                        requestId: pendingSendRequestId,	// 二重送信防止用のIDを送る
+                        attachments: outgoingAttachments	// 処理を続ける
+                    });	// GAS保存を閉じる
+                }	// 保存先の分岐を閉じる
 
                 pendingSendRequestId = "";	// 送信成功後に次のIDを作れるようにする
                 selectedAttachments = [];	// 処理を続ける
                 renderAttachmentPreview();	// 処理を完了する
-                await loadMessages();	// 処理を完了する
+                if (outgoingAttachments.length > 0 || !firebaseReady) await loadMessages();	// GAS保存時だけ履歴を再取得する
             } catch (e) {	// 処理のまとまりを始める
+                if (firebaseReady && outgoingAttachments.length === 0) {	// Firebase失敗時はGASへ切り替える
+                    firebaseReady = false;	// 次回以降もGASを優先する
+                    try {	// GASへの再送に備える
+                        await postChat({ mode: "sendMessage", from: myEmail, to: targetEmail, text: text, requestId: pendingSendRequestId, attachments: [] });	// 本文をGASへ保存する
+                        pendingSendRequestId = "";	// 再送完了後に送信IDを初期化する
+                        tempBubble.remove();	// 送信中表示を消す
+                        await loadMessages();	// GASの履歴を再取得する
+                        return;	// フォールバック成功として終了する
+                    } catch (fallbackError) {	// GASへの再送も失敗した場合に処理する
+                        console.error("FirebaseとGASの送信に失敗しました", fallbackError);	// 原因を開発者向けログへ残す
+                    }	// フォールバック処理を閉じる
+                }	// Firebaseフォールバックを閉じる
                 alert("送信できませんでした: " + (e.message || "通信エラー"));	// 処理結果を知らせる
                 tempBubble.remove();	// 処理を完了する
                 textInput.value = text;	// 再送できるよう本文を戻す
@@ -1358,7 +1504,8 @@
                 adminButton.style.display = "inline-block";	// 処理を続ける
             }	// 処理のまとまりを閉じる
 
-            await loadMessages();	// 処理を完了する
+            await setupFirebaseChat();	// Firebaseを先に初期化する
+            await loadMessages();	// GASとFirebaseの履歴を表示する
             updateUnreadBadge();	// 処理を完了する
             scheduleChatPoll();	// 処理を完了する
             startUnreadPoll();	// 未読確認を開始する

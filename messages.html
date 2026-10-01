@@ -406,6 +406,11 @@
     <link rel="stylesheet" href="theme.css?v=20260918e">	<!-- 外部ファイルを読み込む -->
     <script src="ui.js"></script>
     <script src="online.js?v=20260917b" defer></script>
+    <script>window.HEIKO_FIREBASE_CHAT_ENABLED = true;</script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+    <script src="firebase-chat.js"></script>
 </head>	<!-- 要素を閉じる -->
 
 <body data-page="messages">	<!-- 画面要素を配置 -->
@@ -479,6 +484,8 @@
         let unreadRequest = null;	// 状態を保持
         let partnersRequest = null;	// 一覧の重複通信を防ぐ
         let unreadPollTimer = null;	// 未読確認の定期処理を保持する
+        let firebaseReady = false;	// Firebase一覧が利用可能かを保持する
+        let firebaseInbox = [];	// Firebaseから取得した受信箱を保持する
 
         async function postGas(payload, timeoutMs = 12000) {	// 関数を定義
             const controller = new AbortController();	// 定数を定義
@@ -497,6 +504,36 @@
                 clearTimeout(timeoutId);	// 処理を完了する
             }	// 処理のまとまりを閉じる
         }	// 処理のまとまりを閉じる
+
+        async function setupFirebaseInbox() {	// Firebaseの受信箱を初期化する
+            if (firebaseReady || !window.HeikoFirebaseChat || !window.HeikoFirebaseChat.enabled) return firebaseReady;	// 初期化済みまたは利用不可なら終了する
+            try {	// Firebase接続エラーに備える
+                const userId = localStorage.getItem("userEmail");	// ログイン中のユーザーIDを取得する
+                const result = await postGas({ mode: "firebaseCustomToken", userId: userId }, 15000);	// GASからFirebaseトークンを取得する
+                const token = result && result.message && result.message.token;	// トークンを取り出す
+                if (!token || !await window.HeikoFirebaseChat.signIn(token, userId)) return false;	// Firebaseへログインする
+                firebaseInbox = await window.HeikoFirebaseChat.readInbox(userId);	// 受信箱を読み込む
+                firebaseReady = true;	// Firebase一覧を利用可能にする
+                return true;	// 初期化成功を返す
+            } catch (error) {	// Firebaseが利用できない場合に処理する
+                firebaseReady = false;	// GAS一覧を使い続ける
+                console.warn("Firebase受信箱を利用できません", error);	// 原因を開発者向けログへ残す
+                return false;	// 初期化失敗を返す
+            }	// 初期化処理を閉じる
+        }	// Firebase受信箱初期化を閉じる
+
+        function mergePartnerLists(gasPartners, firebaseMessages) {	// GASとFirebaseの相手一覧をまとめる
+            const map = new Map();	// 相手ごとの最新情報を保持する
+            gasPartners.forEach(partner => map.set(String(partner.email), { ...partner, source: "gas" }));	// GASの相手を先に登録する
+            const myUserId = localStorage.getItem("userEmail");	// 自分のユーザーIDを取得する
+            firebaseMessages.forEach(message => {	// Firebaseの受信箱を相手一覧へ変換する
+                const email = message.from === myUserId ? message.to : message.from;	// 相手のユーザーIDを求める
+                if (!email || email === myUserId || message.isUnsent) return;	// 不正な行は飛ばす
+                const previous = map.get(email);	// 既存の相手を取得する
+                if (!previous || Number(message.sentAt || 0) >= Number(previous.sentAt || 0)) map.set(email, { email: email, name: email, sentAt: message.sentAt, source: "firebase" });	// 新しい相手を保存する
+            });	// Firebase一覧の変換を閉じる
+            return Array.from(map.values()).sort((a, b) => Number(b.sentAt || 0) - Number(a.sentAt || 0));	// 新しい順で返す
+        }	// 相手一覧の統合を閉じる
 
         function toggleMenu() {	// 関数を定義
             document.getElementById("hud-menu-btn").classList.toggle("open");	// 画面表示を更新する
@@ -530,10 +567,12 @@
             `;
 
             try {	// 失敗に備えて処理を始める
+                if (firebaseReady) firebaseInbox = await window.HeikoFirebaseChat.readInbox(myEmail);	// Firebaseの最新受信箱を更新する
+                else await setupFirebaseInbox();	// 初回だけFirebaseを初期化する
                 const result = await postGas({ mode: "getChatPartners", email: myEmail });	// 定数を定義
 
                 if (result.status === "success") {	// 条件に応じて処理を分ける
-                    const partners = result.message;	// 定数を定義
+                    const partners = mergePartnerLists(Array.isArray(result.message) ? result.message : [], firebaseInbox);	// GASとFirebaseの相手を統合する
                     listDiv.innerHTML = "";	// 処理を続ける
 
                     if (partners.length === 0) {	// 条件に応じて処理を分ける
@@ -606,7 +645,8 @@
                     const result = await postGas({ mode: "getUnreadCount", email: myEmail });	// 定数を定義
 
                     if (result.status === "success" && result.message) {	// 条件に応じて処理を分ける
-                        const count = result.message.unreadCount || 0;	// 定数を定義
+                        const firebaseUnread = firebaseInbox.filter(message => message.to === myEmail && !message.isRead && !message.isUnsent).length;	// Firebase側の未読数を数える
+                        const count = (result.message.unreadCount || 0) + firebaseUnread;	// GASとFirebaseの未読数を合計する
                         if (count > 0) {	// 条件に応じて処理を分ける
                             badge.innerText = count > 99 ? "99+" : count;	// 処理を続ける
                             badge.style.display = "inline-block";	// 処理を続ける

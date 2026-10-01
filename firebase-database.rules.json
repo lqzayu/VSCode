@@ -1,0 +1,35 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "chats": {
+      "$uidA": {
+        "$uidB": {
+          ".read": "auth != null && (auth.uid === $uidA || auth.uid === $uidB)",
+          "$messageId": {
+            ".write": "auth != null && newData.exists() && (( !data.exists() && auth.uid === newData.child('fromUid').val() && (auth.uid === $uidA || auth.uid === $uidB)) || (data.exists() && (auth.uid === data.child('fromUid').val() || auth.uid === data.child('toUid').val()) && newData.child('fromUid').val() === data.child('fromUid').val() && newData.child('toUid').val() === data.child('toUid').val()))",
+            ".validate": "newData.hasChildren(['messageId', 'from', 'to', 'fromUid', 'toUid', 'text', 'sentAt', 'isRead', 'isUnsent']) && newData.child('fromUid').val() !== newData.child('toUid').val() && newData.child('fromUid').val() !== '' && newData.child('toUid').val() !== '' && newData.child('text').isString() && newData.child('text').val().length <= 2000"
+          }
+        }
+      }
+    },
+    "inbox": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "$messageId": {
+          ".write": "auth != null && newData.exists() && ((!data.exists() && auth.uid === newData.child('fromUid').val()) || (data.exists() && (auth.uid === data.child('fromUid').val() || auth.uid === data.child('toUid').val())))",
+          ".validate": "newData.hasChildren(['messageId', 'from', 'to', 'fromUid', 'toUid', 'text', 'sentAt', 'isRead', 'isUnsent']) && newData.child('fromUid').val() !== newData.child('toUid').val() && newData.child('text').isString() && newData.child('text').val().length <= 2000"
+        }
+      }
+    },
+    "hidden": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "$partnerUid": {
+          ".write": "auth != null && auth.uid === $uid && newData.isNumber()",
+          ".validate": "newData.isNumber()"
+        }
+      }
+    }
+  }
+}
