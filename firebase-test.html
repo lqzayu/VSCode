@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase接続テスト</title>
+
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 24px;
+            background: #f1f5f9;
+            color: #1e293b;
+            font-family: sans-serif;
+        }
+
+        .box {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 24px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12);
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        #status {
+            margin: 16px 0;
+            padding: 12px;
+            border-radius: 10px;
+            background: #e2e8f0;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            resize: vertical;
+            font-size: 16px;
+        }
+
+        button {
+            margin-top: 12px;
+            margin-right: 8px;
+            padding: 11px 16px;
+            border: 0;
+            border-radius: 9px;
+            background: #0f766e;
+            color: #ffffff;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        button.danger {
+            background: #dc2626;
+        }
+
+        #messages {
+            margin-top: 20px;
+        }
+
+        .message {
+            margin-top: 10px;
+            padding: 12px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .time {
+            margin-top: 5px;
+            color: #64748b;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <main class="box">
+        <h1>Firebase接続テスト</h1>
+
+        <div id="status">接続確認中...</div>
+
+        <textarea id="messageInput" placeholder="テストメッセージを入力してください"></textarea>
+
+        <div>
+            <button id="sendButton" type="button">テストメッセージを送信</button>
+            <button id="clearButton" class="danger" type="button">テストデータを削除</button>
+        </div>
+
+        <section id="messages"></section>
+    </main>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBj5jaygl5A5A1VMtDfmL-M_gJmqS9FI2o",
+            authDomain: "heiko-matching-chat.firebaseapp.com",
+            databaseURL: "https://heiko-matching-chat-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "heiko-matching-chat",
+            storageBucket: "heiko-matching-chat.firebasestorage.app",
+            messagingSenderId: "1043121900904",
+            appId: "1:1043121900904:web:334b3a91cda49edfd69add"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        const database = firebase.database();
+        const testRef = database.ref("connectionTest");
+
+        const statusElement = document.getElementById("status");
+        const messageInput = document.getElementById("messageInput");
+        const sendButton = document.getElementById("sendButton");
+        const clearButton = document.getElementById("clearButton");
+        const messagesElement = document.getElementById("messages");
+
+        database.ref(".info/connected").on("value", snapshot => {
+            if (snapshot.val() === true) {
+                statusElement.textContent = "Firebaseに接続しています";
+                statusElement.style.background = "#dcfce7";
+                statusElement.style.color = "#166534";
+            } else {
+                statusElement.textContent = "Firebaseに接続できていません";
+                statusElement.style.background = "#fee2e2";
+                statusElement.style.color = "#991b1b";
+            }
+        });
+
+        testRef.limitToLast(20).on("value", snapshot => {
+            messagesElement.innerHTML = "";
+
+            snapshot.forEach(childSnapshot => {
+                const data = childSnapshot.val();
+
+                const messageBox = document.createElement("div");
+                messageBox.className = "message";
+
+                const messageText = document.createElement("div");
+                messageText.textContent = data.text || "";
+
+                const time = document.createElement("div");
+                time.className = "time";
+                time.textContent = data.createdAt
+                    ? new Date(data.createdAt).toLocaleString("ja-JP")
+                    : "日時不明";
+
+                messageBox.append(messageText, time);
+                messagesElement.appendChild(messageBox);
+            });
+        }, error => {
+            statusElement.textContent = "読み込みエラー: " + error.message;
+            statusElement.style.background = "#fee2e2";
+            statusElement.style.color = "#991b1b";
+        });
+
+        sendButton.addEventListener("click", async () => {
+            const text = messageInput.value.trim();
+
+            if (!text) {
+                alert("メッセージを入力してください");
+                return;
+            }
+
+            sendButton.disabled = true;
+
+            try {
+                const newMessage = testRef.push();
+
+                await newMessage.set({
+                    text: text,
+                    createdAt: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                messageInput.value = "";
+            } catch (error) {
+                statusElement.textContent = "送信エラー: " + error.message;
+                statusElement.style.background = "#fee2e2";
+                statusElement.style.color = "#991b1b";
+            } finally {
+                sendButton.disabled = false;
+            }
+        });
+
+        clearButton.addEventListener("click", async () => {
+            if (!confirm("テストデータを削除しますか？")) {
+                return;
+            }
+
+            try {
+                await testRef.remove();
+            } catch (error) {
+                statusElement.textContent = "削除エラー: " + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
