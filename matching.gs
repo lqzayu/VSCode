@@ -221,6 +221,18 @@ function doPost(e) {	// 関数を定義
       return createRes("success", profileResult);	// プロフィールを返す
     }	// 処理のまとまりを閉じる
 
+    if (mode === "getUserProfiles") {	// 複数ユーザーの表示名をまとめて返す
+      const userId = cleanCell(data.userId);	// ログイン中のユーザーIDを取得する
+      const targetUserIds = Array.isArray(data.targetUserIds) ? data.targetUserIds.map(cleanCell).filter(Boolean).slice(0, 50) : [];	// 相手IDを安全な件数に整える
+      if (!userId || targetUserIds.length === 0 || !sheetUser || sheetUser.getLastRow() <= 1) return createRes("success", []);	// 対象がなければ空で返す
+      const rows = sheetUser.getDataRange().getValues();	// ユーザー情報をまとめて読む
+      const profiles = targetUserIds.map(targetId => {	// 相手ごとに表示情報を作る
+        const row = findUserRow(rows, targetId);	// UserIDまたはメールアドレスで探す
+        return { userId: targetId, name: getUserDisplayName(row, targetId) };	// 表示名を返す
+      });	// 表示情報の作成を終える
+      return createRes("success", profiles);	// まとめた表示情報を返す
+    }	// 複数プロフィール取得を閉じる
+
     if (mode === "aiStudyChat") {	// 条件に応じて処理を分ける
       const userId = cleanCell(data.userId);	// 定数を定義
       const message = cleanCell(data.message);	// 定数を定義
@@ -1836,6 +1848,7 @@ function getRequestActorId(mode, data) {	// 処理ごとの本人IDを取得す�
     createLineLinkCode: "userId",	// LINE連携コードの発行者を指定する
     unlinkLineAccount: "userId",	// LINE連携解除の本人を指定する
     getUserProfile: data.userId ? "userId" : "email",	// プロフィール取得者を指定する
+    getUserProfiles: "userId",	// チャット相手のプロフィール取得者を指定する
     aiStudyChat: "userId",	// AI相談者を指定する
     aiStudyFeedback: "userId",	// AI評価者を指定する
     updateProfile: "email",	// プロフィール更新者を指定する
