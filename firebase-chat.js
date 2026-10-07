@@ -82,6 +82,12 @@
         };
     }
 
+    // 同じ送信IDが再利用された場合でも別の保存先を作ります。
+    function createCollisionMessageId(messageId) {
+        const randomPart = Math.random().toString(36).slice(2, 10);
+        return `${String(messageId)}-copy-${Date.now().toString(36)}-${randomPart}`.slice(0, 100);
+    }
+
     // 会話のメッセージを並べ替えて通知します。
     function emitMessages(state, onChange) {
         const messages = state.messages
@@ -128,10 +134,29 @@
         const safeText = String(text || "").trim();
         if (!safeText) throw new Error("メッセージを入力してください");
 
+        const requestedMessageId = String(messageId || "").trim();
+        if (!requestedMessageId) throw new Error("送信IDを作成できませんでした");
+
         const fromUid = getFirebaseUid(firstUser);
         const toUid = getFirebaseUid(secondUser);
+        const conversationRef = database.ref(getConversationPath(firstUser, secondUser));
+        let storedMessageId = requestedMessageId;
+        let messageKey = encodeKey(storedMessageId);
+        const existingSnapshot = await conversationRef.child(messageKey).once("value");
+
+        if (existingSnapshot.exists()) {
+            const existing = existingSnapshot.val() || {};
+            const isSameRetry = String(existing.messageId || "") === requestedMessageId &&
+                String(existing.fromUid || "") === fromUid &&
+                String(existing.toUid || "") === toUid &&
+                String(existing.text || "") === safeText;
+            if (isSameRetry) return requestedMessageId;
+            storedMessageId = createCollisionMessageId(requestedMessageId);
+            messageKey = encodeKey(storedMessageId);
+        }
+
         const value = {
-            messageId: String(messageId),
+            messageId: storedMessageId,
             from: String(firstUser),
             to: String(secondUser),
             fromUid,
@@ -141,12 +166,11 @@
             isRead: false,
             isUnsent: false
         };
-        const messageKey = encodeKey(messageId);
-        const chatRef = database.ref(getConversationPath(firstUser, secondUser) + "/" + messageKey);
+        const chatRef = conversationRef.child(messageKey);
         const senderInboxRef = database.ref("inbox/" + fromUid + "/" + messageKey);
         const recipientInboxRef = database.ref("inbox/" + toUid + "/" + messageKey);
         await Promise.all([chatRef.set(value), senderInboxRef.set(value), recipientInboxRef.set(value)]);
-        return "SENT";
+        return storedMessageId;
     }
 
     // Firebase側の会話を一度だけ取得します。

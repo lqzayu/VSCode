@@ -639,6 +639,7 @@
         let firebaseUnsubscribe = null;	// Firebase購読解除関数を保持する
         let firebaseReady = false;	// Firebaseチャットが利用可能かを保持する
         let firebaseSetupRequest = null;	// Firebase初期化の重複通信を防ぐ
+        let messageSendInProgress = false;	// 送信処理の重複実行を防ぐ
 
         function createRequestId() {	// 二重送信防止用のIDを作る
             if (window.crypto && typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();	// 対応ブラウザでは安全なUUIDを使う
@@ -1377,6 +1378,7 @@
         }	// 処理のまとまりを閉じる
 
         async function sendMessage() {	// 関数を定義
+            if (messageSendInProgress) return;	// 送信中の二重実行を防ぐ
             const textInput = document.getElementById("message-input");	// 定数を定義
             const sendBtn = document.getElementById("send-btn");	// 定数を定義
             const listDiv = document.getElementById("message-list");	// 定数を定義
@@ -1388,6 +1390,7 @@
             }));	// 処理を完了する
 
             if (!text && outgoingAttachments.length === 0) return;	// 条件に応じて処理を分ける
+            messageSendInProgress = true;	// 送信処理中に切り替える
             if (!pendingSendRequestId) pendingSendRequestId = createRequestId();	// 新しい送信IDを一度だけ作る
 
             textInput.value = "";	// 処理を続ける
@@ -1406,8 +1409,8 @@
                 if (firebaseReady && outgoingAttachments.length === 0) {	// 本文だけならFirebaseを優先する
                     const firebaseSend = window.HeikoFirebaseChat.sendText(myEmail, targetEmail, pendingSendRequestId, text);	// Firebase送信を開始する
                     const firebaseTimeout = new Promise((resolve, reject) => setTimeout(() => reject(new Error("Firebaseの応答がありません")), 8000));	// 通信停止時にGASへ切り替える
-                    await Promise.race([firebaseSend, firebaseTimeout]);	// 先に終わった結果を使う
-                    firebaseMessages = mergeMessages(firebaseMessages, [{ messageId: pendingSendRequestId, from: myEmail, to: targetEmail, text: text, sentAt: Date.now(), isRead: false, isUnsent: false, storage: "firebase", attachments: [] }]);	// 送信直後の表示を補う
+                    const storedMessageId = await Promise.race([firebaseSend, firebaseTimeout]);	// 先に終わった結果を使う
+                    firebaseMessages = mergeMessages(firebaseMessages, [{ messageId: storedMessageId || pendingSendRequestId, from: myEmail, to: targetEmail, text: text, sentAt: Date.now(), isRead: false, isUnsent: false, storage: "firebase", attachments: [] }]);	// 送信直後の表示を補う
                     renderMessages(mergeMessages(gasMessages, firebaseMessages));	// 送信結果をすぐ表示する
                     postChat({ mode: "notifyFirebaseMessage", from: myEmail, to: targetEmail, text: text }).catch(error => console.warn("Firebase本文のLINE通知失敗", error));	// LINE通知は画面表示を待たずに送る
                 } else {	// 画像付きまたはFirebase停止時はGASを使う
@@ -1442,6 +1445,7 @@
                 tempBubble.remove();	// 処理を完了する
                 textInput.value = text;	// 再送できるよう本文を戻す
             } finally {	// 処理のまとまりを始める
+                messageSendInProgress = false;	// 次の送信を受け付ける
                 if (sendBtn) {	// 条件に応じて処理を分ける
                     sendBtn.disabled = false;	// 処理を続ける
                     sendBtn.innerText = "送信";	// 処理を続ける
