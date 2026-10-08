@@ -166,10 +166,11 @@
             isRead: false,
             isUnsent: false
         };
-        const chatRef = conversationRef.child(messageKey);
-        const senderInboxRef = database.ref("inbox/" + fromUid + "/" + messageKey);
-        const recipientInboxRef = database.ref("inbox/" + toUid + "/" + messageKey);
-        await Promise.all([chatRef.set(value), senderInboxRef.set(value), recipientInboxRef.set(value)]);
+        const updates = {}; // 一括保存する更新内容を用意します。
+        updates[getConversationPath(firstUser, secondUser) + "/" + messageKey] = value; // 会話本体を更新対象へ追加します。
+        updates["inbox/" + fromUid + "/" + messageKey] = value; // 送信者の一覧を更新対象へ追加します。
+        updates["inbox/" + toUid + "/" + messageKey] = value; // 受信者の一覧を更新対象へ追加します。
+        await database.ref().update(updates); // 三か所を一度の処理で保存します。
         return storedMessageId;
     }
 
