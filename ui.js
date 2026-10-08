@@ -178,7 +178,7 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
 
 (function installUsageLogging() {	// GAS通信を利用ログへ記録する仕組みを準備する
     const nativeFetch = window.fetch.bind(window);	// 元の通信関数を保存する
-    const ignoredModes = new Set(["recordUsageLog", "recordUsageLogs", "heartbeat", "login", "register", "verifyEmail", "resendVerificationCode", "forgotPassword", "resetPassword", "verify_face_1toN", "verify_face_for_user", "firebaseCustomToken"]);	// 記録しない処理をまとめる
+    const ignoredModes = new Set(["recordUsageLog", "recordUsageLogs", "heartbeat", "login", "register", "verifyEmail", "resendVerificationCode", "forgotPassword", "resetPassword", "verify_face_1toN", "verify_face_for_user", "firebaseCustomToken", "getMessages", "getUnreadCount", "getNotificationSummary", "getLatestIncomingMessage", "markAsRead"]);	// 自動確認の通信は利用回数へ含めない
     const usageLogQueue = [];	// 利用ログを一時的にまとめる
     let usageLogTimer = null;	// まとめて送るタイマーを保持する
     let usageLogUrl = "";	// 実際に使われたGASのURLを保持する

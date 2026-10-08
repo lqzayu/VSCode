@@ -54,6 +54,28 @@
         return app && typeof app.auth === "function" ? app.auth() : null;
     }
 
+    // 保存済みのFirebaseログインが現在の利用者と一致するか確認します。
+    async function isSignedInAs(userId, timeoutMs = 1500) {	// 保存済み認証の確認を始めます。
+        const auth = getAuth();	// Firebase認証を取得します。
+        if (!auth || !userId) return false;	// 必要な情報がなければ未認証として扱います。
+        const expectedUid = getFirebaseUid(userId);	// 現在の利用者に対応するUIDを作ります。
+        if (auth.currentUser && auth.currentUser.uid === expectedUid) return true;	// 認証済みならすぐ成功を返します。
+        return new Promise(resolve => {	// 認証状態の復元を短時間だけ待ちます。
+            let finished = false;	// 結果を一度だけ返すための状態を持ちます。
+            let unsubscribe = () => {};	// 認証監視の解除処理を用意します。
+            let timerId = null;	// 待機期限のタイマーを保持します。
+            const finish = result => {	// 認証確認を終了します。
+                if (finished) return;	// 二重終了を防ぎます。
+                finished = true;	// 終了済みとして記録します。
+                clearTimeout(timerId);	// 待機期限のタイマーを消します。
+                unsubscribe();	// 認証状態の監視を解除します。
+                resolve(result);	// 確認結果を返します。
+            };	// 終了処理を閉じます。
+            timerId = setTimeout(() => finish(false), timeoutMs);	// 期限を超えたら未認証として扱います。
+            unsubscribe = auth.onAuthStateChanged(user => finish(Boolean(user && user.uid === expectedUid)), () => finish(false));	// 復元された利用者が一致するか確認します。
+        });	// 認証状態の待機を閉じます。
+    }	// 保存済み認証の確認を閉じます。
+
     // GASから受け取ったカスタムトークンでFirebaseへログインします。
     async function signIn(customToken, userId) {
         const auth = getAuth();
@@ -241,6 +263,7 @@
         encodeKey,
         getFirebaseUid,
         getConversationPath,
+        isSignedInAs,
         signIn,
         subscribe,
         sendText,

@@ -538,13 +538,13 @@
             }
         }
     </style>
-    <script src="ui.js"></script>
+    <script src="ui.js?v=20261008chatfix"></script>
     <script src="online.js?v=20260917b" defer></script>
     <script>window.HEIKO_FIREBASE_CHAT_ENABLED = true;</script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-    <script src="firebase-chat.js"></script>
+    <script src="firebase-chat.js?v=20261008chatfix"></script>
 </head>	<!-- 要素を閉じる -->
 
 <body data-page="chat">	<!-- 画面要素を配置 -->
@@ -685,9 +685,12 @@
             if (!window.HeikoFirebaseChat || !window.HeikoFirebaseChat.enabled || firebaseSetupRequest) return firebaseSetupRequest;	// 利用できない場合は何もしない
             firebaseSetupRequest = (async () => {	// 初期化処理を一度だけ実行する
                 try {	// 設定や通信エラーに備える
-                    const result = await postChat({ mode: "firebaseCustomToken", userId: myEmail }, 15000);	// GASから短期トークンを取得する
-                    const token = result && result.message && result.message.token;	// トークンを取り出す
-                    if (!token || !await window.HeikoFirebaseChat.signIn(token, myEmail)) return false;	// Firebaseへログインする
+                    const hasFirebaseSession = await window.HeikoFirebaseChat.isSignedInAs(myEmail);	// 保存済みのFirebase認証を確認する
+                    if (!hasFirebaseSession) {	// Firebaseへの再ログインが必要な場合に処理する
+                        const result = await postChat({ mode: "firebaseCustomToken", userId: myEmail }, 10000);	// GASから短期トークンを取得する
+                        const token = result && result.message && result.message.token;	// トークンを取り出す
+                        if (!token || !await window.HeikoFirebaseChat.signIn(token, myEmail)) return false;	// Firebaseへログインする
+                    }	// Firebase認証の確認を閉じる
                     firebaseReady = true;	// Firebaseチャットを利用可能にする
                     if (firebaseUnsubscribe) firebaseUnsubscribe();	// 古い購読があれば解除する
                     firebaseUnsubscribe = window.HeikoFirebaseChat.subscribe(myEmail, targetEmail, messages => {	// 会話をリアルタイム購読する
@@ -1208,122 +1211,6 @@
         document.getElementById("report-user-btn").addEventListener("click", reportCurrentUser);	// 操作イベントを登録
         document.getElementById("delete-history-btn").addEventListener("click", deleteChatHistory);	// 操作イベントを登録
 
-        async function loadMessages() {	// 関数を定義
-            if (messagesRequest) return messagesRequest;	// 条件に応じて処理を分ける
-
-            messagesRequest = (async () => {	// 処理のまとまりを始める
-                try {	// 失敗に備えて処理を始める
-                    const result = await postChat({	// 定数を定義
-                        mode: "getMessages",	// 処理を続ける
-                        user1: myEmail,	// 処理を続ける
-                        user2: targetEmail	// 処理を続ける
-                    });	// 処理を完了する
-                    const listDiv = document.getElementById("message-list");	// 定数を定義
-
-                    if (result.status !== "success") return;	// 条件に応じて処理を分ける
-
-                    const messages = Array.isArray(result.message) ? result.message : [];	// 定数を定義
-                    const tempMsgs = listDiv.querySelectorAll('.temp-msg');	// 定数を定義
-                    const signature = JSON.stringify(messages);	// 定数を定義
-                    const hasUnreadIncoming = messages.some(msg =>	// 定数を定義
-                        msg.from !== myEmail && !msg.isRead && !msg.isUnsent	// 処理を続ける
-                    );	// 処理を完了する
-                    if (hasUnreadIncoming) markAsRead();	// 条件に応じて処理を分ける
-
-                    if (signature === lastMessagesSignature && tempMsgs.length === 0) return;	// 条件に応じて処理を分ける
-                    lastMessagesSignature = signature;	// 処理を続ける
-
-                    if (messages.length === 0 && tempMsgs.length === 0) {	// 条件に応じて処理を分ける
-                        listDiv.innerHTML = `<div style="text-align: center; color: #94a3b8; font-size: 13px;">メッセージ履歴はありません</div>`;	// 処理を続ける
-                        return;	// 結果を返す
-                    }	// 処理のまとまりを閉じる
-
-                    listDiv.innerHTML = "";	// 処理を続ける
-
-                    messages.forEach(msg => {	// 処理のまとまりを始める
-                        const wrapper = document.createElement("div");	// 定数を定義
-                        wrapper.style.cssText = `display:flex; flex-direction:column; align-items:${msg.from === myEmail ? "flex-end" : "flex-start"}; gap:4px;`;	// 処理を続ける
-
-                        const bubble = document.createElement("div");	// 定数を定義
-                        bubble.className = `message-bubble ${msg.from === myEmail ? 'msg-my' : 'msg-partner'}`;	// 処理を続ける
-                        if (msg.isUnsent) bubble.classList.add("is-unsent");	// 条件に応じて処理を分ける
-                        bubble.innerText = msg.text;	// 処理を続ける
-                        wrapper.appendChild(bubble);	// 処理を完了する
-
-                        if (Array.isArray(msg.attachments) && msg.attachments.length > 0 && !msg.isUnsent) {	// 条件に応じて処理を分ける
-                            const attachments = document.createElement("div");	// 定数を定義
-                            attachments.className = "message-attachments";	// 処理を続ける
-
-                            msg.attachments.slice(0, MAX_ATTACHMENTS).forEach(url => {	// 処理のまとまりを始める
-                                if (typeof url !== "string" || !url.startsWith("http")) return;	// 条件に応じて処理を分ける
-                                const link = document.createElement("a");	// 定数を定義
-                                link.href = url;	// 処理を続ける
-                                link.target = "_blank";	// 処理を続ける
-                                link.rel = "noopener noreferrer";	// 処理を続ける
-
-                                const image = document.createElement("img");	// 定数を定義
-                                image.className = "message-attachment-image";	// 処理を続ける
-                                image.src = getAttachmentDisplayUrl(url);	// 画像表示用URLを設定する
-                                image.alt = "添付画像";	// 処理を続ける
-                                image.loading = "lazy";	// 処理を続ける
-                                image.onerror = () => { image.alt = "画像を表示できません"; };	// 画像の読み込み失敗を表示する
-                                link.appendChild(image);	// 処理を完了する
-                                attachments.appendChild(link);	// 処理を完了する
-                            });	// 処理を完了する
-
-                            if (attachments.childElementCount > 0) wrapper.appendChild(attachments);	// 条件に応じて処理を分ける
-                        }	// 処理のまとまりを閉じる
-
-                        const meta = document.createElement("div");	// 定数を定義
-                        meta.className = "message-meta";	// 処理を続ける
-                        const time = formatMessageTime(msg.sentAt);	// 定数を定義
-                        if (time) {	// 条件に応じて処理を分ける
-                            const timeText = document.createElement("span");	// 定数を定義
-                            timeText.innerText = time;	// 処理を続ける
-                            meta.appendChild(timeText);	// 処理を完了する
-                        }	// 処理のまとまりを閉じる
-
-                        if (msg.from === myEmail && !msg.isUnsent && msg.isRead) {	// 条件に応じて処理を分ける
-                            const readText = document.createElement("span");	// 定数を定義
-                            readText.innerText = "既読";	// 処理を続ける
-                            meta.appendChild(readText);	// 処理を完了する
-                        }	// 処理のまとまりを閉じる
-
-                        const tools = document.createElement("div");	// 定数を定義
-                        tools.className = "message-tools";	// 処理を続ける
-
-                        if (!msg.isUnsent) {
-                            const actionButton = document.createElement("button");
-                            actionButton.type = "button";
-                            actionButton.className = "message-action-button";
-                            actionButton.innerText = "•••";
-                            actionButton.setAttribute("aria-label", "メッセージの操作");
-                            actionButton.setAttribute("title", "メッセージの操作");
-                            actionButton.addEventListener("click", event => {
-                                event.stopPropagation();
-                                showMessageActionMenu(msg, actionButton);
-                            });
-                            tools.appendChild(actionButton);
-                        }
-
-                        if (tools.childElementCount > 0) meta.appendChild(tools);	// 条件に応じて処理を分ける
-                        if (meta.childElementCount > 0) wrapper.appendChild(meta);	// 条件に応じて処理を分ける
-
-                        listDiv.appendChild(wrapper);	// 処理を完了する
-                        if (!msg.isUnsent) installMessageLongPress(wrapper, msg);
-                    });	// 処理を完了する
-
-                    listDiv.scrollTop = listDiv.scrollHeight;	// 処理を続ける
-                } catch (e) {	// 処理のまとまりを始める
-                    console.error("メッセージ取得エラー:", e);	// 処理を完了する
-                } finally {	// 処理のまとまりを始める
-                    messagesRequest = null;	// 処理を続ける
-                }	// 処理のまとまりを閉じる
-            })();	// 処理を完了する
-
-            return messagesRequest;	// 結果を返す
-        }	// 処理のまとまりを閉じる
-
         async function loadMessages() {	// GASとFirebaseのメッセージをまとめて読み込む
             if (messagesRequest) return messagesRequest;	// 実行中なら同じ処理を待つ
             messagesRequest = (async () => {	// 読み込みを一度だけ実行する
@@ -1332,10 +1219,12 @@
                     if (result.status !== "success") return;	// 失敗時は表示を変えない
                     gasMessages = Array.isArray(result.message) ? result.message.map(message => ({ ...message, storage: "gas" })) : [];	// GASの履歴を保存する
                     const messages = mergeMessages(gasMessages, firebaseMessages);	// 二つの保存先をまとめる
-                    if (messages.some(message => message.to !== myEmail && !message.isRead && !message.isUnsent)) markAsRead();	// 受信メッセージを既読にする
+                    if (messages.some(message => message.to === myEmail && !message.isRead && !message.isUnsent)) markAsRead();	// 受信メッセージを既読にする
                     renderMessages(messages);	// 最新の一覧を描画する
                 } catch (error) {	// 読み込み失敗を記録する
                     console.error("メッセージ取得エラー:", error);	// 開発者向けログに残す
+                    if (firebaseMessages.length > 0) renderMessages(firebaseMessages);	// Firebase履歴があれば表示を続ける
+                    else document.getElementById("message-list").innerHTML = `<div style="text-align:center; color:#94a3b8; font-size:13px;">履歴を取得できませんでした。上部の更新ボタンで再試行できます。</div>`;	// 両方失敗した場合だけ案内する
                 } finally {	// 通信終了後に処理する
                     messagesRequest = null;	// 次の読み込みを許可する
                 }	// 読み込み処理を閉じる
@@ -1455,19 +1344,20 @@
 
         function scheduleChatPoll() {	// 関数を定義
             clearTimeout(chatPollTimer);	// 処理を完了する
+            const pollInterval = firebaseReady ? 30000 : 8000;	// Firebase接続中はGAS確認の回数を抑える
             chatPollTimer = setTimeout(async () => {	// 時間を置いて処理する
                 if (document.visibilityState === "visible") {	// 条件に応じて処理を分ける
                     await loadMessages();	// 処理を完了する
                     if (document.visibilityState === "visible") scheduleChatPoll();	// 表示中なら次の確認を予約する
                 }	// 処理のまとまりを閉じる
-            }, 5000);	// 処理を完了する
+            }, pollInterval);	// 接続状態に合う間隔で確認する
         }	// 処理のまとまりを閉じる
 
         function startUnreadPoll() {	// 未読確認を開始する
             if (unreadPollTimer) return;	// 二重開始を防ぐ
             unreadPollTimer = setInterval(() => {	// 定期処理を登録する
                 if (document.visibilityState === "visible") updateUnreadBadge();	// 表示中だけ確認する
-            }, 20000);	// 会話取得と重なりすぎないよう二十秒ごとに確認する
+            }, 60000);	// Firebase接続中のGAS通信を増やさないよう一分ごとに確認する
         }	// 処理のまとまりを閉じる
 
         function stopPagePolling() {	// 画面を離れた時の定期処理を止める
@@ -1508,8 +1398,9 @@
                 adminButton.style.display = "inline-block";	// 処理を続ける
             }	// 処理のまとまりを閉じる
 
-            await setupFirebaseChat();	// Firebaseを先に初期化する
-            await loadMessages();	// GASとFirebaseの履歴を表示する
+            const firebaseSetup = setupFirebaseChat();	// Firebase初期化を待たずに開始する
+            await loadMessages();	// GAS履歴も同時に取得して先に表示できる方を使う
+            firebaseSetup.catch(error => console.warn("Firebase初期化エラー:", error));	// 背景初期化の失敗を記録する
             updateUnreadBadge();	// 処理を完了する
             scheduleChatPoll();	// 処理を完了する
             startUnreadPoll();	// 未読確認を開始する

@@ -404,13 +404,13 @@
     </style>
 
     <link rel="stylesheet" href="theme.css?v=20261006glass">	<!-- 外部ファイルを読み込む -->
-    <script src="ui.js"></script>
+    <script src="ui.js?v=20261008chatfix"></script>
     <script src="online.js?v=20260917b" defer></script>
     <script>window.HEIKO_FIREBASE_CHAT_ENABLED = true;</script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-    <script src="firebase-chat.js"></script>
+    <script src="firebase-chat.js?v=20261008chatfix"></script>
 </head>	<!-- 要素を閉じる -->
 
 <body data-page="messages">	<!-- 画面要素を配置 -->
@@ -505,13 +505,24 @@
             }	// 処理のまとまりを閉じる
         }	// 処理のまとまりを閉じる
 
+        function withDeadline(promise, timeoutMs, message) {	// 画面を止めない通信期限を設定する
+            let timerId;	// 期限確認用のタイマーを保持する
+            const timeout = new Promise((resolve, reject) => {	// 期限切れを通知する処理を作る
+                timerId = setTimeout(() => reject(new Error(message)), timeoutMs);	// 指定時間後に失敗として扱う
+            });	// 期限切れ処理を閉じる
+            return Promise.race([promise, timeout]).finally(() => clearTimeout(timerId));	// 先に終わった結果を返してタイマーを消す
+        }	// 通信期限の設定を閉じる
+
         async function setupFirebaseInbox() {	// Firebaseの受信箱を初期化する
             if (firebaseReady || !window.HeikoFirebaseChat || !window.HeikoFirebaseChat.enabled) return firebaseReady;	// 初期化済みまたは利用不可なら終了する
             try {	// Firebase接続エラーに備える
                 const userId = localStorage.getItem("userEmail");	// ログイン中のユーザーIDを取得する
-                const result = await postGas({ mode: "firebaseCustomToken", userId: userId }, 15000);	// GASからFirebaseトークンを取得する
-                const token = result && result.message && result.message.token;	// トークンを取り出す
-                if (!token || !await window.HeikoFirebaseChat.signIn(token, userId)) return false;	// Firebaseへログインする
+                const hasFirebaseSession = await window.HeikoFirebaseChat.isSignedInAs(userId);	// 保存済みのFirebase認証を確認する
+                if (!hasFirebaseSession) {	// Firebaseへの再ログインが必要な場合に処理する
+                    const result = await postGas({ mode: "firebaseCustomToken", userId: userId }, 10000);	// GASからFirebaseトークンを取得する
+                    const token = result && result.message && result.message.token;	// トークンを取り出す
+                    if (!token || !await window.HeikoFirebaseChat.signIn(token, userId)) return false;	// Firebaseへログインする
+                }	// Firebase認証の確認を閉じる
                 firebaseInbox = await window.HeikoFirebaseChat.readInbox(userId);	// 受信箱を読み込む
                 firebaseReady = true;	// Firebase一覧を利用可能にする
                 return true;	// 初期化成功を返す
@@ -555,85 +566,85 @@
             }	// 後始末を閉じる
         }	// 処理のまとまりを閉じる
 
-        async function loadChatPartnersOnce() {	// 一覧を実際に取得する
-            const myEmail = localStorage.getItem("userEmail");	// 定数を定義
-            const listDiv = document.getElementById("partner-list");	// 定数を定義
+        function renderPartnerList(gasPartners, listDiv) {	// GASとFirebaseをまとめて相手一覧を描画する
+            const partners = mergePartnerLists(gasPartners, firebaseInbox);	// 二つの保存先から相手をまとめる
+            listDiv.innerHTML = "";	// 読み込み表示を消す
+            if (partners.length === 0) {	// 相手がいない場合に案内する
+                listDiv.innerHTML = `<div class="empty-message">メッセージはまだありません。<br>ホーム画面から気になる人にチャットを送ってみましょう！</div>`;	// 空の状態を表示する
+                return;	// 描画を終了する
+            }	// 空表示の処理を閉じる
+            partners.forEach((partner, index) => {	// 相手ごとに一覧項目を作る
+                const initial = partner.name ? partner.name.charAt(0) : "未";	// アイコン用の頭文字を取得する
+                const avatarBg = bgGradients[index % bgGradients.length];	// アイコンの背景色を選ぶ
+                const item = document.createElement("div");	// 一覧項目を作る
+                item.className = "partner-item";	// 一覧項目の見た目を設定する
+                item.onclick = () => openChat(partner.email);	// 選択した相手のチャットを開く
+                const avatarRing = document.createElement("div");	// アイコンの外枠を作る
+                avatarRing.className = "avatar-ring";	// アイコン外枠の見た目を設定する
+                const avatar = document.createElement("div");	// アイコン本体を作る
+                avatar.className = "partner-avatar";	// アイコンの見た目を設定する
+                avatar.style.background = avatarBg;	// アイコンへ背景色を設定する
+                avatar.textContent = initial;	// アイコンへ頭文字を表示する
+                avatarRing.appendChild(avatar);	// 外枠へアイコンを追加する
+                const contentBox = document.createElement("div");	// 名前とIDの表示欄を作る
+                contentBox.className = "partner-content-box";	// 表示欄の見た目を設定する
+                const name = document.createElement("div");	// 表示名の要素を作る
+                name.className = "partner-name";	// 表示名の見た目を設定する
+                name.textContent = partner.name;	// 表示名を安全に表示する
+                const email = document.createElement("div");	// ユーザーIDの要素を作る
+                email.className = "partner-email";	// ユーザーIDの見た目を設定する
+                email.textContent = partner.email;	// ユーザーIDを安全に表示する
+                contentBox.append(name, email);	// 名前とIDを表示欄へ追加する
+                const arrow = document.createElement("div");	// 開く案内を作る
+                arrow.className = "arrow-badge";	// 開く案内の見た目を設定する
+                arrow.textContent = "開く ➔";	// 開く案内を表示する
+                item.append(avatarRing, contentBox, arrow);	// 一覧項目へ内容を追加する
+                const deleteButton = document.createElement("button");	// 履歴非表示ボタンを作る
+                deleteButton.type = "button";	// 通常のボタンとして扱う
+                deleteButton.className = "partner-delete-button";	// ボタンの見た目を設定する
+                deleteButton.innerText = "削除";	// ボタン名を表示する
+                deleteButton.addEventListener("click", event => {	// 削除操作を登録する
+                    event.stopPropagation();	// チャット画面が開く動作を止める
+                    deleteChatPartner(partner.email, deleteButton);	// 選択した履歴を非表示にする
+                });	// 削除操作の登録を閉じる
+                item.appendChild(deleteButton);	// 一覧項目へ削除ボタンを追加する
+                listDiv.appendChild(item);	// 完成した項目を一覧へ追加する
+            });	// 相手一覧の描画を閉じる
+        }	// 相手一覧の描画処理を閉じる
 
-            listDiv.innerHTML = `
-                <div class="loading-box">
-                    <div class="spinner"></div>
-                    <span>データを読み込み中...</span>
-                </div>
-            `;
+        async function loadChatPartnersOnce() {	// FirebaseとGASの一覧取得を並行して始める
+            const myEmail = localStorage.getItem("userEmail");	// ログイン中のユーザーIDを取得する
+            const listDiv = document.getElementById("partner-list");	// 一覧の表示先を取得する
+            let gasPartners = [];	// GASから取得した相手を保持する
+            let hasRendered = false;	// どちらかの一覧を表示できたか保持する
+            listDiv.innerHTML = `<div class="loading-box"><div class="spinner"></div><span>データを読み込み中...</span></div>`;	// 読み込み中の表示へ切り替える
 
-            try {	// 失敗に備えて処理を始める
-                if (firebaseReady) firebaseInbox = await window.HeikoFirebaseChat.readInbox(myEmail);	// Firebaseの最新受信箱を更新する
-                else await setupFirebaseInbox();	// 初回だけFirebaseを初期化する
-                const result = await postGas({ mode: "getChatPartners", email: myEmail });	// 定数を定義
+            const firebaseTask = (async () => {	// Firebase一覧を待たずに取得する
+                try {	// Firebase通信の失敗に備える
+                    if (firebaseReady) firebaseInbox = await window.HeikoFirebaseChat.readInbox(myEmail);	// 認証済みなら最新の受信箱を読む
+                    else await setupFirebaseInbox();	// 初回だけFirebaseを初期化する
+                    if (firebaseReady) {	// Firebase一覧を取得できた場合に表示する
+                        renderPartnerList(gasPartners, listDiv);	// 取得できた一覧をすぐ描画する
+                        hasRendered = true;	// 表示済みとして記録する
+                    }	// Firebase描画の条件を閉じる
+                } catch (error) {	// Firebase取得に失敗した場合に処理する
+                    console.warn("Firebase一覧取得エラー:", error);	// 失敗理由を開発者向けログへ残す
+                }	// Firebase一覧の取得を閉じる
+            })();	// Firebase一覧の取得を開始する
 
-                if (result.status === "success") {	// 条件に応じて処理を分ける
-                    const partners = mergePartnerLists(Array.isArray(result.message) ? result.message : [], firebaseInbox);	// GASとFirebaseの相手を統合する
-                    listDiv.innerHTML = "";	// 処理を続ける
+            try {	// GAS通信の失敗に備える
+                const result = await withDeadline(postGas({ mode: "getChatPartners", email: myEmail }, 10000), 10000, "GAS一覧の取得が時間切れになりました");	// GAS一覧をFirebaseと同時に取得する
+                if (result.status !== "success") throw new Error(result.message || "一覧を取得できませんでした");	// GASのエラー応答を失敗として扱う
+                gasPartners = Array.isArray(result.message) ? result.message : [];	// GASの相手一覧を保存する
+                renderPartnerList(gasPartners, listDiv);	// Firebase分とまとめて描画する
+                hasRendered = true;	// 表示済みとして記録する
+            } catch (error) {	// GAS一覧を取得できなかった場合に処理する
+                console.warn("GAS一覧取得エラー:", error);	// 失敗理由を開発者向けログへ残す
+                if (!hasRendered) listDiv.innerHTML = `<div class="empty-message">通信エラーが発生しました。上部の更新ボタンで再試行できます。</div>`;	// Firebaseも未表示の場合だけエラーを案内する
+            }	// GAS一覧の取得を閉じる
 
-                    if (partners.length === 0) {	// 条件に応じて処理を分ける
-                        listDiv.innerHTML = `
-                            <div class="empty-message">
-                                メッセージはまだありません。<br>
-                                ホーム画面から気になる人にチャットを送ってみましょう！
-                            </div>
-                        `;
-                    } else {	// 処理のまとまりを始める
-                        partners.forEach((partner, index) => {	// 処理のまとまりを始める
-                            const initial = partner.name ? partner.name.charAt(0) : "未";	// 定数を定義
-                            const avatarBg = bgGradients[index % bgGradients.length];	// 定数を定義
-
-                            const item = document.createElement("div");	// 定数を定義
-                            item.className = "partner-item";	// 処理を続ける
-                            item.onclick = () => openChat(partner.email);	// 処理を完了する
-
-                            const avatarRing = document.createElement("div");	// 定数を定義
-                            avatarRing.className = "avatar-ring";	// 処理を続ける
-                            const avatar = document.createElement("div");	// 定数を定義
-                            avatar.className = "partner-avatar";	// 処理を続ける
-                            avatar.style.background = avatarBg;	// 処理を続ける
-                            avatar.textContent = initial;	// 処理を続ける
-                            avatarRing.appendChild(avatar);	// 処理を完了する
-
-                            const contentBox = document.createElement("div");	// 定数を定義
-                            contentBox.className = "partner-content-box";	// 処理を続ける
-                            const name = document.createElement("div");	// 定数を定義
-                            name.className = "partner-name";	// 処理を続ける
-                            name.textContent = partner.name;	// 処理を続ける
-                            const email = document.createElement("div");	// 定数を定義
-                            email.className = "partner-email";	// 処理を続ける
-                            email.textContent = partner.email;	// 処理を続ける
-                            contentBox.append(name, email);	// 処理を完了する
-
-                            const arrow = document.createElement("div");	// 定数を定義
-                            arrow.className = "arrow-badge";	// 処理を続ける
-                            arrow.textContent = "開く ➔";	// 処理を続ける
-                            item.append(avatarRing, contentBox, arrow);	// 処理を完了する
-
-                            const deleteButton = document.createElement("button");	// 定数を定義
-                            deleteButton.type = "button";	// 処理を続ける
-                            deleteButton.className = "partner-delete-button";	// 処理を続ける
-                            deleteButton.innerText = "削除";	// 処理を続ける
-                            deleteButton.addEventListener("click", event => {	// 操作イベントを登録
-                                event.stopPropagation();	// 処理を完了する
-                                deleteChatPartner(partner.email, deleteButton);	// 処理を完了する
-                            });	// 処理を完了する
-                            item.appendChild(deleteButton);	// 処理を完了する
-                            listDiv.appendChild(item);	// 処理を完了する
-                        });	// 処理を完了する
-                    }	// 処理のまとまりを閉じる
-                } else {	// 処理のまとまりを始める
-                    listDiv.innerHTML = `<div class="empty-message">データの取得に失敗しました。</div>`;	// 処理を続ける
-                }	// 処理のまとまりを閉じる
-            } catch (e) {	// 処理のまとまりを始める
-                console.error(e);	// 処理を完了する
-                listDiv.innerHTML = `<div class="empty-message">通信エラーが発生しました。</div>`;	// 処理を続ける
-            }	// 処理のまとまりを閉じる
-        }	// 処理のまとまりを閉じる
+            firebaseTask.catch(error => console.warn("Firebase一覧処理エラー:", error));	// 背景処理の失敗を確実に記録する
+        }	// 相手一覧の読み込みを閉じる
 
         async function updateUnreadBadge() {	// 関数を定義
             const myEmail = localStorage.getItem("userEmail");	// 定数を定義
@@ -706,7 +717,7 @@
             if (unreadPollTimer) return;	// 二重開始を防ぐ
             unreadPollTimer = setInterval(() => {	// 定期処理を登録する
                 if (document.visibilityState === "visible") updateUnreadBadge();	// 表示中だけ確認する
-            }, 20000);	// 未読確認を二十秒ごとにまとめる
+            }, 60000);	// Firebase一覧を優先してGAS確認は一分ごとにまとめる
         }	// 処理のまとまりを閉じる
 
         function stopUnreadPoll() {	// 未読確認を停止する
