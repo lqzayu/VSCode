@@ -829,7 +829,7 @@
                 adminButton.style.display = "inline-block";	// 処理を続ける
             }	// 処理のまとまりを閉じる
 
-            localStorage.removeItem("chatTarget");	// 一覧表示後に旧画面の対象を消す
+            // chatTargetは旧形式のFirebase会話を一覧へ復元するために保持する
 
             await loadChatPartners();	// 最初にメッセージ一覧を表示する
             updateUnreadBadge();	// 一覧表示後に未読数を更新する
