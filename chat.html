@@ -703,6 +703,7 @@
                         firebaseReady = false;	// 次回送信からGASへ戻す
                         console.warn("Firebaseチャット購読失敗", error);	// 原因を開発者向けログへ残す
                     });	// 購読処理を閉じる
+                    scheduleChatPoll();	// Firebase接続後はGASの定期再読込を停止する
                     return true;	// 初期化成功を返す
                 } catch (error) {	// Firebaseが使えない場合に処理する
                     firebaseReady = false;	// GASフォールバックを使う
@@ -1344,7 +1345,11 @@
 
         function scheduleChatPoll() {	// 関数を定義
             clearTimeout(chatPollTimer);	// 処理を完了する
-            const pollInterval = firebaseReady ? 30000 : 8000;	// Firebase接続中はGAS確認の回数を抑える
+            if (firebaseReady) {	// Firebase接続中はリアルタイム購読だけを使う
+                chatPollTimer = null;	// Firebaseのリアルタイム購読を使う
+                return;	// 不要なGAS再読込を行わない
+            }	// Firebase接続中の処理を終える
+            const pollInterval = 8000;	// Firebase停止時だけGASの再確認を行う
             chatPollTimer = setTimeout(async () => {	// 時間を置いて処理する
                 if (document.visibilityState === "visible") {	// 条件に応じて処理を分ける
                     await loadMessages();	// 処理を完了する

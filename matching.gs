@@ -1071,6 +1071,7 @@ function doPost(e) {	// 関数を定義
       const rows = getChatRows(sheetChat);	// 定数を定義
       const myEmail = data.email;	// 定数を定義
       let partnersSet = new Set();	// 状態を保持
+      const latestByPartner = {};	// 相手ごとの最新メッセージを保持する
       const hiddenAtByPartner = {};	// 定数を定義
       if (sheetHiddenChat && sheetHiddenChat.getLastRow() > 1) {	// 条件に応じて処理を分ける
         const hiddenRows = sheetHiddenChat.getDataRange().getValues();	// 定数を定義
@@ -1099,6 +1100,10 @@ function doPost(e) {	// 関数を定義
         } else if (toUser === myEmail) {	// 処理のまとまりを始める
           partnersSet.add(fromUser);	// 処理を完了する
         }	// 処理のまとまりを閉じる
+        if (fromUser === myEmail || toUser === myEmail) {	// 自分が参加したメッセージだけを保存する
+          const current = latestByPartner[partner];	// 相手の最新メッセージを取得する
+          if (!current || sentAt >= current.sentAt) latestByPartner[partner] = { text: rows[i][2] || "", sentAt: sentAt };	// 最新の本文と日時を保存する
+        }	// 最新メッセージの保存を閉じる
       }	// 処理のまとまりを閉じる
 
       const partnerEmails = Array.from(partnersSet);	// 定数を定義
@@ -1110,7 +1115,8 @@ function doPost(e) {	// 関数を定義
         if (isBlockedInRows(blockRows, myEmail, pEmail)) return;	// 条件に応じて処理を分ける
         const userRow = findUserRow(userRows, pEmail);	// 定数を定義
         const pName = getUserDisplayName(userRow, pEmail || "未設定");	// 定数を定義
-        partnerList.push({ email: pEmail, name: pName });	// 処理を完了する
+        const latest = latestByPartner[pEmail] || {};	// 最新メッセージを取得する
+        partnerList.push({ email: pEmail, name: pName, preview: cleanCell(latest.text), sentAt: latest.sentAt || 0 });	// 本文付きの相手情報を追加する
       });	// 処理を完了する
 
       return createRes("success", partnerList);	// 結果を返す

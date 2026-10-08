@@ -240,6 +240,14 @@
             text-overflow: ellipsis;	/* 見た目の設定を指定 */
         }	/* スタイル定義を閉じる */
 
+        .partner-preview {	/* 対象要素のスタイルを始める */
+            font-size: 12px;	/* 見た目の設定を指定 */
+            color: #94a3b8;	/* 見た目の設定を指定 */
+            white-space: nowrap;	/* 見た目の設定を指定 */
+            overflow: hidden;	/* 見た目の設定を指定 */
+            text-overflow: ellipsis;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
         .arrow-badge {	/* 対象要素のスタイルを始める */
             background: rgba(28, 189, 197, 0.1);	/* 見た目の設定を指定 */
             color: #1cbdc5;	/* 見た目の設定を指定 */
@@ -486,6 +494,8 @@
         let unreadPollTimer = null;	// 未読確認の定期処理を保持する
         let firebaseReady = false;	// Firebase一覧が利用可能かを保持する
         let firebaseInbox = [];	// Firebaseから取得した受信箱を保持する
+        const partnerNameCache = new Map();	// 相手の表示名を一時保存する
+        const legacyChatTarget = localStorage.getItem("chatTarget") || "";	// 旧形式の会話を復元する相手を保持する
 
         async function postGas(payload, timeoutMs = 12000) {	// 関数を定義
             const controller = new AbortController();	// 定数を定義
@@ -523,7 +533,19 @@
                     const token = result && result.message && result.message.token;	// トークンを取り出す
                     if (!token || !await window.HeikoFirebaseChat.signIn(token, userId)) return false;	// Firebaseへログインする
                 }	// Firebase認証の確認を閉じる
-                firebaseInbox = await window.HeikoFirebaseChat.readInbox(userId);	// 受信箱を読み込む
+                try {	// 受信箱の取得を試す
+                    firebaseInbox = await window.HeikoFirebaseChat.readInbox(userId);	// 受信箱を読み込む
+                } catch (inboxError) {	// 受信箱が未作成の会話を復元する
+                    if (!legacyChatTarget || legacyChatTarget === userId) throw inboxError;	// 復元先がなければ元のエラーを返す
+                    firebaseInbox = [];	// 旧形式の会話だけを復元する
+                    console.warn("Firebase受信箱の読み込みに失敗したため会話を復元します", inboxError);	// 復元理由を記録する
+                }	// 受信箱の取得処理を閉じる
+                if (legacyChatTarget && legacyChatTarget !== userId) {
+                    const legacyMessages = await window.HeikoFirebaseChat.readOnce(userId, legacyChatTarget);	// 直前に開いていた会話を読み込む
+                    const messageMap = new Map(firebaseInbox.map(message => [String(message.messageId), message]));	// 既存メッセージを重複なく保持する
+                    legacyMessages.forEach(message => messageMap.set(String(message.messageId), message));	// 旧形式の会話を一覧へ加える
+                    firebaseInbox = Array.from(messageMap.values()).sort((a, b) => Number(b.sentAt || 0) - Number(a.sentAt || 0));	// 復元後の受信箱を新しい順に並べる
+                }
                 firebaseReady = true;	// Firebase一覧を利用可能にする
                 return true;	// 初期化成功を返す
             } catch (error) {	// Firebaseが利用できない場合に処理する
@@ -535,16 +557,54 @@
 
         function mergePartnerLists(gasPartners, firebaseMessages) {	// GASとFirebaseの相手一覧をまとめる
             const map = new Map();	// 相手ごとの最新情報を保持する
-            gasPartners.forEach(partner => map.set(String(partner.email), { ...partner, source: "gas" }));	// GASの相手を先に登録する
+            gasPartners.forEach(partner => {	// GASの相手を一覧へ登録する
+                const email = String(partner.email || "").trim();	// 相手のIDを整える
+                if (!email) return;	// IDがないデータは表示しない
+                map.set(email, {
+                    ...partner,	// GASから受け取った情報を引き継ぐ
+                    email: email,	// 相手のIDを統一する
+                    name: partnerNameCache.get(email) || partner.name || email,	// 保存済みの表示名を優先する
+                    preview: partner.preview || partner.lastMessage || "",	// 本文プレビューを保持する
+                    source: "gas"	// 保存元を記録する
+                });	// GASの相手を保存する
+            });	// GASの相手を登録し終える
             const myUserId = localStorage.getItem("userEmail");	// 自分のユーザーIDを取得する
             firebaseMessages.forEach(message => {	// Firebaseの受信箱を相手一覧へ変換する
                 const email = message.from === myUserId ? message.to : message.from;	// 相手のユーザーIDを求める
                 if (!email || email === myUserId || message.isUnsent) return;	// 不正な行は飛ばす
                 const previous = map.get(email);	// 既存の相手を取得する
-                if (!previous || Number(message.sentAt || 0) >= Number(previous.sentAt || 0)) map.set(email, { email: email, name: email, sentAt: message.sentAt, source: "firebase" });	// 新しい相手を保存する
+                const preview = message.text || (Array.isArray(message.attachments) && message.attachments.length > 0 ? "画像が送信されました" : "");	// 本文または画像案内を作る
+                if (!previous || Number(message.sentAt || 0) >= Number(previous.sentAt || 0)) {
+                    map.set(email, {
+                        ...previous,	// 既存の表示情報を引き継ぐ
+                        email: email,	// 相手のIDを設定する
+                        name: partnerNameCache.get(email) || (previous && previous.name) || email,	// 表示名を設定する
+                        preview: preview,	// 最新本文を設定する
+                        sentAt: message.sentAt,	// 最新日時を設定する
+                        source: "firebase"	// Firebase由来として記録する
+                    });	// Firebaseの相手を保存する
+                }
             });	// Firebase一覧の変換を閉じる
             return Array.from(map.values()).sort((a, b) => Number(b.sentAt || 0) - Number(a.sentAt || 0));	// 新しい順で返す
         }	// 相手一覧の統合を閉じる
+
+        async function enrichPartnerNames(gasPartners, listDiv) {	// Firebaseだけで不足する表示名をGASから補う
+            const partners = mergePartnerLists(gasPartners, firebaseInbox);	// 現在の相手一覧を作る
+            const targetUserIds = partners.filter(partner => !partnerNameCache.has(partner.email)).map(partner => partner.email).slice(0, 50);	// 表示名が未取得のIDを集める
+            if (targetUserIds.length === 0) return;	// 取得対象がなければ終了する
+            try {	// 表示名取得の失敗に備える
+                const result = await postGas({ mode: "getUserProfiles", userId: localStorage.getItem("userEmail"), targetUserIds: targetUserIds }, 10000);	// 表示名をまとめて取得する
+                if (result.status !== "success" || !Array.isArray(result.message)) return;	// 正しい結果だけ使う
+                result.message.forEach(profile => {	// 取得したプロフィールを保存する
+                    const email = String(profile.userId || "").trim();	// 対象IDを整える
+                    const name = String(profile.name || "").trim();	// 表示名を整える
+                    if (email && name) partnerNameCache.set(email, name);	// 表示名をキャッシュする
+                });	// プロフィール保存を終える
+                renderPartnerList(gasPartners, listDiv);	// 表示名だけを更新する
+            } catch (error) {
+                console.warn("相手の表示名取得エラー:", error);	// 表示名取得の失敗を記録する
+            }
+        }	// 表示名補完を終える
 
         function toggleMenu() {	// 関数を定義
             document.getElementById("hud-menu-btn").classList.toggle("open");	// 画面表示を更新する
@@ -594,7 +654,10 @@
                 const email = document.createElement("div");	// ユーザーIDの要素を作る
                 email.className = "partner-email";	// ユーザーIDの見た目を設定する
                 email.textContent = partner.email;	// ユーザーIDを安全に表示する
-                contentBox.append(name, email);	// 名前とIDを表示欄へ追加する
+                const preview = document.createElement("div");	// 本文プレビューの要素を作る
+                preview.className = "partner-preview";	// 本文プレビューの見た目を設定する
+                preview.textContent = partner.preview || "メッセージを開く";	// 最新本文を安全に表示する
+                contentBox.append(name, email, preview);	// 名前とIDと本文を表示欄へ追加する
                 const arrow = document.createElement("div");	// 開く案内を作る
                 arrow.className = "arrow-badge";	// 開く案内の見た目を設定する
                 arrow.textContent = "開く ➔";	// 開く案内を表示する
@@ -625,6 +688,7 @@
                     else await setupFirebaseInbox();	// 初回だけFirebaseを初期化する
                     if (firebaseReady) {	// Firebase一覧を取得できた場合に表示する
                         renderPartnerList(gasPartners, listDiv);	// 取得できた一覧をすぐ描画する
+                        enrichPartnerNames(gasPartners, listDiv);	// 表示名を背景で補完する
                         hasRendered = true;	// 表示済みとして記録する
                     }	// Firebase描画の条件を閉じる
                 } catch (error) {	// Firebase取得に失敗した場合に処理する
@@ -637,10 +701,23 @@
                 if (result.status !== "success") throw new Error(result.message || "一覧を取得できませんでした");	// GASのエラー応答を失敗として扱う
                 gasPartners = Array.isArray(result.message) ? result.message : [];	// GASの相手一覧を保存する
                 renderPartnerList(gasPartners, listDiv);	// Firebase分とまとめて描画する
+                enrichPartnerNames(gasPartners, listDiv);	// 表示名を背景で補完する
                 hasRendered = true;	// 表示済みとして記録する
             } catch (error) {	// GAS一覧を取得できなかった場合に処理する
                 console.warn("GAS一覧取得エラー:", error);	// 失敗理由を開発者向けログへ残す
-                if (!hasRendered) listDiv.innerHTML = `<div class="empty-message">通信エラーが発生しました。上部の更新ボタンで再試行できます。</div>`;	// Firebaseも未表示の場合だけエラーを案内する
+                if (!hasRendered) {	// 両方の一覧が表示できなかった場合に再試行する
+                    try {
+                        await setupFirebaseInbox();	// 認証直後の受信箱取得をもう一度試す
+                        if (firebaseReady) {
+                            renderPartnerList(gasPartners, listDiv);	// Firebase一覧を表示する
+                            enrichPartnerNames(gasPartners, listDiv);	// 表示名を補完する
+                            hasRendered = true;	// 表示済みとして記録する
+                        }
+                    } catch (retryError) {
+                        console.warn("Firebase一覧の再試行に失敗しました:", retryError);	// 再試行の失敗を記録する
+                    }	// Firebase再試行を閉じる
+                }	// 初回表示の再試行を閉じる
+                if (!hasRendered) listDiv.innerHTML = `<div class="empty-message">メッセージを取得できませんでした。上部の更新ボタンで再試行してください。</div>`;	// 取得失敗を空表示と区別して案内する
             }	// GAS一覧の取得を閉じる
 
             firebaseTask.catch(error => console.warn("Firebase一覧処理エラー:", error));	// 背景処理の失敗を確実に記録する
@@ -752,7 +829,7 @@
                 adminButton.style.display = "inline-block";	// 処理を続ける
             }	// 処理のまとまりを閉じる
 
-            localStorage.removeItem("chatTarget");	// 端末内の保存情報を扱う
+            localStorage.removeItem("chatTarget");	// 一覧表示後に旧画面の対象を消す
 
             await loadChatPartners();	// 最初にメッセージ一覧を表示する
             updateUnreadBadge();	// 一覧表示後に未読数を更新する
