@@ -84,20 +84,45 @@ function installPageRefreshButton() {	// 各ページのヘッダーへ更新ボ
     (stack || document.body).appendChild(button);	// ヘッダー操作欄またはページ右上へ追加する
 }	// 更新ボタンの追加処理を閉じる
 
-function installRecruitmentPostButton() {	// ログイン後ページのヘッダーへ募集投稿ボタンを追加する
-    if (!document.body || document.getElementById("heiko-recruit-post")) return;	// ページ本体がない場合や二重追加を防ぐ
-    const stack = getHeaderActionStack();	// ヘッダー内の操作欄を取得する
+function installRecruitmentPostButton() {	// ログイン後ページへ募集投稿の共通導線を追加する
+    if (!document.body || document.getElementById("heiko-recruit-post-panel")) return;	// ページ本体がない場合や二重追加を防ぐ
+    const navbar = document.querySelector(".navbar");	// ログイン後の共通ヘッダーを取得する
     const refreshButton = document.getElementById("heiko-page-refresh");	// 更新ボタンを取得する
-    if (!stack || !refreshButton) return;	// ヘッダーや更新ボタンがないページでは追加しない
+    if (!navbar || !refreshButton) return;	// ログイン前・規約ページでは追加しない
 
+    const panel = document.createElement("section");	// 募集投稿用のカードを作る
+    panel.id = "heiko-recruit-post-panel";	// 募集投稿カードを識別する
+    panel.className = "heiko-recruit-post-panel";	// 共通スタイルを適用する
+    const currentRecruitment = document.getElementById("my-post-area");	// ホームの現在の募集カードを取得する
+    if (currentRecruitment) {	// ホーム画面では募集状況のすぐ下へ置く
+        panel.classList.add("is-sidebar-action");	// サイドバー用の見た目を指定する
+        currentRecruitment.insertAdjacentElement("afterend", panel);	// 現在の募集カードの直下へ追加する
+    } else {	// ほかのログイン後ページではメイン内容の直前へ置く
+        const main = document.querySelector("main");	// 各ページの主内容を取得する
+        if (!main) return;	// 主内容がないページでは表示しない
+        panel.classList.add("is-page-action");	// 通常ページ用の見た目を指定する
+        main.insertAdjacentElement("beforebegin", panel);	// ページ内容の直前へ追加する
+    }	// 配置場所の判定を閉じる
+
+    const copy = document.createElement("div");	// カードの案内文を作る
+    copy.className = "heiko-recruit-post-copy";	// 案内文のスタイルを指定する
+    copy.innerHTML = "<span>QUICK MATCH</span><strong>いっしょに勉強する仲間を探そう</strong><small>学年・学科はマイページの設定が使われます</small>";	// 案内文を設定する
+    const actions = document.createElement("div");	// ボタンをまとめる領域を作る
+    actions.className = "heiko-recruit-post-actions";	// ボタン領域のスタイルを指定する
     const button = document.createElement("a");	// 募集投稿ボタンを作る
     button.id = "heiko-recruit-post";	// 募集投稿ボタンを識別する
     button.className = "heiko-recruit-post";	// 目立つ共通スタイルを適用する
     button.href = "main.html?tab=recruit";	// 募集投稿欄を直接開く
     button.setAttribute("aria-label", "募集を投稿する");	// 読み上げ用の説明を設定する
-    button.innerHTML = "<span aria-hidden=\"true\">＋</span><span>募集を投稿</span>";	// 投稿ボタンの表示内容を設定する
-    refreshButton.insertAdjacentElement("beforebegin", button);	// 更新ボタンの上へ配置する
-}	// 募集投稿ボタンの追加処理を閉じる
+    button.innerHTML = "<span class=\"heiko-recruit-post-icon\" aria-hidden=\"true\">＋</span><span>募集を投稿する</span><span class=\"heiko-recruit-post-arrow\" aria-hidden=\"true\">→</span>";	// 投稿ボタンの表示内容を設定する
+    panel.appendChild(copy);	// 案内文をカードへ追加する
+    actions.appendChild(button);	// 投稿ボタンを操作欄へ追加する
+    actions.appendChild(refreshButton);	// 更新ボタンも投稿ボタンの下へ移動する
+    panel.appendChild(actions);	// 操作欄をカードへ追加する
+
+    const headerActions = document.getElementById("heiko-header-actions");	// 一時的に作られたヘッダー操作欄を取得する
+    if (headerActions && !headerActions.children.length) headerActions.remove();	// 空になった操作欄を取り除いてヘッダーを整える
+}	// 募集投稿導線の追加処理を閉じる
 
 function prefetchHeikoPages() {	// 主要ページをバックグラウンドで先読みする
     if (!document.body || document.body.dataset.page !== "main") return;	// ホーム画面だけで実行する
@@ -238,6 +263,125 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
             font-size: 19px;
             line-height: 12px;
         }
+        .heiko-recruit-post-panel {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            box-sizing: border-box;
+            overflow: hidden;
+            padding: 18px;
+            border: 1px solid rgba(23, 165, 171, .22);
+            border-radius: 20px;
+            background:
+                radial-gradient(circle at 94% 7%, rgba(61, 212, 219, .2), transparent 36%),
+                linear-gradient(135deg, rgba(245, 255, 255, .96), rgba(232, 250, 250, .9));
+            box-shadow: 0 14px 30px rgba(13, 88, 96, .1);
+        }
+        .heiko-recruit-post-panel::before {
+            position: absolute;
+            top: -44px;
+            right: -34px;
+            width: 110px;
+            height: 110px;
+            border: 1px solid rgba(25, 166, 172, .2);
+            border-radius: 50%;
+            content: "";
+            pointer-events: none;
+        }
+        .heiko-recruit-post-copy {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            gap: 4px;
+            min-width: 0;
+            color: var(--ui-ink, #164e63);
+        }
+        .heiko-recruit-post-copy span {
+            color: #07828a;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .14em;
+        }
+        .heiko-recruit-post-copy strong {
+            color: var(--ui-ink, #12384a);
+            font-size: 15px;
+            line-height: 1.45;
+        }
+        .heiko-recruit-post-copy small {
+            color: var(--ui-muted, #5d7782);
+            font-size: 11px;
+            line-height: 1.45;
+        }
+        .heiko-recruit-post-actions {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            flex: 0 0 218px;
+            gap: 8px;
+        }
+        .heiko-recruit-post-panel.is-sidebar-action {
+            width: 100%;
+            padding: 17px;
+        }
+        .heiko-recruit-post-panel.is-sidebar-action .heiko-recruit-post-copy strong {
+            font-size: 14px;
+        }
+        .heiko-recruit-post-panel.is-sidebar-action .heiko-recruit-post-actions {
+            flex-basis: auto;
+            width: 100%;
+        }
+        .heiko-recruit-post-panel.is-sidebar-action {
+            display: grid;
+        }
+        .heiko-recruit-post-panel.is-page-action {
+            width: min(calc(100% - 32px), 1080px);
+            margin: 20px auto 0;
+        }
+        .heiko-recruit-post-panel .heiko-recruit-post {
+            min-height: 50px;
+            padding: 11px 15px;
+            border: 1px solid rgba(7, 110, 117, .18);
+            border-radius: 14px;
+            background: linear-gradient(135deg, #11a7ad 0%, #087a85 100%);
+            box-shadow: 0 10px 20px rgba(5, 119, 130, .26);
+        }
+        .heiko-recruit-post-panel .heiko-recruit-post:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 26px rgba(5, 119, 130, .32);
+        }
+        .heiko-recruit-post-icon {
+            display: inline-grid;
+            width: 22px;
+            height: 22px;
+            place-items: center;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, .2);
+            font-size: 19px !important;
+            line-height: 1 !important;
+        }
+        .heiko-recruit-post-arrow {
+            margin-left: auto;
+            font-size: 18px;
+            line-height: 1;
+            transition: transform .2s ease;
+        }
+        .heiko-recruit-post:hover .heiko-recruit-post-arrow {
+            transform: translateX(3px);
+        }
+        .heiko-recruit-post-actions .heiko-page-refresh {
+            min-height: 36px;
+            border-color: rgba(18, 137, 145, .2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .64);
+            color: var(--ui-ink, #155261);
+            box-shadow: none;
+        }
+        .heiko-recruit-post-actions .heiko-page-refresh:hover {
+            background: rgba(255, 255, 255, .92);
+            box-shadow: 0 7px 15px rgba(13, 88, 96, .1);
+        }
         @keyframes heiko-refresh-spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
@@ -268,6 +412,25 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
                 padding: 8px 9px;
                 border-radius: 11px;
                 font-size: 12px;
+            }
+            .heiko-recruit-post-panel,
+            .heiko-recruit-post-panel.is-page-action {
+                width: calc(100% - 24px);
+                margin: 14px auto 0;
+                padding: 15px;
+                border-radius: 18px;
+            }
+            .heiko-recruit-post-panel {
+                display: grid;
+                gap: 14px;
+            }
+            .heiko-recruit-post-actions {
+                width: 100%;
+                flex-basis: auto;
+            }
+            .heiko-recruit-post-panel .heiko-recruit-post {
+                min-height: 48px;
+                font-size: 14px;
             }
         }
         @media (max-width: 380px) {
