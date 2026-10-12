@@ -48,17 +48,31 @@ function handleHeikoSessionResponse(result) {	// APIからログイン切れが�
 }	// ログイン切れ処理を閉じる
 window.handleHeikoSessionResponse = handleHeikoSessionResponse;	// 各ページからログイン切れ処理を使えるようにする
 
-function installPageRefreshButton() {	// 各ページのヘッダーへ更新ボタンを追加する
-    if (!document.body) return;	// ページ本体がない場合は処理しない
-    if (document.getElementById("heiko-page-refresh")) return;	// 二重追加を防ぐ
-
+function getHeaderActionStack() {	// ヘッダー右側の共通操作欄を用意する
     const navbar = document.querySelector(".navbar");	// 共通ヘッダーを取得する
+    if (!navbar) return null;	// ヘッダーがないページでは操作欄を作らない
 
+    let stack = document.getElementById("heiko-header-actions");	// 既存の操作欄を取得する
+    if (stack) return stack;	// 作成済みならそのまま使う
+
+    stack = document.createElement("div");	// 操作欄を作る
+    stack.id = "heiko-header-actions";	// 操作欄を識別する
+    stack.className = "heiko-header-actions";	// 共通レイアウトを適用する
+    const menuButton = navbar.querySelector(".hamburger-btn");	// ハンバーガーボタンを取得する
+    const navigation = navbar.querySelector(".nav-links");	// 通常メニューを取得する
+    navbar.insertBefore(stack, menuButton || navigation || null);	// ロゴの右、メニューの手前へ配置する
+    return stack;	// 作成した操作欄を返す
+}	// 操作欄の準備を閉じる
+
+function installPageRefreshButton() {	// 各ページのヘッダーへ更新ボタンを追加する
+    if (!document.body || document.getElementById("heiko-page-refresh")) return;	// ページ本体がない場合や二重追加を防ぐ
+
+    const stack = getHeaderActionStack();	// ヘッダー内の操作欄を取得する
     const button = document.createElement("button");	// 更新ボタンを作る
     button.id = "heiko-page-refresh";	// 更新ボタンを識別する
     button.type = "button";	// フォーム送信を防ぐ
     button.className = "heiko-page-refresh";	// 共通スタイルを適用する
-    if (!navbar) button.classList.add("is-floating");	// 共通ヘッダーがないページでは右上へ固定する
+    if (!stack) button.classList.add("is-floating");	// ヘッダーがないページでは右上へ固定する
     button.setAttribute("aria-label", "ページを更新");	// 読み上げ用の説明を設定する
     button.innerHTML = "<span aria-hidden=\"true\">↻</span><span>更新</span>";	// ボタンの表示内容を設定する
     button.addEventListener("click", () => {	// 更新ボタンの操作を受け取る
@@ -67,14 +81,14 @@ function installPageRefreshButton() {	// 各ページのヘッダーへ更新ボ
         button.querySelector("span").textContent = "⟳";	// 更新中の記号を表示する
         window.location.reload();	// 現在のページを再読み込みする
     });	// 操作イベントの登録を終える
-    (navbar || document.body).appendChild(button);	// ヘッダーまたはページ右上へボタンを追加する
+    (stack || document.body).appendChild(button);	// ヘッダー操作欄またはページ右上へ追加する
 }	// 更新ボタンの追加処理を閉じる
 
-function installRecruitmentPostButton() {	// ホーム画面の目立つ投稿ボタンを追加する
-    if (!document.body || document.body.dataset.page !== "main") return;	// ホーム画面以外では追加しない
-    if (document.getElementById("heiko-recruit-post")) return;	// 二重追加を防ぐ
+function installRecruitmentPostButton() {	// ログイン後ページのヘッダーへ募集投稿ボタンを追加する
+    if (!document.body || document.getElementById("heiko-recruit-post")) return;	// ページ本体がない場合や二重追加を防ぐ
+    const stack = getHeaderActionStack();	// ヘッダー内の操作欄を取得する
     const refreshButton = document.getElementById("heiko-page-refresh");	// 更新ボタンを取得する
-    if (!refreshButton) return;	// 更新ボタンがない場合は追加しない
+    if (!stack || !refreshButton) return;	// ヘッダーや更新ボタンがないページでは追加しない
 
     const button = document.createElement("a");	// 募集投稿ボタンを作る
     button.id = "heiko-recruit-post";	// 募集投稿ボタンを識別する
@@ -82,7 +96,7 @@ function installRecruitmentPostButton() {	// ホーム画面の目立つ投稿�
     button.href = "main.html?tab=recruit";	// 募集投稿欄を直接開く
     button.setAttribute("aria-label", "募集を投稿する");	// 読み上げ用の説明を設定する
     button.innerHTML = "<span aria-hidden=\"true\">＋</span><span>募集を投稿</span>";	// 投稿ボタンの表示内容を設定する
-    refreshButton.insertAdjacentElement("beforebegin", button);	// 更新ボタンの隣へ追加する
+    refreshButton.insertAdjacentElement("beforebegin", button);	// 更新ボタンの上へ配置する
 }	// 募集投稿ボタンの追加処理を閉じる
 
 function prefetchHeikoPages() {	// 主要ページをバックグラウンドで先読みする
@@ -123,15 +137,31 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
     const style = document.createElement("style");	// style要素を作る
     style.id = "heiko-shared-ui-style";	// style要素を識別する
     style.textContent = `
+        .navbar > .heiko-header-actions {
+            display: flex;
+            flex: 0 0 auto;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+            min-width: 150px;
+            margin-left: 8px;
+        }
+        .navbar > .nav-links {
+            margin-left: auto;
+            justify-content: flex-end;
+        }
+        .navbar > .hamburger-btn {
+            align-self: center;
+        }
         .heiko-page-refresh {
             display: inline-flex;
-            width: auto;
+            width: 100%;
             align-items: center;
             justify-content: center;
             gap: 5px;
             min-height: 36px;
             padding: 7px 11px;
-            margin-left: 8px;
+            margin: 0;
             border: 1px solid var(--ui-line, rgba(28, 189, 197, .25));
             border-radius: 10px;
             background: var(--ui-paper, rgba(255, 255, 255, .86));
@@ -173,12 +203,14 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
         }
         .heiko-recruit-post {
             display: inline-flex;
+            width: 100%;
+            box-sizing: border-box;
             align-items: center;
             justify-content: center;
             gap: 6px;
-            min-height: 42px;
+            min-height: 44px;
             padding: 9px 16px;
-            margin-left: 8px;
+            margin: 0;
             border: 1px solid rgba(12, 122, 128, .16);
             border-radius: 12px;
             background: linear-gradient(135deg, #129fa6 0%, #0b7782 100%);
@@ -210,23 +242,49 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
-        @media (max-width: 760px) {
-            .heiko-page-refresh {
-                min-width: 40px;
-                min-height: 40px;
-                padding: 7px 9px;
-                margin-left: 5px;
-                border-radius: 11px;
+        @media (max-width: 768px) {
+            .navbar {
+                flex-wrap: nowrap !important;
+                align-items: center !important;
             }
-            .heiko-page-refresh span:last-child {
-                display: none;
+            .navbar > .heiko-header-actions {
+                min-width: 124px;
+                gap: 4px;
+                margin-left: 4px;
+            }
+            .navbar > .hamburger-btn {
+                display: flex !important;
+                flex-shrink: 0;
+                margin-left: auto !important;
+                align-self: center;
+            }
+            .heiko-page-refresh {
+                min-height: 32px;
+                padding: 6px 9px;
+                border-radius: 11px;
             }
             .heiko-recruit-post {
-                min-height: 40px;
-                padding: 8px 11px;
-                margin-left: 5px;
+                min-height: 38px;
+                padding: 8px 9px;
                 border-radius: 11px;
                 font-size: 12px;
+            }
+        }
+        @media (max-width: 380px) {
+            .navbar > .heiko-header-actions {
+                min-width: 112px;
+            }
+            .heiko-recruit-post {
+                font-size: 11px;
+            }
+            .heiko-recruit-post span:first-child {
+                font-size: 16px;
+            }
+        }
+        @media (max-aspect-ratio: 4/5) {
+            .navbar > .hamburger-btn {
+                margin-left: auto !important;
+                align-self: center;
             }
         }
     `;	// 共通スタイルを定義する
@@ -323,7 +381,7 @@ document.addEventListener("DOMContentLoaded", () => {	// 画面の読み込み�
     if (selector) selector.value = readThemePreference();	// 保存済みの外観設定を選択欄へ表示する
     installHeikoSharedStyles();	// 共通ボタンのスタイルを読み込む
     installPageRefreshButton();	// ページ上部へ更新ボタンを追加する
-    installRecruitmentPostButton();	// ホーム画面へ募集投稿ボタンを追加する
+    installRecruitmentPostButton();	// ヘッダーがある各ページへ募集投稿ボタンを追加する
     if (document.body && document.body.dataset.page === "main") {	// ホーム画面だけ先読みを開始する
         if ("requestIdleCallback" in window) {	// ブラウザが待機時間を通知できる場合に処理する
             window.requestIdleCallback(prefetchHeikoPages, { timeout: 3000 });	// 初期通信が落ち着いてから先読みする
