@@ -263,6 +263,56 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
             font-size: 19px;
             line-height: 12px;
         }
+        :root {
+            --heiko-recruit-panel-bg: radial-gradient(circle at 94% 7%, rgba(61, 212, 219, .2), transparent 36%), linear-gradient(135deg, rgba(245, 255, 255, .96), rgba(232, 250, 250, .9));
+            --heiko-recruit-panel-border: rgba(23, 165, 171, .22);
+            --heiko-recruit-panel-shadow: 0 14px 30px rgba(13, 88, 96, .1);
+            --heiko-recruit-orb: rgba(25, 166, 172, .2);
+            --heiko-recruit-label: #07828a;
+            --heiko-recruit-title: var(--ui-ink, #12384a);
+            --heiko-recruit-muted: var(--ui-muted, #5d7782);
+            --heiko-recruit-button-bg: linear-gradient(135deg, #11a7ad 0%, #087a85 100%);
+            --heiko-recruit-button-border: rgba(7, 110, 117, .18);
+            --heiko-recruit-button-shadow: 0 10px 20px rgba(5, 119, 130, .26);
+            --heiko-recruit-button-hover-shadow: 0 14px 26px rgba(5, 119, 130, .32);
+            --heiko-recruit-refresh-bg: rgba(255, 255, 255, .64);
+            --heiko-recruit-refresh-hover: rgba(255, 255, 255, .92);
+            --heiko-recruit-refresh-border: rgba(18, 137, 145, .2);
+        }
+        :root[data-theme="dark"] {
+            --heiko-recruit-panel-bg: radial-gradient(circle at 94% 7%, rgba(125, 211, 252, .23), transparent 39%), linear-gradient(135deg, rgba(22, 33, 54, .97), rgba(31, 43, 70, .95));
+            --heiko-recruit-panel-border: rgba(147, 197, 253, .36);
+            --heiko-recruit-panel-shadow: 0 18px 34px rgba(0, 0, 0, .3);
+            --heiko-recruit-orb: rgba(167, 214, 255, .34);
+            --heiko-recruit-label: #8bdcff;
+            --heiko-recruit-title: #f2f6ff;
+            --heiko-recruit-muted: #bdcbe0;
+            --heiko-recruit-button-bg: linear-gradient(135deg, #1689b5 0%, #355fca 100%);
+            --heiko-recruit-button-border: rgba(191, 219, 254, .48);
+            --heiko-recruit-button-shadow: 0 11px 23px rgba(9, 27, 70, .42);
+            --heiko-recruit-button-hover-shadow: 0 15px 30px rgba(9, 27, 70, .56);
+            --heiko-recruit-refresh-bg: rgba(12, 22, 40, .78);
+            --heiko-recruit-refresh-hover: rgba(31, 49, 80, .94);
+            --heiko-recruit-refresh-border: rgba(147, 197, 253, .38);
+        }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --heiko-recruit-panel-bg: radial-gradient(circle at 94% 7%, rgba(125, 211, 252, .23), transparent 39%), linear-gradient(135deg, rgba(22, 33, 54, .97), rgba(31, 43, 70, .95));
+                --heiko-recruit-panel-border: rgba(147, 197, 253, .36);
+                --heiko-recruit-panel-shadow: 0 18px 34px rgba(0, 0, 0, .3);
+                --heiko-recruit-orb: rgba(167, 214, 255, .34);
+                --heiko-recruit-label: #8bdcff;
+                --heiko-recruit-title: #f2f6ff;
+                --heiko-recruit-muted: #bdcbe0;
+                --heiko-recruit-button-bg: linear-gradient(135deg, #1689b5 0%, #355fca 100%);
+                --heiko-recruit-button-border: rgba(191, 219, 254, .48);
+                --heiko-recruit-button-shadow: 0 11px 23px rgba(9, 27, 70, .42);
+                --heiko-recruit-button-hover-shadow: 0 15px 30px rgba(9, 27, 70, .56);
+                --heiko-recruit-refresh-bg: rgba(12, 22, 40, .78);
+                --heiko-recruit-refresh-hover: rgba(31, 49, 80, .94);
+                --heiko-recruit-refresh-border: rgba(147, 197, 253, .38);
+            }
+        }
         .heiko-recruit-post-panel {
             position: relative;
             display: flex;
@@ -272,12 +322,10 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
             box-sizing: border-box;
             overflow: hidden;
             padding: 18px;
-            border: 1px solid rgba(23, 165, 171, .22);
+            border: 1px solid var(--heiko-recruit-panel-border);
             border-radius: 20px;
-            background:
-                radial-gradient(circle at 94% 7%, rgba(61, 212, 219, .2), transparent 36%),
-                linear-gradient(135deg, rgba(245, 255, 255, .96), rgba(232, 250, 250, .9));
-            box-shadow: 0 14px 30px rgba(13, 88, 96, .1);
+            background: var(--heiko-recruit-panel-bg);
+            box-shadow: var(--heiko-recruit-panel-shadow);
         }
         .heiko-recruit-post-panel::before {
             position: absolute;
@@ -285,7 +333,7 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
             right: -34px;
             width: 110px;
             height: 110px;
-            border: 1px solid rgba(25, 166, 172, .2);
+            border: 1px solid var(--heiko-recruit-orb);
             border-radius: 50%;
             content: "";
             pointer-events: none;
@@ -299,18 +347,18 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
             color: var(--ui-ink, #164e63);
         }
         .heiko-recruit-post-copy span {
-            color: #07828a;
+            color: var(--heiko-recruit-label);
             font-size: 10px;
             font-weight: 900;
             letter-spacing: .14em;
         }
         .heiko-recruit-post-copy strong {
-            color: var(--ui-ink, #12384a);
+            color: var(--heiko-recruit-title);
             font-size: 15px;
             line-height: 1.45;
         }
         .heiko-recruit-post-copy small {
-            color: var(--ui-muted, #5d7782);
+            color: var(--heiko-recruit-muted);
             font-size: 11px;
             line-height: 1.45;
         }
@@ -342,14 +390,14 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
         .heiko-recruit-post-panel .heiko-recruit-post {
             min-height: 50px;
             padding: 11px 15px;
-            border: 1px solid rgba(7, 110, 117, .18);
+            border: 1px solid var(--heiko-recruit-button-border);
             border-radius: 14px;
-            background: linear-gradient(135deg, #11a7ad 0%, #087a85 100%);
-            box-shadow: 0 10px 20px rgba(5, 119, 130, .26);
+            background: var(--heiko-recruit-button-bg);
+            box-shadow: var(--heiko-recruit-button-shadow);
         }
         .heiko-recruit-post-panel .heiko-recruit-post:hover {
             transform: translateY(-2px);
-            box-shadow: 0 14px 26px rgba(5, 119, 130, .32);
+            box-shadow: var(--heiko-recruit-button-hover-shadow);
         }
         .heiko-recruit-post-icon {
             display: inline-grid;
@@ -372,14 +420,14 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
         }
         .heiko-recruit-post-actions .heiko-page-refresh {
             min-height: 36px;
-            border-color: rgba(18, 137, 145, .2);
+            border-color: var(--heiko-recruit-refresh-border);
             border-radius: 12px;
-            background: rgba(255, 255, 255, .64);
-            color: var(--ui-ink, #155261);
+            background: var(--heiko-recruit-refresh-bg);
+            color: var(--heiko-recruit-title);
             box-shadow: none;
         }
         .heiko-recruit-post-actions .heiko-page-refresh:hover {
-            background: rgba(255, 255, 255, .92);
+            background: var(--heiko-recruit-refresh-hover);
             box-shadow: 0 7px 15px rgba(13, 88, 96, .1);
         }
         @keyframes heiko-refresh-spin {
