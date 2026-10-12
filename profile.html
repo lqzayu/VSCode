@@ -257,6 +257,16 @@
             box-shadow: 0 0 0 3px rgba(0, 149, 246, 0.12);	/* 見た目の設定を指定 */
         }	/* スタイル定義を閉じる */
 
+        .profile-school-grid {	/* 学年と学科の入力欄を横並びにする */
+            display: grid;	/* グリッド配置を使う */
+            grid-template-columns: repeat(2, minmax(0, 1fr));	/* 二つの入力欄を同じ幅にする */
+            gap: 14px;	/* 入力欄の間を空ける */
+        }	/* 学年と学科の入力欄の設定を閉じる */
+
+        .profile-school-grid .form-group {	/* 学年と学科の余白をそろえる */
+            margin-bottom: 28px;	/* 下側に余白を付ける */
+        }	/* 学年と学科の余白設定を閉じる */
+
         .btn-large {	/* 対象要素のスタイルを始める */
             width: 100%;	/* 見た目の設定を指定 */
             padding: 14px 0;	/* 見た目の設定を指定 */
@@ -439,6 +449,7 @@
         @media screen and (max-width: 768px) {	/* 表示条件を設定 */
             .container { margin: 16px auto; padding: 0 12px; }	/* 見た目の設定を指定 */
             .profile-card { padding: 32px 20px; }	/* 見た目の設定を指定 */
+            .profile-school-grid { grid-template-columns: 1fr; gap: 0; }	/* 小さい画面では入力欄を縦に並べる */
             .hamburger-btn { display: flex !important; }	/* 見た目の設定を指定 */
             .nav-links {	/* 対象要素のスタイルを始める */
                 position: fixed !important; top: 54px !important; left: 0 !important;	/* 見た目の設定を指定 */
@@ -505,6 +516,29 @@
                 <label for="username-input">表示名（ニックネーム）</label>	<!-- 画面要素を配置 -->
                 <input type="text" id="username-input" class="input-large" maxlength="50" placeholder="名前を入力してください">	<!-- 入力要素を配置 -->
             </div>	<!-- 要素を閉じる -->
+
+            <div class="profile-school-grid">	<!-- 学年と学科の設定欄をまとめる -->
+                <div class="form-group">	<!-- 学年の入力欄を配置する -->
+                    <label for="profile-grade">学年</label>	<!-- 学年の入力欄に名前を付ける -->
+                    <select id="profile-grade" class="input-large">	<!-- 学年を選ぶ入力欄を配置する -->
+                        <option value="">選択してください</option>	<!-- 未選択の案内を表示する -->
+                        <option value="1年">1年</option>	<!-- 一年生を選べるようにする -->
+                        <option value="2年">2年</option>	<!-- 二年生を選べるようにする -->
+                        <option value="3年">3年</option>	<!-- 三年生を選べるようにする -->
+                    </select>	<!-- 学年の入力欄を閉じる -->
+                </div>	<!-- 学年の入力欄を閉じる -->
+                <div class="form-group">	<!-- 学科の入力欄を配置する -->
+                    <label for="profile-dept">学科</label>	<!-- 学科の入力欄に名前を付ける -->
+                    <select id="profile-dept" class="input-large">	<!-- 学科を選ぶ入力欄を配置する -->
+                        <option value="">選択してください</option>	<!-- 未選択の案内を表示する -->
+                        <option value="機械工学科">機械工学科</option>	<!-- 機械工学科を選べるようにする -->
+                        <option value="電気工学科">電気工学科</option>	<!-- 電気工学科を選べるようにする -->
+                        <option value="制御工学科">制御工学科</option>	<!-- 制御工学科を選べるようにする -->
+                        <option value="土木環境工学科">土木環境工学科</option>	<!-- 土木環境工学科を選べるようにする -->
+                        <option value="情報工学科">情報工学科</option>	<!-- 情報工学科を選べるようにする -->
+                    </select>	<!-- 学科の入力欄を閉じる -->
+                </div>	<!-- 学科の入力欄を閉じる -->
+            </div>	<!-- 学年と学科の設定欄を閉じる -->
 
             <button class="btn-large" onclick="saveProfile()">設定を保存する</button>	<!-- 操作できる要素を配置 -->
 
@@ -718,12 +752,18 @@
 
                 const name = String(result.message.name || result.message.userId || "").trim();	// 定数を定義
                 const image = String(result.message.profileImage || "").trim();	// 定数を定義
+                const grade = String(result.message.grade || "").trim();	// 保存済みの学年を受け取る
+                const dept = String(result.message.dept || "").trim();	// 保存済みの学科を受け取る
                 lineLinked = result.message.lineLinked === true;	// LINE連携状態を受け取る
                 localStorage.setItem("userName", name);	// 端末内の保存情報を扱う
                 localStorage.setItem("profileImage", image);	// 端末内の保存情報を扱う
+                localStorage.setItem("userGrade", grade);	// 学年を端末内へ保存する
+                localStorage.setItem("userDept", dept);	// 学科を端末内へ保存する
 
                 document.getElementById("username-input").value = name;	// 処理を続ける
                 document.getElementById("profile-icon").src = image || DEFAULT_AVATAR;	// 処理を続ける
+                document.getElementById("profile-grade").value = grade;	// 保存済みの学年を表示する
+                document.getElementById("profile-dept").value = dept;	// 保存済みの学科を表示する
                 updateLineLinkUI();	// LINE連携状態の表示を更新する
             } catch (e) {	// 処理のまとまりを始める
                 console.error("プロフィール情報の同期エラー:", e);	// 処理を完了する
@@ -809,8 +849,11 @@
             const name = document.getElementById("username-input").value.trim();	// 定数を定義
             const imageSrc = document.getElementById("profile-icon").src;	// 定数を定義
             const email = localStorage.getItem("userEmail");	// 定数を定義
+            const grade = document.getElementById("profile-grade").value;	// 選択した学年を取得する
+            const dept = document.getElementById("profile-dept").value;	// 選択した学科を取得する
 
             if (!name) { alert("表示名を入力してください"); return; }	// 条件に応じて処理を分ける
+            if (!grade || !dept) { alert("学年と学科を選択してください"); return; }	// 学年と学科の未設定を防ぐ
             if (!email) { alert("ログイン情報が見つかりません。一度再ログインしてください。"); return; }	// 条件に応じて処理を分ける
 
             try {	// 失敗に備えて処理を始める
@@ -818,13 +861,18 @@
                     mode: "updateProfile",	// 処理を続ける
                     email: email,	// 処理を続ける
                     name: name,	// 処理を続ける
-                    profileImage: imageSrc	// 処理を続ける
+                    profileImage: imageSrc,	// プロフィール画像を送る
+                    grade: grade,	// 学年を送る
+                    dept: dept	// 学科を送る
                 });	// 処理を完了する
                 if (result.status === "success") {	// 条件に応じて処理を分ける
                     localStorage.setItem("userName", name);	// 端末内の保存情報を扱う
                     localStorage.setItem("profileImage", imageSrc);	// 端末内の保存情報を扱う
+                    localStorage.setItem("userGrade", grade);	// 学年を端末内へ保存する
+                    localStorage.setItem("userDept", dept);	// 学科を端末内へ保存する
                     alert("プロフィールを保存しました！");	// 処理結果を知らせる
-                    location.href = "main.html";	// 処理を続ける
+                    const returnToRecruit = new URLSearchParams(location.search).get("returnTo") === "recruit";	// 募集投稿から来たか確認する
+                    location.href = returnToRecruit ? "main.html?tab=recruit" : "main.html";	// 元の目的に応じてホームへ戻る
                 } else {	// 処理のまとまりを始める
                     alert("保存に失敗しました: " + result.message);	// 処理結果を知らせる
                 }	// 処理のまとまりを閉じる
@@ -1200,6 +1248,8 @@
 
             const userName = localStorage.getItem("userName");	// 定数を定義
             const profileImage = localStorage.getItem("profileImage");	// 定数を定義
+            const userGrade = localStorage.getItem("userGrade") || "";	// 保存済みの学年を取得する
+            const userDept = localStorage.getItem("userDept") || "";	// 保存済みの学科を取得する
             const currentUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail");	// 定数を定義
             const adminButton = document.getElementById("nav-admin-btn");	// 定数を定義
             if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") {	// 端末内の保存情報を扱う
@@ -1207,6 +1257,8 @@
             }	// 処理のまとまりを閉じる
 
             if (userName) document.getElementById("username-input").value = userName;	// 条件に応じて処理を分ける
+            document.getElementById("profile-grade").value = userGrade;	// 保存済みの学年を先に表示する
+            document.getElementById("profile-dept").value = userDept;	// 保存済みの学科を先に表示する
 
             if (profileImage && profileImage !== "null") {	// 条件に応じて処理を分ける
                 document.getElementById("profile-icon").src = profileImage;	// 処理を続ける

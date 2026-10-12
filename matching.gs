@@ -10,6 +10,8 @@ const ONLINE_TIMEOUT_MS = 90 * 1000;	// 定数を定義
 const AI_DAILY_LIMIT = 5;	// 定数を定義
 const AI_SESSION_LIMIT = 2;	// 画面で相談完了となる二回目までに制限する
 const USER_SESSION_DURATION_MS = 6 * 60 * 60 * 1000;	// 通常ログインの有効時間を六時間にする
+const SCHOOL_GRADES = ["1年", "2年", "3年"];	// プロフィールで選べる学年を定義する
+const SCHOOL_DEPARTMENTS = ["機械工学科", "電気工学科", "制御工学科", "土木環境工学科", "情報工学科"];	// プロフィールで選べる学科を定義する
 
 const LINE_ACCESS_TOKEN = PropertiesService.getScriptProperties().getProperty("LINE_ACCESS_TOKEN") || "";	// 定数を定義
 const GEMINI_MODEL = PropertiesService.getScriptProperties().getProperty("GEMINI_MODEL") || "gemini-3.5-flash-lite";	// 定数を定義
@@ -215,6 +217,8 @@ function doPost(e) {	// 関数を定義
         email: cleanCell(userRow[5]) || cleanCell(userRow[0]),	// 処理を続ける
         name: cleanCell(userRow[2]),	// 処理を続ける
         profileImage: cleanCell(userRow[4]),	// 処理を続ける
+        grade: cleanCell(userRow[13]),	// 保存済みの学年を返す
+        dept: cleanCell(userRow[14]),	// 保存済みの学科を返す
         lineLinked: Boolean(cleanCell(userRow[11]))	// LINE UserIDが保存されているかを返す
       };	// プロフィール情報を閉じる
       if (isAdminRequest(data)) profileResult.sessionToken = createUserSessionToken(cleanCell(userRow[0]), cleanCell(userRow[12]));	// 代理ログイン用の本人トークンを発行する
@@ -500,13 +504,15 @@ function doPost(e) {	// 関数を定義
         "",	// 処理を続ける
         "",	// 処理を続ける
         "",	// LINE連携欄を空で用意する
-        Utilities.getUuid()	// 新しいアカウントのログイン世代を作る
+        Utilities.getUuid(),	// 新しいアカウントのログイン世代を作る
+        "",	// 学年欄を空で用意する
+        ""	// 学科欄を空で用意する
       ];	// 処理を続ける
 
       const registerLock = LockService.getScriptLock();	// 同時登録による重複を防ぐ
       if (!registerLock.tryLock(5000)) return createRes("error", "登録処理が混み合っています。少し待ってからもう一度お試しください");	// ロックを取得できない場合は再試行を案内する
       try {	// 登録データを安全に書き込む
-        ensureUserSessionColumn(sheetUser);	// ログイン世代の保存先を用意する
+        ensureUserSchoolColumns(sheetUser);	// 学年と学科の保存先を用意する
         const latestRows = sheetUser.getLastRow() > 0 ? sheetUser.getDataRange().getValues() : [];	// 最新の登録状況を読み直す
         let latestExistingRowIndex = -1;	// 同じユーザーIDの行番号を保持する
         for (let i = 1; i < latestRows.length; i++) {	// 最新データから重複を確認する
@@ -732,8 +738,13 @@ function doPost(e) {	// 関数を定義
       const email = data.email;	// 定数を定義
       const name = data.name;	// 定数を定義
       const profileImage = data.profileImage;	// 定数を定義
+      const grade = cleanCell(data.grade);	// 選択された学年を取得する
+      const dept = cleanCell(data.dept);	// 選択された学科を取得する
       if (!cleanCell(name) || String(name).length > 50) return createRes("error", "表示名は50文字以内で入力してください");	// 条件に応じて処理を分ける
+      if (!SCHOOL_GRADES.includes(grade)) return createRes("error", "学年を選択してください");	// 選択肢以外の学年を拒否する
+      if (!SCHOOL_DEPARTMENTS.includes(dept)) return createRes("error", "学科を選択してください");	// 選択肢以外の学科を拒否する
       if (!sheetUser || sheetUser.getLastRow() === 0) return createRes("error", "ユーザーが見つかりません");	// 条件に応じて処理を分ける
+      ensureUserSchoolColumns(sheetUser);	// 学年と学科の保存列を用意する
       const rows = sheetUser.getDataRange().getValues();	// 定数を定義
 
       let userRowIndex = -1;	// 状態を保持
@@ -750,6 +761,7 @@ function doPost(e) {	// 関数を定義
         }	// 処理のまとまりを閉じる
         if (profileImage && !isSafeProfileImage(profileImage)) return createRes("error", "プロフィール画像の形式を確認してください");	// 想定外の画像形式を拒否する
         sheetUser.getRange(userRowIndex, 3).setValue(safeSheetText(name, 50));	// 表示名を数式として実行されない形で保存する
+        sheetUser.getRange(userRowIndex, 14, 1, 2).setValues([[grade, dept]]);	// 学年と学科をまとめて保存する
         if (profileImage) {	// 条件に応じて処理を分ける
           sheetUser.getRange(userRowIndex, 5).setValue(profileImage);	// 保存データを読み込む
         }	// 処理のまとまりを閉じる
@@ -833,17 +845,28 @@ function doPost(e) {	// 関数を定義
       if (!cleanCell(data.content) || String(data.content).length > 2000) return createRes("error", "募集内容は2000文字以内で入力してください");	// 条件に応じて処理を分ける
       if (String(data.tags || "").length > 500) return createRes("error", "タグが長すぎます");	// 条件に応じて処理を分ける
 
+      const requesterId = cleanCell(data.email);	// 投稿者のユーザーIDを取得する
+      if (!requesterId || !sheetUser) return createRes("error", "ログイン情報を確認できませんでした");	// 投稿者の情報がない場合は拒否する
+      ensureUserSchoolColumns(sheetUser);	// 学年と学科の保存列を用意する
+      const userRows = sheetUser.getDataRange().getValues();	// 投稿者のプロフィールを読み込む
+      const requester = findUserRow(userRows, requesterId);	// 投稿者の行を探す
+      if (!requester || requester[6] !== true) return createRes("error", "ログイン情報を確認できませんでした");	// 未認証の投稿を防ぐ
+      const savedGrade = cleanCell(requester[13]);	// マイページで保存した学年を取得する
+      const savedDept = cleanCell(requester[14]);	// マイページで保存した学科を取得する
+      if (!SCHOOL_GRADES.includes(savedGrade) || !SCHOOL_DEPARTMENTS.includes(savedDept)) return createRes("error", "マイページで学年と学科を設定してから投稿してください");	// 未設定の投稿を防ぐ
+      const savedName = getUserDisplayName(requester, requesterId);	// 保存済みの表示名を取得する
+
       ensureRecruitmentDurationColumn(sheetRecruit);	// 処理を完了する
       const rows = sheetRecruit.getLastRow() > 0 ? sheetRecruit.getDataRange().getValues() : [];	// 定数を定義
       let existingRowIndex = -1;	// 状態を保持
       for (let i = 1; i < rows.length; i++) {	// 対象を順番に処理する
-        if (rows[i][5] === data.email) {	// 条件に応じて処理を分ける
+        if (rows[i][5] === requesterId) {	// 自分の既存投稿か確認する
           existingRowIndex = i + 1;	// 処理を続ける
           break;	// 処理を続ける
         }	// 処理のまとまりを閉じる
       }	// 処理のまとまりを閉じる
       const durationMinutes = normalizeRecruitmentDuration(data.durationMinutes);	// 定数を定義
-      const rowData = [safeSheetText(data.name, 50), safeSheetText(data.grade, 30), safeSheetText(data.dept, 50), safeSheetText(data.content, 2000), new Date(), cleanCell(data.email), safeSheetText(data.tags || "", 500), durationMinutes];	// 募集内容を文字列として安全に保存する
+      const rowData = [safeSheetText(savedName, 50), safeSheetText(savedGrade, 30), safeSheetText(savedDept, 50), safeSheetText(data.content, 2000), new Date(), requesterId, safeSheetText(data.tags || "", 500), durationMinutes];	// 保存済みプロフィールを使って募集内容を安全に保存する
 
       if (existingRowIndex !== -1) {	// 条件に応じて処理を分ける
         sheetRecruit.getRange(existingRowIndex, 1, 1, 8).setValues([rowData]);	// 保存データを読み込む
@@ -2231,6 +2254,13 @@ function ensureUserSessionColumn(sheetUser) {	// ログイン世代の保存列�
   if (sheetUser.getMaxColumns() < 13) sheetUser.insertColumnsAfter(sheetUser.getMaxColumns(), 13 - sheetUser.getMaxColumns());	// M列まで不足している列を増やす
   if (!sheetUser.getRange(1, 13).getValue()) sheetUser.getRange(1, 13).setValue("sessionVersion");	// M列の見出しを設定する
 }	// ログイン世代の列確認を閉じる
+
+function ensureUserSchoolColumns(sheetUser) {	// 学年と学科の保存列を用意する
+  ensureUserSessionColumn(sheetUser);	// 既存のログイン世代の列を先に確認する
+  if (sheetUser.getMaxColumns() < 15) sheetUser.insertColumnsAfter(sheetUser.getMaxColumns(), 15 - sheetUser.getMaxColumns());	// O列まで不足している列を増やす
+  if (!sheetUser.getRange(1, 14).getValue()) sheetUser.getRange(1, 14).setValue("学年");	// N列の見出しを設定する
+  if (!sheetUser.getRange(1, 15).getValue()) sheetUser.getRange(1, 15).setValue("学科");	// O列の見出しを設定する
+}	// 学年と学科の列確認を閉じる
 
 function ensureRecruitmentDurationColumn(sheetRecruit) {	// 関数を定義
   if (sheetRecruit.getLastRow() === 0) {	// 条件に応じて処理を分ける

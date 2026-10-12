@@ -1319,7 +1319,6 @@
         <nav class="nav-links" id="nav-links">	<!-- ナビゲーションを配置 -->
             <button type="button" class="nav-item nav-guide-button" onclick="openUsageGuide(); closeMenu();">使い方</button>	<!-- 操作できる要素を配置 -->
             <a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header" class="nav-item">意見箱</a>	<!-- 操作できる要素を配置 -->
-            <a class="nav-item" id="nav-recruit-link" href="main.html?tab=recruit">募集投稿</a>	<!-- 募集投稿タブへのリンクを配置する -->
             <a class="nav-item active" id="nav-search-link" href="main.html?tab=search">ユーザーを探す</a>	<!-- ユーザー検索タブへのリンクを配置する -->
             <a class="nav-item" href="messages.html">	<!-- 操作できる要素を配置 -->
                 メッセージ	<!-- 画面に表示する内容 -->
@@ -1360,18 +1359,7 @@
                     <h3 id="form-title">募集を投稿する</h3>	<!-- 画面要素を配置 -->
                     <input type="text" id="user-name" placeholder="マイページで名前を設定してください" readonly
                         style="margin-bottom:12px;" />
-                    <select id="rec-grade" style="margin-bottom:12px;">	<!-- 入力要素を配置 -->
-                        <option value="1年">1年</option>	<!-- 入力要素を配置 -->
-                        <option value="2年">2年</option>	<!-- 入力要素を配置 -->
-                        <option value="3年">3年</option>	<!-- 入力要素を配置 -->
-                    </select>	<!-- 要素を閉じる -->
-                    <select id="rec-dept" style="margin-bottom:12px;">	<!-- 入力要素を配置 -->
-                        <option value="機械工学科">機械工学科</option>	<!-- 入力要素を配置 -->
-                        <option value="電気工学科">電気工学科</option>	<!-- 入力要素を配置 -->
-                        <option value="制御工学科">制御工学科</option>	<!-- 入力要素を配置 -->
-                        <option value="土木環境工学科">土木環境工学科</option>	<!-- 入力要素を配置 -->
-                        <option value="情報工学科">情報工学科</option>	<!-- 入力要素を配置 -->
-                    </select>	<!-- 要素を閉じる -->
+                    <p id="profile-school-summary" style="margin:-2px 0 12px; color:#64748b; font-size:12px; line-height:1.5;">学年・学科はマイページで設定してください。</p>	<!-- 保存済みの学年と学科を案内する -->
                     <textarea id="rec-content" rows="4" maxlength="2000" placeholder="募集内容を入力してください"
                         style="margin-bottom:12px;"></textarea>
 
@@ -1689,17 +1677,23 @@
 
             const userName = String(profile.name || profile.userId || "").trim();	// 定数を定義
             const profileImage = String(profile.profileImage || "").trim();	// 定数を定義
+            const grade = String(profile.grade || "").trim();	// 保存済みの学年を取得する
+            const dept = String(profile.dept || "").trim();	// 保存済みの学科を取得する
             localStorage.setItem("userName", userName);	// 端末内の保存情報を扱う
             localStorage.setItem("profileImage", profileImage);	// 端末内の保存情報を扱う
+            localStorage.setItem("userGrade", grade);	// 学年を端末内へ保存する
+            localStorage.setItem("userDept", dept);	// 学科を端末内へ保存する
 
             const nameInput = document.getElementById("user-name");	// 定数を定義
             const mypageText = document.getElementById("mypage-text");	// 定数を定義
             const profileIcon = document.getElementById("profile-icon");	// 定数を定義
+            const schoolSummary = document.getElementById("profile-school-summary");	// 学年と学科の案内欄を取得する
             if (nameInput) nameInput.value = userName;	// 条件に応じて処理を分ける
             if (mypageText) mypageText.innerText = userName || "マイページ";	// 条件に応じて処理を分ける
             if (profileIcon) {	// 条件に応じて処理を分ける
                 profileIcon.src = profileImage || "avatar-default.svg";	// 保存画像か初期画像を表示する
             }	// 処理のまとまりを閉じる
+            if (schoolSummary) schoolSummary.textContent = grade && dept ? `学年・学科：${grade} / ${dept}` : "学年・学科はマイページで設定してください。";	// 学年と学科の設定状況を表示する
         }	// 処理のまとまりを閉じる
 
         async function refreshUserProfile(userId) {	// 関数を定義
@@ -2074,11 +2068,18 @@
             const fixedTag = document.getElementById("rec-fixed-tag").value;	// 定数を定義
             const tags = mergeRecruitmentTags(fixedTag, document.getElementById("rec-tags").value);	// 定数を定義
             const durationMinutes = getRecruitmentDurationMinutes(document.getElementById("rec-duration").value);	// 定数を定義
+            const grade = localStorage.getItem("userGrade") || "";	// 保存済みの学年を取得する
+            const dept = localStorage.getItem("userDept") || "";	// 保存済みの学科を取得する
 
             if (!content) {	// 条件に応じて処理を分ける
                 alert("募集内容を入力してください");	// 処理結果を知らせる
                 return;	// 結果を返す
             }	// 処理のまとまりを閉じる
+            if (!grade || !dept) {	// 学年と学科が未設定の場合に処理する
+                alert("募集を投稿する前に、マイページで学年と学科を設定してください。");	// 設定が必要なことを知らせる
+                location.href = "profile.html?returnTo=recruit";	// 設定画面へ移動する
+                return;	// 投稿処理を始めない
+            }	// 学年と学科の確認を閉じる
 
             if (submitBtn) {	// 条件に応じて処理を分ける
                 submitBtn.disabled = true;	// 処理を続ける
@@ -2087,9 +2088,6 @@
 
             const data = {	// 定数を定義
                 mode: "postRecruitment",	// 処理を続ける
-                name: localStorage.getItem("userName"),	// 端末内の保存情報を扱う
-                grade: document.getElementById("rec-grade").value,	// 処理を続ける
-                dept: document.getElementById("rec-dept").value,	// 処理を続ける
                 content: content,	// 処理を続ける
                 tags: tags,	// 処理を続ける
                 durationMinutes: durationMinutes,	// 処理を続ける
