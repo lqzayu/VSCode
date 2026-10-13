@@ -64,6 +64,43 @@ function updateHeikoPwaInstallButton(installed = false) {	// PWAボタンの表�
     if (hint && heikoDeferredInstallPrompt) hint.textContent = "この端末のホーム画面からすぐに開けます。";	// 直接インストールできる場合の案内を表示する
 }	// PWAボタン表示更新を閉じる
 
+function showHeikoPwaInstallDialog(kind) {
+    let dialog = document.getElementById("heiko-pwa-install-dialog");
+    if (!dialog) {
+        dialog = document.createElement("dialog");
+        dialog.id = "heiko-pwa-install-dialog";
+        dialog.className = "heiko-pwa-install-dialog";
+        dialog.addEventListener("click", event => {
+            if (event.target === dialog) dialog.close();
+        });
+        document.body.appendChild(dialog);
+    }
+
+    const isAppleMobile = kind === "apple-mobile";
+    const isSafariDesktop = kind === "safari-desktop";
+    const title = isAppleMobile ? "ホーム画面に追加" : isSafariDesktop ? "Dockに追加" : "アプリとして追加";
+    const description = isAppleMobile
+        ? "Safariでは安全上の仕様により、この画面から直接追加を確定できません。共有メニューを開いたら「ホーム画面に追加」を選んでください。"
+        : isSafariDesktop
+            ? "Safariでは安全上の仕様により、この画面から直接追加を確定できません。メニューバーの「ファイル」から「Dockに追加」を選んでください。"
+            : "このブラウザでは、メニューから「ホーム画面に追加」または「アプリをインストール」を選ぶと追加できます。";
+
+    dialog.innerHTML = `<section class="heiko-pwa-install-dialog-content" aria-labelledby="heiko-pwa-dialog-title"><span class="heiko-pwa-dialog-icon" aria-hidden="true">⌂</span><h3 id="heiko-pwa-dialog-title">${title}</h3><p>${description}</p><button type="button" class="heiko-pwa-dialog-close">わかった</button></section>`;
+    dialog.querySelector(".heiko-pwa-dialog-close").addEventListener("click", () => dialog.close());
+    if (typeof dialog.showModal === "function") dialog.showModal();
+    else window.alert(`${title}\n\n${description}`);
+}
+
+async function openHeikoAppleShareMenu() {
+    if (!navigator.share) return false;
+    try {
+        await navigator.share({ title: document.title, url: window.location.href });
+        return true;
+    } catch (error) {
+        return error && error.name === "AbortError";
+    }
+}
+
 async function requestHeikoPwaInstall() {	// PWAの追加操作を開始する
     if (isHeikoPwaStandalone()) return;	// すでに追加済みなら何もしない
     if (heikoDeferredInstallPrompt) {	// ブラウザがインストール案内を提供している場合に処理する
@@ -74,8 +111,9 @@ async function requestHeikoPwaInstall() {	// PWAの追加操作を開始する
         return;	// 操作を終える
     }	// ブラウザ標準案内の処理を閉じる
     const isAppleMobile = /iPhone|iPad|iPod/i.test(navigator.userAgent);	// iPhoneやiPadか確認する
-    const hint = document.getElementById("heiko-pwa-install-hint");	// 案内文を取得する
-    if (hint) hint.textContent = isAppleMobile ? "Safariの共有ボタンから「ホーム画面に追加」を選択してください。" : "ブラウザのメニューから「ホーム画面に追加」または「アプリをインストール」を選択してください。";	// 手動追加方法を表示する
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);	// Safariか確認する
+    if (isAppleMobile && await openHeikoAppleShareMenu()) return;	// iPhoneやiPadでは共有メニューを直接開く
+    showHeikoPwaInstallDialog(isAppleMobile ? "apple-mobile" : isSafari ? "safari-desktop" : "other");
 }	// PWA追加操作を閉じる
 
 function installHeikoPwaSupport() {	// PWAの共通準備を行う
@@ -402,6 +440,60 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
         #heiko-pwa-install-button:disabled {
             opacity: .7;
             cursor: default;
+        }
+        .heiko-pwa-install-dialog {
+            width: min(420px, calc(100vw - 32px));
+            margin: auto;
+            padding: 0;
+            border: 1px solid var(--ui-line, rgba(28, 189, 197, .3));
+            border-radius: 20px;
+            color: var(--ui-ink, #243c32);
+            background: var(--ui-paper, #ffffff);
+            box-shadow: 0 24px 64px rgba(11, 33, 52, .28);
+        }
+        .heiko-pwa-install-dialog::backdrop {
+            background: rgba(10, 24, 39, .52);
+            backdrop-filter: blur(4px);
+        }
+        .heiko-pwa-install-dialog-content {
+            padding: 26px;
+            text-align: center;
+        }
+        .heiko-pwa-dialog-icon {
+            display: grid;
+            width: 48px;
+            height: 48px;
+            place-items: center;
+            margin: 0 auto 12px;
+            border-radius: 15px;
+            color: #ffffff;
+            background: linear-gradient(135deg, #1689b5, #355fca);
+            font-size: 30px;
+            font-weight: 900;
+            box-shadow: 0 10px 20px rgba(9, 27, 70, .2);
+        }
+        .heiko-pwa-install-dialog h3 {
+            margin: 0 0 9px;
+            font-size: 19px;
+        }
+        .heiko-pwa-install-dialog p {
+            margin: 0;
+            color: var(--ui-muted, #66736a);
+            font-size: 14px;
+            font-weight: 650;
+            line-height: 1.75;
+        }
+        .heiko-pwa-dialog-close {
+            min-width: 140px;
+            min-height: 43px;
+            margin-top: 20px;
+            border: 0;
+            border-radius: 12px;
+            color: #ffffff;
+            background: linear-gradient(135deg, #1689b5, #355fca);
+            font: inherit;
+            font-weight: 800;
+            cursor: pointer;
         }
         .navbar > .hamburger-btn {
             align-self: center;
