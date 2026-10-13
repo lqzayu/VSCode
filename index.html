@@ -936,9 +936,10 @@
             </div>
 	<!-- 要素を閉じる -->
 
+			<form id="auth-form" autocomplete="on" novalidate onsubmit="handleAuthenticationSubmit(event)">
             <div class="input-group">
 	<!-- 画面要素を配置 -->
-                <input type="text" id="login-userid" name="username" maxlength="64" placeholder="ユーザID（顔認証にも使用）" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" onkeypress="handleKeyPress(event)">
+                <input type="text" id="login-userid" name="username" maxlength="64" placeholder="ユーザID（顔認証にも使用）" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
 	<!-- 入力要素を配置 -->
 
                 <div class="name-wrapper" id="name-wrapper">
@@ -955,8 +956,7 @@
 	<!-- 要素を閉じる -->
 
                 <div class="password-wrapper">	<!-- 画面要素を配置 -->
-                    <input type="password" id="password" name="password" placeholder="パスワード" class="password-input" maxlength="128" autocomplete="current-password"
-                        onkeypress="handleKeyPress(event)">
+                    <input type="password" id="password" name="password" placeholder="パスワード" class="password-input" maxlength="128" autocomplete="current-password">
                     <button type="button" id="toggle-password" onclick="togglePasswordVisibility()"
                         class="toggle-password-btn">表示</button>
                 </div>
@@ -989,23 +989,23 @@
 	<!-- 保存期間を説明する -->
                         </label>
 	<!-- ログイン情報保存欄を閉じる -->
-                        <button class="btn-submit-primary" onclick="handleLogin()">ログイン</button>
+                        <button type="submit" class="btn-submit-primary">ログイン</button>
 	<!-- 操作できる要素を配置 -->
-                        <button class="btn-flat" onclick="toggleMode('register')">新規登録はこちら</button>
+                        <button type="button" class="btn-flat" onclick="toggleMode('register')">新規登録はこちら</button>
 	<!-- 操作できる要素を配置 -->
                         <br>
 	<!-- 画面要素を配置 -->
-                        <button class="btn-flat" onclick="showForgotPasswordForm()">パスワードを忘れた場合はこちら</button>
+                        <button type="button" class="btn-flat" onclick="showForgotPasswordForm()">パスワードを忘れた場合はこちら</button>
 	<!-- 操作できる要素を配置 -->
                     </div>
 	<!-- 要素を閉じる -->
 
                     <div id="register-section" style="display: none;">
 	<!-- 画面要素を配置 -->
-                        <button class="btn-submit-primary"
+                        <button type="submit" class="btn-submit-primary"
                             style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);"
-                            onclick="handleRegister()">認証コードを送信する</button>
-                        <button class="btn-flat" onclick="toggleMode('login')">ログインに戻る</button>
+                            >認証コードを送信する</button>
+                        <button type="button" class="btn-flat" onclick="toggleMode('login')">ログインに戻る</button>
 	<!-- 操作できる要素を配置 -->
                     </div>
 	<!-- 要素を閉じる -->
@@ -1018,14 +1018,14 @@
 	<!-- 画面要素を配置 -->
                         <input type="text" id="verify-code" placeholder="認証コード（6桁）" inputmode="numeric" maxlength="6">
 	<!-- 入力要素を配置 -->
-                        <button class="btn-submit-primary"
+                        <button type="button" class="btn-submit-primary"
                             style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);"
                             onclick="handleVerifyCode()">認証して登録完了</button>
-                        <button class="btn-flat" onclick="resendCode()">コードを再送する</button>
+                        <button type="button" class="btn-flat" onclick="resendCode()">コードを再送する</button>
 	<!-- 操作できる要素を配置 -->
                         <br>
 	<!-- 画面要素を配置 -->
-                        <button class="btn-flat" onclick="toggleMode('login')">ログインに戻る</button>
+                        <button type="button" class="btn-flat" onclick="toggleMode('login')">ログインに戻る</button>
 	<!-- 操作できる要素を配置 -->
                     </div>
 	<!-- 要素を閉じる -->
@@ -1034,9 +1034,9 @@
 	<!-- 画面要素を配置 -->
                         <input type="text" id="forgot-userid" placeholder="登録したユーザID">
 	<!-- 入力要素を配置 -->
-                        <button class="btn-submit-primary" onclick="submitForgotPassword()">再設定メールを送信</button>
+                        <button type="button" class="btn-submit-primary" onclick="submitForgotPassword()">再設定メールを送信</button>
 	<!-- 操作できる要素を配置 -->
-                        <button class="btn-flat" onclick="hideForgotPasswordForm()">キャンセル</button>
+                        <button type="button" class="btn-flat" onclick="hideForgotPasswordForm()">キャンセル</button>
 	<!-- 操作できる要素を配置 -->
                     </div>
 	<!-- 要素を閉じる -->
@@ -1044,6 +1044,7 @@
 	<!-- 要素を閉じる -->
             </div>
 	<!-- 要素を閉じる -->
+			</form>
         </div>
 	<!-- 要素を閉じる -->
     </div>
@@ -1992,6 +1993,29 @@
 	// 処理を完了する
         });
 	// 処理を完了する
+
+        function handleAuthenticationSubmit(event) {
+            event.preventDefault();
+
+            const verifySection = document.getElementById("verify-section");
+            const forgotSection = document.getElementById("forgot-password-section");
+            const registerSection = document.getElementById("register-section");
+            const isVisible = (section) => section && window.getComputedStyle(section).display !== "none";
+
+            if (isVisible(verifySection)) {
+                handleVerifyCode();
+                return;
+            }
+            if (isVisible(forgotSection)) {
+                submitForgotPassword();
+                return;
+            }
+            if (isVisible(registerSection)) {
+                handleRegister();
+                return;
+            }
+            handleLogin();
+        }
 
         async function handleLogin() {
 	// 関数を定義
