@@ -131,7 +131,7 @@ function getHeaderActionStack() {	// ヘッダー右側の共通操作欄を用�
 }	// 操作欄の準備を閉じる
 
 function installPageRefreshButton() {	// 各ページのヘッダーへ更新ボタンを追加する
-    if (!document.body || document.getElementById("heiko-page-refresh")) return;	// ページ本体がない場合や二重追加を防ぐ
+    if (!document.body || document.body.dataset.page === "index" || document.getElementById("heiko-page-refresh")) return;	// ログイン画面では表示せず、二重追加も防ぐ
 
     const stack = getHeaderActionStack();	// ヘッダー内の操作欄を取得する
     const button = document.createElement("button");	// 更新ボタンを作る
