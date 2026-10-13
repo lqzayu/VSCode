@@ -9,7 +9,7 @@ const RECRUITMENT_DURATION_MINUTES = [15, 30, 45, 60, 120, 180, 240, 300, 360, 4
 const ONLINE_TIMEOUT_MS = 90 * 1000;	// 定数を定義
 const AI_DAILY_LIMIT = 5;	// 定数を定義
 const AI_SESSION_LIMIT = 2;	// 画面で相談完了となる二回目までに制限する
-const USER_SESSION_DURATION_MS = 6 * 60 * 60 * 1000;	// 通常ログインの有効時間を六時間にする
+const USER_SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;	// 「ログイン情報を保存する」を選んだ利用者が再入力なしで使える期間を30日にする
 const SCHOOL_GRADES = ["1年", "2年", "3年"];	// プロフィールで選べる学年を定義する
 const SCHOOL_DEPARTMENTS = ["機械工学科", "電気工学科", "制御工学科", "土木環境工学科", "情報工学科"];	// プロフィールで選べる学科を定義する
 

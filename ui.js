@@ -101,9 +101,77 @@ function installHeikoFooterNavigation() {	// フッターメニューを上部�
     footerLinks.innerHTML = `<a href="main.html?guide=1">使い方</a><a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a><a href="main.html?tab=recruit">募集投稿</a><a href="main.html?tab=search">ユーザーを探す</a><a href="messages.html">メッセージ</a><a href="profile.html">マイページ</a><a href="ai-study.html">AI学習相談</a><a class="heiko-footer-admin" href="admin.html"${isAdmin ? "" : " style=\"display:none\""}>管理者</a>${isLoggedIn ? "<button type=\"button\" class=\"heiko-footer-logout\" onclick=\"if (typeof logout === 'function') { logout(); } else { clearHeikoSession(); location.href='index.html'; } return false;\">ログアウト</button>" : ""}<a href="terms.html">利用規約</a><a href="privacy.html">プライバシーポリシー</a>`;	// 上部ナビと同じ項目を設定する
 }	// フッターナビの統一を閉じる
 const HEIKO_SESSION_KEYS = ["userId", "userEmail", "userName", "profileImage", "userGrade", "userDept", "sessionToken", "adminSessionToken", "adminToken", "isImpersonating", "chatTarget"];	// ログアウト時に消す情報をまとめる
+const HEIKO_REMEMBER_UNTIL_KEY = "heikoRememberUntil";	// 自動ログインの期限を保存する名前を決める
+const HEIKO_SESSION_ONLY_KEY = "heikoSessionOnly";	// タブを閉じるまでのログインを示す名前を決める
+const HEIKO_SESSION_ACTIVE_KEY = "heikoSessionActive";	// 現在のタブでログイン中か示す名前を決める
+const HEIKO_REMEMBER_DAYS = 30;	// 自動ログインを許可する日数を決める
+
 function clearHeikoSession() {	// 外観設定を残してログイン情報だけ消す
     HEIKO_SESSION_KEYS.forEach(key => localStorage.removeItem(key));	// 認証情報を一件ずつ削除する
+    localStorage.removeItem(HEIKO_REMEMBER_UNTIL_KEY);	// 自動ログイン期限を削除する
+    localStorage.removeItem(HEIKO_SESSION_ONLY_KEY);	// タブ限定ログインの印を削除する
+    try {	// sessionStorageの利用を試す
+        sessionStorage.removeItem(HEIKO_SESSION_ACTIVE_KEY);	// 現在のタブのログイン状態を削除する
+    } catch (error) {	// sessionStorageを使えない環境に対応する
+        console.warn("一時ログイン情報を削除できませんでした。", error);	// 削除失敗を記録する
+    }	// sessionStorage処理を閉じる
 }	// 処理のまとまりを閉じる
+
+function hasHeikoAuthCredentials() {	// 自動ログインに必要な情報がそろっているか確認する
+    return Boolean(localStorage.getItem("sessionToken") && (localStorage.getItem("userId") || localStorage.getItem("userEmail")));	// トークンとユーザーIDの有無を返す
+}	// 認証情報確認を閉じる
+
+function isHeikoAuthSessionActive() {	// 現在のログイン情報が利用可能か確認する
+    if (!hasHeikoAuthCredentials()) return false;	// 必要な情報がなければ未ログインとする
+    const rememberUntilText = localStorage.getItem(HEIKO_REMEMBER_UNTIL_KEY);	// 自動ログイン期限を取得する
+    if (rememberUntilText) {	// 自動ログイン設定がある場合に処理する
+        const rememberUntil = Number(rememberUntilText);	// 期限を数値へ変換する
+        if (Number.isFinite(rememberUntil) && rememberUntil > Date.now()) return true;	// 期限内ならログイン状態を使う
+        clearHeikoSession();	// 期限切れや壊れた期限を削除する
+        return false;	// ログイン画面を表示する
+    }	// 自動ログイン期限の確認を閉じる
+    if (localStorage.getItem(HEIKO_SESSION_ONLY_KEY) === "1") {	// タブ限定ログインの場合に処理する
+        try {	// sessionStorageの確認を試す
+            if (sessionStorage.getItem(HEIKO_SESSION_ACTIVE_KEY) === "1") return true;	// 同じタブならログイン状態を使う
+        } catch (error) {	// sessionStorageを使えない環境に対応する
+            clearHeikoSession();	// 安全のためログイン情報を削除する
+            return false;	// ログイン画面を表示する
+        }	// sessionStorage処理を閉じる
+        clearHeikoSession();	// 別のタブや再訪問ではログイン情報を削除する
+        return false;	// ログイン画面を表示する
+    }	// タブ限定ログインの確認を閉じる
+    return true;	// 旧形式の有効なログイン情報は次回ログインまで利用する
+}	// ログイン状態確認を閉じる
+
+function saveHeikoAuthSession(authResult, remember) {	// ログイン結果を保存する
+    if (!authResult || !authResult.email || !authResult.sessionToken) return false;	// 不完全な結果は保存しない
+    localStorage.setItem("userEmail", authResult.email);	// ユーザーIDを保存する
+    localStorage.setItem("userId", authResult.userId || authResult.email);	// ユーザーIDを保存する
+    localStorage.setItem("userName", authResult.name || "");	// 表示名を保存する
+    localStorage.setItem("profileImage", authResult.profileImage || "");	// プロフィール画像を保存する
+    localStorage.setItem("sessionToken", authResult.sessionToken);	// 本人確認トークンを保存する
+    if (authResult.adminToken) localStorage.setItem("adminToken", authResult.adminToken);	// 管理者トークンを保存する
+    else localStorage.removeItem("adminToken");	// 管理者以外の古いトークンを削除する
+    try {	// sessionStorageの利用を試す
+        sessionStorage.setItem(HEIKO_SESSION_ACTIVE_KEY, "1");	// 現在のタブでログイン中と記録する
+    } catch (error) {	// sessionStorageを使えない環境に対応する
+        console.warn("一時ログイン状態を保存できませんでした。", error);	// 保存失敗を記録する
+    }	// sessionStorage処理を閉じる
+    if (remember) {	// 自動ログインを選択した場合に処理する
+        localStorage.setItem(HEIKO_REMEMBER_UNTIL_KEY, String(Date.now() + HEIKO_REMEMBER_DAYS * 24 * 60 * 60 * 1000));	// 30日後の期限を保存する
+        localStorage.removeItem(HEIKO_SESSION_ONLY_KEY);	// タブ限定設定を解除する
+    } else {	// 自動ログインを選択しなかった場合に処理する
+        localStorage.removeItem(HEIKO_REMEMBER_UNTIL_KEY);	// 長期保存の期限を削除する
+        localStorage.setItem(HEIKO_SESSION_ONLY_KEY, "1");	// タブを閉じるまでのログインと記録する
+    }	// 保存期間の設定を閉じる
+    return true;	// 保存成功を返す
+}	// ログイン情報保存を閉じる
+
+window.saveHeikoAuthSession = saveHeikoAuthSession;	// ログイン画面から共通保存処理を使えるようにする
+window.isHeikoAuthSessionActive = isHeikoAuthSessionActive;	// ページの自動ログイン判定に使えるようにする
+isHeikoAuthSessionActive();	// 期限切れのログイン情報をページ表示前に整理する
+const isHeikoLoginPage = /\/index\.html$/.test(window.location.pathname) || /\/$/.test(window.location.pathname);	// ログイン画面のURLか確認する
+if (isHeikoLoginPage && isHeikoAuthSessionActive()) window.location.replace("main.html");	// 有効なログイン情報があれば画面表示前にホームへ移動する
 window.clearHeikoSession = clearHeikoSession;	// 各ページから共通処理を使えるようにする
 function handleHeikoSessionResponse(result) {	// APIからログイン切れが返った場合に処理する
     const message = result && result.status === "error" ? String(result.message || "") : "";	// エラー内容を取得する
@@ -748,6 +816,10 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
 })();	// 利用ログ記録の準備を完了する
 
 document.addEventListener("DOMContentLoaded", () => {	// 画面の読み込み完了後に処理する
+    if (document.body && document.body.dataset.page === "index" && isHeikoAuthSessionActive()) {	// 有効なログイン情報がある場合に処理する
+        window.location.replace("main.html");	// ログイン画面を表示せずホームへ移動する
+        return;	// ログイン画面の初期化を行わず終了する
+    }	// 自動ログイン判定を閉じる
     const selector = document.getElementById("theme-preference");	// 外観設定の選択欄を取得する
     if (selector) selector.value = readThemePreference();	// 保存済みの外観設定を選択欄へ表示する
     installHeikoSharedStyles();	// 共通ボタンのスタイルを読み込む

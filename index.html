@@ -408,6 +408,40 @@
         }
 	/* スタイル定義を閉じる */
 
+        .remember-login-row {
+	/* ログイン情報保存欄を整える */
+            display: flex;
+	/* 内容を横並びにする */
+            align-items: center;
+	/* チェックと文字を中央へそろえる */
+            justify-content: center;
+	/* ログインボタンの中央へ配置する */
+            gap: 8px;
+	/* チェックと文字の間隔を空ける */
+            margin: 0 0 12px;
+	/* ログインボタンとの間隔を作る */
+            color: var(--ui-muted);
+	/* 補助説明と同じ色にする */
+            font-size: 13px;
+	/* 読みやすい文字サイズにする */
+            font-weight: 700;
+	/* 少し見やすく太くする */
+        }
+	/* ログイン情報保存欄の設定を閉じる */
+
+        .remember-login-row input {
+	/* 保存チェック欄を整える */
+            width: 18px;
+	/* 押しやすい大きさにする */
+            height: 18px;
+	/* 押しやすい大きさにする */
+            margin: 0;
+	/* 既定の余白を消す */
+            accent-color: var(--ui-green);
+	/* テーマに合わせてチェック色を変える */
+        }
+	/* 保存チェック欄の設定を閉じる */
+
         #face-login-btn {
 	/* 対象要素のスタイルを始める */
             background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%) !important;
@@ -771,7 +805,7 @@
 	<!-- 外部ファイルを読み込む -->
     <link rel="stylesheet" href="theme.css?v=20261006glass">
 	<!-- 外部ファイルを読み込む -->
-    <script src="ui.js?v=20261013loginrefresh"></script>
+    <script src="ui.js?v=20261013remember30"></script>
 </head>
 	<!-- 要素を閉じる -->
 
@@ -866,6 +900,14 @@
 	<!-- 画面要素を配置 -->
                     <div id="login-section">
 	<!-- 画面要素を配置 -->
+                        <label class="remember-login-row" for="remember-login">
+	<!-- ログイン情報保存の選択欄を表示する -->
+                            <input type="checkbox" id="remember-login">
+	<!-- 30日間の自動ログインを選択する -->
+                            <span>ログイン情報を保存する（30日間）</span>
+	<!-- 保存期間を説明する -->
+                        </label>
+	<!-- ログイン情報保存欄を閉じる -->
                         <button class="btn-submit-primary" onclick="handleLogin()">ログイン</button>
 	<!-- 操作できる要素を配置 -->
                         <button class="btn-flat" onclick="toggleMode('register')">新規登録はこちら</button>
@@ -1823,20 +1865,8 @@
 
                     if (result.status === "success" && result.message.email) {
 	// 条件に応じて処理を分ける
-                        localStorage.setItem("userEmail", result.message.email);
-	// 端末内の保存情報を扱う
-                        localStorage.setItem("userId", result.message.userId || result.message.email);
-	// 端末内の保存情報を扱う
-                        localStorage.setItem("userName", result.message.name || "");
-	// 端末内の保存情報を扱う
-                        localStorage.setItem("profileImage", result.message.profileImage || "");
-	// 端末内の保存情報を扱う
-                        localStorage.setItem("sessionToken", result.message.sessionToken || "");
-	// 通常ユーザー用のログイン情報を保存する
-                        if (result.message.adminToken) localStorage.setItem("adminToken", result.message.adminToken);
-	// 端末内の保存情報を扱う
-                        else localStorage.removeItem("adminToken");
-	// 端末内の保存情報を扱う
+                        saveHeikoAuthSession(result.message, document.getElementById("remember-login").checked);
+	// 選択した期間でログイン情報を保存する
 
                         document.getElementById('auth-status').innerText =
 	// 処理を続ける
@@ -1902,20 +1932,8 @@
 
                 if (result.status === "success") {
 	// 条件に応じて処理を分ける
-                    localStorage.setItem("userEmail", result.message.email);
-	// 端末内の保存情報を扱う
-                    localStorage.setItem("userId", result.message.userId || result.message.email);
-	// 端末内の保存情報を扱う
-                    localStorage.setItem("userName", result.message.name || "");
-	// 端末内の保存情報を扱う
-                    localStorage.setItem("profileImage", result.message.profileImage || "");
-	// 端末内の保存情報を扱う
-                    localStorage.setItem("sessionToken", result.message.sessionToken || "");
-	// 通常ユーザー用のログイン情報を保存する
-                    if (result.message.adminToken) localStorage.setItem("adminToken", result.message.adminToken);
-	// 端末内の保存情報を扱う
-                    else localStorage.removeItem("adminToken");
-	// 端末内の保存情報を扱う
+                    saveHeikoAuthSession(result.message, document.getElementById("remember-login").checked);
+	// 選択した期間でログイン情報を保存する
 
                     updateMsg("ログイン成功", "success");
 	// 処理を完了する
