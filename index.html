@@ -866,6 +866,24 @@
 	<!-- 外部ファイルを読み込む -->
     <link rel="stylesheet" href="theme.css?v=20261006glass">
 	<!-- 外部ファイルを読み込む -->
+    <style>
+        /* 共通テーマより後に置き、Safariでも保存チェックの状態を必ず表示する */
+        #remember-login:checked + .remember-login-checkmark {
+            background: #0ea5e9 !important;
+            border-color: #38bdf8 !important;
+            color: transparent !important;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22) !important;
+        }
+
+        #remember-login:checked + .remember-login-checkmark::after {
+            content: "✓";
+            color: #ffffff !important;
+            font-size: 17px;
+            font-weight: 900;
+            line-height: 1;
+            transform: translateY(-1px);
+        }
+    </style>
     <script src="ui.js?v=20261013remember30"></script>
 </head>
 	<!-- 要素を閉じる -->
