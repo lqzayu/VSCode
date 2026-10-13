@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">	<!-- 表示環境を設定 -->
     <title>チャット - 平工マッチング</title>	<!-- ページタイトルを設定 -->
     <link rel="icon" href="icon-192.png">	<!-- 外部ファイルを読み込む -->
+    <link rel="manifest" href="manifest.json">	<!-- PWAとしてホーム画面へ追加できるようにする -->
+    <meta name="theme-color" content="#254f3d">
+    <link rel="apple-touch-icon" href="icon-192.png">
 
     <style>
         body {	/* 対象要素のスタイルを始める */
@@ -538,7 +541,7 @@
             }
         }
     </style>
-    <script src="ui.js?v=20261012darkcard"></script>
+    <script src="ui.js?v=20261013footerpwa"></script>
     <script src="online.js?v=20260917b" defer></script>
     <script>window.HEIKO_FIREBASE_CHAT_ENABLED = true;</script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>

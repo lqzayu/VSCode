@@ -34,6 +34,72 @@ function applyThemePreference(value, save = true) {	// 外観設定を画面へ�
 applyThemePreference(readThemePreference(), false);	// ページ表示前に外観設定を反映する
 window.applyThemePreference = applyThemePreference;	// ページ側から外観設定を変更できるようにする
 window.getThemePreference = readThemePreference;	// ページ側から外観設定を確認できるようにする
+let heikoDeferredInstallPrompt = null;	// PWAインストール確認を一時的に保持する
+window.addEventListener("beforeinstallprompt", event => {	// ブラウザのインストール案内を受け取る
+    event.preventDefault();	// 自動表示を止めてマイページのボタンから表示する
+    heikoDeferredInstallPrompt = event;	// 後でボタンから呼び出せるように保存する
+    updateHeikoPwaInstallButton();	// ボタンをインストール可能な状態へ更新する
+});	// PWA案内の受け取りを終える
+window.addEventListener("appinstalled", () => {	// PWAがインストールされた場合に処理する
+    heikoDeferredInstallPrompt = null;	// 使用済みの案内を破棄する
+    updateHeikoPwaInstallButton(true);	// インストール済み表示へ更新する
+});	// インストール完了処理を終える
+
+function isHeikoPwaStandalone() {	// PWAとして起動中か確認する
+    return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;	// iOSと通常ブラウザの両方に対応する
+}	// PWA起動状態の確認を閉じる
+
+function updateHeikoPwaInstallButton(installed = false) {	// PWAボタンの表示状態を更新する
+    const button = document.getElementById("heiko-pwa-install-button");	// PWAボタンを取得する
+    const hint = document.getElementById("heiko-pwa-install-hint");	// PWA案内文を取得する
+    if (!button) return;	// マイページ以外では終了する
+    if (installed || isHeikoPwaStandalone()) {	// すでにアプリとして起動中の場合に処理する
+        button.disabled = true;	// インストールボタンを無効にする
+        button.textContent = "ホーム画面に追加済み";	// 完了状態を表示する
+        if (hint) hint.textContent = "このサービスはアプリとして起動できます。";	// 完了案内を表示する
+        return;	// 表示更新を終える
+    }	// インストール済み判定を閉じる
+    button.disabled = false;	// ボタンを有効にする
+    button.textContent = "ホーム画面に追加";	// ボタンの標準表示を設定する
+    if (hint && heikoDeferredInstallPrompt) hint.textContent = "この端末のホーム画面からすぐに開けます。";	// 直接インストールできる場合の案内を表示する
+}	// PWAボタン表示更新を閉じる
+
+async function requestHeikoPwaInstall() {	// PWAの追加操作を開始する
+    if (isHeikoPwaStandalone()) return;	// すでに追加済みなら何もしない
+    if (heikoDeferredInstallPrompt) {	// ブラウザがインストール案内を提供している場合に処理する
+        heikoDeferredInstallPrompt.prompt();	// インストール確認を表示する
+        await heikoDeferredInstallPrompt.userChoice;	// 利用者の選択を待つ
+        heikoDeferredInstallPrompt = null;	// 一度使った案内を破棄する
+        updateHeikoPwaInstallButton();	// 選択後の状態へ更新する
+        return;	// 操作を終える
+    }	// ブラウザ標準案内の処理を閉じる
+    const isAppleMobile = /iPhone|iPad|iPod/i.test(navigator.userAgent);	// iPhoneやiPadか確認する
+    const hint = document.getElementById("heiko-pwa-install-hint");	// 案内文を取得する
+    if (hint) hint.textContent = isAppleMobile ? "Safariの共有ボタンから「ホーム画面に追加」を選択してください。" : "ブラウザのメニューから「ホーム画面に追加」または「アプリをインストール」を選択してください。";	// 手動追加方法を表示する
+}	// PWA追加操作を閉じる
+
+function installHeikoPwaSupport() {	// PWAの共通準備を行う
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(error => console.warn("PWA準備に失敗しました。", error));	// すべてのページでサービスワーカーを登録する
+    if (!document.body || document.body.dataset.page !== "profile") return;	// ボタンはマイページだけに表示する
+    if (document.getElementById("heiko-pwa-install-card")) return;	// 二重追加を防ぐ
+    const appearance = document.querySelector(".appearance-settings");	// 外観設定カードを取得する
+    if (!appearance) return;	// 追加位置がない場合は終了する
+    const card = document.createElement("section");	// PWA案内カードを作る
+    card.id = "heiko-pwa-install-card";	// カードを識別する
+    card.className = "heiko-pwa-install-card";	// 共通スタイルを適用する
+    card.setAttribute("aria-labelledby", "heiko-pwa-install-title");	// 読み上げ用の見出しを設定する
+    card.innerHTML = "<div><span class=\"heiko-pwa-kicker\">QUICK ACCESS</span><h3 id=\"heiko-pwa-install-title\">ホーム画面からすぐに開く</h3><p id=\"heiko-pwa-install-hint\">スマホのホーム画面に追加すると、アプリのように使えます。</p></div><button type=\"button\" id=\"heiko-pwa-install-button\" onclick=\"requestHeikoPwaInstall()\">ホーム画面に追加</button>";	// PWA案内の内容を設定する
+    appearance.insertAdjacentElement("afterend", card);	// 外観設定の下へ表示する
+    updateHeikoPwaInstallButton();	// 初期状態を反映する
+}	// PWA共通準備を閉じる
+
+function installHeikoFooterNavigation() {	// フッターメニューを上部ナビとそろえる
+    const footerLinks = document.querySelector(".footer-links");	// フッターメニューを取得する
+    if (!footerLinks) return;	// フッターがないページでは終了する
+    const isLoggedIn = Boolean(localStorage.getItem("sessionToken") && (localStorage.getItem("userId") || localStorage.getItem("userEmail")));	// ログイン状態を確認する
+    const isAdmin = localStorage.getItem("userId") === "admin" && localStorage.getItem("isImpersonating") !== "true";	// 管理者表示条件を確認する
+    footerLinks.innerHTML = `<a href="main.html?guide=1">使い方</a><a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a><a href="main.html?tab=recruit">募集投稿</a><a href="main.html?tab=search">ユーザーを探す</a><a href="messages.html">メッセージ</a><a href="profile.html">マイページ</a><a href="ai-study.html">AI学習相談</a><a class="heiko-footer-admin" href="admin.html"${isAdmin ? "" : " style=\"display:none\""}>管理者</a>${isLoggedIn ? "<button type=\"button\" class=\"heiko-footer-logout\" onclick=\"if (typeof logout === 'function') { logout(); } else { clearHeikoSession(); location.href='index.html'; } return false;\">ログアウト</button>" : ""}<a href="terms.html">利用規約</a><a href="privacy.html">プライバシーポリシー</a>`;	// 上部ナビと同じ項目を設定する
+}	// フッターナビの統一を閉じる
 const HEIKO_SESSION_KEYS = ["userId", "userEmail", "userName", "profileImage", "userGrade", "userDept", "sessionToken", "adminSessionToken", "adminToken", "isImpersonating", "chatTarget"];	// ログアウト時に消す情報をまとめる
 function clearHeikoSession() {	// 外観設定を残してログイン情報だけ消す
     HEIKO_SESSION_KEYS.forEach(key => localStorage.removeItem(key));	// 認証情報を一件ずつ削除する
@@ -174,6 +240,100 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
         .navbar > .nav-links {
             margin-left: auto;
             justify-content: flex-end;
+        }
+        .navbar .nav-guide-button {
+            font-family: inherit;
+            font-size: inherit;
+            font-weight: inherit;
+            line-height: inherit;
+        }
+        .navbar .nav-item#nav-admin-btn,
+        [data-page="admin"] .navbar .nav-item.active {
+            color: #dc2626 !important;
+        }
+        .navbar .nav-item#nav-admin-btn:hover,
+        [data-page="admin"] .navbar .nav-item.active:hover {
+            color: #b91c1c !important;
+        }
+        .footer-links {
+            align-items: center;
+            gap: 10px 18px !important;
+        }
+        .footer-links a,
+        .footer-links button {
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+        .footer-links .heiko-footer-admin {
+            color: #dc2626 !important;
+        }
+        .footer-links .heiko-footer-admin:hover {
+            color: #b91c1c !important;
+        }
+        .heiko-footer-logout {
+            appearance: none;
+            border: 0;
+            border-radius: 8px;
+            padding: 4px 8px;
+            background: transparent;
+            color: var(--ui-muted, #64748b);
+            cursor: pointer;
+        }
+        .heiko-footer-logout:hover {
+            color: var(--ui-green, #07828a);
+            background: var(--ui-soft, rgba(28, 189, 197, .08));
+        }
+        .heiko-pwa-install-card {
+            display: grid;
+            gap: 14px;
+            margin-top: 20px;
+            padding: 18px;
+            border: 1px solid var(--ui-line, rgba(28, 189, 197, .2));
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--glass-surface-strong, rgba(255, 255, 255, .82)), var(--glass-surface, rgba(255, 254, 251, .66)));
+            box-shadow: var(--glass-shadow, 0 12px 30px rgba(36, 60, 50, .08));
+            text-align: left;
+        }
+        .heiko-pwa-kicker {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--ui-green, #07828a);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .14em;
+        }
+        .heiko-pwa-install-card h3 {
+            margin: 0 0 5px;
+            color: var(--ui-ink, #243c32);
+            font-size: 16px;
+        }
+        .heiko-pwa-install-card p {
+            margin: 0;
+            color: var(--ui-muted, #66736a);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        #heiko-pwa-install-button {
+            min-height: 44px;
+            border: 1px solid rgba(125, 211, 252, .48);
+            border-radius: 12px;
+            background: linear-gradient(135deg, #1689b5, #355fca);
+            color: #fff;
+            font: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 9px 18px rgba(9, 27, 70, .2);
+        }
+        #heiko-pwa-install-button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.06);
+        }
+        #heiko-pwa-install-button:disabled {
+            opacity: .7;
+            cursor: default;
         }
         .navbar > .hamburger-btn {
             align-self: center;
@@ -593,6 +753,8 @@ document.addEventListener("DOMContentLoaded", () => {	// 画面の読み込み�
     installHeikoSharedStyles();	// 共通ボタンのスタイルを読み込む
     installPageRefreshButton();	// ページ上部へ更新ボタンを追加する
     installRecruitmentPostButton();	// ヘッダーがある各ページへ募集投稿ボタンを追加する
+    installHeikoPwaSupport();	// PWAの登録とマイページの追加ボタンを準備する
+    installHeikoFooterNavigation();	// フッターメニューを上部ナビと統一する
     if (document.body && document.body.dataset.page === "main") {	// ホーム画面だけ先読みを開始する
         if ("requestIdleCallback" in window) {	// ブラウザが待機時間を通知できる場合に処理する
             window.requestIdleCallback(prefetchHeikoPages, { timeout: 3000 });	// 初期通信が落ち着いてから先読みする
