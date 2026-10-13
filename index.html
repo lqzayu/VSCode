@@ -938,24 +938,24 @@
 
             <div class="input-group">
 	<!-- 画面要素を配置 -->
-                <input type="text" id="login-userid" maxlength="64" placeholder="ユーザID（顔認証にも使用）" onkeypress="handleKeyPress(event)">
+                <input type="text" id="login-userid" name="username" maxlength="64" placeholder="ユーザID（顔認証にも使用）" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" onkeypress="handleKeyPress(event)">
 	<!-- 入力要素を配置 -->
 
                 <div class="name-wrapper" id="name-wrapper">
 	<!-- 画面要素を配置 -->
-                    <input type="text" id="display-name" maxlength="50" placeholder="表示名（ニックネーム）">
+                    <input type="text" id="display-name" name="nickname" maxlength="50" placeholder="表示名（ニックネーム）" autocomplete="nickname">
 	<!-- 入力要素を配置 -->
                 </div>
 	<!-- 要素を閉じる -->
                 <div class="name-wrapper" id="reg-email-wrapper">
 	<!-- 画面要素を配置 -->
-                    <input type="text" id="reg-email" maxlength="254" placeholder="メールアドレス（認証コード送信用）" inputmode="email">
+                    <input type="email" id="reg-email" name="email" maxlength="254" placeholder="メールアドレス（認証コード送信用）" autocomplete="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false">
 	<!-- 入力要素を配置 -->
                 </div>
 	<!-- 要素を閉じる -->
 
                 <div class="password-wrapper">	<!-- 画面要素を配置 -->
-                    <input type="password" id="password" placeholder="パスワード" class="password-input" maxlength="128" autocomplete="new-password"
+                    <input type="password" id="password" name="password" placeholder="パスワード" class="password-input" maxlength="128" autocomplete="current-password"
                         onkeypress="handleKeyPress(event)">
                     <button type="button" id="toggle-password" onclick="togglePasswordVisibility()"
                         class="toggle-password-btn">表示</button>
@@ -963,7 +963,7 @@
 	<!-- 要素を閉じる -->
 
                 <div class="confirm-password-wrapper">	<!-- 画面要素を配置 -->
-                    <input type="password" id="confirm-password" placeholder="パスワード（確認）" class="confirm-password-input" maxlength="128" autocomplete="new-password">	<!-- 入力要素を配置 -->
+                    <input type="password" id="confirm-password" name="confirm-password" placeholder="パスワード（確認）" class="confirm-password-input" maxlength="128" autocomplete="new-password">	<!-- 入力要素を配置 -->
                     <button type="button" id="toggle-confirm" onclick="toggleconfirmVisibility()"
                         class="toggle-confirm-btn">表示</button>
                 </div>	<!-- 要素を閉じる -->
@@ -1703,6 +1703,8 @@
 	// 定数を定義
             const authStatus = document.getElementById("auth-status");	// 定数を定義
             const loginUserId = document.getElementById("login-userid");	// 定数を定義
+            const passwordInput = document.getElementById("password");	// 定数を定義
+            const confirmPasswordInput = document.getElementById("confirm-password");	// 定数を定義
             const passwordRuleNote = document.getElementById("password-rule-note");	// 定数を定義
 
             msg.innerText = "";
@@ -1724,6 +1726,8 @@
 	// 処理を続ける
                 confirmWrapper.style.display = "flex";	// 処理を続ける
                 passwordRuleNote.style.display = "block";	// 処理を続ける
+                passwordInput.setAttribute("autocomplete", "new-password");
+                confirmPasswordInput.setAttribute("autocomplete", "new-password");
 
                 loginSec.style.display = "none";
 	// 処理を続ける
@@ -1751,6 +1755,8 @@
 	// 処理を続ける
                 confirmWrapper.style.display = "none";	// 処理を続ける
                 passwordRuleNote.style.display = "none";	// 処理を続ける
+                passwordInput.setAttribute("autocomplete", "current-password");
+                confirmPasswordInput.setAttribute("autocomplete", "new-password");
 
                 loginSec.style.display = "block";
 	// 処理を続ける
