@@ -428,52 +428,74 @@
 	/* 少し見やすく太くする */
 	            cursor: pointer;
 	/* 文字部分を押しても選択できることを示す */
+	            position: relative;
+	/* 見た目用のチェック欄を配置する基準にする */
         }
 	/* ログイン情報保存欄の設定を閉じる */
 
         .remember-login-row input {
-	/* 保存チェック欄を整える */
-            appearance: none;
-	/* ブラウザごとの標準表示をそろえる */
-            -webkit-appearance: none;
-	/* Safariでも表示をそろえる */
+	/* 実際の入力欄はアクセシビリティを保ったまま隠す */
+            position: absolute;
+	/* 見た目用の欄と重ならないようにする */
+            width: 1px !important;
+	/* 共通入力欄の幅指定を無効にする */
+            height: 1px !important;
+	/* 共通入力欄の高さ指定を無効にする */
+            padding: 0 !important;
+	/* 共通入力欄の余白を無効にする */
+            margin: 0 !important;
+	/* 共通入力欄の余白を無効にする */
+            opacity: 0;
+	/* 見た目は専用の要素へ任せる */
+            clip-path: inset(50%);
+	/* 画面には表示しない */
+        }
+
+        .remember-login-checkmark {
+	/* チェック状態を表示する専用の欄 */
+            display: inline-grid;
+	/* レ点を中央へ置く */
+            place-items: center;
+	/* レ点を中央へ置く */
             width: 20px;
 	/* 押しやすい大きさにする */
             height: 20px;
 	/* 押しやすい大きさにする */
-            margin: 0;
-	/* 既定の余白を消す */
+            flex: 0 0 20px;
+	/* 文字に押されて縮まないようにする */
             border: 2px solid var(--ui-muted);
 	/* 未選択状態でも枠を見えるようにする */
             border-radius: 5px;
-	/* チェック欄の角を整える */
+	/* 角を整える */
+            box-sizing: border-box;
+	/* サイズに枠を含める */
+            color: transparent;
+	/* 未選択時はレ点を隠す */
             background: var(--ui-paper);
-	/* 未選択状態の背景をテーマに合わせる */
-            flex: 0 0 20px;
-	/* 文字に押されて縮まないようにする */
-            cursor: pointer;
-	/* チェック欄を押せることを示す */
-            transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+	/* テーマに合わせた背景にする */
+            font-size: 16px;
+	/* レ点を読みやすい大きさにする */
+            font-weight: 900;
+	/* レ点を太くする */
+            line-height: 1;
+	/* レ点の上下位置を整える */
+            transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
 	/* 選択状態をなめらかに切り替える */
         }
 
-        .remember-login-row input:checked {
+        .remember-login-row input:checked + .remember-login-checkmark {
 	/* チェック済み状態を明確にする */
-            background-color: var(--ui-green) !important;
+            background: var(--ui-green) !important;
 	/* テーマ色で塗りつぶす */
             border-color: var(--ui-green) !important;
 	/* 枠も同じ色にする */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M4 10.5 8.2 15 16 5.5' fill='none' stroke='white' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
-	/* 白いレ点を常に表示する */
-            background-repeat: no-repeat;
-	/* レ点の繰り返しを防ぐ */
-            background-position: center;
-	/* レ点を中央へ配置する */
-            background-size: 17px 17px;
-	/* レ点を見やすい大きさにする */
+            color: #ffffff;
+	/* 白いレ点を表示する */
+            transform: scale(1.06);
+	/* 選択時に少しだけ強調する */
         }
 
-        .remember-login-row input:focus-visible {
+        .remember-login-row input:focus-visible + .remember-login-checkmark {
 	/* キーボード操作時の選択位置を示す */
             outline: 3px solid color-mix(in srgb, var(--ui-green) 35%, transparent);
 	/* ダークモードでも見えるフォーカス表示 */
@@ -943,6 +965,8 @@
 	<!-- ログイン情報保存の選択欄を表示する -->
                             <input type="checkbox" id="remember-login">
 	<!-- 30日間の自動ログインを選択する -->
+                            <span class="remember-login-checkmark" aria-hidden="true">✓</span>
+	<!-- 選択状態をSafariでも明確に表示する -->
                             <span>ログイン情報を保存する（30日間）</span>
 	<!-- 保存期間を説明する -->
                         </label>
