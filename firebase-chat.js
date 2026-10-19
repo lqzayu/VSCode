@@ -129,7 +129,7 @@
         const emit = () => emitMessages(state, onChange);
         const chatHandler = snapshot => {
             state.messages = [];
-            snapshot.forEach(child => state.messages.push(normalizeMessage(child)));
+            snapshot.forEach(child => { state.messages.push(normalizeMessage(child)); });
             emit();
         };
         const hiddenHandler = snapshot => {
@@ -202,7 +202,7 @@
         if (!database) return [];
         const snapshot = await database.ref(getConversationPath(firstUser, secondUser)).once("value");
         const messages = [];
-        snapshot.forEach(child => messages.push(normalizeMessage(child)));
+        snapshot.forEach(child => { messages.push(normalizeMessage(child)); });
         return messages.sort((a, b) => a.sentAt - b.sentAt);
     }
 
@@ -212,7 +212,7 @@
         if (!database) return [];
         const snapshot = await database.ref("inbox/" + getFirebaseUid(userId)).once("value");
         const messages = [];
-        snapshot.forEach(child => messages.push(normalizeMessage(child)));
+        snapshot.forEach(child => { messages.push(normalizeMessage(child)); });
         return messages.sort((a, b) => b.sentAt - a.sentAt);
     }
 
@@ -222,7 +222,7 @@
         const inboxRef = database.ref("inbox/" + getFirebaseUid(userId));
         const handler = snapshot => {
             const messages = [];
-            snapshot.forEach(child => messages.push(normalizeMessage(child)));
+            snapshot.forEach(child => { messages.push(normalizeMessage(child)); });
             onChange(messages.sort((a, b) => b.sentAt - a.sentAt));
         };
         inboxRef.on("value", handler, onError);
