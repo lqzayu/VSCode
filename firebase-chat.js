@@ -216,6 +216,19 @@
         return messages.sort((a, b) => b.sentAt - a.sentAt);
     }
 
+    function subscribeInbox(userId, onChange, onError) {
+        const database = getDatabase();
+        if (!database) return () => {};
+        const inboxRef = database.ref("inbox/" + getFirebaseUid(userId));
+        const handler = snapshot => {
+            const messages = [];
+            snapshot.forEach(child => messages.push(normalizeMessage(child)));
+            onChange(messages.sort((a, b) => b.sentAt - a.sentAt));
+        };
+        inboxRef.on("value", handler, onError);
+        return () => inboxRef.off("value", handler);
+    }
+
     // Firebase側の未読メッセージを既読へ更新します。
     async function markAsRead(firstUser, secondUser) {
         const database = getDatabase();
@@ -238,7 +251,13 @@
     async function unsendMessage(firstUser, secondUser, messageId) {
         const database = getDatabase();
         if (!database) throw new Error("Firebaseが利用できません");
-        const messageKey = encodeKey(messageId);
+        const snapshot = await database.ref(getConversationPath(firstUser, secondUser)).once("value");
+        let messageKey = null;
+        snapshot.forEach(child => {
+            const message = child.val() || {};
+            if (String(message.messageId || child.key) === String(messageId) && message.fromUid === getFirebaseUid(firstUser)) messageKey = child.key;
+        });
+        if (!messageKey) throw new Error("取り消せるメッセージが見つかりません");
         const basePath = getConversationPath(firstUser, secondUser) + "/" + messageKey;
         const value = { text: "このメッセージは送信取り消しされました。", isUnsent: true, isRead: true };
         const updates = {};
@@ -269,6 +288,7 @@
         sendText,
         readOnce,
         readInbox,
+        subscribeInbox,
         markAsRead,
         unsendMessage,
         hideConversation

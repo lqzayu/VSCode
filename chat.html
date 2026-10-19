@@ -547,7 +547,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-    <script src="firebase-chat.js?v=20261008chatfix"></script>
+    <script src="firebase-chat.js?v=20261019qa"></script>
 </head>	<!-- 要素を閉じる -->
 
 <body data-page="chat">	<!-- 画面要素を配置 -->
@@ -724,7 +724,8 @@
                 const previous = merged.get(String(message.messageId));	// 既存メッセージを取得する
                 merged.set(String(message.messageId), previous && previous.storage === "firebase" ? previous : message);	// Firebase側の最新値を優先する
             });	// 統合処理を閉じる
-            return Array.from(merged.values()).sort((a, b) => Number(a.sentAt || 0) - Number(b.sentAt || 0));	// 時刻順で返す
+            const timestamp = value => typeof value === "number" ? value : (Date.parse(value) || 0);
+            return Array.from(merged.values()).sort((a, b) => timestamp(a.sentAt) - timestamp(b.sentAt));	// ISO日時のGAS履歴も時刻順に統合する
         }	// メッセージ統合を閉じる
 
         function renderMessages(messages) {	// メッセージ一覧を画面へ描画する
@@ -1221,7 +1222,7 @@
                 try {	// 通信失敗に備える
                     const result = await postChat({ mode: "getMessages", user1: myEmail, user2: targetEmail });	// GASから画像付き履歴を取得する
                     if (result.status !== "success") return;	// 失敗時は表示を変えない
-                    gasMessages = Array.isArray(result.message) ? result.message.map(message => ({ ...message, storage: "gas" })) : [];	// GASの履歴を保存する
+                    gasMessages = Array.isArray(result.message) ? result.message.map(message => ({ ...message, to: message.from === myEmail ? targetEmail : myEmail, storage: "gas" })) : [];	// GASの履歴に受信先も補って既読処理へ渡す
                     const messages = mergeMessages(gasMessages, firebaseMessages);	// 二つの保存先をまとめる
                     if (messages.some(message => message.to === myEmail && !message.isRead && !message.isUnsent)) markAsRead();	// 受信メッセージを既読にする
                     renderMessages(messages);	// 最新の一覧を描画する
@@ -1348,11 +1349,7 @@
 
         function scheduleChatPoll() {	// 関数を定義
             clearTimeout(chatPollTimer);	// 処理を完了する
-            if (firebaseReady) {	// Firebase接続中はリアルタイム購読だけを使う
-                chatPollTimer = null;	// Firebaseのリアルタイム購読を使う
-                return;	// 不要なGAS再読込を行わない
-            }	// Firebase接続中の処理を終える
-            const pollInterval = 8000;	// Firebase停止時だけGASの再確認を行う
+            const pollInterval = firebaseReady ? 10000 : 8000;	// Firebase接続中もGASに保存される画像・切替後の本文を取得する
             chatPollTimer = setTimeout(async () => {	// 時間を置いて処理する
                 if (document.visibilityState === "visible") {	// 条件に応じて処理を分ける
                     await loadMessages();	// 処理を完了する

@@ -421,7 +421,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-    <script src="firebase-chat.js?v=20261008chatfix"></script>
+    <script src="firebase-chat.js?v=20261019qa"></script>
 </head>	<!-- 要素を閉じる -->
 
 <body data-page="messages">	<!-- 画面要素を配置 -->
@@ -497,6 +497,10 @@
         let unreadPollTimer = null;	// 未読確認の定期処理を保持する
         let firebaseReady = false;	// Firebase一覧が利用可能かを保持する
         let firebaseInbox = [];	// Firebaseから取得した受信箱を保持する
+        let firebaseInboxUnsubscribe = null;
+        let cachedGasPartners = [];
+        let lastPartnerSignature = "";
+        let gasUnreadCount = 0;
         const partnerNameCache = new Map();	// 相手の表示名を一時保存する
         const legacyChatTarget = localStorage.getItem("chatTarget") || "";	// 旧形式の会話を復元する相手を保持する
 
@@ -550,6 +554,7 @@
                     firebaseInbox = Array.from(messageMap.values()).sort((a, b) => Number(b.sentAt || 0) - Number(a.sentAt || 0));	// 復元後の受信箱を新しい順に並べる
                 }
                 firebaseReady = true;	// Firebase一覧を利用可能にする
+                startFirebaseInboxSubscription();
                 return true;	// 初期化成功を返す
             } catch (error) {	// Firebaseが利用できない場合に処理する
                 firebaseReady = false;	// GAS一覧を使い続ける
@@ -557,6 +562,27 @@
                 return false;	// 初期化失敗を返す
             }	// 初期化処理を閉じる
         }	// Firebase受信箱初期化を閉じる
+
+        function startFirebaseInboxSubscription() {
+            if (firebaseInboxUnsubscribe || !firebaseReady) return;
+            const userId = localStorage.getItem("userEmail");
+            firebaseInboxUnsubscribe = window.HeikoFirebaseChat.subscribeInbox(userId, messages => {
+                firebaseInbox = messages;
+                const list = document.getElementById("partner-list");
+                renderPartnerList(cachedGasPartners, list);
+                enrichPartnerNames(cachedGasPartners, list);
+                renderUnreadBadge();
+            }, error => console.warn("Firebase受信箱の購読エラー:", error));
+        }
+
+        function renderUnreadBadge() {
+            const badge = document.getElementById("unread-badge");
+            if (!badge) return;
+            const userId = localStorage.getItem("userEmail");
+            const count = gasUnreadCount + firebaseInbox.filter(message => message.to === userId && !message.isRead && !message.isUnsent).length;
+            badge.innerText = count > 99 ? "99+" : String(count);
+            badge.style.display = count > 0 ? "inline-block" : "none";
+        }
 
         function mergePartnerLists(gasPartners, firebaseMessages) {	// GASとFirebaseの相手一覧をまとめる
             const map = new Map();	// 相手ごとの最新情報を保持する
@@ -631,6 +657,9 @@
 
         function renderPartnerList(gasPartners, listDiv) {	// GASとFirebaseをまとめて相手一覧を描画する
             const partners = mergePartnerLists(gasPartners, firebaseInbox);	// 二つの保存先から相手をまとめる
+            const signature = JSON.stringify(partners);
+            if (signature === lastPartnerSignature) return;
+            lastPartnerSignature = signature;
             listDiv.innerHTML = "";	// 読み込み表示を消す
             if (partners.length === 0) {	// 相手がいない場合に案内する
                 listDiv.innerHTML = `<div class="empty-message">メッセージはまだありません。<br>ホーム画面から気になる人にチャットを送ってみましょう！</div>`;	// 空の状態を表示する
@@ -681,13 +710,13 @@
         async function loadChatPartnersOnce() {	// FirebaseとGASの一覧取得を並行して始める
             const myEmail = localStorage.getItem("userEmail");	// ログイン中のユーザーIDを取得する
             const listDiv = document.getElementById("partner-list");	// 一覧の表示先を取得する
-            let gasPartners = [];	// GASから取得した相手を保持する
+            let gasPartners = cachedGasPartners;	// 表示済みの一覧を維持する
             let hasRendered = false;	// どちらかの一覧を表示できたか保持する
-            listDiv.innerHTML = `<div class="loading-box"><div class="spinner"></div><span>データを読み込み中...</span></div>`;	// 読み込み中の表示へ切り替える
+            if (!lastPartnerSignature) listDiv.innerHTML = `<div class="loading-box"><div class="spinner"></div><span>データを読み込み中...</span></div>`;	// 初回だけ読み込み表示を出す
 
             const firebaseTask = (async () => {	// Firebase一覧を待たずに取得する
                 try {	// Firebase通信の失敗に備える
-                    if (firebaseReady) firebaseInbox = await window.HeikoFirebaseChat.readInbox(myEmail);	// 認証済みなら最新の受信箱を読む
+                    if (firebaseReady && !firebaseInboxUnsubscribe) firebaseInbox = await window.HeikoFirebaseChat.readInbox(myEmail);	// 購読中はリアルタイムの値を維持する
                     else await setupFirebaseInbox();	// 初回だけFirebaseを初期化する
                     if (firebaseReady) {	// Firebase一覧を取得できた場合に表示する
                         renderPartnerList(gasPartners, listDiv);	// 取得できた一覧をすぐ描画する
@@ -703,6 +732,7 @@
                 const result = await withDeadline(postGas({ mode: "getChatPartners", email: myEmail }, 10000), 10000, "GAS一覧の取得が時間切れになりました");	// GAS一覧をFirebaseと同時に取得する
                 if (result.status !== "success") throw new Error(result.message || "一覧を取得できませんでした");	// GASのエラー応答を失敗として扱う
                 gasPartners = Array.isArray(result.message) ? result.message : [];	// GASの相手一覧を保存する
+                cachedGasPartners = gasPartners;
                 renderPartnerList(gasPartners, listDiv);	// Firebase分とまとめて描画する
                 enrichPartnerNames(gasPartners, listDiv);	// 表示名を背景で補完する
                 hasRendered = true;	// 表示済みとして記録する
@@ -736,14 +766,8 @@
                     const result = await postGas({ mode: "getUnreadCount", email: myEmail });	// 定数を定義
 
                     if (result.status === "success" && result.message) {	// 条件に応じて処理を分ける
-                        const firebaseUnread = firebaseInbox.filter(message => message.to === myEmail && !message.isRead && !message.isUnsent).length;	// Firebase側の未読数を数える
-                        const count = (result.message.unreadCount || 0) + firebaseUnread;	// GASとFirebaseの未読数を合計する
-                        if (count > 0) {	// 条件に応じて処理を分ける
-                            badge.innerText = count > 99 ? "99+" : count;	// 処理を続ける
-                            badge.style.display = "inline-block";	// 処理を続ける
-                        } else {	// 処理のまとまりを始める
-                            badge.style.display = "none";	// 処理を続ける
-                        }	// 処理のまとまりを閉じる
+                        gasUnreadCount = Number(result.message.unreadCount) || 0;
+                        renderUnreadBadge();
                     }	// 処理のまとまりを閉じる
                 } catch (e) {	// 処理のまとまりを始める
                     console.error("未読チェックエラー:", e);	// 処理を完了する
@@ -796,8 +820,11 @@
         function startUnreadPoll() {	// 未読確認を開始する
             if (unreadPollTimer) return;	// 二重開始を防ぐ
             unreadPollTimer = setInterval(() => {	// 定期処理を登録する
-                if (document.visibilityState === "visible") updateUnreadBadge();	// 表示中だけ確認する
-            }, 60000);	// Firebase一覧を優先してGAS確認は一分ごとにまとめる
+                if (document.visibilityState === "visible") {
+                    loadChatPartners();
+                    updateUnreadBadge();
+                }
+            }, 15000);	// GAS画像・フォールバックの新着も表示を維持したまま確認する
         }	// 処理のまとまりを閉じる
 
         function stopUnreadPoll() {	// 未読確認を停止する
@@ -813,9 +840,14 @@
                 stopUnreadPoll();	// 不要な通信を止める
             }	// 表示状態の確認を閉じる
         });	// 監視処理を登録する
-        window.addEventListener("pagehide", stopUnreadPoll);	// ページを離れた時に通信を止める
+        window.addEventListener("pagehide", () => {
+            stopUnreadPoll();
+            if (firebaseInboxUnsubscribe) firebaseInboxUnsubscribe();
+            firebaseInboxUnsubscribe = null;
+        });
         window.addEventListener("pageshow", event => {	// 履歴から戻った場合に処理する
             if (event.persisted) {	// 画面が復元された場合だけ更新する
+                startFirebaseInboxSubscription();
                 loadChatPartners();	// 一覧を更新する
                 updateUnreadBadge();	// 未読数を更新する
                 startUnreadPoll();	// 定期確認を再開する
