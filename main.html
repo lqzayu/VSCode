@@ -1669,15 +1669,23 @@
             if (schoolSummary) schoolSummary.textContent = grade && dept ? `学年・学科：${grade} / ${dept}` : "学年・学科はマイページで設定してください。";	// 学年と学科の設定状況を表示する
         }	// 処理のまとまりを閉じる
 
-        async function refreshUserProfile(userId) {	// 関数を定義
-            if (!userId || userId === "admin") return;	// 条件に応じて処理を分ける
-            try {	// 失敗に備えて処理を始める
-                const result = await fetchGas({ mode: "getUserProfile", userId: userId }, 20000);	// 定数を定義
-                applyUserProfile(result.message);	// 処理を完了する
-            } catch (e) {	// 処理のまとまりを始める
-                if (!e || e.name !== "AbortError") console.error("プロフィール情報の取得エラー:", e);	// 条件に応じて処理を分ける
-            }	// 処理のまとまりを閉じる
-        }	// 処理のまとまりを閉じる
+        let userProfileRequest = null;
+        async function refreshUserProfile(userId) {
+            if (!userId) return false;
+            if (userProfileRequest) return userProfileRequest;
+            userProfileRequest = (async () => {
+                try {
+                    const result = await fetchGas({ mode: "getUserProfile", userId }, 20000);
+                    applyUserProfile(result.message);
+                    return true;
+                } catch (error) {
+                    console.error("プロフィール情報の取得エラー:", error);
+                    return false;
+                }
+            })();
+            try { return await userProfileRequest; }
+            finally { userProfileRequest = null; }
+        }
 
         function toggleMenu() {	// 関数を定義
             document.getElementById("hud-menu-btn").classList.toggle("open");	// 画面表示を更新する
@@ -2029,17 +2037,33 @@
 
         async function submitRecruitment() {	// 関数を定義
             const submitBtn = document.getElementById("submit-btn");	// 定数を定義
+            if (submitBtn && submitBtn.disabled) return;
             const content = document.getElementById("rec-content").value.trim();	// 定数を定義
             const fixedTag = document.getElementById("rec-fixed-tag").value;	// 定数を定義
             const tags = mergeRecruitmentTags(fixedTag, document.getElementById("rec-tags").value);	// 定数を定義
             const durationMinutes = getRecruitmentDurationMinutes(document.getElementById("rec-duration").value);	// 定数を定義
-            const grade = localStorage.getItem("userGrade") || "";	// 保存済みの学年を取得する
-            const dept = localStorage.getItem("userDept") || "";	// 保存済みの学科を取得する
+            let grade = localStorage.getItem("userGrade") || "";
+            let dept = localStorage.getItem("userDept") || "";
 
             if (!content) {	// 条件に応じて処理を分ける
                 alert("募集内容を入力してください");	// 処理結果を知らせる
                 return;	// 結果を返す
             }	// 処理のまとまりを閉じる
+            if (!grade || !dept) {
+                if (submitBtn) { submitBtn.disabled = true; submitBtn.innerText = "プロフィールを確認中..."; }
+                let refreshed = false;
+                try {
+                    refreshed = await refreshUserProfile(localStorage.getItem("userId") || localStorage.getItem("userEmail"));
+                } finally {
+                    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerText = "投稿する"; }
+                }
+                if (!refreshed) {
+                    alert("プロフィールを取得できませんでした。入力内容は残っています。少し待ってからもう一度投稿してください。");
+                    return;
+                }
+                grade = localStorage.getItem("userGrade") || "";
+                dept = localStorage.getItem("userDept") || "";
+            }
             if (!grade || !dept) {	// 学年と学科が未設定の場合に処理する
                 alert("募集を投稿する前に、マイページで学年と学科を設定してください。");	// 設定が必要なことを知らせる
                 location.href = "profile.html?returnTo=recruit";	// 設定画面へ移動する
