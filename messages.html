@@ -586,6 +586,7 @@
 
         function mergePartnerLists(gasPartners, firebaseMessages) {	// GASとFirebaseの相手一覧をまとめる
             const map = new Map();	// 相手ごとの最新情報を保持する
+            const timestamp = value => typeof value === "number" ? value : (Date.parse(value) || 0);
             gasPartners.forEach(partner => {	// GASの相手を一覧へ登録する
                 const email = String(partner.email || "").trim();	// 相手のIDを整える
                 if (!email) return;	// IDがないデータは表示しない
@@ -594,6 +595,7 @@
                     email: email,	// 相手のIDを統一する
                     name: partnerNameCache.get(email) || partner.name || email,	// 保存済みの表示名を優先する
                     preview: partner.preview || partner.lastMessage || "",	// 本文プレビューを保持する
+                    sentAt: timestamp(partner.sentAt),
                     source: "gas"	// 保存元を記録する
                 });	// GASの相手を保存する
             });	// GASの相手を登録し終える
@@ -603,13 +605,13 @@
                 if (!email || email === myUserId || message.isUnsent) return;	// 不正な行は飛ばす
                 const previous = map.get(email);	// 既存の相手を取得する
                 const preview = message.text || (Array.isArray(message.attachments) && message.attachments.length > 0 ? "画像が送信されました" : "");	// 本文または画像案内を作る
-                if (!previous || Number(message.sentAt || 0) >= Number(previous.sentAt || 0)) {
+                if (!previous || timestamp(message.sentAt) >= timestamp(previous.sentAt)) {
                     map.set(email, {
                         ...previous,	// 既存の表示情報を引き継ぐ
                         email: email,	// 相手のIDを設定する
                         name: partnerNameCache.get(email) || (previous && previous.name) || email,	// 表示名を設定する
                         preview: preview,	// 最新本文を設定する
-                        sentAt: message.sentAt,	// 最新日時を設定する
+                        sentAt: timestamp(message.sentAt),	// 最新日時を設定する
                         source: "firebase"	// Firebase由来として記録する
                     });	// Firebaseの相手を保存する
                 }
