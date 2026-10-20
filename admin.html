@@ -185,6 +185,23 @@
             box-shadow: 0 6px 16px rgba(28, 189, 197, 0.35);	/* 見た目の設定を指定 */
         }	/* スタイル定義を閉じる */
 
+        .btn-clear-chat {	/* 危険操作ボタンのスタイルを始める */
+            background: #fff1f2;	/* 見た目の設定を指定 */
+            color: #be123c;	/* 見た目の設定を指定 */
+            border: 1px solid #fda4af;	/* 見た目の設定を指定 */
+            padding: 10px 16px;	/* 見た目の設定を指定 */
+            border-radius: 10px;	/* 見た目の設定を指定 */
+            font-weight: 800;	/* 見た目の設定を指定 */
+            font-size: 13px;	/* 見た目の設定を指定 */
+            cursor: pointer;	/* 見た目の設定を指定 */
+            transition: all 0.2s;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
+        .btn-clear-chat:hover {	/* 危険操作ボタンのホバー状態を始める */
+            background: #be123c;	/* 見た目の設定を指定 */
+            color: #ffffff;	/* 見た目の設定を指定 */
+        }	/* スタイル定義を閉じる */
+
         .online-summary {	/* 対象要素のスタイルを始める */
             display: flex;	/* 見た目の設定を指定 */
             align-items: center;	/* 見た目の設定を指定 */
@@ -402,6 +419,7 @@
                 <strong id="online-user-count">--</strong>	<!-- 画面要素を配置 -->
                 <span>人</span>	<!-- 画面要素を配置 -->
             </div>	<!-- 要素を閉じる -->
+            <button class="btn-clear-chat" type="button" onclick="clearAllChatHistory()">全チャット履歴を消去</button>	<!-- 危険操作を開始する -->
             <button class="btn-reload" onclick="loadOverview()">データを更新</button>	<!-- 操作できる要素を配置 -->
         </div>	<!-- 要素を閉じる -->
 
@@ -803,6 +821,29 @@
                 alert("通信エラーが発生しました");	// 処理結果を知らせる
             }	// 処理のまとまりを閉じる
         }	// 処理のまとまりを閉じる
+
+        async function clearAllChatHistory() {	// 全チャット履歴を消去する
+            const firstConfirmed = confirm("全チャット履歴を消去しますか？\n\nchat-copyは残りますが、チャット本体・非表示履歴・iOS版Firebaseデータを消去します。\nこの操作は元に戻せません。");	// 最初の確認を行う
+            if (!firstConfirmed) return;	// キャンセル時は終了する
+
+            const confirmationText = prompt("誤操作防止のため、確認欄に「全削除」と入力してください。");	// 二段階確認を行う
+            if (confirmationText !== "全削除") {	// 入力が一致しない場合に処理する
+                alert("確認文字が一致しないため、消去を中止しました。");	// 中止を知らせる
+                return;	// 消去せず終了する
+            }	// 二段階確認を閉じる
+
+            try {	// 消去処理を開始する
+                const result = await postGas({ mode: "adminClearChatHistory", adminId: ADMIN_ID, adminToken: adminToken });	// 管理者専用APIを呼び出す
+                if (result.status === "success") {	// 成功時に処理する
+                    const data = result.message || {};	// 消去結果を取得する
+                    alert("全チャット履歴を消去しました。\n\nchat-copyは保持されています。\nチャット: " + (data.chatRows || 0) + "件\n非表示履歴: " + (data.hiddenChatRows || 0) + "件");	// 完了を知らせる
+                } else {	// 失敗時に処理する
+                    alert("消去失敗: " + result.message);	// 失敗を知らせる
+                }	// 成否の分岐を閉じる
+            } catch (e) {	// 通信エラーに備える
+                alert("通信エラーが発生したため、消去できませんでした。");	// 通信失敗を知らせる
+            }	// 消去処理を閉じる
+        }	// 全チャット履歴消去を閉じる
 
         async function toggleBanUser(targetUserId, isCurrentVerified) {	// 関数を定義
             const actionName = isCurrentVerified ? "凍結（BAN）" : "BAN解除";	// 定数を定義

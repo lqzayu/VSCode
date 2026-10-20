@@ -3,6 +3,7 @@ function doGet(e) {	// 関数を定義
 }	// 処理のまとまりを閉じる
 
 const SITE_URL = "https://lqzayu.github.io/VSCode/";	// 定数を定義
+const FIREBASE_DATABASE_URL = PropertiesService.getScriptProperties().getProperty("FIREBASE_DATABASE_URL") || "https://heiko-matching-chat-default-rtdb.asia-southeast1.firebasedatabase.app";	// Firebase Realtime Databaseの接続先を定義する
 
 const ADMIN_USER_ID = "admin";	// 定数を定義
 const RECRUITMENT_DURATION_MINUTES = [15, 30, 45, 60, 120, 180, 240, 300, 360, 420, 480, 540, 600, 660, 720, 780, 840, 900, 960, 1020, 1080, 1140, 1200, 1260, 1320, 1380, 1440];	// 定数を定義
@@ -99,7 +100,7 @@ function doPost(e) {	// 関数を定義
     const mode = data.mode;	// 定数を定義
 
     const publicModes = ["register", "verifyEmail", "resendVerificationCode", "login", "verify_face_1toN", "verify_face_for_user", "forgotPassword", "resetPassword"];	// ログイン前に使える処理を限定する
-    const adminModes = ["adminGetOverview", "adminDeletePost", "adminBanUser", "getReports", "updateReportStatus", "getDailyAnalysis"];	// 管理者認証を個別に確認する処理をまとめる
+    const adminModes = ["adminGetOverview", "adminDeletePost", "adminBanUser", "adminClearChatHistory", "getReports", "updateReportStatus", "getDailyAnalysis"];	// 管理者認証を個別に確認する処理をまとめる
     if (!publicModes.includes(mode) && !adminModes.includes(mode)) {	// 通常ユーザー向け処理を確認する
       const actorId = getRequestActorId(mode, data);	// 処理を行う本人のIDを取得する
       const adminProfileRequest = mode === "getUserProfile" && isAdminRequest(data);	// 管理者の代理ログイン用取得か確認する
@@ -453,6 +454,30 @@ function doPost(e) {	// 関数を定義
 
       return createRes("success", newStatus ? "USER_UNBANNED" : "USER_BANNED");	// 結果を返す
     }	// 処理のまとまりを閉じる
+
+    if (mode === "adminClearChatHistory") {	// 管理者がチャット履歴を一括消去する
+      if (!isAdminRequest(data)) return createRes("error", "管理者権限がありません。再ログインしてください");	// 管理者以外を拒否する
+
+      const lock = LockService.getScriptLock();	// 同時実行による消去漏れを防ぐロックを取得する
+      if (!lock.tryLock(10000)) return createRes("error", "別の管理処理が実行中です。少し待ってからもう一度お試しください");	// ロックを取得できない場合は消去しない
+
+      try {	// 一括消去を安全に実行する
+        clearFirebaseChatData();	// iOS版のFirebaseチャットデータを先に消去する
+        const chatRows = clearChatDataRows(sheetChat);	// 通常のチャットシートだけを消去する
+        const hiddenChatRows = clearChatDataRows(sheetHiddenChat);	// 非表示履歴もリセットする
+        return createRes("success", {
+          code: "CHAT_HISTORY_CLEARED",
+          chatRows: chatRows,
+          hiddenChatRows: hiddenChatRows,
+          archivePreserved: Boolean(sheetChatCopy)
+        });	// chat-copyは残したまま結果を返す
+      } catch (clearError) {	// Firebaseまたはシートの消去失敗に備える
+        console.error("チャット履歴一括消去失敗", clearError);	// 詳細は実行ログだけへ記録する
+        return createRes("error", "チャット履歴を消去できませんでした。データは一部だけ消去されていない可能性があります");	// 不完全な成功を返さない
+      } finally {	// 一括消去の最後に実行する
+        if (lock.hasLock()) lock.releaseLock();	// ロックを必ず解放する
+      }	// 一括消去を閉じる
+    }	// 管理者チャット履歴一括消去を閉じる
 
     if (mode === "register") {	// 条件に応じて処理を分ける
       if (!sheetUser) return createRes("error", "シートが存在しません");	// 条件に応じて処理を分ける
@@ -1942,6 +1967,71 @@ function firebaseUserUid(userId) {	// Firebase用のUIDをユーザーIDから�
   return "u_" + base64UrlEncode(cleanCell(userId));	// 同じ入力から常に同じUIDを返す
 }	// Firebase UID作成を閉じる
 
+function clearFirebaseChatData() {	// Firebase内のチャット関連ノードを一括消去する
+  const account = getFcmServiceAccount();	// GASに保存したサービスアカウントを取得する
+  if (!account) throw new Error("Firebaseサービスアカウント設定がありません");	// 設定不足の場合はシートも消去しない
+
+  const accessToken = getFirebaseDatabaseAccessToken(account);	// Realtime Database用のアクセストークンを取得する
+  if (!accessToken) throw new Error("Firebase Realtime Databaseのアクセストークンを取得できません");	// 認証できない場合は消去しない
+
+  const endpoint = FIREBASE_DATABASE_URL.replace(/\/+$/, "") + "/.json";	// ルート更新用のURLを作る
+  const response = UrlFetchApp.fetch(endpoint, {	// Firebaseへ一括更新を送る
+    method: "patch",
+    contentType: "application/json",
+    headers: { Authorization: "Bearer " + accessToken },
+    payload: JSON.stringify({ chats: null, inbox: null, hidden: null }),
+    muteHttpExceptions: true
+  });	// Firebaseの応答を取得する
+  const code = response.getResponseCode();	// HTTPステータスを確認する
+  if (code < 200 || code >= 300) throw new Error("Firebase消去失敗: HTTP " + code);	// 失敗時はシートを消去しない
+  return true;	// 消去完了を返す
+}	// Firebaseチャット一括消去を閉じる
+
+function getFirebaseDatabaseAccessToken(account) {	// Firebase Realtime Database用のOAuthトークンを取得する
+  const cache = CacheService.getScriptCache();	// 短時間のアクセストークンキャッシュを取得する
+  const cacheKey = "firebase-database-access-token";	// キャッシュ名を定義する
+  const cached = cache.get(cacheKey);	// 保存済みトークンを確認する
+  if (cached) return cached;	// 有効期限内なら再利用する
+
+  try {	// OAuthトークンの発行を試みる
+    const issuedAt = Math.floor(Date.now() / 1000);	// 発行時刻を秒で作る
+    const header = base64UrlEncode(JSON.stringify({ alg: "RS256", typ: "JWT" }));	// JWTヘッダーを作る
+    const claim = base64UrlEncode(JSON.stringify({
+      iss: account.clientEmail,
+      scope: "https://www.googleapis.com/auth/firebase.database",
+      aud: "https://oauth2.googleapis.com/token",
+      iat: issuedAt,
+      exp: issuedAt + 3600
+    }));	// OAuth用JWT本文を作る
+    const unsignedJwt = header + "." + claim;	// 署名前のJWTを作る
+    const signature = base64UrlEncode(Utilities.computeRsaSha256Signature(unsignedJwt, account.privateKey));	// サービスアカウントで署名する
+    const response = UrlFetchApp.fetch("https://oauth2.googleapis.com/token", {	// Google OAuthへトークンを要求する
+      method: "post",
+      contentType: "application/x-www-form-urlencoded",
+      payload: {
+        grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+        assertion: unsignedJwt + "." + signature
+      },
+      muteHttpExceptions: true
+    });	// OAuth応答を取得する
+    if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) return "";	// 認証失敗時は空で返す
+    const token = cleanCell(JSON.parse(response.getContentText()).access_token);	// アクセストークンを取り出す
+    if (token) cache.put(cacheKey, token, 3300);	// 期限前までキャッシュする
+    return token;	// トークンを返す
+  } catch (error) {	// 認証エラーに備える
+    console.error("Firebase Databaseアクセストークン取得失敗", error);	// 詳細は実行ログだけへ記録する
+    return "";	// 失敗として返す
+  }	// OAuth処理を閉じる
+}	// Firebase Databaseアクセストークン取得を閉じる
+
+function clearChatDataRows(sheet) {	// チャット系シートのヘッダーを残してデータだけを消去する
+  if (!sheet || sheet.getLastRow() <= 1) return 0;	// 対象データがなければ終了する
+  const rowCount = sheet.getLastRow() - 1;	// ヘッダーを除いた行数を数える
+  const columnCount = Math.max(1, sheet.getLastColumn());	// 現在の列数を取得する
+  sheet.getRange(2, 1, rowCount, columnCount).clearContent();	// ヘッダーとシート自体は残して内容だけ消去する
+  return rowCount;	// 消去した行数を返す
+}	// チャット系シート消去を閉じる
+
 function getUserTokenSecret() {	// 通常ユーザー用の署名鍵を取得する
   const properties = PropertiesService.getScriptProperties();	// スクリプト設定を取得する
   let secret = properties.getProperty("USER_TOKEN_SECRET");	// 保存済みの署名鍵を取得する
@@ -2354,8 +2444,16 @@ function saveChatAttachments(attachments, senderId) {	// 関数を定義
       const originalName = cleanCell(attachment && attachment.name) || `image-${index + 1}.jpg`;	// 定数を定義
       const safeName = originalName.replace(/[^\w.\-ぁ-んァ-ヶ一-龠]/g, "_").slice(0, 80);	// 定数を定義
       const fileName = `${Date.now()}_${cleanCell(senderId) || "user"}_${safeName}`;	// 定数を定義
-      createdFile = folder.createFile(Utilities.newBlob(bytes, mimeType, fileName));	// 画像ファイルを作成する
-      createdFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);	// 閲覧権限を設定する
+      try {	// Driveへのファイル作成権限を分けて確認する
+        createdFile = folder.createFile(Utilities.newBlob(bytes, mimeType, fileName));	// 画像ファイルを作成する
+      } catch (createError) {	// ファイル作成に失敗した場合に原因を明示する
+        throw new Error("Driveへの画像ファイル作成に失敗しました: " + String(createError && createError.message ? createError.message : createError));	// 作成権限の失敗を返す
+      }	// ファイル作成の確認を閉じる
+      try {	// 外部共有権限を分けて確認する
+        createdFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);	// 閲覧権限を設定する
+      } catch (sharingError) {	// リンク共有設定に失敗した場合に原因を明示する
+        throw new Error("Driveのリンク共有設定に失敗しました: " + String(sharingError && sharingError.message ? sharingError.message : sharingError));	// 共有設定の失敗を返す
+      }	// 外部共有権限の確認を閉じる
       savedUrls.push(`https://drive.google.com/thumbnail?id=${encodeURIComponent(createdFile.getId())}&sz=w1200`);	// 画像表示用URLを保存する
     } catch (e) {	// 処理のまとまりを始める
       if (createdFile) {	// ファイル作成後に失敗した場合に処理する
