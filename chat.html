@@ -743,11 +743,13 @@
             messages.forEach(msg => {	// メッセージごとに画面を作る
                 const wrapper = document.createElement("div");	// 外側の要素を作る
                 wrapper.style.cssText = `display:flex; flex-direction:column; align-items:${msg.from === myEmail ? "flex-end" : "flex-start"}; gap:4px;`;	// 表示位置を設定する
-                const bubble = document.createElement("div");	// 本文の吹き出しを作る
-                bubble.className = `message-bubble ${msg.from === myEmail ? "msg-my" : "msg-partner"}`;	// 自分と相手の見た目を分ける
-                if (msg.isUnsent) bubble.classList.add("is-unsent");	// 取り消し表示を付ける
-                bubble.innerText = msg.text;	// 本文を安全に表示する
-                wrapper.appendChild(bubble);	// 吹き出しを追加する
+                if (String(msg.text || "").trim() || msg.isUnsent) {	// 本文がある場合だけ本文用の吹き出しを表示する
+                    const bubble = document.createElement("div");	// 本文の吹き出しを作る
+                    bubble.className = `message-bubble ${msg.from === myEmail ? "msg-my" : "msg-partner"}`;	// 自分と相手の見た目を分ける
+                    if (msg.isUnsent) bubble.classList.add("is-unsent");	// 取り消し表示を付ける
+                    bubble.innerText = msg.text || "";	// 本文を安全に表示する
+                    wrapper.appendChild(bubble);	// 吹き出しを追加する
+                }	// 本文吹き出しの表示条件を閉じる
                 if (Array.isArray(msg.attachments) && msg.attachments.length > 0 && !msg.isUnsent) {	// 添付画像がある場合に処理する
                     const attachments = document.createElement("div");	// 画像一覧を作る
                     attachments.className = "message-attachments";	// 画像一覧の見た目を設定する

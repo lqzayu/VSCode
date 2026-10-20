@@ -2449,11 +2449,7 @@ function saveChatAttachments(attachments, senderId) {	// 関数を定義
       } catch (createError) {	// ファイル作成に失敗した場合に原因を明示する
         throw new Error("Driveへの画像ファイル作成に失敗しました: " + String(createError && createError.message ? createError.message : createError));	// 作成権限の失敗を返す
       }	// ファイル作成の確認を閉じる
-      try {	// 外部共有権限を分けて確認する
-        createdFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);	// 閲覧権限を設定する
-      } catch (sharingError) {	// リンク共有設定に失敗した場合に原因を明示する
-        throw new Error("Driveのリンク共有設定に失敗しました: " + String(sharingError && sharingError.message ? sharingError.message : sharingError));	// 共有設定の失敗を返す
-      }	// 外部共有権限の確認を閉じる
+      // 保存先フォルダの共有権限を継承するため、ファイル単位の共有設定は行わない。
       savedUrls.push(`https://drive.google.com/thumbnail?id=${encodeURIComponent(createdFile.getId())}&sz=w1200`);	// 画像表示用URLを保存する
     } catch (e) {	// 処理のまとまりを始める
       if (createdFile) {	// ファイル作成後に失敗した場合に処理する
