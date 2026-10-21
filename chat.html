@@ -530,6 +530,10 @@
             flex: 0 0 auto;
         }
 
+        body[data-page="chat"] .footer-links {
+            display: none !important;
+        }
+
         @media screen and (max-width: 600px) {
             body[data-page="chat"] > .chat-container {
                 width: 100%;
@@ -753,6 +757,7 @@
                 if (Array.isArray(msg.attachments) && msg.attachments.length > 0 && !msg.isUnsent) {	// 添付画像がある場合に処理する
                     const attachments = document.createElement("div");	// 画像一覧を作る
                     attachments.className = "message-attachments";	// 画像一覧の見た目を設定する
+                    attachments.style.alignSelf = msg.from === myEmail ? "flex-end" : "flex-start";	// 画像を送信者側へ揃える
                     msg.attachments.slice(0, MAX_ATTACHMENTS).forEach(url => {	// 最大枚数まで画像を表示する
                         if (typeof url !== "string" || !url.startsWith("http")) return;	// 不正なURLは表示しない
                         const link = document.createElement("a");	// 画像リンクを作る
