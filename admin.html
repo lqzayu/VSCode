@@ -500,7 +500,8 @@
         const currentEmail = localStorage.getItem("userEmail");	// 定数を定義
         const currentUserId = localStorage.getItem("userId") || currentEmail;	// 定数を定義
         const isImpersonating = localStorage.getItem("isImpersonating");	// 定数を定義
-        const adminToken = localStorage.getItem("adminToken") || "";	// 定数を定義
+        let adminToken = localStorage.getItem("adminToken") || "";	// 現在の管理者トークンを保持する
+        const sessionToken = localStorage.getItem("sessionToken") || "";	// 管理者セッションを保持する
         let overviewLoading = false;	// 状態を保持
         let unreadRequest = null;	// 状態を保持
         let adminAccessDenied = false;	// 状態を保持
@@ -518,7 +519,16 @@
                     signal: controller.signal	// 処理を続ける
                 });	// 処理を完了する
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);	// 条件に応じて処理を分ける
-                return await res.json();	// 結果を返す
+                const result = await res.json();	// GAS応答を読み込む
+                if (payload.adminToken && payload.mode !== "refreshAdminToken" && result.status === "error" && /管理者権限がありません/.test(String(result.message || "")) && sessionToken) {	// 管理者トークン切れなら有効なログインから更新する
+                    const renewed = await postGas({ mode: "refreshAdminToken", userId: currentUserId, sessionToken: sessionToken }, timeoutMs);	// セッションを検証して新しいトークンを取得する
+                    if (renewed.status === "success" && renewed.message && renewed.message.adminToken) {	// 更新できた場合に再試行する
+                        adminToken = renewed.message.adminToken;	// 最新トークンを保持する
+                        localStorage.setItem("adminToken", adminToken);	// 次回のために端末へ保存する
+                        return await postGas({ ...payload, adminToken: adminToken }, timeoutMs);	// 元の管理者操作を一度だけ再送する
+                    }	// トークン更新結果を確認する
+                }	// 期限切れ対応を閉じる
+                return result;	// 結果を返す
             } finally {	// 処理のまとまりを始める
                 clearTimeout(timeoutId);	// 処理を完了する
             }	// 処理のまとまりを閉じる

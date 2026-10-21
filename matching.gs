@@ -109,6 +109,12 @@ function doPost(e) {	// 関数を定義
       }	// 本人確認を閉じる
     }	// 通常ユーザー認証を閉じる
 
+    if (mode === "refreshAdminToken") {	// 有効な管理者ログインから短期管理者トークンを更新する
+      const userId = cleanCell(data.userId);	// 認証済みユーザーIDを取得する
+      if (userId !== ADMIN_USER_ID) return createRes("error", "管理者権限がありません。再ログインしてください");	// 管理者以外には発行しない
+      return createRes("success", { adminToken: createAdminSessionToken() });	// 新しい短期トークンを返す
+    }	// 管理者トークン更新を閉じる
+
     if (mode === "heartbeat") {	// 条件に応じて処理を分ける
       const userId = String(data.userId || "").trim();	// 定数を定義
       if (!userId) return createRes("error", "ユーザーが見つかりません");	// 共通認証後もIDが空なら拒否する
@@ -1894,6 +1900,7 @@ function getAdminTokenSecret() {	// 関数を定義
 function getRequestActorId(mode, data) {	// 処理ごとの本人IDを取得する
   const actorFields = {	// 本人確認に使う項目をまとめる
     heartbeat: "userId",	// オンライン更新の本人を指定する
+    refreshAdminToken: "userId",	// 管理者トークン更新者を指定する
     firebaseCustomToken: "userId",	// Firebaseトークン発行者を指定する
     registerAndroidDevice: "userId",	// Android通知先の登録者を指定する
     unregisterAndroidDevice: "userId",	// Android通知先の解除者を指定する
