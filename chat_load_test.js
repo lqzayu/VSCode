@@ -1,40 +1,40 @@
-import http from 'k6/http';	// 必要な機能を読み込む
-import { check, sleep } from 'k6';	// 必要な機能を読み込む
+import http from 'k6/http';
+import { check, sleep } from 'k6';
 
-export const options = {	// 必要な機能を読み込む
-  stages: [	// 処理を続ける
-    { duration: '20s', target: 5 },	// 処理を続ける
-    { duration: '40s', target: 10 },	// 処理を続ける
-    { duration: '20s', target: 0 },	// 処理を続ける
-  ],	// 処理を続ける
-  maxRedirects: 10,	// 処理を続ける
-};	// 処理のまとまりを閉じる
+export const options = {
+  stages: [
+    { duration: '20s', target: 5 },
+    { duration: '40s', target: 10 },
+    { duration: '20s', target: 0 },
+  ],
+  maxRedirects: 10,
+};
 
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec';	// GAS APIの接続先を設定
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec';
 
-export default function () {	// 必要な機能を読み込む
-  const payload = JSON.stringify({	// 定数を定義
-    mode: 'sendMessage',	// 処理を続ける
-    from: __ENV.TEST_USER_ID || 'test_user_A',	// 試験用の送信者を指定する
-    to: __ENV.TEST_TARGET_ID || 'test_user_B',	// 試験用の送信先を指定する
-    sessionToken: __ENV.SESSION_TOKEN || '',	// 試験用の本人確認情報を指定する
-    requestId: `load-${__VU}-${__ITER}-${Date.now()}`,	// 二重送信防止用のIDを付ける
-    text: `負荷テストメッセージ [VU: ${__VU}, Iter: ${__ITER}]`	// 処理を続ける
-  });	// 処理を完了する
+export default function () {
+  const payload = JSON.stringify({
+    mode: 'sendMessage',
+    from: __ENV.TEST_USER_ID || 'test_user_A',
+    to: __ENV.TEST_TARGET_ID || 'test_user_B',
+    sessionToken: __ENV.SESSION_TOKEN || '',
+    requestId: `load-${__VU}-${__ITER}-${Date.now()}`,
+    text: `負荷テストメッセージ [VU: ${__VU}, Iter: ${__ITER}]`
+  });
 
-  const params = {	// 定数を定義
-    headers: {	// 処理のまとまりを始める
-      'Content-Type': 'text/plain;charset=UTF-8',	// 処理を続ける
-    },	// 処理のまとまりを閉じる
-    redirects: 5,	// 処理を続ける
-  };	// 処理のまとまりを閉じる
+  const params = {
+    headers: {
+      'Content-Type': 'text/plain;charset=UTF-8',
+    },
+    redirects: 5,
+  };
 
-  const res = http.post(GAS_URL, payload, params);	// 定数を定義
+  const res = http.post(GAS_URL, payload, params);
 
-  check(res, {	// 処理のまとまりを始める
-    'status is 200': (r) => r.status === 200,	// 処理を続ける
-    'body includes success': (r) => r.body && (r.body.includes('SENT') || r.body.includes('success')),	// 処理を続ける
-  });	// 処理を完了する
+  check(res, {
+    'status is 200': (r) => r.status === 200,
+    'body includes success': (r) => r.body && (r.body.includes('SENT') || r.body.includes('success')),
+  });
 
-  sleep(Math.random() * 2 + 1);	// 処理を完了する
-}	// 処理のまとまりを閉じる
+  sleep(Math.random() * 2 + 1);
+}

@@ -1,68 +1,68 @@
-const THEME_STORAGE_KEY = "heikoThemePreference";	// 外観設定の保存名を決める
+const THEME_STORAGE_KEY = "heikoThemePreference";
 
-function normalizeThemePreference(value) {	// 外観設定の値を確認する
-    return value === "light" || value === "dark" ? value : "auto";	// 使用できる外観設定だけを返す
-}	// 処理のまとまりを閉じる
+function normalizeThemePreference(value) {
+    return value === "light" || value === "dark" ? value : "auto";
+}
 
-function readThemePreference() {	// 保存済みの外観設定を読み込む
-    try {	// 保存情報の読み込みを試す
-        return normalizeThemePreference(localStorage.getItem(THEME_STORAGE_KEY));	// 保存値を整えて返す
-    } catch (error) {	// 保存情報を読めない場合に処理する
-        return "auto";	// 端末設定を初期値にする
-    }	// 処理のまとまりを閉じる
-}	// 処理のまとまりを閉じる
+function readThemePreference() {
+    try {
+        return normalizeThemePreference(localStorage.getItem(THEME_STORAGE_KEY));
+    } catch (error) {
+        return "auto";
+    }
+}
 
-function applyThemePreference(value, save = true) {	// 外観設定を画面へ反映する
-    const preference = normalizeThemePreference(value);	// 外観設定の値を整える
-    if (preference === "auto") {	// 端末設定を使う場合に処理する
-        document.documentElement.removeAttribute("data-theme");	// 手動設定を解除する
-    } else {	// 手動設定を使う場合に処理する
-        document.documentElement.setAttribute("data-theme", preference);	// 選択した外観を設定する
-    }	// 処理のまとまりを閉じる
-    if (save) {	// 保存が必要な場合に処理する
-        try {	// 外観設定の保存を試す
-            localStorage.setItem(THEME_STORAGE_KEY, preference);	// 選択した外観を保存する
-        } catch (error) {	// 保存できない場合に処理する
-            console.warn("外観設定を保存できませんでした。", error);	// 保存失敗を記録する
-        }	// 処理のまとまりを閉じる
-    }	// 処理のまとまりを閉じる
-    const selector = document.getElementById("theme-preference");	// 外観設定の選択欄を取得する
-    if (selector) selector.value = preference;	// 選択欄へ現在値を表示する
-    return preference;	// 適用した外観設定を返す
-}	// 処理のまとまりを閉じる
+function applyThemePreference(value, save = true) {
+    const preference = normalizeThemePreference(value);
+    if (preference === "auto") {
+        document.documentElement.removeAttribute("data-theme");
+    } else {
+        document.documentElement.setAttribute("data-theme", preference);
+    }
+    if (save) {
+        try {
+            localStorage.setItem(THEME_STORAGE_KEY, preference);
+        } catch (error) {
+            console.warn("外観設定を保存できませんでした。", error);
+        }
+    }
+    const selector = document.getElementById("theme-preference");
+    if (selector) selector.value = preference;
+    return preference;
+}
 
-applyThemePreference(readThemePreference(), false);	// ページ表示前に外観設定を反映する
-window.applyThemePreference = applyThemePreference;	// ページ側から外観設定を変更できるようにする
-window.getThemePreference = readThemePreference;	// ページ側から外観設定を確認できるようにする
-let heikoDeferredInstallPrompt = null;	// PWAインストール確認を一時的に保持する
-window.addEventListener("beforeinstallprompt", event => {	// ブラウザのインストール案内を受け取る
-    event.preventDefault();	// 自動表示を止めてマイページのボタンから表示する
-    heikoDeferredInstallPrompt = event;	// 後でボタンから呼び出せるように保存する
-    updateHeikoPwaInstallButton();	// ボタンをインストール可能な状態へ更新する
-});	// PWA案内の受け取りを終える
-window.addEventListener("appinstalled", () => {	// PWAがインストールされた場合に処理する
-    heikoDeferredInstallPrompt = null;	// 使用済みの案内を破棄する
-    updateHeikoPwaInstallButton(true);	// インストール済み表示へ更新する
-});	// インストール完了処理を終える
+applyThemePreference(readThemePreference(), false);
+window.applyThemePreference = applyThemePreference;
+window.getThemePreference = readThemePreference;
+let heikoDeferredInstallPrompt = null;
+window.addEventListener("beforeinstallprompt", event => {
+    event.preventDefault();
+    heikoDeferredInstallPrompt = event;
+    updateHeikoPwaInstallButton();
+});
+window.addEventListener("appinstalled", () => {
+    heikoDeferredInstallPrompt = null;
+    updateHeikoPwaInstallButton(true);
+});
 
-function isHeikoPwaStandalone() {	// PWAとして起動中か確認する
-    return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;	// iOSと通常ブラウザの両方に対応する
-}	// PWA起動状態の確認を閉じる
+function isHeikoPwaStandalone() {
+    return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+}
 
-function updateHeikoPwaInstallButton(installed = false) {	// PWAボタンの表示状態を更新する
-    const button = document.getElementById("heiko-pwa-install-button");	// PWAボタンを取得する
-    const hint = document.getElementById("heiko-pwa-install-hint");	// PWA案内文を取得する
-    if (!button) return;	// マイページ以外では終了する
-    if (installed || isHeikoPwaStandalone()) {	// すでにアプリとして起動中の場合に処理する
-        button.disabled = true;	// インストールボタンを無効にする
-        button.textContent = "ホーム画面に追加済み";	// 完了状態を表示する
-        if (hint) hint.textContent = "このサービスはアプリとして起動できます。";	// 完了案内を表示する
-        return;	// 表示更新を終える
-    }	// インストール済み判定を閉じる
-    button.disabled = false;	// ボタンを有効にする
-    button.textContent = "ホーム画面に追加";	// ボタンの標準表示を設定する
-    if (hint && heikoDeferredInstallPrompt) hint.textContent = "この端末のホーム画面からすぐに開けます。";	// 直接インストールできる場合の案内を表示する
-}	// PWAボタン表示更新を閉じる
+function updateHeikoPwaInstallButton(installed = false) {
+    const button = document.getElementById("heiko-pwa-install-button");
+    const hint = document.getElementById("heiko-pwa-install-hint");
+    if (!button) return;
+    if (installed || isHeikoPwaStandalone()) {
+        button.disabled = true;
+        button.textContent = "ホーム画面に追加済み";
+        if (hint) hint.textContent = "このサービスはアプリとして起動できます。";
+        return;
+    }
+    button.disabled = false;
+    button.textContent = "ホーム画面に追加";
+    if (hint && heikoDeferredInstallPrompt) hint.textContent = "この端末のホーム画面からすぐに開けます。";
+}
 
 function showHeikoPwaInstallDialog(kind) {
     let dialog = document.getElementById("heiko-pwa-install-dialog");
@@ -101,238 +101,238 @@ async function openHeikoAppleShareMenu() {
     }
 }
 
-async function requestHeikoPwaInstall() {	// PWAの追加操作を開始する
-    if (isHeikoPwaStandalone()) return;	// すでに追加済みなら何もしない
-    if (heikoDeferredInstallPrompt) {	// ブラウザがインストール案内を提供している場合に処理する
-        heikoDeferredInstallPrompt.prompt();	// インストール確認を表示する
-        await heikoDeferredInstallPrompt.userChoice;	// 利用者の選択を待つ
-        heikoDeferredInstallPrompt = null;	// 一度使った案内を破棄する
-        updateHeikoPwaInstallButton();	// 選択後の状態へ更新する
-        return;	// 操作を終える
-    }	// ブラウザ標準案内の処理を閉じる
-    const isAppleMobile = /iPhone|iPad|iPod/i.test(navigator.userAgent);	// iPhoneやiPadか確認する
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);	// Safariか確認する
-    if (isAppleMobile && await openHeikoAppleShareMenu()) return;	// iPhoneやiPadでは共有メニューを直接開く
+async function requestHeikoPwaInstall() {
+    if (isHeikoPwaStandalone()) return;
+    if (heikoDeferredInstallPrompt) {
+        heikoDeferredInstallPrompt.prompt();
+        await heikoDeferredInstallPrompt.userChoice;
+        heikoDeferredInstallPrompt = null;
+        updateHeikoPwaInstallButton();
+        return;
+    }
+    const isAppleMobile = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    if (isAppleMobile && await openHeikoAppleShareMenu()) return;
     showHeikoPwaInstallDialog(isAppleMobile ? "apple-mobile" : isSafari ? "safari-desktop" : "other");
-}	// PWA追加操作を閉じる
+}
 
-function installHeikoPwaSupport() {	// PWAの共通準備を行う
-    if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(error => console.warn("PWA準備に失敗しました。", error));	// すべてのページでサービスワーカーを登録する
-    if (!document.body || document.body.dataset.page !== "profile") return;	// ボタンはマイページだけに表示する
-    if (document.getElementById("heiko-pwa-install-card")) return;	// 二重追加を防ぐ
-    const appearance = document.querySelector(".appearance-settings");	// 外観設定カードを取得する
-    if (!appearance) return;	// 追加位置がない場合は終了する
-    const card = document.createElement("section");	// PWA案内カードを作る
-    card.id = "heiko-pwa-install-card";	// カードを識別する
-    card.className = "heiko-pwa-install-card";	// 共通スタイルを適用する
-    card.setAttribute("aria-labelledby", "heiko-pwa-install-title");	// 読み上げ用の見出しを設定する
-    card.innerHTML = "<div><span class=\"heiko-pwa-kicker\">QUICK ACCESS</span><h3 id=\"heiko-pwa-install-title\">ホーム画面からすぐに開く</h3><p id=\"heiko-pwa-install-hint\">スマホのホーム画面に追加すると、アプリのように使えます。</p></div><button type=\"button\" id=\"heiko-pwa-install-button\" onclick=\"requestHeikoPwaInstall()\">ホーム画面に追加</button>";	// PWA案内の内容を設定する
-    appearance.insertAdjacentElement("afterend", card);	// 外観設定の下へ表示する
-    updateHeikoPwaInstallButton();	// 初期状態を反映する
-}	// PWA共通準備を閉じる
+function installHeikoPwaSupport() {
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(error => console.warn("PWA準備に失敗しました。", error));
+    if (!document.body || document.body.dataset.page !== "profile") return;
+    if (document.getElementById("heiko-pwa-install-card")) return;
+    const appearance = document.querySelector(".appearance-settings");
+    if (!appearance) return;
+    const card = document.createElement("section");
+    card.id = "heiko-pwa-install-card";
+    card.className = "heiko-pwa-install-card";
+    card.setAttribute("aria-labelledby", "heiko-pwa-install-title");
+    card.innerHTML = "<div><span class=\"heiko-pwa-kicker\">QUICK ACCESS</span><h3 id=\"heiko-pwa-install-title\">ホーム画面からすぐに開く</h3><p id=\"heiko-pwa-install-hint\">スマホのホーム画面に追加すると、アプリのように使えます。</p></div><button type=\"button\" id=\"heiko-pwa-install-button\" onclick=\"requestHeikoPwaInstall()\">ホーム画面に追加</button>";
+    appearance.insertAdjacentElement("afterend", card);
+    updateHeikoPwaInstallButton();
+}
 
-function installHeikoFooterNavigation() {	// フッターメニューを上部ナビとそろえる
-    const footerLinks = document.querySelector(".footer-links");	// フッターメニューを取得する
-    if (!footerLinks) return;	// フッターがないページでは終了する
-    const isLoggedIn = Boolean(localStorage.getItem("sessionToken") && (localStorage.getItem("userId") || localStorage.getItem("userEmail")));	// ログイン状態を確認する
-    const isAdmin = localStorage.getItem("userId") === "admin" && localStorage.getItem("isImpersonating") !== "true";	// 管理者表示条件を確認する
-    footerLinks.innerHTML = `<a href="main.html?guide=1">使い方</a><a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a><a href="main.html?tab=recruit">募集投稿</a><a href="main.html?tab=search">ユーザーを探す</a><a href="messages.html">メッセージ</a><a href="profile.html">マイページ</a><a href="ai-study.html">AI学習相談</a><a class="heiko-footer-admin" href="admin.html"${isAdmin ? "" : " style=\"display:none\""}>管理者</a>${isLoggedIn ? "<button type=\"button\" class=\"heiko-footer-logout\" onclick=\"if (typeof logout === 'function') { logout(); } else { clearHeikoSession(); location.href='index.html'; } return false;\">ログアウト</button>" : ""}<a href="terms.html">利用規約</a><a href="privacy.html">プライバシーポリシー</a>`;	// 上部ナビと同じ項目を設定する
-}	// フッターナビの統一を閉じる
-const HEIKO_SESSION_KEYS = ["userId", "userEmail", "userName", "profileImage", "userGrade", "userDept", "sessionToken", "adminSessionToken", "adminToken", "isImpersonating", "chatTarget"];	// ログアウト時に消す情報をまとめる
-const HEIKO_REMEMBER_UNTIL_KEY = "heikoRememberUntil";	// 自動ログインの期限を保存する名前を決める
-const HEIKO_SESSION_ONLY_KEY = "heikoSessionOnly";	// タブを閉じるまでのログインを示す名前を決める
-const HEIKO_SESSION_ACTIVE_KEY = "heikoSessionActive";	// 現在のタブでログイン中か示す名前を決める
-const HEIKO_REMEMBER_DAYS = 30;	// 自動ログインを許可する日数を決める
+function installHeikoFooterNavigation() {
+    const footerLinks = document.querySelector(".footer-links");
+    if (!footerLinks) return;
+    const isLoggedIn = Boolean(localStorage.getItem("sessionToken") && (localStorage.getItem("userId") || localStorage.getItem("userEmail")));
+    const isAdmin = localStorage.getItem("userId") === "admin" && localStorage.getItem("isImpersonating") !== "true";
+    footerLinks.innerHTML = `<a href="main.html?guide=1">使い方</a><a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a><a href="main.html?tab=recruit">募集投稿</a><a href="main.html?tab=search">ユーザーを探す</a><a href="messages.html">メッセージ</a><a href="profile.html">マイページ</a><a href="ai-study.html">AI学習相談</a><a class="heiko-footer-admin" href="admin.html"${isAdmin ? "" : " style=\"display:none\""}>管理者</a>${isLoggedIn ? "<button type=\"button\" class=\"heiko-footer-logout\" onclick=\"if (typeof logout === 'function') { logout(); } else { clearHeikoSession(); location.href='index.html'; } return false;\">ログアウト</button>" : ""}<a href="terms.html">利用規約</a><a href="privacy.html">プライバシーポリシー</a>`;
+}
+const HEIKO_SESSION_KEYS = ["userId", "userEmail", "userName", "profileImage", "userGrade", "userDept", "sessionToken", "adminSessionToken", "adminToken", "isImpersonating", "chatTarget"];
+const HEIKO_REMEMBER_UNTIL_KEY = "heikoRememberUntil";
+const HEIKO_SESSION_ONLY_KEY = "heikoSessionOnly";
+const HEIKO_SESSION_ACTIVE_KEY = "heikoSessionActive";
+const HEIKO_REMEMBER_DAYS = 30;
 
-function clearHeikoSession() {	// 外観設定を残してログイン情報だけ消す
-    HEIKO_SESSION_KEYS.forEach(key => localStorage.removeItem(key));	// 認証情報を一件ずつ削除する
-    localStorage.removeItem(HEIKO_REMEMBER_UNTIL_KEY);	// 自動ログイン期限を削除する
-    localStorage.removeItem(HEIKO_SESSION_ONLY_KEY);	// タブ限定ログインの印を削除する
-    try {	// sessionStorageの利用を試す
-        sessionStorage.removeItem(HEIKO_SESSION_ACTIVE_KEY);	// 現在のタブのログイン状態を削除する
-    } catch (error) {	// sessionStorageを使えない環境に対応する
-        console.warn("一時ログイン情報を削除できませんでした。", error);	// 削除失敗を記録する
-    }	// sessionStorage処理を閉じる
-}	// 処理のまとまりを閉じる
+function clearHeikoSession() {
+    HEIKO_SESSION_KEYS.forEach(key => localStorage.removeItem(key));
+    localStorage.removeItem(HEIKO_REMEMBER_UNTIL_KEY);
+    localStorage.removeItem(HEIKO_SESSION_ONLY_KEY);
+    try {
+        sessionStorage.removeItem(HEIKO_SESSION_ACTIVE_KEY);
+    } catch (error) {
+        console.warn("一時ログイン情報を削除できませんでした。", error);
+    }
+}
 
-function hasHeikoAuthCredentials() {	// 自動ログインに必要な情報がそろっているか確認する
-    return Boolean(localStorage.getItem("sessionToken") && (localStorage.getItem("userId") || localStorage.getItem("userEmail")));	// トークンとユーザーIDの有無を返す
-}	// 認証情報確認を閉じる
+function hasHeikoAuthCredentials() {
+    return Boolean(localStorage.getItem("sessionToken") && (localStorage.getItem("userId") || localStorage.getItem("userEmail")));
+}
 
-function isHeikoAuthSessionActive() {	// 現在のログイン情報が利用可能か確認する
-    if (!hasHeikoAuthCredentials()) return false;	// 必要な情報がなければ未ログインとする
-    const rememberUntilText = localStorage.getItem(HEIKO_REMEMBER_UNTIL_KEY);	// 自動ログイン期限を取得する
-    if (rememberUntilText) {	// 自動ログイン設定がある場合に処理する
-        const rememberUntil = Number(rememberUntilText);	// 期限を数値へ変換する
-        if (Number.isFinite(rememberUntil) && rememberUntil > Date.now()) return true;	// 期限内ならログイン状態を使う
-        clearHeikoSession();	// 期限切れや壊れた期限を削除する
-        return false;	// ログイン画面を表示する
-    }	// 自動ログイン期限の確認を閉じる
-    if (localStorage.getItem(HEIKO_SESSION_ONLY_KEY) === "1") {	// タブ限定ログインの場合に処理する
-        try {	// sessionStorageの確認を試す
-            if (sessionStorage.getItem(HEIKO_SESSION_ACTIVE_KEY) === "1") return true;	// 同じタブならログイン状態を使う
-        } catch (error) {	// sessionStorageを使えない環境に対応する
-            clearHeikoSession();	// 安全のためログイン情報を削除する
-            return false;	// ログイン画面を表示する
-        }	// sessionStorage処理を閉じる
-        clearHeikoSession();	// 別のタブや再訪問ではログイン情報を削除する
-        return false;	// ログイン画面を表示する
-    }	// タブ限定ログインの確認を閉じる
-    return true;	// 旧形式の有効なログイン情報は次回ログインまで利用する
-}	// ログイン状態確認を閉じる
+function isHeikoAuthSessionActive() {
+    if (!hasHeikoAuthCredentials()) return false;
+    const rememberUntilText = localStorage.getItem(HEIKO_REMEMBER_UNTIL_KEY);
+    if (rememberUntilText) {
+        const rememberUntil = Number(rememberUntilText);
+        if (Number.isFinite(rememberUntil) && rememberUntil > Date.now()) return true;
+        clearHeikoSession();
+        return false;
+    }
+    if (localStorage.getItem(HEIKO_SESSION_ONLY_KEY) === "1") {
+        try {
+            if (sessionStorage.getItem(HEIKO_SESSION_ACTIVE_KEY) === "1") return true;
+        } catch (error) {
+            clearHeikoSession();
+            return false;
+        }
+        clearHeikoSession();
+        return false;
+    }
+    return true;
+}
 
-function saveHeikoAuthSession(authResult, remember) {	// ログイン結果を保存する
-    if (!authResult || !authResult.email || !authResult.sessionToken) return false;	// 不完全な結果は保存しない
-    localStorage.setItem("userEmail", authResult.email);	// ユーザーIDを保存する
-    localStorage.setItem("userId", authResult.userId || authResult.email);	// ユーザーIDを保存する
-    localStorage.setItem("userName", authResult.name || "");	// 表示名を保存する
-    localStorage.setItem("profileImage", authResult.profileImage || "");	// プロフィール画像を保存する
-    localStorage.setItem("sessionToken", authResult.sessionToken);	// 本人確認トークンを保存する
-    if (authResult.adminToken) localStorage.setItem("adminToken", authResult.adminToken);	// 管理者トークンを保存する
-    else localStorage.removeItem("adminToken");	// 管理者以外の古いトークンを削除する
-    try {	// sessionStorageの利用を試す
-        sessionStorage.setItem(HEIKO_SESSION_ACTIVE_KEY, "1");	// 現在のタブでログイン中と記録する
-    } catch (error) {	// sessionStorageを使えない環境に対応する
-        console.warn("一時ログイン状態を保存できませんでした。", error);	// 保存失敗を記録する
-    }	// sessionStorage処理を閉じる
-    if (remember) {	// 自動ログインを選択した場合に処理する
-        localStorage.setItem(HEIKO_REMEMBER_UNTIL_KEY, String(Date.now() + HEIKO_REMEMBER_DAYS * 24 * 60 * 60 * 1000));	// 30日後の期限を保存する
-        localStorage.removeItem(HEIKO_SESSION_ONLY_KEY);	// タブ限定設定を解除する
-    } else {	// 自動ログインを選択しなかった場合に処理する
-        localStorage.removeItem(HEIKO_REMEMBER_UNTIL_KEY);	// 長期保存の期限を削除する
-        localStorage.setItem(HEIKO_SESSION_ONLY_KEY, "1");	// タブを閉じるまでのログインと記録する
-    }	// 保存期間の設定を閉じる
-    return true;	// 保存成功を返す
-}	// ログイン情報保存を閉じる
+function saveHeikoAuthSession(authResult, remember) {
+    if (!authResult || !authResult.email || !authResult.sessionToken) return false;
+    localStorage.setItem("userEmail", authResult.email);
+    localStorage.setItem("userId", authResult.userId || authResult.email);
+    localStorage.setItem("userName", authResult.name || "");
+    localStorage.setItem("profileImage", authResult.profileImage || "");
+    localStorage.setItem("sessionToken", authResult.sessionToken);
+    if (authResult.adminToken) localStorage.setItem("adminToken", authResult.adminToken);
+    else localStorage.removeItem("adminToken");
+    try {
+        sessionStorage.setItem(HEIKO_SESSION_ACTIVE_KEY, "1");
+    } catch (error) {
+        console.warn("一時ログイン状態を保存できませんでした。", error);
+    }
+    if (remember) {
+        localStorage.setItem(HEIKO_REMEMBER_UNTIL_KEY, String(Date.now() + HEIKO_REMEMBER_DAYS * 24 * 60 * 60 * 1000));
+        localStorage.removeItem(HEIKO_SESSION_ONLY_KEY);
+    } else {
+        localStorage.removeItem(HEIKO_REMEMBER_UNTIL_KEY);
+        localStorage.setItem(HEIKO_SESSION_ONLY_KEY, "1");
+    }
+    return true;
+}
 
-window.saveHeikoAuthSession = saveHeikoAuthSession;	// ログイン画面から共通保存処理を使えるようにする
-window.isHeikoAuthSessionActive = isHeikoAuthSessionActive;	// ページの自動ログイン判定に使えるようにする
-isHeikoAuthSessionActive();	// 期限切れのログイン情報をページ表示前に整理する
-const isHeikoLoginPage = /\/index\.html$/.test(window.location.pathname) || /\/$/.test(window.location.pathname);	// ログイン画面のURLか確認する
-if (isHeikoLoginPage && isHeikoAuthSessionActive()) window.location.replace("main.html");	// 有効なログイン情報があれば画面表示前にホームへ移動する
-window.clearHeikoSession = clearHeikoSession;	// 各ページから共通処理を使えるようにする
-function handleHeikoSessionResponse(result) {	// APIからログイン切れが返った場合に処理する
-    const message = result && result.status === "error" ? String(result.message || "") : "";	// エラー内容を取得する
-    if (!message.includes("ログインの有効期限")) return false;	// 通常のエラーはそのまま扱う
-    clearHeikoSession();	// 期限切れのログイン情報を消す
-    window.location.replace("index.html");	// ログイン画面へ戻す
-    return true;	// ログイン切れを処理したことを返す
-}	// ログイン切れ処理を閉じる
-window.handleHeikoSessionResponse = handleHeikoSessionResponse;	// 各ページからログイン切れ処理を使えるようにする
+window.saveHeikoAuthSession = saveHeikoAuthSession;
+window.isHeikoAuthSessionActive = isHeikoAuthSessionActive;
+isHeikoAuthSessionActive();
+const isHeikoLoginPage = /\/index\.html$/.test(window.location.pathname) || /\/$/.test(window.location.pathname);
+if (isHeikoLoginPage && isHeikoAuthSessionActive()) window.location.replace("main.html");
+window.clearHeikoSession = clearHeikoSession;
+function handleHeikoSessionResponse(result) {
+    const message = result && result.status === "error" ? String(result.message || "") : "";
+    if (!message.includes("ログインの有効期限")) return false;
+    clearHeikoSession();
+    window.location.replace("index.html");
+    return true;
+}
+window.handleHeikoSessionResponse = handleHeikoSessionResponse;
 
-function getHeaderActionStack() {	// ヘッダー右側の共通操作欄を用意する
-    const navbar = document.querySelector(".navbar");	// 共通ヘッダーを取得する
-    if (!navbar) return null;	// ヘッダーがないページでは操作欄を作らない
+function getHeaderActionStack() {
+    const navbar = document.querySelector(".navbar");
+    if (!navbar) return null;
 
-    let stack = document.getElementById("heiko-header-actions");	// 既存の操作欄を取得する
-    if (stack) return stack;	// 作成済みならそのまま使う
+    let stack = document.getElementById("heiko-header-actions");
+    if (stack) return stack;
 
-    stack = document.createElement("div");	// 操作欄を作る
-    stack.id = "heiko-header-actions";	// 操作欄を識別する
-    stack.className = "heiko-header-actions";	// 共通レイアウトを適用する
-    const menuButton = navbar.querySelector(".hamburger-btn");	// ハンバーガーボタンを取得する
-    const navigation = navbar.querySelector(".nav-links");	// 通常メニューを取得する
-    navbar.insertBefore(stack, menuButton || navigation || null);	// ロゴの右、メニューの手前へ配置する
-    return stack;	// 作成した操作欄を返す
-}	// 操作欄の準備を閉じる
+    stack = document.createElement("div");
+    stack.id = "heiko-header-actions";
+    stack.className = "heiko-header-actions";
+    const menuButton = navbar.querySelector(".hamburger-btn");
+    const navigation = navbar.querySelector(".nav-links");
+    navbar.insertBefore(stack, menuButton || navigation || null);
+    return stack;
+}
 
-function installPageRefreshButton() {	// 各ページのヘッダーへ更新ボタンを追加する
-    if (!document.body || document.body.dataset.page === "index" || document.getElementById("heiko-page-refresh")) return;	// ログイン画面では表示せず、二重追加も防ぐ
+function installPageRefreshButton() {
+    if (!document.body || document.body.dataset.page === "index" || document.getElementById("heiko-page-refresh")) return;
 
-    const stack = getHeaderActionStack();	// ヘッダー内の操作欄を取得する
-    const button = document.createElement("button");	// 更新ボタンを作る
-    button.id = "heiko-page-refresh";	// 更新ボタンを識別する
-    button.type = "button";	// フォーム送信を防ぐ
-    button.className = "heiko-page-refresh";	// 共通スタイルを適用する
-    if (!stack) button.classList.add("is-floating");	// ヘッダーがないページでは右上へ固定する
-    button.setAttribute("aria-label", "ページを更新");	// 読み上げ用の説明を設定する
-    button.innerHTML = "<span aria-hidden=\"true\">↻</span><span>更新</span>";	// ボタンの表示内容を設定する
-    button.addEventListener("click", () => {	// 更新ボタンの操作を受け取る
-        button.disabled = true;	// 連続操作を防ぐ
-        button.classList.add("is-loading");	// 更新中の見た目へ変更する
-        button.querySelector("span").textContent = "⟳";	// 更新中の記号を表示する
-        window.location.reload();	// 現在のページを再読み込みする
-    });	// 操作イベントの登録を終える
-    (stack || document.body).appendChild(button);	// ヘッダー操作欄またはページ右上へ追加する
-}	// 更新ボタンの追加処理を閉じる
+    const stack = getHeaderActionStack();
+    const button = document.createElement("button");
+    button.id = "heiko-page-refresh";
+    button.type = "button";
+    button.className = "heiko-page-refresh";
+    if (!stack) button.classList.add("is-floating");
+    button.setAttribute("aria-label", "ページを更新");
+    button.innerHTML = "<span aria-hidden=\"true\">↻</span><span>更新</span>";
+    button.addEventListener("click", () => {
+        button.disabled = true;
+        button.classList.add("is-loading");
+        button.querySelector("span").textContent = "⟳";
+        window.location.reload();
+    });
+    (stack || document.body).appendChild(button);
+}
 
-function installRecruitmentPostButton() {	// ログイン後ページへ募集投稿の共通導線を追加する
-    if (!document.body || document.getElementById("heiko-recruit-post-panel")) return;	// ページ本体がない場合や二重追加を防ぐ
-    const navbar = document.querySelector(".navbar");	// ログイン後の共通ヘッダーを取得する
-    const refreshButton = document.getElementById("heiko-page-refresh");	// 更新ボタンを取得する
-    if (!navbar || !refreshButton) return;	// ログイン前・規約ページでは追加しない
+function installRecruitmentPostButton() {
+    if (!document.body || document.getElementById("heiko-recruit-post-panel")) return;
+    const navbar = document.querySelector(".navbar");
+    const refreshButton = document.getElementById("heiko-page-refresh");
+    if (!navbar || !refreshButton) return;
 
-    const panel = document.createElement("section");	// 募集投稿用のカードを作る
-    panel.id = "heiko-recruit-post-panel";	// 募集投稿カードを識別する
-    panel.className = "heiko-recruit-post-panel";	// 共通スタイルを適用する
-    const currentRecruitment = document.getElementById("my-post-area");	// ホームの現在の募集カードを取得する
-    if (currentRecruitment) {	// ホーム画面では募集状況のすぐ下へ置く
-        panel.classList.add("is-sidebar-action");	// サイドバー用の見た目を指定する
-        currentRecruitment.insertAdjacentElement("afterend", panel);	// 現在の募集カードの直下へ追加する
-    } else {	// ほかのログイン後ページではメイン内容の直前へ置く
-        const main = document.querySelector("main");	// 各ページの主内容を取得する
-        if (!main) return;	// 主内容がないページでは表示しない
-        panel.classList.add("is-page-action");	// 通常ページ用の見た目を指定する
-        main.insertAdjacentElement("beforebegin", panel);	// ページ内容の直前へ追加する
-    }	// 配置場所の判定を閉じる
+    const panel = document.createElement("section");
+    panel.id = "heiko-recruit-post-panel";
+    panel.className = "heiko-recruit-post-panel";
+    const currentRecruitment = document.getElementById("my-post-area");
+    if (currentRecruitment) {
+        panel.classList.add("is-sidebar-action");
+        currentRecruitment.insertAdjacentElement("afterend", panel);
+    } else {
+        const main = document.querySelector("main");
+        if (!main) return;
+        panel.classList.add("is-page-action");
+        main.insertAdjacentElement("beforebegin", panel);
+    }
 
-    const copy = document.createElement("div");	// カードの案内文を作る
-    copy.className = "heiko-recruit-post-copy";	// 案内文のスタイルを指定する
-    copy.innerHTML = "<span>QUICK MATCH</span><strong>いっしょに勉強する仲間を探そう</strong><small>学年・学科はマイページの設定が使われます</small>";	// 案内文を設定する
-    const actions = document.createElement("div");	// ボタンをまとめる領域を作る
-    actions.className = "heiko-recruit-post-actions";	// ボタン領域のスタイルを指定する
-    const button = document.createElement("a");	// 募集投稿ボタンを作る
-    button.id = "heiko-recruit-post";	// 募集投稿ボタンを識別する
-    button.className = "heiko-recruit-post";	// 目立つ共通スタイルを適用する
-    button.href = "main.html?tab=recruit";	// 募集投稿欄を直接開く
-    button.setAttribute("aria-label", "募集を投稿する");	// 読み上げ用の説明を設定する
-    button.innerHTML = "<span class=\"heiko-recruit-post-icon\" aria-hidden=\"true\">＋</span><span>募集を投稿する</span><span class=\"heiko-recruit-post-arrow\" aria-hidden=\"true\">→</span>";	// 投稿ボタンの表示内容を設定する
-    panel.appendChild(copy);	// 案内文をカードへ追加する
-    actions.appendChild(button);	// 投稿ボタンを操作欄へ追加する
-    actions.appendChild(refreshButton);	// 更新ボタンも投稿ボタンの下へ移動する
-    panel.appendChild(actions);	// 操作欄をカードへ追加する
+    const copy = document.createElement("div");
+    copy.className = "heiko-recruit-post-copy";
+    copy.innerHTML = "<span>QUICK MATCH</span><strong>いっしょに勉強する仲間を探そう</strong><small>学年・学科はマイページの設定が使われます</small>";
+    const actions = document.createElement("div");
+    actions.className = "heiko-recruit-post-actions";
+    const button = document.createElement("a");
+    button.id = "heiko-recruit-post";
+    button.className = "heiko-recruit-post";
+    button.href = "main.html?tab=recruit";
+    button.setAttribute("aria-label", "募集を投稿する");
+    button.innerHTML = "<span class=\"heiko-recruit-post-icon\" aria-hidden=\"true\">＋</span><span>募集を投稿する</span><span class=\"heiko-recruit-post-arrow\" aria-hidden=\"true\">→</span>";
+    panel.appendChild(copy);
+    actions.appendChild(button);
+    actions.appendChild(refreshButton);
+    panel.appendChild(actions);
 
-    const headerActions = document.getElementById("heiko-header-actions");	// 一時的に作られたヘッダー操作欄を取得する
-    if (headerActions && !headerActions.children.length) headerActions.remove();	// 空になった操作欄を取り除いてヘッダーを整える
-}	// 募集投稿導線の追加処理を閉じる
+    const headerActions = document.getElementById("heiko-header-actions");
+    if (headerActions && !headerActions.children.length) headerActions.remove();
+}
 
-function prefetchHeikoPages() {	// 主要ページをバックグラウンドで先読みする
-    if (!document.body || document.body.dataset.page !== "main") return;	// ホーム画面だけで実行する
+function prefetchHeikoPages() {
+    if (!document.body || document.body.dataset.page !== "main") return;
 
-    const pages = [	// 先読みするページをまとめる
-        "messages.html",	// メッセージ一覧を先読みする
-        "chat.html",	// チャット画面を先読みする
-        "profile.html",	// マイページを先読みする
-        "ai-study.html",	// AI相談画面を先読みする
-        "admin.html",	// 管理者画面を先読みする
-        "privacy.html",	// プライバシーポリシーを先読みする
-        "terms.html"	// 利用規約を先読みする
-    ];	// 先読み対象の定義を終える
+    const pages = [
+        "messages.html",
+        "chat.html",
+        "profile.html",
+        "ai-study.html",
+        "admin.html",
+        "privacy.html",
+        "terms.html"
+    ];
 
-    const cacheKey = "heiko-prefetched-pages-v20260930";	// 先読み済み状態の保存名を決める
-    try {	// sessionStorageの利用を試す
-        if (sessionStorage.getItem(cacheKey) === "1") return;	// 同じタブでは再実行しない
-        sessionStorage.setItem(cacheKey, "1");	// 先読み開始済みとして保存する
-    } catch (error) {	// 保存できない環境に備える
-        console.warn("ページ先読み状態を保存できませんでした。", error);	// 保存失敗を記録する
-    }	// sessionStorage処理を閉じる
+    const cacheKey = "heiko-prefetched-pages-v20260930";
+    try {
+        if (sessionStorage.getItem(cacheKey) === "1") return;
+        sessionStorage.setItem(cacheKey, "1");
+    } catch (error) {
+        console.warn("ページ先読み状態を保存できませんでした。", error);
+    }
 
-    Promise.allSettled(pages.map(page => {	// ページを並列で取得する
-        return fetch(page, { cache: "force-cache", credentials: "same-origin" }).then(response => {	// HTMLをキャッシュへ読み込む
-            if (!response.ok) throw new Error(`${page}: HTTP ${response.status}`);	// 取得失敗を検出する
-            return response.text();	// 本文を最後まで読み込む
-        });	// ページ取得を完了する
-    })).then(results => {	// 先読み結果を受け取る
-        const failed = results.filter(result => result.status === "rejected").length;	// 失敗したページ数を数える
-        if (failed > 0) console.info(`ページ先読み: ${pages.length - failed}/${pages.length}件完了`);	// 部分的な失敗だけ記録する
-    });	// 並列先読みを完了する
-}	// ページ先読み処理を閉じる
+    Promise.allSettled(pages.map(page => {
+        return fetch(page, { cache: "force-cache", credentials: "same-origin" }).then(response => {
+            if (!response.ok) throw new Error(`${page}: HTTP ${response.status}`);
+            return response.text();
+        });
+    })).then(results => {
+        const failed = results.filter(result => result.status === "rejected").length;
+        if (failed > 0) console.info(`ページ先読み: ${pages.length - failed}/${pages.length}件完了`);
+    });
+}
 
-function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加する
-    if (document.getElementById("heiko-shared-ui-style")) return;	// スタイルの二重追加を防ぐ
+function installHeikoSharedStyles() {
+    if (document.getElementById("heiko-shared-ui-style")) return;
 
-    const style = document.createElement("style");	// style要素を作る
-    style.id = "heiko-shared-ui-style";	// style要素を識別する
+    const style = document.createElement("style");
+    style.id = "heiko-shared-ui-style";
     style.textContent = `
         .navbar > .heiko-header-actions {
             display: flex;
@@ -818,173 +818,173 @@ function installHeikoSharedStyles() {	// 共通ボタンのスタイルを追加
                 align-self: center;
             }
         }
-    `;	// 共通スタイルを定義する
-    document.head.appendChild(style);	// style要素をページへ追加する
-}	// 共通スタイル追加処理を閉じる
+    `;
+    document.head.appendChild(style);
+}
 
-(function installUsageLogging() {	// GAS通信を利用ログへ記録する仕組みを準備する
-    const nativeFetch = window.fetch.bind(window);	// 元の通信関数を保存する
-    const ignoredModes = new Set(["recordUsageLog", "recordUsageLogs", "heartbeat", "login", "register", "verifyEmail", "resendVerificationCode", "forgotPassword", "resetPassword", "verify_face_1toN", "verify_face_for_user", "firebaseCustomToken", "getMessages", "getUnreadCount", "getNotificationSummary", "getLatestIncomingMessage", "markAsRead"]);	// 自動確認の通信は利用回数へ含めない
-    const usageLogQueue = [];	// 利用ログを一時的にまとめる
-    let usageLogTimer = null;	// まとめて送るタイマーを保持する
-    let usageLogUrl = "";	// 実際に使われたGASのURLを保持する
+(function installUsageLogging() {
+    const nativeFetch = window.fetch.bind(window);
+    const ignoredModes = new Set(["recordUsageLog", "recordUsageLogs", "heartbeat", "login", "register", "verifyEmail", "resendVerificationCode", "forgotPassword", "resetPassword", "verify_face_1toN", "verify_face_for_user", "firebaseCustomToken", "getMessages", "getUnreadCount", "getNotificationSummary", "getLatestIncomingMessage", "markAsRead"]);
+    const usageLogQueue = [];
+    let usageLogTimer = null;
+    let usageLogUrl = "";
 
-    function parsePayload(body) {	// 通信本文からJSONを読み取る
-        if (typeof body !== "string") return null;	// JSON文字列以外は対象外にする
-        try {	// JSONの読み込みを試す
-            const payload = JSON.parse(body);	// 通信本文をオブジェクトへ変換する
-            return payload && typeof payload === "object" ? payload : null;	// オブジェクトだけ返す
-        } catch (error) {	// 壊れたJSONに備える
-            return null;	// 読み込み失敗を無視する
-        }	// JSON読み込みを閉じる
-    }	// 本文解析を閉じる
+    function parsePayload(body) {
+        if (typeof body !== "string") return null;
+        try {
+            const payload = JSON.parse(body);
+            return payload && typeof payload === "object" ? payload : null;
+        } catch (error) {
+            return null;
+        }
+    }
 
-    function getRequestUrl(input) {	// fetchの入力からURLを取得する
-        return typeof input === "string" ? input : input && input.url ? input.url : "";	// URL文字列を返す
-    }	// URL取得を閉じる
+    function getRequestUrl(input) {
+        return typeof input === "string" ? input : input && input.url ? input.url : "";
+    }
 
-    function flushUsageLogs() {	// たまった利用ログを一度に送る
-        const sessionToken = localStorage.getItem("sessionToken") || "";	// 現在のセッションを取得する
-        const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";	// 本人のUserIDを取得する
-        if (!sessionToken || !userId || usageLogQueue.length === 0) return;	// 送る情報がなければ終了する
-        if (usageLogTimer) clearTimeout(usageLogTimer);	// 予約済みの送信を解除する
-        usageLogTimer = null;	// タイマー情報を破棄する
-        const events = usageLogQueue.splice(0, 20);	// 一度に送る件数を制限する
-        const logPayload = {	// ログ保存用の本文を作る
-            mode: "recordUsageLogs",	// 一括保存モードを指定する
-            userId: String(userId).slice(0, 64),	// UserIDを短くして送る
-            events: events,	// まとめた利用ログを送る
-            sessionToken: sessionToken	// 本人確認情報を送る
-        };	// ログ本文の定義を閉じる
-        nativeFetch(usageLogUrl || window.HEIKO_GAS_URL || "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec", {	// 元の通信と同じGASへログを送る
-            method: "POST",	// POST通信を使う
-            body: JSON.stringify(logPayload),	// ログ本文をJSONへ変換する
-            keepalive: true	// 画面移動直前でも送信を続ける
-        }).catch(() => {});	// ログ失敗で本来の操作を止めない
-        if (usageLogQueue.length > 0) usageLogTimer = setTimeout(flushUsageLogs, 1500);	// 残りがあれば続けて送る
-    }	// 一括送信を閉じる
+    function flushUsageLogs() {
+        const sessionToken = localStorage.getItem("sessionToken") || "";
+        const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";
+        if (!sessionToken || !userId || usageLogQueue.length === 0) return;
+        if (usageLogTimer) clearTimeout(usageLogTimer);
+        usageLogTimer = null;
+        const events = usageLogQueue.splice(0, 20);
+        const logPayload = {
+            mode: "recordUsageLogs",
+            userId: String(userId).slice(0, 64),
+            events: events,
+            sessionToken: sessionToken
+        };
+        nativeFetch(usageLogUrl || window.HEIKO_GAS_URL || "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec", {
+            method: "POST",
+            body: JSON.stringify(logPayload),
+            keepalive: true
+        }).catch(() => {});
+        if (usageLogQueue.length > 0) usageLogTimer = setTimeout(flushUsageLogs, 1500);
+    }
 
-    function queueUsageLog(url, payload, result, durationMs, errorMessage) {	// 利用ログを送信待ちへ追加する
-        if (!payload || payload.adminToken) return;	// 管理者操作は記録しない
-        if (url) usageLogUrl = url;	// 通信に使ったGASのURLを保存する
-        usageLogQueue.push({	// 利用イベントを追加する
-            sourceMode: String(payload.mode || "unknown").slice(0, 80),	// 元のAPIモードを保存する
-            result: result,	// 成否を保存する
-            durationMs: Math.round(durationMs),	// 処理時間を保存する
-            errorMessage: String(errorMessage || "").slice(0, 300)	// エラー内容を短く保存する
-        });	// 利用イベントの追加を閉じる
-        if (usageLogQueue.length >= 10 || result === "error") {	// 件数が多い場合や失敗時は早めに送る
-            flushUsageLogs();	// たまったログを送る
-        } else if (!usageLogTimer) {	// 通常時は一定時間まとめる
-            usageLogTimer = setTimeout(flushUsageLogs, 20000);	// 二十秒後に一括送信する
-        }	// 送信時期の判定を閉じる
-    }	// ログ追加処理を閉じる
+    function queueUsageLog(url, payload, result, durationMs, errorMessage) {
+        if (!payload || payload.adminToken) return;
+        if (url) usageLogUrl = url;
+        usageLogQueue.push({
+            sourceMode: String(payload.mode || "unknown").slice(0, 80),
+            result: result,
+            durationMs: Math.round(durationMs),
+            errorMessage: String(errorMessage || "").slice(0, 300)
+        });
+        if (usageLogQueue.length >= 10 || result === "error") {
+            flushUsageLogs();
+        } else if (!usageLogTimer) {
+            usageLogTimer = setTimeout(flushUsageLogs, 20000);
+        }
+    }
 
-    window.fetch = async function (input, init = {}) {	// すべてのGAS通信を確認する
-        const url = getRequestUrl(input);	// 通信先URLを取得する
-        const payload = parsePayload(init.body);	// 通信本文を取得する
-        const shouldLog = Boolean(payload && payload.mode && url.includes("script.google.com/macros/") && !ignoredModes.has(payload.mode) && !payload.adminToken);	// 記録対象か確認する
-        const startedAt = performance.now();	// 通信開始時刻を保存する
+    window.fetch = async function (input, init = {}) {
+        const url = getRequestUrl(input);
+        const payload = parsePayload(init.body);
+        const shouldLog = Boolean(payload && payload.mode && url.includes("script.google.com/macros/") && !ignoredModes.has(payload.mode) && !payload.adminToken);
+        const startedAt = performance.now();
 
-        try {	// 通信を実行する
-            const response = await nativeFetch(input, init);	// 元のfetchで通信する
-            if (shouldLog) {	// 記録対象の場合に処理する
-                const copy = response.clone();	// 本来の処理を邪魔しない複製を作る
-                copy.json().then(result => {	// GASの応答を読み込む
-                    const status = result && result.status === "success" ? "success" : "error";	// 応答から成否を判定する
-                    queueUsageLog(url, payload, status, performance.now() - startedAt, status === "error" ? result.message : "");	// 結果を保存する
-                }).catch(error => queueUsageLog(url, payload, "error", performance.now() - startedAt, error.message));	// JSON読込失敗を保存する
-            }	// 記録対象の処理を閉じる
-            return response;	// 元の応答を返す
-        } catch (error) {	// 通信失敗に備える
-            if (shouldLog) queueUsageLog(url, payload, "error", performance.now() - startedAt, error.message);	// 通信エラーを保存する
-            throw error;	// 元のエラーを呼び出し元へ返す
-        }	// 通信処理を閉じる
-    };	// fetchの差し替えを完了する
+        try {
+            const response = await nativeFetch(input, init);
+            if (shouldLog) {
+                const copy = response.clone();
+                copy.json().then(result => {
+                    const status = result && result.status === "success" ? "success" : "error";
+                    queueUsageLog(url, payload, status, performance.now() - startedAt, status === "error" ? result.message : "");
+                }).catch(error => queueUsageLog(url, payload, "error", performance.now() - startedAt, error.message));
+            }
+            return response;
+        } catch (error) {
+            if (shouldLog) queueUsageLog(url, payload, "error", performance.now() - startedAt, error.message);
+            throw error;
+        }
+    };
 
-    document.addEventListener("visibilitychange", () => {	// 画面が隠れる前にログを送る
-        if (document.visibilityState === "hidden") flushUsageLogs();	// 未送信ログを一括送信する
-    });	// 表示状態の監視を閉じる
-})();	// 利用ログ記録の準備を完了する
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") flushUsageLogs();
+    });
+})();
 
-document.addEventListener("DOMContentLoaded", () => {	// 画面の読み込み完了後に処理する
-    if (document.body && document.body.dataset.page === "index" && isHeikoAuthSessionActive()) {	// 有効なログイン情報がある場合に処理する
-        window.location.replace("main.html");	// ログイン画面を表示せずホームへ移動する
-        return;	// ログイン画面の初期化を行わず終了する
-    }	// 自動ログイン判定を閉じる
-    const selector = document.getElementById("theme-preference");	// 外観設定の選択欄を取得する
-    if (selector) selector.value = readThemePreference();	// 保存済みの外観設定を選択欄へ表示する
-    installHeikoSharedStyles();	// 共通ボタンのスタイルを読み込む
-    installPageRefreshButton();	// ページ上部へ更新ボタンを追加する
-    installRecruitmentPostButton();	// ヘッダーがある各ページへ募集投稿ボタンを追加する
-    installHeikoPwaSupport();	// PWAの登録とマイページの追加ボタンを準備する
-    installHeikoFooterNavigation();	// フッターメニューを上部ナビと統一する
-    if (document.body && document.body.dataset.page === "main") {	// ホーム画面だけ先読みを開始する
-        if ("requestIdleCallback" in window) {	// ブラウザが待機時間を通知できる場合に処理する
-            window.requestIdleCallback(prefetchHeikoPages, { timeout: 3000 });	// 初期通信が落ち着いてから先読みする
-        } else {	// 待機時間通知に対応していない場合に処理する
-            window.setTimeout(prefetchHeikoPages, 1800);	// 初期表示の後に先読みする
-        }	// 先読み開始方法の判定を閉じる
-    }	// ホーム画面の先読み条件を閉じる
-});	// 読み込み完了時の処理を登録する
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.body && document.body.dataset.page === "index" && isHeikoAuthSessionActive()) {
+        window.location.replace("main.html");
+        return;
+    }
+    const selector = document.getElementById("theme-preference");
+    if (selector) selector.value = readThemePreference();
+    installHeikoSharedStyles();
+    installPageRefreshButton();
+    installRecruitmentPostButton();
+    installHeikoPwaSupport();
+    installHeikoFooterNavigation();
+    if (document.body && document.body.dataset.page === "main") {
+        if ("requestIdleCallback" in window) {
+            window.requestIdleCallback(prefetchHeikoPages, { timeout: 3000 });
+        } else {
+            window.setTimeout(prefetchHeikoPages, 1800);
+        }
+    }
+});
 
-(function () {	// 処理のまとまりを始める
-    function getNoticeType(message) {	// 関数を定義
-        const text = String(message || "");	// 定数を定義
-        if (/失敗|エラー|通信|不足|見つかりません|入力してください|必要です|無効|権限|間違|ありません/.test(text)) {	// 条件に応じて処理を分ける
-            return "error";	// 結果を返す
-        }	// 処理のまとまりを閉じる
-        if (/完了|保存|削除|受け付け|成功|送りました|しました|更新/.test(text)) {	// 条件に応じて処理を分ける
-            return "success";	// 結果を返す
-        }	// 処理のまとまりを閉じる
-        return "info";	// 結果を返す
-    }	// 処理のまとまりを閉じる
+(function () {
+    function getNoticeType(message) {
+        const text = String(message || "");
+        if (/失敗|エラー|通信|不足|見つかりません|入力してください|必要です|無効|権限|間違|ありません/.test(text)) {
+            return "error";
+        }
+        if (/完了|保存|削除|受け付け|成功|送りました|しました|更新/.test(text)) {
+            return "success";
+        }
+        return "info";
+    }
 
-    function getRoot() {	// 関数を定義
-        let root = document.getElementById("ui-notice-root");	// 状態を保持
-        if (!root) {	// 条件に応じて処理を分ける
-            root = document.createElement("div");	// 処理を完了する
-            root.id = "ui-notice-root";	// 処理を続ける
-            root.setAttribute("aria-live", "polite");	// 処理を完了する
-            root.setAttribute("aria-atomic", "true");	// 処理を完了する
-            document.body.appendChild(root);	// 処理を完了する
-        }	// 処理のまとまりを閉じる
-        return root;	// 結果を返す
-    }	// 処理のまとまりを閉じる
+    function getRoot() {
+        let root = document.getElementById("ui-notice-root");
+        if (!root) {
+            root = document.createElement("div");
+            root.id = "ui-notice-root";
+            root.setAttribute("aria-live", "polite");
+            root.setAttribute("aria-atomic", "true");
+            document.body.appendChild(root);
+        }
+        return root;
+    }
 
-    function showNotice(message, type) {	// 関数を定義
-        const root = getRoot();	// 定数を定義
-        const notice = document.createElement("div");	// 定数を定義
-        const noticeType = type || getNoticeType(message);	// 定数を定義
-        const icon = noticeType === "success" ? "✓" : noticeType === "error" ? "!" : "i";	// 定数を定義
+    function showNotice(message, type) {
+        const root = getRoot();
+        const notice = document.createElement("div");
+        const noticeType = type || getNoticeType(message);
+        const icon = noticeType === "success" ? "✓" : noticeType === "error" ? "!" : "i";
 
-        notice.className = `ui-notice ui-notice-${noticeType}`;	// 処理を続ける
-        notice.setAttribute("role", noticeType === "error" ? "alert" : "status");	// 処理を完了する
+        notice.className = `ui-notice ui-notice-${noticeType}`;
+        notice.setAttribute("role", noticeType === "error" ? "alert" : "status");
         notice.innerHTML = `
             <span class="ui-notice-icon">${icon}</span>
             <span class="ui-notice-message"></span>
             <button type="button" class="ui-notice-close" aria-label="通知を閉じる">×</button>
         `;
-        notice.querySelector(".ui-notice-message").textContent = String(message || "");	// 処理を完了する
-        notice.querySelector(".ui-notice-close").addEventListener("click", () => removeNotice(notice));	// 操作イベントを登録
-        root.appendChild(notice);	// 処理を完了する
+        notice.querySelector(".ui-notice-message").textContent = String(message || "");
+        notice.querySelector(".ui-notice-close").addEventListener("click", () => removeNotice(notice));
+        root.appendChild(notice);
 
-        requestAnimationFrame(() => notice.classList.add("is-visible"));	// 処理を完了する
-        const duration = noticeType === "error" ? 5200 : 3600;	// 定数を定義
-        let timer = setTimeout(() => removeNotice(notice), duration);	// 状態を保持
-        notice.addEventListener("mouseenter", () => clearTimeout(timer));	// 操作イベントを登録
-        notice.addEventListener("mouseleave", () => {	// 操作イベントを登録
-            timer = setTimeout(() => removeNotice(notice), duration);	// 時間を置いて処理する
-        });	// 処理を完了する
-    }	// 処理のまとまりを閉じる
+        requestAnimationFrame(() => notice.classList.add("is-visible"));
+        const duration = noticeType === "error" ? 5200 : 3600;
+        let timer = setTimeout(() => removeNotice(notice), duration);
+        notice.addEventListener("mouseenter", () => clearTimeout(timer));
+        notice.addEventListener("mouseleave", () => {
+            timer = setTimeout(() => removeNotice(notice), duration);
+        });
+    }
 
-    function removeNotice(notice) {	// 関数を定義
-        if (!notice || notice.classList.contains("is-leaving")) return;	// 条件に応じて処理を分ける
-        notice.classList.remove("is-visible");	// 処理を完了する
-        notice.classList.add("is-leaving");	// 処理を完了する
-        setTimeout(() => notice.remove(), 220);	// 時間を置いて処理する
-    }	// 処理のまとまりを閉じる
+    function removeNotice(notice) {
+        if (!notice || notice.classList.contains("is-leaving")) return;
+        notice.classList.remove("is-visible");
+        notice.classList.add("is-leaving");
+        setTimeout(() => notice.remove(), 220);
+    }
 
-    window.showNotice = showNotice;	// 処理を続ける
-    window.alert = message => showNotice(message);	// 処理結果を知らせる
-})();	// 処理を完了する
+    window.showNotice = showNotice;
+    window.alert = message => showNotice(message);
+})();

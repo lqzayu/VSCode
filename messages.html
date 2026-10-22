@@ -1,420 +1,420 @@
-<!DOCTYPE html>	<!-- HTML文書として宣言 -->
-<html lang="ja">	<!-- 画面要素を配置 -->
+<!DOCTYPE html>
+<html lang="ja">
 
-<head>	<!-- 画面要素を配置 -->
-    <meta charset="UTF-8">	<!-- 表示環境を設定 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">	<!-- 表示環境を設定 -->
-    <title>メッセージ - 平工マッチング</title>	<!-- ページタイトルを設定 -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メッセージ - 平工マッチング</title>
 
-    <link rel="icon" href="icon-192.png">	<!-- 外部ファイルを読み込む -->
-    <link rel="manifest" href="manifest.json">	<!-- PWAとしてホーム画面へ追加できるようにする -->
+    <link rel="icon" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#254f3d">
     <link rel="apple-touch-icon" href="icon-192.png">
 
 
     <style>
 
-        body {	/* 対象要素のスタイルを始める */
-            margin: 0;	/* 見た目の設定を指定 */
-            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);	/* 見た目の設定を指定 */
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;	/* 見た目の設定を指定 */
-            color: #1e293b;	/* 見た目の設定を指定 */
-            display: flex;	/* 見た目の設定を指定 */
-            flex-direction: column;	/* 見た目の設定を指定 */
-            min-height: 100vh;	/* 見た目の設定を指定 */
-            -webkit-font-smoothing: antialiased;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        body {
+            margin: 0;
+            background: radial-gradient(circle at 10% 20%, rgba(238, 252, 253, 1) 0%, rgba(218, 241, 245, 1) 90%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+            color: #1e293b;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
 
-        .navbar {	/* 対象要素のスタイルを始める */
-            background: rgba(255, 255, 255, 0.75);	/* 見た目の設定を指定 */
-            backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
-            -webkit-backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
-            padding: 14px 5%;	/* 見た目の設定を指定 */
-            display: flex;	/* 見た目の設定を指定 */
-            justify-content: space-between;	/* 見た目の設定を指定 */
-            align-items: center;	/* 見た目の設定を指定 */
-            border-bottom: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);	/* 見た目の設定を指定 */
-            position: sticky;	/* 見た目の設定を指定 */
-            top: 0;	/* 見た目の設定を指定 */
-            z-index: 100;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .navbar {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 14px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-        .logo {	/* 対象要素のスタイルを始める */
-            font-size: 1.4rem;	/* 見た目の設定を指定 */
-            font-weight: 800;	/* 見た目の設定を指定 */
-            letter-spacing: -0.03em;	/* 見た目の設定を指定 */
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
-            -webkit-background-clip: text;	/* 見た目の設定を指定 */
-            -webkit-text-fill-color: transparent;	/* 見た目の設定を指定 */
-            cursor: pointer;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
 
-        .nav-links {	/* 対象要素のスタイルを始める */
-            display: flex;	/* 見た目の設定を指定 */
-            align-items: center;	/* 見た目の設定を指定 */
-            gap: 8px;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-        .nav-item {	/* 対象要素のスタイルを始める */
-            cursor: pointer;	/* 見た目の設定を指定 */
-            color: #64748b;	/* 見た目の設定を指定 */
-            font-weight: 700;	/* 見た目の設定を指定 */
-            font-size: 14px;	/* 見た目の設定を指定 */
-            padding: 8px 16px;	/* 見た目の設定を指定 */
-            text-decoration: none;	/* 見た目の設定を指定 */
-            border-radius: 8px;	/* 見た目の設定を指定 */
-            transition: all 0.2s ease;	/* 見た目の設定を指定 */
-            position: relative;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .nav-item {
+            cursor: pointer;
+            color: #64748b;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
 
-        .nav-item:hover {	/* 対象要素のスタイルを始める */
-            background-color: rgba(28, 189, 197, 0.06);	/* 見た目の設定を指定 */
-            color: #1cbdc5;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .nav-item:hover {
+            background-color: rgba(28, 189, 197, 0.06);
+            color: #1cbdc5;
+        }
 
-        .nav-item.active {	/* 対象要素のスタイルを始める */
-            color: #1cbdc5;	/* 見た目の設定を指定 */
-            background-color: rgba(28, 189, 197, 0.1);	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .nav-item.active {
+            color: #1cbdc5;
+            background-color: rgba(28, 189, 197, 0.1);
+        }
 
-        .unread-badge {	/* 対象要素のスタイルを始める */
-            position: absolute;	/* 見た目の設定を指定 */
-            top: 2px;	/* 見た目の設定を指定 */
-            right: 4px;	/* 見た目の設定を指定 */
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);	/* 見た目の設定を指定 */
-            color: #ffffff;	/* 見た目の設定を指定 */
-            font-size: 10px;	/* 見た目の設定を指定 */
-            font-weight: 800;	/* 見た目の設定を指定 */
-            padding: 2px 6px;	/* 見た目の設定を指定 */
-            border-radius: 10px;	/* 見た目の設定を指定 */
-            line-height: 1;	/* 見た目の設定を指定 */
-            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);	/* 見た目の設定を指定 */
-            min-width: 14px;	/* 見た目の設定を指定 */
-            text-align: center;	/* 見た目の設定を指定 */
-            box-sizing: border-box;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .unread-badge {
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 10px;
+            line-height: 1;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+            min-width: 14px;
+            text-align: center;
+            box-sizing: border-box;
+        }
 
-        .btn-logout {	/* 対象要素のスタイルを始める */
-            padding: 8px 16px;	/* 見た目の設定を指定 */
-            border-radius: 8px;	/* 見た目の設定を指定 */
-            border: none;	/* 見た目の設定を指定 */
-            background-color: #ef4444;	/* 見た目の設定を指定 */
-            color: #ffffff;	/* 見た目の設定を指定 */
-            font-weight: 700;	/* 見た目の設定を指定 */
-            font-size: 13px;	/* 見た目の設定を指定 */
-            cursor: pointer;	/* 見た目の設定を指定 */
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);	/* 見た目の設定を指定 */
-            transition: all 0.2s;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .btn-logout {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            background-color: #ef4444;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+            transition: all 0.2s;
+        }
 
-        .btn-logout:hover {	/* 対象要素のスタイルを始める */
-            opacity: 0.9;	/* 見た目の設定を指定 */
-            transform: translateY(-1px);	/* 見た目の設定を指定 */
-            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .btn-logout:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
+        }
 
-        .hamburger-btn {	/* 対象要素のスタイルを始める */
-            display: none;	/* 見た目の設定を指定 */
-            flex-direction: column;	/* 見た目の設定を指定 */
-            justify-content: space-between;	/* 見た目の設定を指定 */
-            width: 24px;	/* 見た目の設定を指定 */
-            height: 18px;	/* 見た目の設定を指定 */
-            background: transparent;	/* 見た目の設定を指定 */
-            border: none;	/* 見た目の設定を指定 */
-            cursor: pointer;	/* 見た目の設定を指定 */
-            padding: 0;	/* 見た目の設定を指定 */
-            z-index: 110;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .hamburger-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 24px;
+            height: 18px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 110;
+        }
 
-        .hamburger-btn span {	/* 対象要素のスタイルを始める */
-            width: 100%;	/* 見た目の設定を指定 */
-            height: 2.5px;	/* 見た目の設定を指定 */
-            background-color: #1e293b;	/* 見た目の設定を指定 */
-            border-radius: 3px;	/* 見た目の設定を指定 */
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .hamburger-btn span {
+            width: 100%;
+            height: 2.5px;
+            background-color: #1e293b;
+            border-radius: 3px;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
 
-        .container {	/* 対象要素のスタイルを始める */
-            flex: 1;	/* 見た目の設定を指定 */
-            width: 100%;	/* 見た目の設定を指定 */
-            max-width: 680px;	/* 見た目の設定を指定 */
-            margin: 40px auto;	/* 見た目の設定を指定 */
-            padding: 0 24px;	/* 見た目の設定を指定 */
-            box-sizing: border-box;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .container {
+            flex: 1;
+            width: 100%;
+            max-width: 680px;
+            margin: 40px auto;
+            padding: 0 24px;
+            box-sizing: border-box;
+        }
 
-        .dm-card {	/* 対象要素のスタイルを始める */
-            background: rgba(255, 255, 255, 0.85);	/* 見た目の設定を指定 */
-            backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
-            -webkit-backdrop-filter: blur(20px);	/* 見た目の設定を指定 */
-            border: 1px solid rgba(255, 255, 255, 0.6);	/* 見た目の設定を指定 */
-            border-radius: 24px;	/* 見た目の設定を指定 */
-            overflow: hidden;	/* 見た目の設定を指定 */
-            box-shadow: 0 20px 40px -4px rgba(24, 76, 92, 0.05);	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .dm-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -4px rgba(24, 76, 92, 0.05);
+        }
 
-        .dm-header {	/* 対象要素のスタイルを始める */
-            padding: 24px 28px;	/* 見た目の設定を指定 */
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);	/* 見た目の設定を指定 */
-            display: flex;	/* 見た目の設定を指定 */
-            align-items: center;	/* 見た目の設定を指定 */
-            justify-content: space-between;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .dm-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-        .dm-header h2 {	/* 対象要素のスタイルを始める */
-            font-size: 1.25rem;	/* 見た目の設定を指定 */
-            margin: 0;	/* 見た目の設定を指定 */
-            color: #1e293b;	/* 見た目の設定を指定 */
-            font-weight: 800;	/* 見た目の設定を指定 */
-            display: flex;	/* 見た目の設定を指定 */
-            align-items: center;	/* 見た目の設定を指定 */
-            gap: 10px;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .dm-header h2 {
+            font-size: 1.25rem;
+            margin: 0;
+            color: #1e293b;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-        .dm-header h2::before {	/* 対象要素のスタイルを始める */
-            content: '';	/* 見た目の設定を指定 */
-            display: inline-block;	/* 見た目の設定を指定 */
-            width: 4px;	/* 見た目の設定を指定 */
-            height: 20px;	/* 見た目の設定を指定 */
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
-            border-radius: 4px;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .dm-header h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
+            border-radius: 4px;
+        }
 
-        .partner-item {	/* 対象要素のスタイルを始める */
-            display: flex;	/* 見た目の設定を指定 */
-            align-items: center;	/* 見た目の設定を指定 */
-            padding: 18px 24px;	/* 見た目の設定を指定 */
-            cursor: pointer;	/* 見た目の設定を指定 */
-            transition: all 0.25s ease;	/* 見た目の設定を指定 */
-            border-bottom: 1px solid rgba(0, 0, 0, 0.03);	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .partner-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 24px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+        }
 
-        .partner-item:hover {	/* 対象要素のスタイルを始める */
-            background-color: rgba(28, 189, 197, 0.05);	/* 見た目の設定を指定 */
-            transform: translateX(4px);	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .partner-item:hover {
+            background-color: rgba(28, 189, 197, 0.05);
+            transform: translateX(4px);
+        }
 
-        .avatar-ring {	/* 対象要素のスタイルを始める */
-            width: 52px;	/* 見た目の設定を指定 */
-            height: 52px;	/* 見た目の設定を指定 */
-            border-radius: 50%;	/* 見た目の設定を指定 */
-            padding: 2px;	/* 見た目の設定を指定 */
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
-            margin-right: 18px;	/* 見た目の設定を指定 */
-            flex-shrink: 0;	/* 見た目の設定を指定 */
-            box-sizing: border-box;	/* 見た目の設定を指定 */
-            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.2);	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .avatar-ring {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            padding: 2px;
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
+            margin-right: 18px;
+            flex-shrink: 0;
+            box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(28, 189, 197, 0.2);
+        }
 
-        .partner-avatar {	/* 対象要素のスタイルを始める */
-            width: 100%;	/* 見た目の設定を指定 */
-            height: 100%;	/* 見た目の設定を指定 */
-            border-radius: 50%;	/* 見た目の設定を指定 */
-            border: 2px solid #ffffff;	/* 見た目の設定を指定 */
-            display: flex;	/* 見た目の設定を指定 */
-            align-items: center;	/* 見た目の設定を指定 */
-            justify-content: center;	/* 見た目の設定を指定 */
-            color: white;	/* 見た目の設定を指定 */
-            font-weight: 800;	/* 見た目の設定を指定 */
-            font-size: 18px;	/* 見た目の設定を指定 */
-            box-sizing: border-box;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .partner-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 18px;
+            box-sizing: border-box;
+        }
 
-        .partner-content-box {	/* 対象要素のスタイルを始める */
-            display: flex;	/* 見た目の設定を指定 */
-            flex-direction: column;	/* 見た目の設定を指定 */
-            gap: 4px;	/* 見た目の設定を指定 */
-            flex: 1;	/* 見た目の設定を指定 */
-            overflow: hidden;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .partner-content-box {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            overflow: hidden;
+        }
 
-        .partner-name {	/* 対象要素のスタイルを始める */
-            font-weight: 800;	/* 見た目の設定を指定 */
-            font-size: 15px;	/* 見た目の設定を指定 */
-            color: #1e293b;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .partner-name {
+            font-weight: 800;
+            font-size: 15px;
+            color: #1e293b;
+        }
 
-        .partner-email {	/* 対象要素のスタイルを始める */
-            font-size: 13px;	/* 見た目の設定を指定 */
-            color: #64748b;	/* 見た目の設定を指定 */
-            white-space: nowrap;	/* 見た目の設定を指定 */
-            overflow: hidden;	/* 見た目の設定を指定 */
-            text-overflow: ellipsis;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .partner-email {
+            font-size: 13px;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-        .partner-preview {	/* 対象要素のスタイルを始める */
-            font-size: 12px;	/* 見た目の設定を指定 */
-            color: #94a3b8;	/* 見た目の設定を指定 */
-            white-space: nowrap;	/* 見た目の設定を指定 */
-            overflow: hidden;	/* 見た目の設定を指定 */
-            text-overflow: ellipsis;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .partner-preview {
+            font-size: 12px;
+            color: #94a3b8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-        .arrow-badge {	/* 対象要素のスタイルを始める */
-            background: rgba(28, 189, 197, 0.1);	/* 見た目の設定を指定 */
-            color: #1cbdc5;	/* 見た目の設定を指定 */
-            font-size: 12px;	/* 見た目の設定を指定 */
-            font-weight: 800;	/* 見た目の設定を指定 */
-            padding: 6px 14px;	/* 見た目の設定を指定 */
-            border-radius: 20px;	/* 見た目の設定を指定 */
-            margin-left: 10px;	/* 見た目の設定を指定 */
-            transition: all 0.2s;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .arrow-badge {
+            background: rgba(28, 189, 197, 0.1);
+            color: #1cbdc5;
+            font-size: 12px;
+            font-weight: 800;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-left: 10px;
+            transition: all 0.2s;
+        }
 
-        .partner-item:hover .arrow-badge {	/* 対象要素のスタイルを始める */
-            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);	/* 見た目の設定を指定 */
-            color: #ffffff;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .partner-item:hover .arrow-badge {
+            background: linear-gradient(135deg, #1cbdc5 0%, #119299 100%);
+            color: #ffffff;
+        }
 
-        .partner-delete-button {	/* 対象要素のスタイルを始める */
-            flex-shrink: 0;	/* 見た目の設定を指定 */
-            margin-left: 8px;	/* 見た目の設定を指定 */
-            padding: 7px 10px;	/* 見た目の設定を指定 */
-            border: 1px solid #fecaca;	/* 見た目の設定を指定 */
-            border-radius: 8px;	/* 見た目の設定を指定 */
-            background: #fff1f2;	/* 見た目の設定を指定 */
-            color: #be123c;	/* 見た目の設定を指定 */
-            font-size: 11px;	/* 見た目の設定を指定 */
-            font-weight: 700;	/* 見た目の設定を指定 */
-            cursor: pointer;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .partner-delete-button {
+            flex-shrink: 0;
+            margin-left: 8px;
+            padding: 7px 10px;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            background: #fff1f2;
+            color: #be123c;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
 
-        .partner-delete-button:hover {	/* 対象要素のスタイルを始める */
-            background: #ffe4e6;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .partner-delete-button:hover {
+            background: #ffe4e6;
+        }
 
-        .empty-message {	/* 対象要素のスタイルを始める */
-            text-align: center;	/* 見た目の設定を指定 */
-            color: #64748b;	/* 見た目の設定を指定 */
-            font-size: 14px;	/* 見た目の設定を指定 */
-            line-height: 1.7;	/* 見た目の設定を指定 */
-            padding: 60px 20px;	/* 見た目の設定を指定 */
-            font-weight: 600;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .empty-message {
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.7;
+            padding: 60px 20px;
+            font-weight: 600;
+        }
 
-        .loading-box {	/* 対象要素のスタイルを始める */
-            display: flex;	/* 見た目の設定を指定 */
-            flex-direction: column;	/* 見た目の設定を指定 */
-            align-items: center;	/* 見た目の設定を指定 */
-            justify-content: center;	/* 見た目の設定を指定 */
-            padding: 60px 20px;	/* 見た目の設定を指定 */
-            gap: 14px;	/* 見た目の設定を指定 */
-            color: #64748b;	/* 見た目の設定を指定 */
-            font-size: 14px;	/* 見た目の設定を指定 */
-            font-weight: 700;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .loading-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            gap: 14px;
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 700;
+        }
 
-        .spinner {	/* 対象要素のスタイルを始める */
-            width: 32px;	/* 見た目の設定を指定 */
-            height: 32px;	/* 見た目の設定を指定 */
-            border: 3px solid rgba(28, 189, 197, 0.2);	/* 見た目の設定を指定 */
-            border-top: 3px solid #1cbdc5;	/* 見た目の設定を指定 */
-            border-radius: 50%;	/* 見た目の設定を指定 */
-            animation: spin 0.8s linear infinite;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(28, 189, 197, 0.2);
+            border-top: 3px solid #1cbdc5;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
 
-        @keyframes spin {	/* 表示条件を設定 */
-            0% { transform: rotate(0deg); }	/* 見た目の設定を指定 */
-            100% { transform: rotate(360deg); }	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-        .footer {	/* 対象要素のスタイルを始める */
-            background-color: transparent;	/* 見た目の設定を指定 */
-            padding: 30px 20px;	/* 見た目の設定を指定 */
-            margin-top: auto;	/* 見た目の設定を指定 */
-            width: 100%;	/* 見た目の設定を指定 */
-            box-sizing: border-box;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .footer {
+            background-color: transparent;
+            padding: 30px 20px;
+            margin-top: auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
 
-        .footer-container {	/* 対象要素のスタイルを始める */
-            max-width: 1200px;	/* 見た目の設定を指定 */
-            margin: 0 auto;	/* 見た目の設定を指定 */
-            display: flex;	/* 見た目の設定を指定 */
-            flex-direction: column;	/* 見た目の設定を指定 */
-            align-items: center;	/* 見た目の設定を指定 */
-            gap: 12px;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
 
-        .footer-links {	/* 対象要素のスタイルを始める */
-            display: flex;	/* 見た目の設定を指定 */
-            gap: 24px;	/* 見た目の設定を指定 */
-            justify-content: center;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .footer-links {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+        }
 
-        .footer-links a {	/* 対象要素のスタイルを始める */
-            color: #64748b;	/* 見た目の設定を指定 */
-            text-decoration: none;	/* 見た目の設定を指定 */
-            font-size: 13px;	/* 見た目の設定を指定 */
-            font-weight: 700;	/* 見た目の設定を指定 */
-            transition: color 0.2s;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .footer-links a {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            transition: color 0.2s;
+        }
 
-        .footer-links a:hover {	/* 対象要素のスタイルを始める */
-            color: #1cbdc5;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .footer-links a:hover {
+            color: #1cbdc5;
+        }
 
-        .copyright {	/* 対象要素のスタイルを始める */
-            color: #94a3b8;	/* 見た目の設定を指定 */
-            font-size: 0.75rem;	/* 見た目の設定を指定 */
-            margin: 0;	/* 見た目の設定を指定 */
-            font-weight: 600;	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+        .copyright {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            margin: 0;
+            font-weight: 600;
+        }
 
-        @media screen and (max-width: 768px) {	/* 表示条件を設定 */
-            .container {	/* 対象要素のスタイルを始める */
-                margin: 16px auto;	/* 見た目の設定を指定 */
-                padding: 0 16px;	/* 見た目の設定を指定 */
-            }	/* スタイル定義を閉じる */
+        @media screen and (max-width: 768px) {
+            .container {
+                margin: 16px auto;
+                padding: 0 16px;
+            }
 
-            .hamburger-btn {	/* 対象要素のスタイルを始める */
-                display: flex !important;	/* 見た目の設定を指定 */
-            }	/* スタイル定義を閉じる */
+            .hamburger-btn {
+                display: flex !important;
+            }
 
-            .nav-links {	/* 対象要素のスタイルを始める */
-                position: fixed !important;	/* 見た目の設定を指定 */
-                top: 54px !important;	/* 見た目の設定を指定 */
-                left: 0 !important;	/* 見た目の設定を指定 */
-                width: 100% !important;	/* 見た目の設定を指定 */
-                background: rgba(255, 255, 255, 0.98) !important;	/* 見た目の設定を指定 */
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;	/* 見た目の設定を指定 */
-                flex-direction: column !important;	/* 見た目の設定を指定 */
-                padding: 24px 0 !important;	/* 見た目の設定を指定 */
-                gap: 8px !important;	/* 見た目の設定を指定 */
-                z-index: 99 !important;	/* 見た目の設定を指定 */
-                opacity: 0 !important;	/* 見た目の設定を指定 */
-                pointer-events: none !important;	/* 見た目の設定を指定 */
-                transform: translateY(-10px) !important;	/* 見た目の設定を指定 */
-                transition: transform 0.3s ease, opacity 0.3s ease !important;	/* 見た目の設定を指定 */
-            }	/* スタイル定義を閉じる */
+            .nav-links {
+                position: fixed !important;
+                top: 54px !important;
+                left: 0 !important;
+                width: 100% !important;
+                background: rgba(255, 255, 255, 0.98) !important;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+                flex-direction: column !important;
+                padding: 24px 0 !important;
+                gap: 8px !important;
+                z-index: 99 !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+                transform: translateY(-10px) !important;
+                transition: transform 0.3s ease, opacity 0.3s ease !important;
+            }
 
-            .nav-links.open {	/* 対象要素のスタイルを始める */
-                opacity: 1 !important;	/* 見た目の設定を指定 */
-                pointer-events: auto !important;	/* 見た目の設定を指定 */
-                transform: translateY(0) !important;	/* 見た目の設定を指定 */
-            }	/* スタイル定義を閉じる */
+            .nav-links.open {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                transform: translateY(0) !important;
+            }
 
-            .nav-item {	/* 対象要素のスタイルを始める */
-                font-size: 16px !important;	/* 見た目の設定を指定 */
-                padding: 12px 0 !important;	/* 見た目の設定を指定 */
-                width: 80% !important;	/* 見た目の設定を指定 */
-                text-align: center !important;	/* 見た目の設定を指定 */
-                border-radius: 10px;	/* 見た目の設定を指定 */
-            }	/* スタイル定義を閉じる */
+            .nav-item {
+                font-size: 16px !important;
+                padding: 12px 0 !important;
+                width: 80% !important;
+                text-align: center !important;
+                border-radius: 10px;
+            }
 
-            .btn-logout {	/* 対象要素のスタイルを始める */
-                width: 80% !important;	/* 見た目の設定を指定 */
-                padding: 12px 0 !important;	/* 見た目の設定を指定 */
-                margin: 0 auto !important;	/* 見た目の設定を指定 */
-            }	/* スタイル定義を閉じる */
+            .btn-logout {
+                width: 80% !important;
+                padding: 12px 0 !important;
+                margin: 0 auto !important;
+            }
 
-            .hamburger-btn.open span:nth-child(1) { transform: translateY(8px) rotate(45deg) !important; }	/* 見た目の設定を指定 */
-            .hamburger-btn.open span:nth-child(2) { opacity: 0 !important; transform: scale(0) !important; }	/* 見た目の設定を指定 */
-            .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) !important; }	/* 見た目の設定を指定 */
-        }	/* スタイル定義を閉じる */
+            .hamburger-btn.open span:nth-child(1) { transform: translateY(8px) rotate(45deg) !important; }
+            .hamburger-btn.open span:nth-child(2) { opacity: 0 !important; transform: scale(0) !important; }
+            .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) !important; }
+        }
     </style>
 
-    <link rel="stylesheet" href="theme.css?v=20261006glass">	<!-- 外部ファイルを読み込む -->
+    <link rel="stylesheet" href="theme.css?v=20261006glass">
     <script src="ui.js?v=20261013pwaDialog"></script>
     <script src="online.js?v=20260917b" defer></script>
     <script>window.HEIKO_FIREBASE_CHAT_ENABLED = true;</script>
@@ -422,146 +422,146 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
     <script src="firebase-chat.js?v=20261019qa2"></script>
-</head>	<!-- 要素を閉じる -->
+</head>
 
-<body data-page="messages">	<!-- 画面要素を配置 -->
+<body data-page="messages">
 
-    <header class="navbar">	<!-- ヘッダーを配置 -->
-        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>	<!-- 画面要素を配置 -->
+    <header class="navbar">
+        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
 
-        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">	<!-- 操作できる要素を配置 -->
-            <span></span>	<!-- 画面要素を配置 -->
-            <span></span>	<!-- 画面要素を配置 -->
-            <span></span>	<!-- 画面要素を配置 -->
-        </button>	<!-- 要素を閉じる -->
+        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
 
-        <nav class="nav-links" id="nav-links">	<!-- ナビゲーションを配置 -->
-            <a class="nav-item" href="main.html?guide=1">使い方</a>	<!-- 操作できる要素を配置 -->
-            <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>	<!-- 操作できる要素を配置 -->
-            <a class="nav-item" href="main.html?tab=recruit">募集投稿</a>	<!-- 操作できる要素を配置 -->
-            <a class="nav-item" href="main.html?tab=search">ユーザーを探す</a>	<!-- 操作できる要素を配置 -->
-            <a class="nav-item active" href="messages.html">	<!-- 操作できる要素を配置 -->
-                メッセージ	<!-- 画面に表示する内容 -->
-                <span id="unread-badge" class="unread-badge" style="display: none;">0</span>	<!-- 画面要素を配置 -->
-            </a>	<!-- 要素を閉じる -->
-            <a class="nav-item" href="profile.html">マイページ</a>	<!-- 操作できる要素を配置 -->
-            <a class="nav-item" href="ai-study.html">AI学習相談</a>	<!-- 操作できる要素を配置 -->
-            <a class="nav-item" id="nav-admin-btn" style="display:none;" href="admin.html">管理者</a>	<!-- 操作できる要素を配置 -->
-            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>	<!-- 操作できる要素を配置 -->
-        </nav>	<!-- 要素を閉じる -->
-    </header>	<!-- 要素を閉じる -->
+        <nav class="nav-links" id="nav-links">
+            <a class="nav-item" href="main.html?guide=1">使い方</a>
+            <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>
+            <a class="nav-item" href="main.html?tab=recruit">募集投稿</a>
+            <a class="nav-item" href="main.html?tab=search">ユーザーを探す</a>
+            <a class="nav-item active" href="messages.html">
+                メッセージ
+                <span id="unread-badge" class="unread-badge" style="display: none;">0</span>
+            </a>
+            <a class="nav-item" href="profile.html">マイページ</a>
+            <a class="nav-item" href="ai-study.html">AI学習相談</a>
+            <a class="nav-item" id="nav-admin-btn" style="display:none;" href="admin.html">管理者</a>
+            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>
+        </nav>
+    </header>
 
-    <main class="container">	<!-- ページの主内容を配置 -->
-        <div class="dm-card">	<!-- 画面要素を配置 -->
-            <div class="dm-header">	<!-- 画面要素を配置 -->
-                <h2>メッセージ一覧</h2>	<!-- 画面要素を配置 -->
-            </div>	<!-- 要素を閉じる -->
-            <div id="partner-list">	<!-- 画面要素を配置 -->
-                <div class="loading-box">	<!-- 画面要素を配置 -->
-                    <div class="spinner"></div>	<!-- 画面要素を配置 -->
-                    <span>読み込み中...</span>	<!-- 画面要素を配置 -->
-                </div>	<!-- 要素を閉じる -->
-            </div>	<!-- 要素を閉じる -->
-        </div>	<!-- 要素を閉じる -->
-    </main>	<!-- 要素を閉じる -->
+    <main class="container">
+        <div class="dm-card">
+            <div class="dm-header">
+                <h2>メッセージ一覧</h2>
+            </div>
+            <div id="partner-list">
+                <div class="loading-box">
+                    <div class="spinner"></div>
+                    <span>読み込み中...</span>
+                </div>
+            </div>
+        </div>
+    </main>
 
-    <footer class="footer">	<!-- フッターを配置 -->
-        <div class="footer-container">	<!-- 画面要素を配置 -->
-            <div class="footer-links">	<!-- 画面要素を配置 -->
-                <a href="main.html">ホーム</a>	<!-- 操作できる要素を配置 -->
-                <a href="messages.html">メッセージ</a>	<!-- 操作できる要素を配置 -->
-                <a href="profile.html">マイページ</a>	<!-- 操作できる要素を配置 -->
-                <a href="terms.html">利用規約</a>	<!-- 操作できる要素を配置 -->
-                <a href="privacy.html">プライバシーポリシー</a>	<!-- 操作できる要素を配置 -->
-            </div>	<!-- 要素を閉じる -->
-            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>	<!-- 画面要素を配置 -->
-        </div>	<!-- 要素を閉じる -->
-    </footer>	<!-- 要素を閉じる -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-links">
+                <a href="main.html">ホーム</a>
+                <a href="messages.html">メッセージ</a>
+                <a href="profile.html">マイページ</a>
+                <a href="terms.html">利用規約</a>
+                <a href="privacy.html">プライバシーポリシー</a>
+            </div>
+            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>
+        </div>
+    </footer>
 
     <script>
-        if (!localStorage.getItem("userEmail") || !localStorage.getItem("sessionToken")) {	// ログイン情報と本人確認情報を確認する
-            clearHeikoSession();	// 不完全なログイン情報を消す
-            window.location.href = "index.html";	// 画面表示を更新する
-        }	// 処理のまとまりを閉じる
+        if (!localStorage.getItem("userEmail") || !localStorage.getItem("sessionToken")) {
+            clearHeikoSession();
+            window.location.href = "index.html";
+        }
 
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";	// GAS APIの接続先を設定
-        const bgGradients = [	// 定数を定義
-            "linear-gradient(135deg, #1cbdc5 0%, #119299 100%)",	// 処理を続ける
-            "linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)",	// 処理を続ける
-            "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",	// 処理を続ける
-            "linear-gradient(135deg, #0d9488 0%, #115e59 100%)",	// 処理を続ける
-            "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)"	// 処理を続ける
-        ];	// 処理を続ける
-        let unreadRequest = null;	// 状態を保持
-        let partnersRequest = null;	// 一覧の重複通信を防ぐ
-        let unreadPollTimer = null;	// 未読確認の定期処理を保持する
-        let firebaseReady = false;	// Firebase一覧が利用可能かを保持する
-        let firebaseInbox = [];	// Firebaseから取得した受信箱を保持する
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
+        const bgGradients = [
+            "linear-gradient(135deg, #1cbdc5 0%, #119299 100%)",
+            "linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)",
+            "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+            "linear-gradient(135deg, #0d9488 0%, #115e59 100%)",
+            "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)"
+        ];
+        let unreadRequest = null;
+        let partnersRequest = null;
+        let unreadPollTimer = null;
+        let firebaseReady = false;
+        let firebaseInbox = [];
         let firebaseInboxUnsubscribe = null;
         let cachedGasPartners = [];
         let lastPartnerSignature = "";
         let gasUnreadCount = 0;
-        const partnerNameCache = new Map();	// 相手の表示名を一時保存する
-        const legacyChatTarget = localStorage.getItem("chatTarget") || "";	// 旧形式の会話を復元する相手を保持する
+        const partnerNameCache = new Map();
+        const legacyChatTarget = localStorage.getItem("chatTarget") || "";
 
-        async function postGas(payload, timeoutMs = 12000) {	// 関数を定義
-            const controller = new AbortController();	// 定数を定義
-            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);	// 定数を定義
-            try {	// 失敗に備えて処理を始める
-                const res = await fetch(GAS_URL, {	// 定数を定義
-                    method: "POST",	// 処理を続ける
-                    body: JSON.stringify({ ...payload, sessionToken: localStorage.getItem("sessionToken") || "" }),	// 本人確認情報を付けて送信する
-                    signal: controller.signal	// 処理を続ける
-                });	// 処理を完了する
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);	// 条件に応じて処理を分ける
-                const result = await res.json();	// 応答内容を読み込む
-                if (handleHeikoSessionResponse(result)) throw new Error("ログインの有効期限が切れました");	// ログイン切れを共通処理する
-                return result;	// 結果を返す
-            } finally {	// 処理のまとまりを始める
-                clearTimeout(timeoutId);	// 処理を完了する
-            }	// 処理のまとまりを閉じる
-        }	// 処理のまとまりを閉じる
+        async function postGas(payload, timeoutMs = 12000) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const res = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ ...payload, sessionToken: localStorage.getItem("sessionToken") || "" }),
+                    signal: controller.signal
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const result = await res.json();
+                if (handleHeikoSessionResponse(result)) throw new Error("ログインの有効期限が切れました");
+                return result;
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
 
-        function withDeadline(promise, timeoutMs, message) {	// 画面を止めない通信期限を設定する
-            let timerId;	// 期限確認用のタイマーを保持する
-            const timeout = new Promise((resolve, reject) => {	// 期限切れを通知する処理を作る
-                timerId = setTimeout(() => reject(new Error(message)), timeoutMs);	// 指定時間後に失敗として扱う
-            });	// 期限切れ処理を閉じる
-            return Promise.race([promise, timeout]).finally(() => clearTimeout(timerId));	// 先に終わった結果を返してタイマーを消す
-        }	// 通信期限の設定を閉じる
+        function withDeadline(promise, timeoutMs, message) {
+            let timerId;
+            const timeout = new Promise((resolve, reject) => {
+                timerId = setTimeout(() => reject(new Error(message)), timeoutMs);
+            });
+            return Promise.race([promise, timeout]).finally(() => clearTimeout(timerId));
+        }
 
-        async function setupFirebaseInbox() {	// Firebaseの受信箱を初期化する
-            if (firebaseReady || !window.HeikoFirebaseChat || !window.HeikoFirebaseChat.enabled) return firebaseReady;	// 初期化済みまたは利用不可なら終了する
-            try {	// Firebase接続エラーに備える
-                const userId = localStorage.getItem("userEmail");	// ログイン中のユーザーIDを取得する
-                const hasFirebaseSession = await window.HeikoFirebaseChat.isSignedInAs(userId);	// 保存済みのFirebase認証を確認する
-                if (!hasFirebaseSession) {	// Firebaseへの再ログインが必要な場合に処理する
-                    const result = await postGas({ mode: "firebaseCustomToken", userId: userId }, 10000);	// GASからFirebaseトークンを取得する
-                    const token = result && result.message && result.message.token;	// トークンを取り出す
-                    if (!token || !await window.HeikoFirebaseChat.signIn(token, userId)) return false;	// Firebaseへログインする
-                }	// Firebase認証の確認を閉じる
-                try {	// 受信箱の取得を試す
-                    firebaseInbox = await window.HeikoFirebaseChat.readInbox(userId);	// 受信箱を読み込む
-                } catch (inboxError) {	// 受信箱が未作成の会話を復元する
-                    if (!legacyChatTarget || legacyChatTarget === userId) throw inboxError;	// 復元先がなければ元のエラーを返す
-                    firebaseInbox = [];	// 旧形式の会話だけを復元する
-                    console.warn("Firebase受信箱の読み込みに失敗したため会話を復元します", inboxError);	// 復元理由を記録する
-                }	// 受信箱の取得処理を閉じる
-                if (legacyChatTarget && legacyChatTarget !== userId) {
-                    const legacyMessages = await window.HeikoFirebaseChat.readOnce(userId, legacyChatTarget);	// 直前に開いていた会話を読み込む
-                    const messageMap = new Map(firebaseInbox.map(message => [String(message.messageId), message]));	// 既存メッセージを重複なく保持する
-                    legacyMessages.forEach(message => messageMap.set(String(message.messageId), message));	// 旧形式の会話を一覧へ加える
-                    firebaseInbox = Array.from(messageMap.values()).sort((a, b) => Number(b.sentAt || 0) - Number(a.sentAt || 0));	// 復元後の受信箱を新しい順に並べる
+        async function setupFirebaseInbox() {
+            if (firebaseReady || !window.HeikoFirebaseChat || !window.HeikoFirebaseChat.enabled) return firebaseReady;
+            try {
+                const userId = localStorage.getItem("userEmail");
+                const hasFirebaseSession = await window.HeikoFirebaseChat.isSignedInAs(userId);
+                if (!hasFirebaseSession) {
+                    const result = await postGas({ mode: "firebaseCustomToken", userId: userId }, 10000);
+                    const token = result && result.message && result.message.token;
+                    if (!token || !await window.HeikoFirebaseChat.signIn(token, userId)) return false;
                 }
-                firebaseReady = true;	// Firebase一覧を利用可能にする
+                try {
+                    firebaseInbox = await window.HeikoFirebaseChat.readInbox(userId);
+                } catch (inboxError) {
+                    if (!legacyChatTarget || legacyChatTarget === userId) throw inboxError;
+                    firebaseInbox = [];
+                    console.warn("Firebase受信箱の読み込みに失敗したため会話を復元します", inboxError);
+                }
+                if (legacyChatTarget && legacyChatTarget !== userId) {
+                    const legacyMessages = await window.HeikoFirebaseChat.readOnce(userId, legacyChatTarget);
+                    const messageMap = new Map(firebaseInbox.map(message => [String(message.messageId), message]));
+                    legacyMessages.forEach(message => messageMap.set(String(message.messageId), message));
+                    firebaseInbox = Array.from(messageMap.values()).sort((a, b) => Number(b.sentAt || 0) - Number(a.sentAt || 0));
+                }
+                firebaseReady = true;
                 startFirebaseInboxSubscription();
-                return true;	// 初期化成功を返す
-            } catch (error) {	// Firebaseが利用できない場合に処理する
-                firebaseReady = false;	// GAS一覧を使い続ける
-                console.warn("Firebase受信箱を利用できません", error);	// 原因を開発者向けログへ残す
-                return false;	// 初期化失敗を返す
-            }	// 初期化処理を閉じる
-        }	// Firebase受信箱初期化を閉じる
+                return true;
+            } catch (error) {
+                firebaseReady = false;
+                console.warn("Firebase受信箱を利用できません", error);
+                return false;
+            }
+        }
 
         function startFirebaseInboxSubscription() {
             if (firebaseInboxUnsubscribe || !firebaseReady) return;
@@ -584,296 +584,295 @@
             badge.style.display = count > 0 ? "inline-block" : "none";
         }
 
-        function mergePartnerLists(gasPartners, firebaseMessages) {	// GASとFirebaseの相手一覧をまとめる
-            const map = new Map();	// 相手ごとの最新情報を保持する
+        function mergePartnerLists(gasPartners, firebaseMessages) {
+            const map = new Map();
             const timestamp = value => typeof value === "number" ? value : (Date.parse(value) || 0);
-            gasPartners.forEach(partner => {	// GASの相手を一覧へ登録する
-                const email = String(partner.email || "").trim();	// 相手のIDを整える
-                if (!email) return;	// IDがないデータは表示しない
+            gasPartners.forEach(partner => {
+                const email = String(partner.email || "").trim();
+                if (!email) return;
                 map.set(email, {
-                    ...partner,	// GASから受け取った情報を引き継ぐ
-                    email: email,	// 相手のIDを統一する
-                    name: partnerNameCache.get(email) || partner.name || email,	// 保存済みの表示名を優先する
-                    preview: partner.preview || partner.lastMessage || "",	// 本文プレビューを保持する
+                    ...partner,
+                    email: email,
+                    name: partnerNameCache.get(email) || partner.name || email,
+                    preview: partner.preview || partner.lastMessage || "",
                     sentAt: timestamp(partner.sentAt),
-                    source: "gas"	// 保存元を記録する
-                });	// GASの相手を保存する
-            });	// GASの相手を登録し終える
-            const myUserId = localStorage.getItem("userEmail");	// 自分のユーザーIDを取得する
-            firebaseMessages.forEach(message => {	// Firebaseの受信箱を相手一覧へ変換する
-                const email = message.from === myUserId ? message.to : message.from;	// 相手のユーザーIDを求める
-                if (!email || email === myUserId || message.isUnsent) return;	// 不正な行は飛ばす
-                const previous = map.get(email);	// 既存の相手を取得する
-                const preview = message.text || (Array.isArray(message.attachments) && message.attachments.length > 0 ? "画像が送信されました" : "");	// 本文または画像案内を作る
+                    source: "gas"
+                });
+            });
+            const myUserId = localStorage.getItem("userEmail");
+            firebaseMessages.forEach(message => {
+                const email = message.from === myUserId ? message.to : message.from;
+                if (!email || email === myUserId || message.isUnsent) return;
+                const previous = map.get(email);
+                const preview = message.text || (Array.isArray(message.attachments) && message.attachments.length > 0 ? "画像が送信されました" : "");
                 if (!previous || timestamp(message.sentAt) >= timestamp(previous.sentAt)) {
                     map.set(email, {
-                        ...previous,	// 既存の表示情報を引き継ぐ
-                        email: email,	// 相手のIDを設定する
-                        name: partnerNameCache.get(email) || (previous && previous.name) || email,	// 表示名を設定する
-                        preview: preview,	// 最新本文を設定する
-                        sentAt: timestamp(message.sentAt),	// 最新日時を設定する
-                        source: "firebase"	// Firebase由来として記録する
-                    });	// Firebaseの相手を保存する
+                        ...previous,
+                        email: email,
+                        name: partnerNameCache.get(email) || (previous && previous.name) || email,
+                        preview: preview,
+                        sentAt: timestamp(message.sentAt),
+                        source: "firebase"
+                    });
                 }
-            });	// Firebase一覧の変換を閉じる
-            return Array.from(map.values()).sort((a, b) => Number(b.sentAt || 0) - Number(a.sentAt || 0));	// 新しい順で返す
-        }	// 相手一覧の統合を閉じる
+            });
+            return Array.from(map.values()).sort((a, b) => Number(b.sentAt || 0) - Number(a.sentAt || 0));
+        }
 
-        async function enrichPartnerNames(gasPartners, listDiv) {	// Firebaseだけで不足する表示名をGASから補う
-            const partners = mergePartnerLists(gasPartners, firebaseInbox);	// 現在の相手一覧を作る
-            const targetUserIds = partners.filter(partner => !partnerNameCache.has(partner.email)).map(partner => partner.email).slice(0, 50);	// 表示名が未取得のIDを集める
-            if (targetUserIds.length === 0) return;	// 取得対象がなければ終了する
-            try {	// 表示名取得の失敗に備える
-                const result = await postGas({ mode: "getUserProfiles", userId: localStorage.getItem("userEmail"), targetUserIds: targetUserIds }, 10000);	// 表示名をまとめて取得する
-                if (result.status !== "success" || !Array.isArray(result.message)) return;	// 正しい結果だけ使う
-                result.message.forEach(profile => {	// 取得したプロフィールを保存する
-                    const email = String(profile.userId || "").trim();	// 対象IDを整える
-                    const name = String(profile.name || "").trim();	// 表示名を整える
-                    if (email && name) partnerNameCache.set(email, name);	// 表示名をキャッシュする
-                });	// プロフィール保存を終える
-                renderPartnerList(gasPartners, listDiv);	// 表示名だけを更新する
+        async function enrichPartnerNames(gasPartners, listDiv) {
+            const partners = mergePartnerLists(gasPartners, firebaseInbox);
+            const targetUserIds = partners.filter(partner => !partnerNameCache.has(partner.email)).map(partner => partner.email).slice(0, 50);
+            if (targetUserIds.length === 0) return;
+            try {
+                const result = await postGas({ mode: "getUserProfiles", userId: localStorage.getItem("userEmail"), targetUserIds: targetUserIds }, 10000);
+                if (result.status !== "success" || !Array.isArray(result.message)) return;
+                result.message.forEach(profile => {
+                    const email = String(profile.userId || "").trim();
+                    const name = String(profile.name || "").trim();
+                    if (email && name) partnerNameCache.set(email, name);
+                });
+                renderPartnerList(gasPartners, listDiv);
             } catch (error) {
-                console.warn("相手の表示名取得エラー:", error);	// 表示名取得の失敗を記録する
+                console.warn("相手の表示名取得エラー:", error);
             }
-        }	// 表示名補完を終える
+        }
 
-        function toggleMenu() {	// 関数を定義
-            document.getElementById("hud-menu-btn").classList.toggle("open");	// 画面表示を更新する
-            document.getElementById("nav-links").classList.toggle("open");	// 画面表示を更新する
-        }	// 処理のまとまりを閉じる
+        function toggleMenu() {
+            document.getElementById("hud-menu-btn").classList.toggle("open");
+            document.getElementById("nav-links").classList.toggle("open");
+        }
 
-        function closeMenu() {	// 関数を定義
-            document.getElementById("hud-menu-btn").classList.remove("open");	// 画面表示を更新する
-            document.getElementById("nav-links").classList.remove("open");	// 画面表示を更新する
-        }	// 処理のまとまりを閉じる
+        function closeMenu() {
+            document.getElementById("hud-menu-btn").classList.remove("open");
+            document.getElementById("nav-links").classList.remove("open");
+        }
 
-        async function loadChatPartners() {	// 一覧の読み込みを一度だけ実行する
-            if (partnersRequest) return partnersRequest;	// 実行中なら同じ通信の完了を待つ
-            partnersRequest = loadChatPartnersOnce();	// 新しい読み込みを開始する
-            try {	// 完了まで通信情報を保持する
-                return await partnersRequest;	// 読み込み結果を返す
-            } finally {	// 成否にかかわらず後始末する
-                partnersRequest = null;	// 次の読み込みを許可する
-            }	// 後始末を閉じる
-        }	// 処理のまとまりを閉じる
+        async function loadChatPartners() {
+            if (partnersRequest) return partnersRequest;
+            partnersRequest = loadChatPartnersOnce();
+            try {
+                return await partnersRequest;
+            } finally {
+                partnersRequest = null;
+            }
+        }
 
-        function renderPartnerList(gasPartners, listDiv) {	// GASとFirebaseをまとめて相手一覧を描画する
-            const partners = mergePartnerLists(gasPartners, firebaseInbox);	// 二つの保存先から相手をまとめる
+        function renderPartnerList(gasPartners, listDiv) {
+            const partners = mergePartnerLists(gasPartners, firebaseInbox);
             const signature = JSON.stringify(partners);
             if (signature === lastPartnerSignature) return;
             lastPartnerSignature = signature;
-            listDiv.innerHTML = "";	// 読み込み表示を消す
-            if (partners.length === 0) {	// 相手がいない場合に案内する
-                listDiv.innerHTML = `<div class="empty-message">メッセージはまだありません。<br>ホーム画面から気になる人にチャットを送ってみましょう！</div>`;	// 空の状態を表示する
-                return;	// 描画を終了する
-            }	// 空表示の処理を閉じる
-            partners.forEach((partner, index) => {	// 相手ごとに一覧項目を作る
-                const initial = partner.name ? partner.name.charAt(0) : "未";	// アイコン用の頭文字を取得する
-                const avatarBg = bgGradients[index % bgGradients.length];	// アイコンの背景色を選ぶ
-                const item = document.createElement("div");	// 一覧項目を作る
-                item.className = "partner-item";	// 一覧項目の見た目を設定する
-                item.onclick = () => openChat(partner.email);	// 選択した相手のチャットを開く
-                const avatarRing = document.createElement("div");	// アイコンの外枠を作る
-                avatarRing.className = "avatar-ring";	// アイコン外枠の見た目を設定する
-                const avatar = document.createElement("div");	// アイコン本体を作る
-                avatar.className = "partner-avatar";	// アイコンの見た目を設定する
-                avatar.style.background = avatarBg;	// アイコンへ背景色を設定する
-                avatar.textContent = initial;	// アイコンへ頭文字を表示する
-                avatarRing.appendChild(avatar);	// 外枠へアイコンを追加する
-                const contentBox = document.createElement("div");	// 名前とIDの表示欄を作る
-                contentBox.className = "partner-content-box";	// 表示欄の見た目を設定する
-                const name = document.createElement("div");	// 表示名の要素を作る
-                name.className = "partner-name";	// 表示名の見た目を設定する
-                name.textContent = partner.name;	// 表示名を安全に表示する
-                const email = document.createElement("div");	// ユーザーIDの要素を作る
-                email.className = "partner-email";	// ユーザーIDの見た目を設定する
-                email.textContent = partner.email;	// ユーザーIDを安全に表示する
-                const preview = document.createElement("div");	// 本文プレビューの要素を作る
-                preview.className = "partner-preview";	// 本文プレビューの見た目を設定する
-                preview.textContent = partner.preview || "メッセージを開く";	// 最新本文を安全に表示する
-                contentBox.append(name, email, preview);	// 名前とIDと本文を表示欄へ追加する
-                const arrow = document.createElement("div");	// 開く案内を作る
-                arrow.className = "arrow-badge";	// 開く案内の見た目を設定する
-                arrow.textContent = "開く ➔";	// 開く案内を表示する
-                item.append(avatarRing, contentBox, arrow);	// 一覧項目へ内容を追加する
-                const deleteButton = document.createElement("button");	// 履歴非表示ボタンを作る
-                deleteButton.type = "button";	// 通常のボタンとして扱う
-                deleteButton.className = "partner-delete-button";	// ボタンの見た目を設定する
-                deleteButton.innerText = "削除";	// ボタン名を表示する
-                deleteButton.addEventListener("click", event => {	// 削除操作を登録する
-                    event.stopPropagation();	// チャット画面が開く動作を止める
-                    deleteChatPartner(partner.email, deleteButton);	// 選択した履歴を非表示にする
-                });	// 削除操作の登録を閉じる
-                item.appendChild(deleteButton);	// 一覧項目へ削除ボタンを追加する
-                listDiv.appendChild(item);	// 完成した項目を一覧へ追加する
-            });	// 相手一覧の描画を閉じる
-        }	// 相手一覧の描画処理を閉じる
+            listDiv.innerHTML = "";
+            if (partners.length === 0) {
+                listDiv.innerHTML = `<div class="empty-message">メッセージはまだありません。<br>ホーム画面から気になる人にチャットを送ってみましょう！</div>`;
+                return;
+            }
+            partners.forEach((partner, index) => {
+                const initial = partner.name ? partner.name.charAt(0) : "未";
+                const avatarBg = bgGradients[index % bgGradients.length];
+                const item = document.createElement("div");
+                item.className = "partner-item";
+                item.onclick = () => openChat(partner.email);
+                const avatarRing = document.createElement("div");
+                avatarRing.className = "avatar-ring";
+                const avatar = document.createElement("div");
+                avatar.className = "partner-avatar";
+                avatar.style.background = avatarBg;
+                avatar.textContent = initial;
+                avatarRing.appendChild(avatar);
+                const contentBox = document.createElement("div");
+                contentBox.className = "partner-content-box";
+                const name = document.createElement("div");
+                name.className = "partner-name";
+                name.textContent = partner.name;
+                const email = document.createElement("div");
+                email.className = "partner-email";
+                email.textContent = partner.email;
+                const preview = document.createElement("div");
+                preview.className = "partner-preview";
+                preview.textContent = partner.preview || "メッセージを開く";
+                contentBox.append(name, email, preview);
+                const arrow = document.createElement("div");
+                arrow.className = "arrow-badge";
+                arrow.textContent = "開く ➔";
+                item.append(avatarRing, contentBox, arrow);
+                const deleteButton = document.createElement("button");
+                deleteButton.type = "button";
+                deleteButton.className = "partner-delete-button";
+                deleteButton.innerText = "削除";
+                deleteButton.addEventListener("click", event => {
+                    event.stopPropagation();
+                    deleteChatPartner(partner.email, deleteButton);
+                });
+                item.appendChild(deleteButton);
+                listDiv.appendChild(item);
+            });
+        }
 
-        async function loadChatPartnersOnce() {	// FirebaseとGASの一覧取得を並行して始める
-            const myEmail = localStorage.getItem("userEmail");	// ログイン中のユーザーIDを取得する
-            const listDiv = document.getElementById("partner-list");	// 一覧の表示先を取得する
-            let gasPartners = cachedGasPartners;	// 表示済みの一覧を維持する
-            let hasRendered = false;	// どちらかの一覧を表示できたか保持する
-            if (!lastPartnerSignature) listDiv.innerHTML = `<div class="loading-box"><div class="spinner"></div><span>データを読み込み中...</span></div>`;	// 初回だけ読み込み表示を出す
+        async function loadChatPartnersOnce() {
+            const myEmail = localStorage.getItem("userEmail");
+            const listDiv = document.getElementById("partner-list");
+            let gasPartners = cachedGasPartners;
+            let hasRendered = false;
+            if (!lastPartnerSignature) listDiv.innerHTML = `<div class="loading-box"><div class="spinner"></div><span>データを読み込み中...</span></div>`;
 
-            const firebaseTask = (async () => {	// Firebase一覧を待たずに取得する
-                try {	// Firebase通信の失敗に備える
-                    if (firebaseReady && !firebaseInboxUnsubscribe) firebaseInbox = await window.HeikoFirebaseChat.readInbox(myEmail);	// 購読中はリアルタイムの値を維持する
-                    else await setupFirebaseInbox();	// 初回だけFirebaseを初期化する
-                    if (firebaseReady) {	// Firebase一覧を取得できた場合に表示する
-                        renderPartnerList(gasPartners, listDiv);	// 取得できた一覧をすぐ描画する
-                        enrichPartnerNames(gasPartners, listDiv);	// 表示名を背景で補完する
-                        hasRendered = true;	// 表示済みとして記録する
-                    }	// Firebase描画の条件を閉じる
-                } catch (error) {	// Firebase取得に失敗した場合に処理する
-                    console.warn("Firebase一覧取得エラー:", error);	// 失敗理由を開発者向けログへ残す
-                }	// Firebase一覧の取得を閉じる
-            })();	// Firebase一覧の取得を開始する
+            const firebaseTask = (async () => {
+                try {
+                    if (firebaseReady && !firebaseInboxUnsubscribe) firebaseInbox = await window.HeikoFirebaseChat.readInbox(myEmail);
+                    else await setupFirebaseInbox();
+                    if (firebaseReady) {
+                        renderPartnerList(gasPartners, listDiv);
+                        enrichPartnerNames(gasPartners, listDiv);
+                        hasRendered = true;
+                    }
+                } catch (error) {
+                    console.warn("Firebase一覧取得エラー:", error);
+                }
+            })();
 
-            try {	// GAS通信の失敗に備える
-                const result = await withDeadline(postGas({ mode: "getChatPartners", email: myEmail }, 10000), 10000, "GAS一覧の取得が時間切れになりました");	// GAS一覧をFirebaseと同時に取得する
-                if (result.status !== "success") throw new Error(result.message || "一覧を取得できませんでした");	// GASのエラー応答を失敗として扱う
-                gasPartners = Array.isArray(result.message) ? result.message : [];	// GASの相手一覧を保存する
+            try {
+                const result = await withDeadline(postGas({ mode: "getChatPartners", email: myEmail }, 10000), 10000, "GAS一覧の取得が時間切れになりました");
+                if (result.status !== "success") throw new Error(result.message || "一覧を取得できませんでした");
+                gasPartners = Array.isArray(result.message) ? result.message : [];
                 cachedGasPartners = gasPartners;
-                renderPartnerList(gasPartners, listDiv);	// Firebase分とまとめて描画する
-                enrichPartnerNames(gasPartners, listDiv);	// 表示名を背景で補完する
-                hasRendered = true;	// 表示済みとして記録する
-            } catch (error) {	// GAS一覧を取得できなかった場合に処理する
-                console.warn("GAS一覧取得エラー:", error);	// 失敗理由を開発者向けログへ残す
-                if (!hasRendered) {	// 両方の一覧が表示できなかった場合に再試行する
+                renderPartnerList(gasPartners, listDiv);
+                enrichPartnerNames(gasPartners, listDiv);
+                hasRendered = true;
+            } catch (error) {
+                console.warn("GAS一覧取得エラー:", error);
+                if (!hasRendered) {
                     try {
-                        await setupFirebaseInbox();	// 認証直後の受信箱取得をもう一度試す
+                        await setupFirebaseInbox();
                         if (firebaseReady) {
-                            renderPartnerList(gasPartners, listDiv);	// Firebase一覧を表示する
-                            enrichPartnerNames(gasPartners, listDiv);	// 表示名を補完する
-                            hasRendered = true;	// 表示済みとして記録する
+                            renderPartnerList(gasPartners, listDiv);
+                            enrichPartnerNames(gasPartners, listDiv);
+                            hasRendered = true;
                         }
                     } catch (retryError) {
-                        console.warn("Firebase一覧の再試行に失敗しました:", retryError);	// 再試行の失敗を記録する
-                    }	// Firebase再試行を閉じる
-                }	// 初回表示の再試行を閉じる
-                if (!hasRendered) listDiv.innerHTML = `<div class="empty-message">メッセージを取得できませんでした。上部の更新ボタンで再試行してください。</div>`;	// 取得失敗を空表示と区別して案内する
-            }	// GAS一覧の取得を閉じる
+                        console.warn("Firebase一覧の再試行に失敗しました:", retryError);
+                    }
+                }
+                if (!hasRendered) listDiv.innerHTML = `<div class="empty-message">メッセージを取得できませんでした。上部の更新ボタンで再試行してください。</div>`;
+            }
 
-            firebaseTask.catch(error => console.warn("Firebase一覧処理エラー:", error));	// 背景処理の失敗を確実に記録する
-        }	// 相手一覧の読み込みを閉じる
+            firebaseTask.catch(error => console.warn("Firebase一覧処理エラー:", error));
+        }
 
-        async function updateUnreadBadge() {	// 関数を定義
-            const myEmail = localStorage.getItem("userEmail");	// 定数を定義
-            const badge = document.getElementById("unread-badge");	// 定数を定義
-            if (!myEmail || !badge || unreadRequest) return unreadRequest;	// 条件に応じて処理を分ける
+        async function updateUnreadBadge() {
+            const myEmail = localStorage.getItem("userEmail");
+            const badge = document.getElementById("unread-badge");
+            if (!myEmail || !badge || unreadRequest) return unreadRequest;
 
-            unreadRequest = (async () => {	// 処理のまとまりを始める
-                try {	// 失敗に備えて処理を始める
-                    const result = await postGas({ mode: "getUnreadCount", email: myEmail });	// 定数を定義
+            unreadRequest = (async () => {
+                try {
+                    const result = await postGas({ mode: "getUnreadCount", email: myEmail });
 
-                    if (result.status === "success" && result.message) {	// 条件に応じて処理を分ける
+                    if (result.status === "success" && result.message) {
                         gasUnreadCount = Number(result.message.unreadCount) || 0;
                         renderUnreadBadge();
-                    }	// 処理のまとまりを閉じる
-                } catch (e) {	// 処理のまとまりを始める
-                    console.error("未読チェックエラー:", e);	// 処理を完了する
-                } finally {	// 処理のまとまりを始める
-                    unreadRequest = null;	// 処理を続ける
-                }	// 処理のまとまりを閉じる
-            })();	// 処理を完了する
+                    }
+                } catch (e) {
+                    console.error("未読チェックエラー:", e);
+                } finally {
+                    unreadRequest = null;
+                }
+            })();
 
-            return unreadRequest;	// 結果を返す
-        }	// 処理のまとまりを閉じる
+            return unreadRequest;
+        }
 
-        function openChat(email) {	// 関数を定義
-            localStorage.setItem("chatTarget", email);	// 端末内の保存情報を扱う
-            location.href = 'chat.html';	// 処理を続ける
-        }	// 処理のまとまりを閉じる
+        function openChat(email) {
+            localStorage.setItem("chatTarget", email);
+            location.href = 'chat.html';
+        }
 
-        async function deleteChatPartner(email, button) {	// 関数を定義
-            if (!confirm("この相手とのメッセージ一覧を削除しますか？\n自分の画面から非表示になります。相手の画面には影響しません。")) return;	// 条件に応じて処理を分ける
+        async function deleteChatPartner(email, button) {
+            if (!confirm("この相手とのメッセージ一覧を削除しますか？\n自分の画面から非表示になります。相手の画面には影響しません。")) return;
 
-            const originalText = button.innerText;	// 定数を定義
-            button.disabled = true;	// 処理を続ける
-            button.innerText = "削除中...";	// 処理を続ける
+            const originalText = button.innerText;
+            button.disabled = true;
+            button.innerText = "削除中...";
 
-            try {	// 失敗に備えて処理を始める
-                const result = await postGas({	// 定数を定義
-                    mode: "deleteChatHistory",	// 処理を続ける
-                    userId: localStorage.getItem("userEmail"),	// 端末内の保存情報を扱う
-                    targetUserId: email	// 処理を続ける
-                });	// 処理を完了する
+            try {
+                const result = await postGas({
+                    mode: "deleteChatHistory",
+                    userId: localStorage.getItem("userEmail"),
+                    targetUserId: email
+                });
 
-                if (result.status === "success") {	// 条件に応じて処理を分ける
-                    await loadChatPartners();	// 処理を完了する
-                } else {	// 処理のまとまりを始める
-                    button.disabled = false;	// 処理を続ける
-                    button.innerText = originalText;	// 処理を続ける
-                    alert("リストの削除に失敗しました: " + result.message);	// 処理結果を知らせる
-                }	// 処理のまとまりを閉じる
-            } catch (e) {	// 処理のまとまりを始める
-                button.disabled = false;	// 処理を続ける
-                button.innerText = originalText;	// 処理を続ける
-                alert("通信エラーが発生しました。");	// 処理結果を知らせる
-            }	// 処理のまとまりを閉じる
-        }	// 処理のまとまりを閉じる
+                if (result.status === "success") {
+                    await loadChatPartners();
+                } else {
+                    button.disabled = false;
+                    button.innerText = originalText;
+                    alert("リストの削除に失敗しました: " + result.message);
+                }
+            } catch (e) {
+                button.disabled = false;
+                button.innerText = originalText;
+                alert("通信エラーが発生しました。");
+            }
+        }
 
-        function logout() {	// 関数を定義
-            clearHeikoSession();	// 外観設定を残してログイン情報を消す
-            window.location.href = "index.html";	// 画面表示を更新する
-        }	// 処理のまとまりを閉じる
+        function logout() {
+            clearHeikoSession();
+            window.location.href = "index.html";
+        }
 
-        function startUnreadPoll() {	// 未読確認を開始する
-            if (unreadPollTimer) return;	// 二重開始を防ぐ
-            unreadPollTimer = setInterval(() => {	// 定期処理を登録する
+        function startUnreadPoll() {
+            if (unreadPollTimer) return;
+            unreadPollTimer = setInterval(() => {
                 if (document.visibilityState === "visible") {
                     loadChatPartners();
                     updateUnreadBadge();
                 }
-            }, 15000);	// GAS画像・フォールバックの新着も表示を維持したまま確認する
-        }	// 処理のまとまりを閉じる
+            }, 15000);
+        }
 
-        function stopUnreadPoll() {	// 未読確認を停止する
-            clearInterval(unreadPollTimer);	// 定期処理を止める
-            unreadPollTimer = null;	// タイマー情報を破棄する
-        }	// 処理のまとまりを閉じる
+        function stopUnreadPoll() {
+            clearInterval(unreadPollTimer);
+            unreadPollTimer = null;
+        }
 
-        document.addEventListener("visibilitychange", () => {	// 表示状態の変化を監視する
-            if (document.visibilityState === "visible") {	// 画面へ戻った場合に処理する
-                updateUnreadBadge();	// 未読数をすぐ更新する
-                startUnreadPoll();	// 定期確認を再開する
-            } else {	// 画面が隠れた場合に処理する
-                stopUnreadPoll();	// 不要な通信を止める
-            }	// 表示状態の確認を閉じる
-        });	// 監視処理を登録する
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
+                updateUnreadBadge();
+                startUnreadPoll();
+            } else {
+                stopUnreadPoll();
+            }
+        });
         window.addEventListener("pagehide", () => {
             stopUnreadPoll();
             if (firebaseInboxUnsubscribe) firebaseInboxUnsubscribe();
             firebaseInboxUnsubscribe = null;
         });
-        window.addEventListener("pageshow", event => {	// 履歴から戻った場合に処理する
-            if (event.persisted) {	// 画面が復元された場合だけ更新する
+        window.addEventListener("pageshow", event => {
+            if (event.persisted) {
                 startFirebaseInboxSubscription();
-                loadChatPartners();	// 一覧を更新する
-                updateUnreadBadge();	// 未読数を更新する
-                startUnreadPoll();	// 定期確認を再開する
-            }	// 復元処理を閉じる
-        });	// ページ復元処理を登録する
+                loadChatPartners();
+                updateUnreadBadge();
+                startUnreadPoll();
+            }
+        });
 
-        window.onload = async () => {	// 初期通信の順番を制御する
-            document.getElementById("hud-menu-btn").classList.remove("open");	// 画面表示を更新する
-            document.getElementById("nav-links").classList.remove("open");	// 画面表示を更新する
+        window.onload = async () => {
+            document.getElementById("hud-menu-btn").classList.remove("open");
+            document.getElementById("nav-links").classList.remove("open");
 
-            const currentUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail");	// 定数を定義
-            const adminButton = document.getElementById("nav-admin-btn");	// 定数を定義
-            if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") {	// 端末内の保存情報を扱う
-                adminButton.style.display = "inline-block";	// 処理を続ける
-            }	// 処理のまとまりを閉じる
+            const currentUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail");
+            const adminButton = document.getElementById("nav-admin-btn");
+            if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") {
+                adminButton.style.display = "inline-block";
+            }
 
-            // chatTargetは旧形式のFirebase会話を一覧へ復元するために保持する
 
-            await loadChatPartners();	// 最初にメッセージ一覧を表示する
-            updateUnreadBadge();	// 一覧表示後に未読数を更新する
+            await loadChatPartners();
+            updateUnreadBadge();
 
-            startUnreadPoll();	// 未読確認を開始する
-        };	// 処理のまとまりを閉じる
+            startUnreadPoll();
+        };
     </script>
-</body>	<!-- 要素を閉じる -->
+</body>
 
-</html>	<!-- 要素を閉じる -->
+</html>

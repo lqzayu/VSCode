@@ -1,11 +1,8 @@
-// Firebaseを使ったテキストチャットの共通処理です。
 (function () {
     "use strict";
 
-    // Firebaseを利用する画面だけがtrueを指定します。
     const ENABLED = window.HEIKO_FIREBASE_CHAT_ENABLED === true;
 
-    // Firebaseコンソールで発行されたWebアプリの設定です。
     const firebaseConfig = {
         apiKey: "AIzaSyBj5jaygl5A5A1VMtDfmL-M_gJmqS9FI2o",
         authDomain: "heiko-matching-chat.firebaseapp.com",
@@ -16,7 +13,6 @@
         appId: "1:1043121900904:web:334b3a91cda49edfd69add"
     };
 
-    // ユーザーIDをFirebaseのパスで安全に使える文字列へ変換します。
     function encodeKey(value) {
         const bytes = new TextEncoder().encode(String(value || ""));
         let binary = "";
@@ -24,59 +20,52 @@
         return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
     }
 
-    // GAS側で発行するカスタムトークンと同じUIDを作ります。
     function getFirebaseUid(userId) {
         return "u_" + encodeKey(userId);
     }
 
-    // 二人のユーザーで常に同じ並びの会話パスを作ります。
     function getConversationPath(firstUser, secondUser) {
         const ids = [getFirebaseUid(firstUser), getFirebaseUid(secondUser)].sort();
         return "chats/" + ids[0] + "/" + ids[1];
     }
 
-    // Firebase SDKが読み込まれている場合だけアプリを初期化します。
     function getApp() {
         if (!ENABLED || !window.firebase || typeof window.firebase.initializeApp !== "function") return null;
         if (!window.firebase.apps.length) window.firebase.initializeApp(firebaseConfig);
         return window.firebase;
     }
 
-    // Firebase Databaseを取得します。
     function getDatabase() {
         const app = getApp();
         return app && typeof app.database === "function" ? app.database() : null;
     }
 
-    // Firebase Authenticationを取得します。
     function getAuth() {
         const app = getApp();
         return app && typeof app.auth === "function" ? app.auth() : null;
     }
 
-    // 保存済みのFirebaseログインが現在の利用者と一致するか確認します。
-    async function isSignedInAs(userId, timeoutMs = 1500) {	// 保存済み認証の確認を始めます。
-        const auth = getAuth();	// Firebase認証を取得します。
-        if (!auth || !userId) return false;	// 必要な情報がなければ未認証として扱います。
-        const expectedUid = getFirebaseUid(userId);	// 現在の利用者に対応するUIDを作ります。
-        if (auth.currentUser && auth.currentUser.uid === expectedUid) return true;	// 認証済みならすぐ成功を返します。
-        return new Promise(resolve => {	// 認証状態の復元を短時間だけ待ちます。
-            let finished = false;	// 結果を一度だけ返すための状態を持ちます。
-            let unsubscribe = () => {};	// 認証監視の解除処理を用意します。
-            let timerId = null;	// 待機期限のタイマーを保持します。
-            const finish = result => {	// 認証確認を終了します。
-                if (finished) return;	// 二重終了を防ぎます。
-                finished = true;	// 終了済みとして記録します。
-                clearTimeout(timerId);	// 待機期限のタイマーを消します。
-                unsubscribe();	// 認証状態の監視を解除します。
-                resolve(result);	// 確認結果を返します。
-            };	// 終了処理を閉じます。
-            timerId = setTimeout(() => finish(false), timeoutMs);	// 期限を超えたら未認証として扱います。
-            unsubscribe = auth.onAuthStateChanged(user => finish(Boolean(user && user.uid === expectedUid)), () => finish(false));	// 復元された利用者が一致するか確認します。
-        });	// 認証状態の待機を閉じます。
-    }	// 保存済み認証の確認を閉じます。
+    async function isSignedInAs(userId, timeoutMs = 1500) {
+        const auth = getAuth();
+        if (!auth || !userId) return false;
+        const expectedUid = getFirebaseUid(userId);
+        if (auth.currentUser && auth.currentUser.uid === expectedUid) return true;
+        return new Promise(resolve => {
+            let finished = false;
+            let unsubscribe = () => {};
+            let timerId = null;
+            const finish = result => {
+                if (finished) return;
+                finished = true;
+                clearTimeout(timerId);
+                unsubscribe();
+                resolve(result);
+            };
+            timerId = setTimeout(() => finish(false), timeoutMs);
+            unsubscribe = auth.onAuthStateChanged(user => finish(Boolean(user && user.uid === expectedUid)), () => finish(false));
+        });
+    }
 
-    // GASから受け取ったカスタムトークンでFirebaseへログインします。
     async function signIn(customToken, userId) {
         const auth = getAuth();
         if (!auth || !customToken || !userId) return false;
@@ -86,7 +75,6 @@
         return Boolean(auth.currentUser && auth.currentUser.uid === expectedUid);
     }
 
-    // Firebase側の値を既存画面で使うメッセージ形式に整えます。
     function normalizeMessage(snapshot) {
         const value = snapshot.val() || {};
         return {
@@ -104,13 +92,11 @@
         };
     }
 
-    // 同じ送信IDが再利用された場合でも別の保存先を作ります。
     function createCollisionMessageId(messageId) {
         const randomPart = Math.random().toString(36).slice(2, 10);
         return `${String(messageId)}-copy-${Date.now().toString(36)}-${randomPart}`.slice(0, 100);
     }
 
-    // 会話のメッセージを並べ替えて通知します。
     function emitMessages(state, onChange) {
         const messages = state.messages
             .filter(message => !state.hiddenAt || !message.sentAt || message.sentAt > state.hiddenAt)
@@ -118,7 +104,6 @@
         onChange(messages);
     }
 
-    // Firebaseの会話をリアルタイム購読します。
     function subscribe(firstUser, secondUser, onChange, onError) {
         const database = getDatabase();
         if (!database) return () => {};
@@ -145,7 +130,6 @@
         };
     }
 
-    // Firebaseへ本文だけを保存し、一覧用の受信箱も更新します。
     async function sendText(firstUser, secondUser, messageId, text) {
         const database = getDatabase();
         const auth = getAuth();
@@ -196,7 +180,6 @@
         return storedMessageId;
     }
 
-    // Firebase側の会話を一度だけ取得します。
     async function readOnce(firstUser, secondUser) {
         const database = getDatabase();
         if (!database) return [];
@@ -206,7 +189,6 @@
         return messages.sort((a, b) => a.sentAt - b.sentAt);
     }
 
-    // Firebase側の受信箱を取得してメッセージ一覧を作れるようにします。
     async function readInbox(userId) {
         const database = getDatabase();
         if (!database) return [];
@@ -229,7 +211,6 @@
         return () => inboxRef.off("value", handler);
     }
 
-    // Firebase側の未読メッセージを既読へ更新します。
     async function markAsRead(firstUser, secondUser) {
         const database = getDatabase();
         if (!database) return;
@@ -247,7 +228,6 @@
         if (Object.keys(updates).length > 0) await database.ref().update(updates);
     }
 
-    // 送信者本人のFirebaseメッセージを取り消します。
     async function unsendMessage(firstUser, secondUser, messageId) {
         const database = getDatabase();
         if (!database) throw new Error("Firebaseが利用できません");
@@ -269,14 +249,12 @@
         await database.ref().update(updates);
     }
 
-    // 自分の画面だけ会話を非表示にします。
     async function hideConversation(firstUser, secondUser) {
         const database = getDatabase();
         if (!database) throw new Error("Firebaseが利用できません");
         await database.ref("hidden/" + getFirebaseUid(firstUser) + "/" + getFirebaseUid(secondUser)).set(Date.now());
     }
 
-    // チャット画面から利用する公開APIです。
     window.HeikoFirebaseChat = {
         enabled: ENABLED,
         encodeKey,
