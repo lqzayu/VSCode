@@ -292,6 +292,13 @@ function installRecruitmentPostButton() {
     actions.appendChild(refreshButton);
     panel.appendChild(actions);
 
+    if (document.body.dataset.page !== "junior-meister") {
+        const promo = document.createElement("div");
+        promo.className = "heiko-jm-promo";
+        promo.innerHTML = "<p>ジュニアマイスターを計算してみませんか？</p><a class=\"heiko-jm-promo-link\" href=\"junior-meister.html\"><span>点数を計算する</span><span class=\"heiko-recruit-post-arrow\" aria-hidden=\"true\">→</span></a>";
+        panel.appendChild(promo);
+    }
+
     const headerActions = document.getElementById("heiko-header-actions");
     if (headerActions && !headerActions.children.length) headerActions.remove();
 }
@@ -706,6 +713,62 @@ function installHeikoSharedStyles() {
         .heiko-recruit-post-panel.is-page-action {
             width: min(calc(100% - 32px), 1080px);
             margin: 20px auto 0;
+            flex-wrap: wrap;
+        }
+        .heiko-jm-promo {
+            position: relative;
+            z-index: 1;
+            flex: 1 0 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--heiko-recruit-panel-border);
+        }
+        .heiko-jm-promo p {
+            margin: 0;
+            color: var(--heiko-recruit-title);
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.5;
+        }
+        .heiko-jm-promo-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 40px;
+            padding: 8px 14px;
+            box-sizing: border-box;
+            border: 1px solid var(--heiko-recruit-refresh-border);
+            border-radius: 12px;
+            background: var(--heiko-recruit-refresh-bg);
+            color: var(--heiko-recruit-label);
+            font-size: 13px;
+            font-weight: 800;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+        }
+        .heiko-jm-promo-link:hover {
+            transform: translateY(-1px);
+            background: var(--heiko-recruit-refresh-hover);
+            box-shadow: 0 7px 15px rgba(13, 88, 96, .1);
+        }
+        .heiko-jm-promo-link:hover .heiko-recruit-post-arrow {
+            transform: translateX(3px);
+        }
+        .heiko-jm-promo-link:focus-visible {
+            outline: 3px solid rgba(28, 189, 197, .35);
+            outline-offset: 2px;
+        }
+        .heiko-recruit-post-panel.is-sidebar-action .heiko-jm-promo {
+            display: grid;
+            gap: 10px;
+        }
+        .heiko-recruit-post-panel.is-sidebar-action .heiko-jm-promo-link {
+            width: 100%;
         }
         .heiko-recruit-post-panel .heiko-recruit-post {
             min-height: 50px;
@@ -799,6 +862,13 @@ function installHeikoSharedStyles() {
             .heiko-recruit-post-panel .heiko-recruit-post {
                 min-height: 48px;
                 font-size: 14px;
+            }
+            .heiko-jm-promo {
+                display: grid;
+                gap: 10px;
+            }
+            .heiko-jm-promo-link {
+                width: 100%;
             }
         }
         @media (max-width: 380px) {
