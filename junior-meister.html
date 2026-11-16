@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ジュニアマイスター計算 - 平工マッチング</title>
+    <link rel="icon" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#254f3d">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="stylesheet" href="theme.css?v=20261006glass">
+    <script src="ui.js?v=20261013pwaDialog"></script>
+    <script src="online.js?v=20260917b" defer></script>
+    <style>
+        .jm-page { max-width: 1080px; margin: 0 auto; padding: 46px 24px 80px; }
+        .jm-hero { display:grid; grid-template-columns:1.1fr .9fr; gap:24px; margin-bottom:24px; }
+        .jm-card { background:var(--ui-paper); border:1px solid var(--ui-line); border-radius:20px; box-shadow:0 12px 30px rgba(36,60,50,.06); padding:22px; }
+        .jm-hero-copy { padding:30px; border-radius:20px; background:linear-gradient(135deg, var(--ui-green), var(--ui-green-deep, #173528)); color:#fff; position:relative; overflow:hidden; }
+        .jm-hero-copy::after { content:""; position:absolute; width:220px; height:220px; right:-70px; top:-80px; border-radius:50%; background:var(--ui-lime); opacity:.22; }
+        .jm-kicker { margin:0 0 10px; font-size:11px; letter-spacing:.18em; font-weight:800; opacity:.8; }
+        .jm-hero-copy h1 { margin:0; font-size:clamp(26px,4vw,40px); line-height:1.25; letter-spacing:-.05em; position:relative; z-index:1; }
+        .jm-hero-copy p { margin:14px 0 0; color:rgba(255,255,255,.84); position:relative; z-index:1; font-size:14px; }
+        .jm-score-total { display:flex; align-items:baseline; gap:8px; margin:4px 0 6px; }
+        .jm-score-total strong { font-size:54px; line-height:1; letter-spacing:-.04em; color:var(--ui-ink); font-variant-numeric:tabular-nums; }
+        .jm-score-total span { color:var(--ui-muted); font-weight:700; }
+        .jm-level { display:inline-block; padding:5px 12px; border-radius:999px; font-weight:800; font-size:13px; background:var(--ui-soft); color:var(--ui-ink); border:1px solid var(--ui-line); }
+        .jm-level.bronze { background:#f3e2d3; color:#7a4520; border-color:#e2c3a6; }
+        .jm-level.silver { background:#e8ecf1; color:#3d4a5a; border-color:#cdd5df; }
+        .jm-level.gold { background:#f7ebc2; color:#6e5308; border-color:#e6cf82; }
+        .jm-bar { position:relative; height:10px; border-radius:999px; background:var(--ui-soft); margin:16px 0 6px; overflow:hidden; }
+        .jm-bar-fill { position:absolute; inset:0 auto 0 0; background:var(--ui-green); border-radius:999px; transition:width .3s; }
+        .jm-bar-marks { display:flex; justify-content:space-between; color:var(--ui-muted); font-size:11px; }
+        .jm-next { margin:10px 0 0; font-size:13px; color:var(--ui-ink); }
+        .jm-checks { list-style:none; margin:14px 0 0; padding:0; display:grid; gap:6px; font-size:13px; }
+        .jm-checks li { display:flex; gap:8px; align-items:flex-start; color:var(--ui-muted); }
+        .jm-checks li::before { content:"－"; font-weight:800; width:1.2em; flex:none; }
+        .jm-checks li.ok { color:var(--ui-ink); }
+        .jm-checks li.ok::before { content:"✓"; color:var(--ui-green); }
+        .jm-checks li.ng::before { content:"✕"; color:var(--ui-danger); }
+        .jm-grid { display:grid; grid-template-columns:.95fr 1.05fr; gap:24px; align-items:start; }
+        .jm-card h2 { margin:0 0 14px; font-size:17px; letter-spacing:-.03em; }
+        .jm-field { display:flex; flex-direction:column; gap:5px; margin-bottom:12px; }
+        .jm-field label { color:var(--ui-muted); font-size:12px; font-weight:700; }
+        .jm-field input, .jm-field select { width:100%; min-height:44px; padding:9px 11px; box-sizing:border-box; }
+        .jm-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .jm-btn { min-height:44px; padding:0 18px; border:0; border-radius:10px; background:var(--ui-green); color:var(--ui-paper); font-weight:800; cursor:pointer; width:100%; }
+        .jm-btn:disabled { opacity:.5; cursor:not-allowed; }
+        .jm-btn.ghost { background:transparent; color:var(--ui-muted); border:1px solid var(--ui-line); width:auto; min-height:34px; font-size:12px; }
+        .jm-hint { margin:4px 0 12px; color:var(--ui-muted); font-size:12px; line-height:1.6; }
+        .jm-divider { border:0; border-top:1px solid var(--ui-line); margin:20px 0; }
+        .jm-list { list-style:none; margin:0; padding:0; display:grid; gap:8px; }
+        .jm-item { display:grid; grid-template-columns:1fr auto auto; gap:10px; align-items:center; padding:12px 14px; border:1px solid var(--ui-line); border-radius:12px; background:var(--ui-paper); }
+        .jm-item.void { opacity:.6; }
+        .jm-item-name { font-weight:700; font-size:14px; color:var(--ui-ink); overflow-wrap:anywhere; }
+        .jm-item-meta { font-size:11px; color:var(--ui-muted); margin-top:2px; }
+        .jm-item-meta .warn { color:var(--ui-danger); font-weight:700; }
+        .jm-pts { font-weight:800; font-size:18px; color:var(--ui-ink); font-variant-numeric:tabular-nums; white-space:nowrap; }
+        .jm-pts small { font-size:11px; color:var(--ui-muted); font-weight:700; margin-left:2px; }
+        .jm-item.void .jm-pts { text-decoration:line-through; }
+        .jm-remove { border:0; background:transparent; color:var(--ui-muted); font-size:18px; cursor:pointer; padding:4px 8px; border-radius:8px; }
+        .jm-remove:hover { color:var(--ui-danger); background:var(--ui-soft); }
+        .jm-empty { color:var(--ui-muted); font-size:14px; text-align:center; padding:28px 10px; border:1px dashed var(--ui-line); border-radius:12px; }
+        .jm-list-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:14px; }
+        .jm-list-head h2 { margin:0; }
+        .jm-note { margin:24px 0 0; color:var(--ui-muted); font-size:12px; line-height:1.7; }
+        .jm-note a { color:var(--ui-green); }
+        @media (max-width:760px) {
+            .jm-page { padding:28px 16px 60px; }
+            .jm-hero, .jm-grid { grid-template-columns:1fr; }
+            .jm-hero-copy { padding:24px; }
+            .jm-row { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+
+<body data-page="junior-meister">
+    <header class="navbar">
+        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
+        <button class="hamburger-btn" id="hud-menu-btn" type="button" onclick="toggleMenu()" aria-label="メニューを開く">
+            <span></span><span></span><span></span>
+        </button>
+        <nav class="nav-links" id="nav-links">
+            <a class="nav-item" href="main.html?guide=1">使い方</a>
+            <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>
+            <a class="nav-item" href="main.html?tab=recruit">募集投稿</a>
+            <a class="nav-item" href="main.html?tab=search">ユーザーを探す</a>
+            <a class="nav-item" href="messages.html">メッセージ</a>
+            <a class="nav-item" href="profile.html">マイページ</a>
+            <a class="nav-item" href="ai-study.html">AI学習相談</a>
+            <a class="nav-item active" href="junior-meister.html">JM計算</a>
+            <a class="nav-item" id="nav-admin-btn" style="display:none;color:#a84738;" href="admin.html">管理者</a>
+            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>
+        </nav>
+    </header>
+
+    <main class="jm-page">
+        <section class="jm-hero">
+            <div class="jm-hero-copy">
+                <p class="jm-kicker">JUNIOR MEISTER</p>
+                <h1>取った資格から、ジュニアマイスターの点数を計算する。</h1>
+                <p>資格・検定と級を選ぶと、全工協の区分表に沿って合計点と認定の目安を出します。同じ区分の資格は高い方だけ数えるなど、申請時のルールも反映します。</p>
+            </div>
+            <section class="jm-card" aria-live="polite">
+                <div class="jm-score-total"><strong id="jm-total">0</strong><span>点</span></div>
+                <span id="jm-level" class="jm-level">まだ申請できません</span>
+                <div class="jm-bar"><div id="jm-bar-fill" class="jm-bar-fill" style="width:0%"></div></div>
+                <div class="jm-bar-marks"><span>0</span><span>ブロンズ 20</span><span>シルバー 30</span><span>ゴールド 45</span></div>
+                <p id="jm-next" class="jm-next"></p>
+                <ul class="jm-checks">
+                    <li id="jm-check-base">区分1の資格（教養系を除く）が20点以上</li>
+                    <li id="jm-check-special">特別表彰の目安（ゴールド＋S/Aランク資格＋上位8資格で60点以上）</li>
+                </ul>
+            </section>
+        </section>
+
+        <section class="jm-grid">
+            <div class="jm-card">
+                <h2>資格・検定を追加</h2>
+                <div class="jm-field">
+                    <label for="jm-search">名前で探す</label>
+                    <input id="jm-search" type="search" placeholder="例：電気工事士、危険物、漢字" autocomplete="off">
+                </div>
+                <div class="jm-field">
+                    <label for="jm-category">分野</label>
+                    <select id="jm-category"></select>
+                </div>
+                <div class="jm-field">
+                    <label for="jm-item">資格・検定</label>
+                    <select id="jm-item"></select>
+                </div>
+                <div class="jm-field">
+                    <label for="jm-grade">級・結果</label>
+                    <select id="jm-grade"></select>
+                </div>
+                <p id="jm-item-note" class="jm-hint"></p>
+                <button id="jm-add" class="jm-btn" type="button">追加する</button>
+
+                <hr class="jm-divider">
+
+                <h2>競技大会・コンクール（区分2・3）</h2>
+                <p class="jm-hint">大会やコンクールの成績は種類が多いため、区分表で点数を確認して入力してください。合計点には入りますが、「区分1で20点以上」の条件には含まれません。</p>
+                <div class="jm-row">
+                    <div class="jm-field">
+                        <label for="jm-manual-name">大会・コンクール名と成績</label>
+                        <input id="jm-manual-name" type="text" maxlength="60" placeholder="例：ものづくりコンテスト 県優勝">
+                    </div>
+                    <div class="jm-field">
+                        <label for="jm-manual-pts">区分</label>
+                        <select id="jm-manual-pts">
+                            <option value="30">S（30点）</option><option value="20">A（20点）</option><option value="12">B（12点）</option>
+                            <option value="7" selected>C（7点）</option><option value="4">D（4点）</option><option value="2">E（2点）</option><option value="1">F（1点）</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="jm-manual-add" class="jm-btn" type="button">大会・コンクールを追加</button>
+            </div>
+
+            <div class="jm-card">
+                <div class="jm-list-head">
+                    <h2>取得した資格</h2>
+                    <button id="jm-clear" class="jm-btn ghost" type="button">すべて消す</button>
+                </div>
+                <ul id="jm-list" class="jm-list"></ul>
+            </div>
+        </section>
+
+        <p class="jm-note">
+            点数は全国工業高等学校長協会の「令和8年度前期 区分表」をもとにしています。区分表は毎期見直されるため、申請前に必ず
+            <a href="https://zenkoukyo.or.jp/index_jm/" target="_blank" rel="noopener">全工協のジュニアマイスターのページ</a>で最新の区分表を確認し、担当の先生に相談してください。この計算結果は目安で、認定を保証するものではありません。入力した内容はこの端末のブラウザだけに保存されます。
+        </p>
+    </main>
+
+    <script>
+        // 令和8年度前期 区分表（区分1・別表）より。[区分番号, 名称, [[級・結果, 点数], ...], オプション]
+        // g: 「いずれか一つ」のグループ番号（同じグループは最も高い1件のみ加算）
+        const OK = "合格・取得";
+        const CATEGORIES = [
+            { id: "zenkoukyo", name: "全工協主催の検定", items: [
+                [101, "計算技術検定", [["1級", 20], ["2級", 7], ["3級", 2], ["4級", 1]]],
+                [102, "情報技術検定", [["特別表彰", 20], ["1級", 12], ["2級", 4], ["3級", 2]]],
+                [103, "基礎製図検定", [[OK, 2]]],
+                [104, "機械製図検定", [["特別賞", 12], [OK, 7]]],
+                [105, "パソコン利用技術検定", [["1級", 12], ["2級", 4], ["3級", 2]]],
+                [106, "リスニング英語検定", [["1級", 12], ["2級", 7], ["3級", 2]]],
+                [107, "初級CAD検定", [[OK, 2]]],
+                [108, "グラフィックデザイン検定", [["1級", 20], ["準1級", 12], ["2級", 7], ["3級", 4]]],
+                [109, "高等学校工業基礎学力テスト", [["95以上", 12], ["90以上", 7], ["85以上", 4], ["80以上", 2], ["70以上", 1]]]
+            ]},
+            { id: "kyoyo", name: "教養系（20点の条件には含まれない）", kyoyo: true, items: [
+                [111, "CEFRに対応している外国語検定（英検など）", [["B2以上", 30], ["B1", 20], ["A2", 7], ["A1", 2]], { note: "CEFRのレベルで申請します。英検などがどのレベルにあたるかは文部科学省の対照表で確認してください。" }],
+                [112, "技術英語能力検定", [["プロフェッショナル", 30], ["準プロフェッショナル", 20], ["1級", 12], ["2級", 7], ["3級", 4]]],
+                [113, "日本漢字能力検定", [["1級", 12], ["準1級", 7], ["2級", 4], ["準2級", 2], ["3級", 1]]],
+                [114, "実用数学技能検定", [["1級", 12], ["準1級", 7], ["2級", 4], ["準2級", 2], ["3級", 1]]],
+                [115, "日本語検定", [["1級", 12], ["準1級", 7], ["2級", 4], ["準2級", 2], ["3級", 1]]]
+            ]},
+            { id: "gino", name: "技能・技術（技能士・技能講習など）", items: [
+                [121, "技能士（1つ目の職種）", [["2級", 20], ["3級", 12]], { note: "対象の職種は全工協のWebページの一覧で確認してください。" }],
+                [122, "技能士（1つ目と同じ職種の別作業）", [["2級", 12], ["3級", 7]]],
+                [123, "技能士（1つ目と同じ職種の別作業・2つ目）", [["2級", 12], ["3級", 7]]],
+                [124, "技能士（2つ目の職種）", [["2級", 20], ["3級", 12]]],
+                [125, "技能士（3つ目の職種）", [["2級", 20], ["3級", 12]]],
+                [126, "情報配線施工技能検定", [["2級", 12], ["3級", 7]]],
+                [127, "知的財産管理技能検定", [["2級", 12], ["3級", 7]]],
+                [128, "ウェブデザイン技能検定", [["2級", 12], ["3級", 7]]],
+                [129, "機械保全技能検定", [["2級", 12], ["3級", 7]]],
+                [130, "機械保全技能検定（129とは別の作業）", [["2級", 7], ["3級", 4]], { note: "機械系保全作業と電気系保全作業の両方を取った場合だけ申請できます。" }],
+                [131, "技能講習（1つ目）", [["修了", 1]], { note: "フォークリフト・玉掛け・ガス溶接などの技能講習です。3種類まで申請できます。" }],
+                [132, "技能講習（2つ目）", [["修了", 1]]],
+                [133, "技能講習（3つ目）", [["修了", 1]]],
+                [134, "特別教育（1つ目）", [["修了", 1]], { note: "3種類まで申請できます。" }],
+                [135, "特別教育（2つ目）", [["修了", 1]]],
+                [136, "特別教育（3つ目）", [["修了", 1]]],
+                [137, "技術士補", [[OK, 30]]]
+            ]},
+            { id: "kikai", name: "機械系", items: [
+                [141, "ボイラー技士", [["1級（学科）", 20], ["2級（免許取得）", 7]], { note: "2級は学科試験の合格だけでは申請できません。" }],
+                [142, "JIS溶接技能者評価試験（1種類目）", [["専門級", 20], ["基本級", 12]]],
+                [143, "JIS溶接技能者評価試験（2種類目）", [["専門級", 12], ["基本級", 7]]],
+                [144, "JIS溶接技能者評価試験（3種類目）", [["専門級", 12], ["基本級", 7]]],
+                [145, "自動車整備士（1種類目）", [["3級", 12]]],
+                [146, "自動車整備士（2種類目）", [["3級", 7]]],
+                [147, "自動車整備士（3種類目）", [["3級", 7]]],
+                [148, "三次元CAD認定技術者試験", [["CSWP", 7], ["CSWA", 4]]]
+            ]},
+            { id: "denki", name: "電気系", items: [
+                [151, "電気主任技術者", [["第三種以上", 30]], { note: "科目合格では申請できません。" }],
+                [152, "電気工事士", [["第一種（技能合格）", 20], ["第二種", 7]], { note: "筆記試験だけの合格では申請できません。" }]
+            ]},
+            { id: "design", name: "デザイン系", items: [
+                [161, "色彩士検定", [["1級", 7], ["2級", 4], ["3級", 2]]],
+                [162, "カラーコーディネーター検定", [["アドバンス", 12], ["スタンダード", 4]]],
+                [163, "色彩検定", [["1級", 12], ["2級", 7], ["3級", 2], ["UC級", 1]]],
+                [164, "織物設計検定", [["2級", 4], ["3級", 2]]]
+            ]},
+            { id: "kenchiku", name: "建築・土木系", items: [
+                [171, "土木施工管理技術検定", [["2級・技士補", 20]]],
+                [172, "建築施工管理技術検定", [["2級・技士補", 20]]],
+                [173, "電気工事施工管理技術検定", [["2級・技士補", 20]]],
+                [174, "管工事施工管理技術検定", [["2級・技士補", 20]]],
+                [175, "造園施工管理技術検定", [["2級・技士補", 20]]],
+                [176, "建設機械施工管理技術検定", [["2級・技士補", 20]]],
+                [177, "電気通信工事施工管理技術検定", [["2級・技士補", 20]]],
+                [178, "インテリアコーディネーター資格試験", [[OK, 20]]],
+                [179, "測量士・測量士補", [["測量士", 30], ["測量士補", 20]]],
+                [180, "インテリア設計士", [["2級", 7]]],
+                [181, "建築CAD検定", [["准1級", 20], ["2級", 12], ["准2級", 7], ["3級", 4], ["4級", 2]]],
+                [182, "トレース技能検定", [["1級", 7], ["2級", 4], ["3級", 2], ["4級", 1]]],
+                [183, "レタリング技能検定", [["1級", 20], ["2級", 7], ["3級", 4], ["4級", 1]]],
+                [184, "福祉住環境コーディネーター検定試験", [["2級", 7], ["3級", 4]]]
+            ]},
+            { id: "shobo", name: "消防試験関係（危険物・消防設備士）", items: [
+                [191, "危険物取扱者（甲種・乙種4類・丙種）", [["甲種", 20], ["乙種4類", 4], ["丙種", 2]], { note: "甲種を申請する場合、乙種はすべて申請できません。" }],
+                [192, "危険物取扱者（乙種1類）", [[OK, 2]]],
+                [193, "危険物取扱者（乙種2類）", [[OK, 2]]],
+                [194, "危険物取扱者（乙種3類）", [[OK, 2]]],
+                [195, "危険物取扱者（乙種5類）", [[OK, 2]]],
+                [196, "危険物取扱者（乙種6類）", [[OK, 2]]],
+                [197, "消防設備士（1類）", [["甲種", 12], ["乙種", 4]]],
+                [198, "消防設備士（2類）", [["甲種", 12], ["乙種", 4]]],
+                [199, "消防設備士（3類）", [["甲種", 12], ["乙種", 4]]],
+                [200, "消防設備士（4類）", [["甲種", 20], ["乙種", 7]]],
+                [201, "消防設備士（5類）", [["甲種", 12], ["乙種", 4]]],
+                [202, "消防設備士（6類）", [["乙種", 4]]],
+                [203, "消防設備士（7類）", [["乙種", 4]]]
+            ]},
+            { id: "kankyo", name: "環境・化学系", items: [
+                [211, "公害防止管理者（ダイオキシン）", [[OK, 30]]],
+                [212, "公害防止管理者（大気・水質）", [["1種・3種", 30], ["2種", 20], ["4種", 12]]],
+                [213, "公害防止管理者（騒音・振動・粉じん）", [[OK, 12]]],
+                [214, "毒物劇物取扱責任者", [["試験合格", 12]]],
+                [215, "eco検定（環境社会検定）", [[OK, 2]]],
+                [216, "エックス線作業主任者", [[OK, 12]]],
+                [217, "火薬類取扱保安責任者", [["甲種", 12], ["乙種", 7]]],
+                [218, "環境管理士検定", [["4級", 2]]]
+            ]},
+            { id: "joho", name: "情報・通信系", items: [
+                [221, "情報処理技術者試験（応用・基本・ITパスポート）", [["応用情報技術者", 30], ["基本情報技術者", 20], ["ITパスポート", 12]]],
+                [222, "情報セキュリティマネジメント試験", [[OK, 12]]],
+                [231, "工事担任者（アナログ系）", [["第一級", 12], ["第二級", 7]]],
+                [232, "工事担任者（デジタル系）", [["第一級", 12], ["第二級", 7]]],
+                [233, "陸上特殊無線技士", [["第一級", 7], ["第二級", 4], ["国内電信", 2], ["第三級", 1]]],
+                [234, "海上特殊無線技士", [["第一級", 7], ["第二級", 4], ["第三級", 2], ["レーダー", 1]]],
+                [235, "航空特殊無線技士", [[OK, 7]]],
+                [236, "アマチュア無線技士", [["第一級", 7], ["第二級", 4], ["第三級", 2], ["第四級", 1]]],
+                [237, "総合無線通信士", [["第一級", 30], ["第二級", 20], ["第三級", 12]]],
+                [238, "海上無線通信士", [["第一級", 30], ["第二級", 20], ["第三級", 12], ["第四級", 7]]],
+                [239, "航空無線通信士", [[OK, 20]]],
+                [240, "陸上無線技術士", [["第一級", 30], ["第二級", 20]]],
+                [241, "電気通信主任技術者（伝送交換・線路）", [[OK, 30]]],
+                [271, "ITストラテジスト試験", [[OK, 30]], { g: 271 }],
+                [271, "システムアーキテクト試験", [[OK, 30]], { g: 271 }],
+                [271, "プロジェクトマネージャ試験", [[OK, 30]], { g: 271 }],
+                [271, "ネットワークスペシャリスト試験", [[OK, 30]], { g: 271 }],
+                [271, "データベーススペシャリスト試験", [[OK, 30]], { g: 271 }],
+                [271, "エンベデッドシステムスペシャリスト試験", [[OK, 30]], { g: 271 }],
+                [271, "ITサービスマネージャ試験", [[OK, 30]], { g: 271 }],
+                [271, "システム監査技術者試験", [[OK, 30]], { g: 271 }],
+                [271, "情報処理安全確保支援士試験", [[OK, 30]], { g: 271 }],
+                [271, "情報セキュリティスペシャリスト試験", [[OK, 30]], { g: 271 }]
+            ]},
+            { id: "pc", name: "パソコン・CAD・CG系（別表）", items: [
+                [281, "コンピュータサービス技能評価試験（ワープロ部門）", [["1級", 4], ["2級", 2], ["3級", 1]], { g: 281 }],
+                [281, "MOS Word", [["上級", 4], ["一般", 2]], { g: 281 }],
+                [281, "日本語ワープロ検定", [["初段", 7], ["1級・準1級", 4], ["2級・準2級", 2], ["3級・4級", 1]], { g: 281 }],
+                [281, "文書デザイン検定", [["1級", 4], ["2級", 2], ["3級・4級", 1]], { g: 281 }],
+                [281, "文章入力スピード認定試験", [["特段・初段・1級", 7], ["準1級・2級", 4], ["準2級・3級", 2]], { g: 281 }],
+                [282, "コンピュータサービス技能評価試験（表計算部門）", [["1級", 4], ["2級", 2], ["3級", 1]], { g: 282 }],
+                [282, "MOS Excel", [["上級", 4], ["一般", 2]], { g: 282 }],
+                [282, "情報処理技能検定（表計算）", [["初段", 7], ["1級", 4], ["準1級・2級", 2], ["準2級・3級・4級", 1]], { g: 282 }],
+                [282, "情報処理技能検定（データベース）", [["1級", 4], ["2級", 2], ["3級・4級", 1]], { g: 282 }],
+                [283, "DTP検定", [["2種", 7], ["3種", 4]], { g: 283 }],
+                [283, "CGエンジニア検定", [["エキスパート", 7], ["ベーシック", 2]], { g: 283 }],
+                [283, "CGクリエイター検定", [["エキスパート", 7], ["ベーシック", 2]], { g: 283 }],
+                [283, "マルチメディア検定", [["エキスパート", 7], ["ベーシック", 2]], { g: 283 }],
+                [283, "Webデザイナー検定", [["エキスパート", 7], ["ベーシック", 2]], { g: 283 }],
+                [284, "POP広告クリエイター技能審査試験", [[OK, 2]], { g: 284 }],
+                [284, "Illustratorクリエイター能力認定試験", [["エキスパート", 2], ["スタンダード", 1]], { g: 284 }],
+                [285, "C言語プログラミング能力認定試験", [["1級", 4], ["2級", 2], ["3級", 1]], { g: 285 }],
+                [285, "プログラミング能力検定（テキスト言語版）", [["レベル6", 4], ["レベル5・4", 2], ["レベル3・2", 1]], { g: 285 }],
+                [286, "MOS PowerPoint", [["一般（共通）", 2]], { g: 286 }],
+                [286, "ホームページ作成検定", [["1級", 4], ["2級", 2], ["3級・4級", 1]], { g: 286 }],
+                [286, "プレゼンテーション作成検定", [["1級", 4], ["2級", 2], ["3級・4級", 1]], { g: 286 }],
+                [287, "パソコン技能検定II種試験", [["1級", 4], ["2級", 2], ["3級", 1]], { g: 287 }],
+                [287, "ICTプロフィシエンシー検定（P検）", [["1級", 12], ["2級", 7], ["準2級・3級", 4], ["4級", 2]], { g: 287 }],
+                [288, "情報検定（J検）情報活用試験", [["1級", 7], ["2級", 4], ["3級", 1]]],
+                [289, "2次元CAD利用技術者", [["1級", 4], ["2級", 2], ["基礎", 1]], { g: 289 }],
+                [289, "3次元CAD利用技術者", [["1級", 7], ["準1級", 4], ["2級", 2]], { g: 289 }]
+            ]},
+            { id: "other", name: "その他の資格・検定", items: [
+                [251, "都道府県や工業校長会などが実施する検定（1つ目）", [[OK, 2]]],
+                [252, "都道府県や工業校長会などが実施する検定（2つ目）", [[OK, 2]]],
+                [253, "品質管理検定（QC検定）", [["2級", 12], ["3級", 4], ["4級", 2]]],
+                [261, "高圧ガス販売主任者", [["第二種", 4]]],
+                [262, "高圧ガス製造保安責任者（冷凍機械）", [["2種", 20], ["3種", 12]]],
+                [263, "高圧ガス製造保安責任者 丙種化学（液石・特別試験科目）", [[OK, 7]]],
+                [264, "高圧ガス製造保安責任者（化学・機械）", [["甲種", 30], ["乙種", 20]]],
+                [265, "エネルギー管理士（熱・電気分野）", [[OK, 30]]],
+                [266, "非破壊試験技術者 レベル2", [[OK, 12]]],
+                [291, "建設業経理士", [["2級", 12]], { g: 291 }],
+                [291, "建設業経理事務士", [["3級", 4], ["4級", 1]], { g: 291 }],
+                [292, "宅地建物取引士", [[OK, 12]]],
+                [293, "陶磁器能力検定", [[OK, 2]]],
+                [294, "セラミック能力検定", [[OK, 2]]],
+                [295, "機械設計技術者試験", [["3級", 20]]],
+                [296, "染色検定", [["2級", 4], ["3級", 2]]],
+                [297, "エクステリアプランナー", [["1級", 4], ["2級", 2]]],
+                [298, "シスコ技術者認定", [["CCNP", 30], ["CCNA", 20], ["CCENT", 7]]],
+                [299, "全国統一陶芸技能検定", [["上級", 4], ["中級", 2], ["初級", 1]]],
+                [300, "潜水士", [[OK, 2]]],
+                [301, "計量士国家試験", [[OK, 30]]],
+                [302, "ジーンズソムリエ資格認定試験", [[OK, 1]]],
+                [303, "モバイルシステム技術検定", [["2級", 7]], { g: 303 }],
+                [303, "モバイル技術基礎検定", [[OK, 1]], { g: 303 }],
+                [304, "コンクリート製品検定", [["上級", 4], ["中級", 2], ["初級", 1]]],
+                [305, "ファッションビジネス能力検定", [["2級", 4], ["3級", 2]]],
+                [306, "ファッション色彩能力検定", [["2級", 4], ["3級", 2]]],
+                [307, "無人航空機操縦者技能証明", [["一等", 7], ["二等", 4]], { g: 307 }],
+                [307, "無人航空従事者試験（ドローン検定）", [["1級", 4], ["2級", 2], ["3級", 1]], { g: 307 }],
+                [308, "自主保全士", [["2級", 4]]],
+                [309, "半導体技術者検定", [["2級（3科目）", 20], ["2級（2科目）", 12], ["2級（1科目）", 7], ["3級", 4], ["4級", 2]]],
+                [310, "インフラ調査士補", [["中級・初級", 1]]]
+            ]}
+        ];
+
+        // 名称から一意のキーを作り、検索・保存に使う
+        const ITEMS = [];
+        CATEGORIES.forEach(cat => cat.items.forEach(([no, name, grades, opt = {}]) => {
+            ITEMS.push({ key: no + ":" + name, no, name, grades, cat: cat.id, kyoyo: !!cat.kyoyo, group: opt.g ? "g" + opt.g : "n" + no, note: opt.note || (opt.g ? "この資格を含むグループ（区分番号" + opt.g + "）は、いずれか一つだけ申請できます。" : "") });
+        }));
+        const ITEM_BY_KEY = new Map(ITEMS.map(item => [item.key, item]));
+        const KOSHU_KEY = ITEMS.find(item => item.no === 191).key;
+        const OTSUSHU_NOS = new Set([192, 193, 194, 195, 196]);
+
+        const currentUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";
+        const adminButton = document.getElementById("nav-admin-btn");
+        if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") {
+            adminButton.style.display = "inline-block";
+        }
+        const stateKey = "junior-meister:" + currentUserId;
+        let entries = [];
+
+        const $ = id => document.getElementById(id);
+        const categorySelect = $("jm-category"), itemSelect = $("jm-item"), gradeSelect = $("jm-grade"), searchInput = $("jm-search");
+
+        function toggleMenu() {
+            $("nav-links").classList.toggle("open");
+            $("hud-menu-btn").classList.toggle("open");
+        }
+        function logout() {
+            ["userId", "userEmail", "userName", "profileImage", "adminToken", "isImpersonating"].forEach(key => localStorage.removeItem(key));
+            location.href = "index.html";
+        }
+
+        function loadEntries() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(stateKey) || "[]");
+                entries = Array.isArray(saved) ? saved.filter(e => e && (e.manual ? typeof e.name === "string" && Number(e.pts) > 0 : ITEM_BY_KEY.has(e.key))) : [];
+            } catch (error) { entries = []; }
+        }
+        function saveEntries() {
+            try { localStorage.setItem(stateKey, JSON.stringify(entries)); } catch (error) { console.warn("保存できませんでした。", error); }
+        }
+
+        function fillCategories() {
+            categorySelect.innerHTML = '<option value="">すべての分野</option>' + CATEGORIES.map(c => `<option value="${c.id}">${c.name}</option>`).join("");
+        }
+        function fillItems() {
+            const q = searchInput.value.trim().toLowerCase();
+            const cat = categorySelect.value;
+            const list = ITEMS.filter(item => (!cat || item.cat === cat) && (!q || item.name.toLowerCase().includes(q)));
+            itemSelect.innerHTML = list.length ? list.map(item => `<option value="${escapeHtml(item.key)}">${escapeHtml(item.name)}</option>`).join("") : '<option value="">見つかりません</option>';
+            fillGrades();
+        }
+        function fillGrades() {
+            const item = ITEM_BY_KEY.get(itemSelect.value);
+            gradeSelect.innerHTML = item ? item.grades.map(([label, pts], i) => `<option value="${i}">${escapeHtml(label)}（${pts}点）</option>`).join("") : "";
+            $("jm-item-note").textContent = item ? item.note : "";
+            $("jm-add").disabled = !item;
+        }
+
+        function addEntry() {
+            const item = ITEM_BY_KEY.get(itemSelect.value);
+            if (!item) return;
+            const grade = Number(gradeSelect.value) || 0;
+            const existing = entries.find(e => e.key === item.key);
+            if (existing) {
+                existing.grade = grade;
+                showNotice("同じ資格が登録済みだったため、級を更新しました", "info");
+            } else {
+                entries.push({ key: item.key, grade });
+            }
+            saveEntries();
+            render();
+        }
+        function addManual() {
+            const name = $("jm-manual-name").value.trim();
+            if (!name) { showNotice("大会・コンクール名を入力してください", "error"); return; }
+            entries.push({ manual: true, name: name.slice(0, 60), pts: Number($("jm-manual-pts").value) });
+            $("jm-manual-name").value = "";
+            saveEntries();
+            render();
+        }
+        function removeEntry(index) {
+            entries.splice(index, 1);
+            saveEntries();
+            render();
+        }
+
+        // 申請ルールを反映して、各項目が加算されるかどうかを決める
+        function evaluate() {
+            const rows = entries.map((e, index) => {
+                if (e.manual) return { index, name: e.name, label: "区分2・3（手入力）", pts: e.pts, counted: true, kubun1: false, kyoyo: false };
+                const item = ITEM_BY_KEY.get(e.key);
+                const [label, pts] = item.grades[e.grade] || item.grades[0];
+                return { index, item, name: item.name, label: `区分${item.no}・${label}`, pts, counted: true, kubun1: true, kyoyo: item.kyoyo, group: item.group };
+            });
+            const koshu = entries.some(e => e.key === KOSHU_KEY && ITEM_BY_KEY.get(e.key).grades[e.grade][0] === "甲種");
+            if (koshu) rows.forEach(r => { if (r.item && OTSUSHU_NOS.has(r.item.no)) { r.counted = false; r.reason = "危険物の甲種を申請する場合は乙種を申請できません"; } });
+            const best = new Map();
+            rows.forEach(r => {
+                if (!r.counted || !r.group) return;
+                const prev = best.get(r.group);
+                if (!prev || r.pts > prev.pts) { if (prev) { prev.counted = false; prev.reason = "同じ区分でより高い資格があるため加算されません"; } best.set(r.group, r); }
+                else { r.counted = false; r.reason = "同じ区分でより高い資格があるため加算されません"; }
+            });
+            const counted = rows.filter(r => r.counted);
+            const total = counted.reduce((s, r) => s + r.pts, 0);
+            const base = counted.filter(r => r.kubun1 && !r.kyoyo).reduce((s, r) => s + r.pts, 0);
+            const kubun1 = counted.filter(r => r.kubun1).map(r => r.pts).sort((a, b) => b - a);
+            const top8 = kubun1.slice(0, 8).reduce((s, p) => s + p, 0);
+            const hasSA = counted.some(r => r.kubun1 && r.pts >= 20);
+            return { rows, total, base, top8, hasSA };
+        }
+
+        function render() {
+            const { rows, total, base, top8, hasSA } = evaluate();
+            $("jm-total").textContent = total;
+            const eligible = base >= 20;
+            const levelEl = $("jm-level");
+            let level = "", cls = "";
+            if (eligible && total >= 45) { level = "ゴールド"; cls = "gold"; }
+            else if (eligible && total >= 30) { level = "シルバー"; cls = "silver"; }
+            else if (eligible && total >= 20) { level = "ブロンズ"; cls = "bronze"; }
+            levelEl.className = "jm-level " + cls;
+            levelEl.textContent = level ? "ジュニアマイスター" + level + "の目安" : "まだ申請できません";
+            $("jm-bar-fill").style.width = Math.min(100, total / 45 * 100) + "%";
+
+            let next = "";
+            if (!eligible) next = `区分1の資格（教養系を除く）があと${20 - base}点で申請できます。`;
+            else if (total < 30) next = `あと${30 - total}点でシルバーです。`;
+            else if (total < 45) next = `あと${45 - total}点でゴールドです。`;
+            else next = "ゴールドの基準に達しています。";
+            $("jm-next").textContent = next;
+
+            const baseEl = $("jm-check-base");
+            baseEl.className = eligible ? "ok" : "ng";
+            baseEl.textContent = `区分1の資格（教養系を除く）が20点以上：現在${base}点`;
+            const special = cls === "gold" && hasSA && top8 >= 60;
+            const spEl = $("jm-check-special");
+            spEl.className = special ? "ok" : "";
+            spEl.textContent = `特別表彰の目安（ゴールド＋S/Aランク資格＋区分1の上位8資格で60点以上）：上位8資格 ${top8}点`;
+
+            const list = $("jm-list");
+            if (!rows.length) {
+                list.innerHTML = '<li class="jm-empty">まだ資格が登録されていません。左のフォームから追加してください。</li>';
+                return;
+            }
+            list.innerHTML = rows.map(r => `
+                <li class="jm-item${r.counted ? "" : " void"}">
+                    <div>
+                        <div class="jm-item-name">${escapeHtml(r.name)}</div>
+                        <div class="jm-item-meta">${escapeHtml(r.label)}${r.kyoyo ? "・教養系" : ""}${r.reason ? `<br><span class="warn">${escapeHtml(r.reason)}</span>` : ""}</div>
+                    </div>
+                    <div class="jm-pts">${r.pts}<small>点</small></div>
+                    <button class="jm-remove" type="button" data-index="${r.index}" aria-label="${escapeHtml(r.name)}を削除">×</button>
+                </li>`).join("");
+        }
+
+        function escapeHtml(value) {
+            return String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+        }
+
+        categorySelect.addEventListener("change", fillItems);
+        searchInput.addEventListener("input", () => { if (searchInput.value) categorySelect.value = ""; fillItems(); });
+        itemSelect.addEventListener("change", fillGrades);
+        $("jm-add").addEventListener("click", addEntry);
+        $("jm-manual-add").addEventListener("click", addManual);
+        $("jm-list").addEventListener("click", event => {
+            const button = event.target.closest(".jm-remove");
+            if (button) removeEntry(Number(button.dataset.index));
+        });
+        $("jm-clear").addEventListener("click", () => {
+            if (!entries.length || !confirm("登録した資格をすべて消しますか？")) return;
+            entries = [];
+            saveEntries();
+            render();
+        });
+
+        if (!currentUserId || !localStorage.getItem("sessionToken")) {
+            if (typeof showNotice === "function") showNotice("ログインしてから利用してください", "error");
+            if (typeof clearHeikoSession === "function") clearHeikoSession();
+            window.location.replace("index.html");
+        } else {
+            fillCategories();
+            fillItems();
+            loadEntries();
+            render();
+        }
+    </script>
+</body>
+
+</html>
