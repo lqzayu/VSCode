@@ -421,7 +421,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-    <script src="firebase-chat.js?v=20261019qa2"></script>
+    <script src="firebase-chat.js?v=20261117hide"></script>
 </head>
 
 <body data-page="messages">
@@ -482,7 +482,7 @@
     <script>
         if (!localStorage.getItem("userEmail") || !localStorage.getItem("sessionToken")) {
             clearHeikoSession();
-            window.location.href = "index.html";
+            window.location.replace("index.html");
         }
 
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
@@ -499,6 +499,7 @@
         let firebaseReady = false;
         let firebaseInbox = [];
         let firebaseInboxUnsubscribe = null;
+        let firebaseHidden = {};
         let cachedGasPartners = [];
         let lastPartnerSignature = "";
         let gasUnreadCount = 0;
@@ -548,6 +549,11 @@
                     firebaseInbox = [];
                     console.warn("Firebase受信箱の読み込みに失敗したため会話を復元します", inboxError);
                 }
+                try {
+                    firebaseHidden = await window.HeikoFirebaseChat.readHidden(userId);
+                } catch (hiddenError) {
+                    console.warn("非表示にした会話を読み込めませんでした", hiddenError);
+                }
                 if (legacyChatTarget && legacyChatTarget !== userId) {
                     const legacyMessages = await window.HeikoFirebaseChat.readOnce(userId, legacyChatTarget);
                     const messageMap = new Map(firebaseInbox.map(message => [String(message.messageId), message]));
@@ -576,11 +582,22 @@
             }, error => console.warn("Firebase受信箱の購読エラー:", error));
         }
 
+        // 「削除」で非表示にした会話は、その時刻より前のFirebaseのメッセージを一覧に出さない
+        function getVisibleFirebaseMessages(messages) {
+            const myUserId = localStorage.getItem("userEmail");
+            return messages.filter(message => {
+                const partner = message.from === myUserId ? message.to : message.from;
+                if (!partner) return false;
+                const hiddenAt = Number(firebaseHidden[window.HeikoFirebaseChat.getFirebaseUid(partner)] || 0);
+                return !hiddenAt || !message.sentAt || Number(message.sentAt) > hiddenAt;
+            });
+        }
+
         function renderUnreadBadge() {
             const badge = document.getElementById("unread-badge");
             if (!badge) return;
             const userId = localStorage.getItem("userEmail");
-            const count = gasUnreadCount + firebaseInbox.filter(message => message.to === userId && !message.isRead && !message.isUnsent).length;
+            const count = gasUnreadCount + getVisibleFirebaseMessages(firebaseInbox).filter(message => message.to === userId && !message.isRead && !message.isUnsent).length;
             badge.innerText = count > 99 ? "99+" : String(count);
             badge.style.display = count > 0 ? "inline-block" : "none";
         }
@@ -601,7 +618,7 @@
                 });
             });
             const myUserId = localStorage.getItem("userEmail");
-            firebaseMessages.forEach(message => {
+            getVisibleFirebaseMessages(firebaseMessages).forEach(message => {
                 const email = message.from === myUserId ? message.to : message.from;
                 if (!email || email === myUserId || message.isUnsent) return;
                 const previous = map.get(email);
@@ -795,9 +812,14 @@
             button.innerText = "削除中...";
 
             try {
+                const myUserId = localStorage.getItem("userEmail");
+                if (firebaseReady) {
+                    await window.HeikoFirebaseChat.hideConversation(myUserId, email);
+                    firebaseHidden[window.HeikoFirebaseChat.getFirebaseUid(email)] = Date.now();
+                }
                 const result = await postGas({
                     mode: "deleteChatHistory",
-                    userId: localStorage.getItem("userEmail"),
+                    userId: myUserId,
                     targetUserId: email
                 });
 

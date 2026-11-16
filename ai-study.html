@@ -217,7 +217,7 @@
         }
 
         function logout() {
-            ["userId", "userEmail", "userName", "profileImage", "adminToken", "isImpersonating"].forEach(key => localStorage.removeItem(key));
+            clearHeikoSession();
             location.href = "index.html";
         }
 
@@ -319,6 +319,7 @@
                 }
 
                 pendingRequest = null;
+                sendButton.textContent = "相談する";
                 addBubble(result.message.reply, "model", result.message.responseId);
                 history.push({ role: "model", text: result.message.reply });
                 conversation.push({ type: "model", text: result.message.reply, responseId: result.message.responseId || "" });

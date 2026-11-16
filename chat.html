@@ -546,7 +546,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-    <script src="firebase-chat.js?v=20261019qa2"></script>
+    <script src="firebase-chat.js?v=20261117hide"></script>
 </head>
 
 <body data-page="chat">
@@ -682,6 +682,15 @@
             } finally {
                 clearTimeout(timeoutId);
             }
+        }
+
+        // サーバーが理由を返したときはその内容を、通信そのものの失敗は定型文を出す
+        function chatErrorMessage(error, prefix) {
+            const message = error && error.message ? String(error.message) : "";
+            if (!message || (error && (error.name === "AbortError" || error.name === "TypeError")) || /^HTTP \d+/.test(message)) {
+                return "通信エラーが発生しました。";
+            }
+            return prefix + message;
         }
 
         async function setupFirebaseChat() {
@@ -937,7 +946,7 @@
                 });
                 alert("通報を受け付けました。");
             } catch (e) {
-                alert("通信エラーが発生しました。");
+                alert(chatErrorMessage(e, "通報に失敗しました: "));
             }
         }
 
@@ -963,7 +972,7 @@
                 });
                 alert("メッセージの通報を受け付けました。");
             } catch (e) {
-                alert("通信エラーが発生しました。");
+                alert(chatErrorMessage(e, "通報に失敗しました: "));
             }
         }
 
@@ -985,7 +994,7 @@
                 localStorage.removeItem("chatTarget");
                 window.location.href = "messages.html";
             } catch (e) {
-                alert("通信エラーが発生しました。");
+                alert(chatErrorMessage(e, "ブロックに失敗しました: "));
             }
         }
 
@@ -1173,7 +1182,8 @@
             }
 
             try {
-                if (message && message.storage === "firebase" && firebaseReady) {
+                // Firebaseに保存されたメッセージはGASでは取り消せないので、購読が切れていてもFirebase側で取り消す
+                if (message && message.storage === "firebase" && window.HeikoFirebaseChat) {
                     await window.HeikoFirebaseChat.unsendMessage(myEmail, targetEmail, messageId);
                 } else {
                     await postChat({ mode: "unsendMessage", userId: myEmail, messageId: messageId });
@@ -1184,7 +1194,7 @@
                     button.disabled = false;
                     button.innerText = originalText;
                 }
-                alert("通信エラーが発生しました。");
+                alert(chatErrorMessage(e, "送信を取り消せませんでした: "));
             }
         }
 
@@ -1211,7 +1221,7 @@
                     deleteButton.disabled = false;
                     deleteButton.innerText = "履歴を削除";
                 }
-                alert("通信エラーが発生しました。");
+                alert(chatErrorMessage(e, "履歴を削除できませんでした: "));
             }
         }
 

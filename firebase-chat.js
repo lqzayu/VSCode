@@ -249,6 +249,14 @@
         await database.ref().update(updates);
     }
 
+    // 自分が非表示にした会話の一覧（相手のUID → 非表示にした時刻）
+    async function readHidden(userId) {
+        const database = getDatabase();
+        if (!database) return {};
+        const snapshot = await database.ref("hidden/" + getFirebaseUid(userId)).once("value");
+        return snapshot.val() || {};
+    }
+
     async function hideConversation(firstUser, secondUser) {
         const database = getDatabase();
         if (!database) throw new Error("Firebaseが利用できません");
@@ -269,6 +277,7 @@
         subscribeInbox,
         markAsRead,
         unsendMessage,
+        readHidden,
         hideConversation
     };
 })();

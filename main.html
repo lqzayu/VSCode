@@ -1574,7 +1574,7 @@
     <script>
         if (!localStorage.getItem("userEmail") || !localStorage.getItem("sessionToken")) {
             clearHeikoSession();
-            window.location.href = "index.html";
+            window.location.replace("index.html");
         }
 
         const GAS_URL = "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
@@ -1620,6 +1620,7 @@
                     if (!result || result.status !== "success") {
                         const responseError = new Error(result && result.message ? result.message : "GASからエラーが返されました");
                         responseError.retryable = false;
+                        responseError.fromServer = true;
                         throw responseError;
                     }
 
@@ -1636,6 +1637,12 @@
             }
 
             throw lastError || new Error("GASとの通信に失敗しました");
+        }
+
+        // サーバーが理由を返したときはその内容を、通信自体が失敗したときは定型文を出す
+        function requestErrorMessage(error, prefix, fallback = "通信エラーが発生しました。") {
+            if (error && error.fromServer && error.message) return `${prefix}${error.message}`;
+            return fallback;
         }
 
         function escapeHtml(value) {
@@ -2011,7 +2018,7 @@
             } catch (e) {
                 button.disabled = false;
                 button.innerText = originalText;
-                alert("通信エラーが発生しました。");
+                alert(requestErrorMessage(e, "リアクションの送信に失敗しました: "));
             }
         }
 
@@ -2033,7 +2040,7 @@
                     alert("削除に失敗しました。");
                 }
             } catch (e) {
-                alert("通信エラーが発生しました。");
+                alert(requestErrorMessage(e, "削除に失敗しました: "));
             }
         }
 
@@ -2099,7 +2106,7 @@
                     alert("投稿エラー: " + result.message);
                 }
             } catch (e) {
-                alert("通信エラーが発生しました");
+                alert(requestErrorMessage(e, "投稿エラー: ", "通信エラーが発生しました。入力内容は残っています。"));
             } finally {
                 if (submitBtn) {
                     submitBtn.disabled = false;
@@ -2163,7 +2170,7 @@
                     alert("通報に失敗しました: " + result.message);
                 }
             } catch (e) {
-                alert("通信エラーが発生しました。");
+                alert(requestErrorMessage(e, "通報に失敗しました: "));
             }
         }
 
@@ -2191,7 +2198,7 @@
                     alert("ブロックに失敗しました: " + result.message);
                 }
             } catch (e) {
-                alert("通信エラーが発生しました。");
+                alert(requestErrorMessage(e, "ブロックに失敗しました: "));
             }
         }
 
@@ -2239,7 +2246,8 @@
 
             toast.classList.add("show");
 
-            setTimeout(() => {
+            clearTimeout(showToast.hideTimer);
+            showToast.hideTimer = setTimeout(() => {
                 toast.classList.remove("show");
             }, 5000);
         }

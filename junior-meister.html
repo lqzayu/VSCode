@@ -1677,7 +1677,7 @@
             $("hud-menu-btn").classList.toggle("open");
         }
         function logout() {
-            ["userId", "userEmail", "userName", "profileImage", "adminToken", "isImpersonating"].forEach(key => localStorage.removeItem(key));
+            clearHeikoSession();
             location.href = "index.html";
         }
 

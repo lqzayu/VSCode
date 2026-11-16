@@ -592,8 +592,6 @@
 
             overflow: hidden;
 
-            transform: scaleX(-1);
-
             box-shadow: 0 10px 25px rgba(28, 189, 197, 0.15);
 
             position: relative;
@@ -626,6 +624,43 @@
             z-index: 1;
 
             background: #000;
+
+        }
+
+
+        /* 鏡像表示は枠ではなく映像と点に付ける（角丸の枠に付けると Safari で映像が描画されないことがある） */
+        #camera-container video,
+
+        #camera-container canvas {
+
+            transform: scaleX(-1);
+
+        }
+
+
+        #camera-container.is-starting::after {
+
+            content: "カメラを起動中...";
+
+            position: absolute;
+
+            inset: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            z-index: 20;
+
+            color: rgba(255, 255, 255, 0.85);
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            pointer-events: none;
 
         }
 
@@ -884,6 +919,7 @@
         }
     </style>
     <script src="ui.js?v=20261116jmPromo"></script>
+    <script src="face-camera.js?v=20261117cam"></script>
 </head>
 
 
@@ -1019,8 +1055,8 @@
 
                         <button type="button" class="btn-submit-primary"
                             style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);"
-                            onclick="handleVerifyCode()">認証して登録完了</button>
-                        <button type="button" class="btn-flat" onclick="resendCode()">コードを再送する</button>
+                            onclick="runAuthAction(handleVerifyCode)">認証して登録完了</button>
+                        <button type="button" class="btn-flat" onclick="runAuthAction(resendCode)">コードを再送する</button>
 
                         <br>
 
@@ -1033,7 +1069,7 @@
 
                         <input type="text" id="forgot-userid" placeholder="登録したユーザID">
 
-                        <button type="button" class="btn-submit-primary" onclick="submitForgotPassword()">再設定メールを送信</button>
+                        <button type="button" class="btn-submit-primary" onclick="runAuthAction(submitForgotPassword)">再設定メールを送信</button>
 
                         <button type="button" class="btn-flat" onclick="hideForgotPasswordForm()">キャンセル</button>
 
@@ -1175,6 +1211,8 @@
         let faceLoginTimer = null;
 
         let faceRegisterTimer = null;
+
+        let faceLoginBusy = false;
 
         let savedFeaturesText = "";
 
@@ -1495,7 +1533,16 @@
 
         async function startCamera() {
 
-            if (videoStream) return true;
+            if (videoStream && HeikoFaceCamera.isLive(videoStream)) {
+
+                document.getElementById('camera-container').style.display = "block";
+
+                return true;
+
+            }
+
+            // 止まったままのストリームを使い回すと黒い画面になるので、作り直す
+            if (videoStream) releaseCamera();
 
             if (cameraStartPromise) return cameraStartPromise;
 
@@ -1517,89 +1564,61 @@
 
         async function startCameraInternal() {
 
-            initFaceMesh();
-
             const container = document.getElementById('camera-container');
 
             const video = document.getElementById('video');
 
             const authStatus = document.getElementById('auth-status');
 
+            try {
+
+                initFaceMesh();
+
+            } catch (err) {
+
+                authStatus.innerText = "顔認証の部品を読み込めませんでした。通信環境を確認して、ページを再読み込みしてください。";
+
+                authStatus.style.color = "#ef4444";
+
+                return false;
+
+            }
+
+
+            const session = ++cameraSession;
+
             container.style.display = "block";
+
+            container.classList.add("is-starting");
+
+            authStatus.innerText = "カメラを起動しています...";
+
+            authStatus.style.color = "#64748b";
 
 
             try {
 
-                const constraints = {
+                const stream = await HeikoFaceCamera.open(video, { isCancelled: () => session !== cameraSession });
 
-                    audio: false,
+                videoStream = stream;
 
-                    video: {
+                HeikoFaceCamera.watch(stream, () => {
 
-                        facingMode: { ideal: "user" },
+                    if (videoStream !== stream) return;
 
-                        width: { ideal: 1280, max: 1920 },
+                    stopCamera();
 
-                        height: { ideal: 720, max: 1080 },
+                    authStatus.innerText = "カメラが停止しました。もう一度ボタンを押してください。";
 
-                        frameRate: { ideal: 30, max: 30 }
-
-                    }
-
-                };
-
-
-                try {
-
-                    videoStream = await navigator.mediaDevices.getUserMedia(constraints);
-
-                } catch (err) {
-
-                    if (err.name === "NotAllowedError" || err.name === "SecurityError" || err.name === "AbortError") {
-
-                        throw err;
-
-                    }
-
-                    videoStream = await navigator.mediaDevices.getUserMedia({
-
-                        audio: false,
-
-                        video: { facingMode: "user" }
-
-                    });
-
-                }
-
-
-                video.srcObject = videoStream;
-
-                video.muted = true;
-
-                video.setAttribute("playsinline", "");
-
-                await new Promise(resolve => {
-
-                    if (video.readyState >= 1) {
-
-                        resolve();
-
-                    } else {
-
-                        video.addEventListener("loadedmetadata", resolve, { once: true });
-
-                    }
+                    authStatus.style.color = "#ef4444";
 
                 });
 
-                await video.play();
-
-
-                cameraSession++;
+                container.classList.remove("is-starting");
 
                 lastFaceCheck = 0;
 
-                scheduleFaceFrame(cameraSession);
+                scheduleFaceFrame(session);
 
                 authStatus.innerText = "";
 
@@ -1607,19 +1626,16 @@
 
             } catch (err) {
 
-                if (videoStream) {
+                // 途中でキャンセルされた場合は stopCamera 側で画面を片付け済み
+                if (session !== cameraSession) return false;
 
-                    videoStream.getTracks().forEach(track => track.stop());
+                HeikoFaceCamera.detach(video);
 
-                }
-
-                videoStream = null;
-
-                video.srcObject = null;
+                container.classList.remove("is-starting");
 
                 container.style.display = "none";
 
-                authStatus.innerText = "カメラの起動に失敗しました。ブラウザのカメラ許可も確認してください。";
+                authStatus.innerText = HeikoFaceCamera.describeError(err);
 
                 authStatus.style.color = "#ef4444";
 
@@ -1630,11 +1646,39 @@
         }
 
 
-        function stopCamera() {
+        function releaseFaceLoginButton() {
+
+            faceLoginBusy = false;
+
+            document.getElementById('face-login-btn').disabled = false;
+
+        }
+
+
+        function releaseCamera() {
 
             cameraSession++;
 
             stopFaceLoop();
+
+            if (videoStream) HeikoFaceCamera.stopStream(videoStream);
+
+            videoStream = null;
+
+            HeikoFaceCamera.detach(document.getElementById('video'));
+
+            lastLandmarks = null;
+
+            lastFaceSeen = 0;
+
+            faceProcessing = false;
+
+        }
+
+
+        function stopCamera() {
+
+            releaseCamera();
 
             collectingFaceSamples = false;
 
@@ -1654,23 +1698,15 @@
 
                 faceLoginTimer = null;
 
-                document.getElementById('face-login-btn').disabled = false;
+                releaseFaceLoginButton();
 
             }
 
-            if (videoStream) videoStream.getTracks().forEach(track => track.stop());
+            const container = document.getElementById('camera-container');
 
-            videoStream = null;
+            container.classList.remove("is-starting");
 
-            document.getElementById('video').pause();
-
-            document.getElementById('video').srcObject = null;
-
-            lastLandmarks = null;
-
-            lastFaceSeen = 0;
-
-            document.getElementById('camera-container').style.display = "none";
+            container.style.display = "none";
 
             drawFeatures(null);
 
@@ -1787,10 +1823,10 @@
 
             const authStatus = document.getElementById('auth-status');
 
-            if (isCapturing) return;
+            if (isCapturing || cameraStartPromise) return;
 
 
-            if (!videoStream) {
+            if (!videoStream || !HeikoFaceCamera.isLive(videoStream)) {
 
                 const started = await startCamera();
 
@@ -1870,7 +1906,7 @@
 
         document.getElementById('face-login-btn').addEventListener('click', async () => {
 
-            if (faceLoginTimer !== null) return;
+            if (faceLoginBusy) return;
 
             const userId = document.getElementById('login-userid').value.trim();
 
@@ -1889,17 +1925,25 @@
             }
 
 
+            faceLoginBusy = true;
+
+            document.getElementById('face-login-btn').disabled = true;
+
             const started = await startCamera();
 
-            if (!started) return;
+            if (!started) {
+
+                releaseFaceLoginButton();
+
+                return;
+
+            }
 
             faceSamples = [];
 
             lastFaceSampleAt = 0;
 
             collectingFaceSamples = true;
-
-            document.getElementById('face-login-btn').disabled = true;
 
             authStatus.innerText = "3秒後に顔を確認します。正面を向いてください。";
 
@@ -1908,34 +1952,38 @@
 
             faceLoginTimer = setTimeout(async () => {
 
+                faceLoginTimer = null;
+
                 collectingFaceSamples = false;
 
-                if (!lastLandmarks || faceSamples.length < 2) {
+                let keepLocked = false;
 
-                    document.getElementById('auth-status').innerText = "顔を検出できずスキャンに失敗しました。";
+                try {
 
-                    document.getElementById('auth-status').style.color = "#ef4444";
+                    if (!lastLandmarks || faceSamples.length < 2) {
+
+                        stopCamera();
+
+                        authStatus.innerText = "顔を検出できずスキャンに失敗しました。明るい場所で正面を向いて、もう一度お試しください。";
+
+                        authStatus.style.color = "#ef4444";
+
+                        return;
+
+                    }
+
+
+                    const currentLandmarks = compactFaceLandmarks(lastLandmarks);
+
+                    const currentFeaturesSamples = faceSamples.slice();
 
                     stopCamera();
 
-                    return;
 
-                }
+                    authStatus.innerText = "AIデータ解析中...";
 
+                    authStatus.style.color = "#e67e22";
 
-                const currentLandmarks = compactFaceLandmarks(lastLandmarks);
-
-                const currentFeaturesSamples = faceSamples.slice();
-
-                stopCamera();
-
-
-                document.getElementById('auth-status').innerText = "AIデータ解析中...";
-
-                document.getElementById('auth-status').style.color = "#e67e22";
-
-
-                try {
 
                     const result = await postGas({
 
@@ -1950,16 +1998,16 @@
                     });
 
 
-                    if (result.status === "success" && result.message.email) {
+                    if (result.status === "success" && result.message && result.message.email) {
+
+                        keepLocked = true;
 
                         saveHeikoAuthSession(result.message, document.getElementById("remember-login").checked);
 
 
-                        document.getElementById('auth-status').innerText =
+                        authStatus.innerText = `認証成功！こんにちは、${result.message.name}さん。`;
 
-                            `認証成功！こんにちは、${result.message.name}さん。`;
-
-                        document.getElementById('auth-status').style.color = "#10b981";
+                        authStatus.style.color = "#10b981";
 
 
                         document.querySelector('.login-card').classList.add('fade-out-exit');
@@ -1974,17 +2022,21 @@
 
                     } else {
 
-                        document.getElementById('auth-status').innerText = "顔認証失敗: " + result.message;
+                        authStatus.innerText = "顔認証失敗: " + (result.message || "もう一度お試しください。");
 
-                        document.getElementById('auth-status').style.color = "#ef4444";
+                        authStatus.style.color = "#ef4444";
 
                     }
 
                 } catch (err) {
 
-                    document.getElementById('auth-status').innerText = "通信エラーが発生しました。";
+                    authStatus.innerText = "通信エラーが発生しました。";
 
-                    document.getElementById('auth-status').style.color = "#ef4444";
+                    authStatus.style.color = "#ef4444";
+
+                } finally {
+
+                    if (!keepLocked) releaseFaceLoginButton();
 
                 }
 
@@ -2002,18 +2054,31 @@
             const isVisible = (section) => section && window.getComputedStyle(section).display !== "none";
 
             if (isVisible(verifySection)) {
-                handleVerifyCode();
+                runAuthAction(handleVerifyCode);
                 return;
             }
             if (isVisible(forgotSection)) {
-                submitForgotPassword();
+                runAuthAction(submitForgotPassword);
                 return;
             }
             if (isVisible(registerSection)) {
-                handleRegister();
+                runAuthAction(handleRegister);
                 return;
             }
-            handleLogin();
+            runAuthAction(handleLogin);
+        }
+
+        // ボタンの連打やEnterの連続入力で、登録・ログインの通信が二重に送られないようにする
+        let authActionBusy = false;
+
+        async function runAuthAction(action) {
+            if (authActionBusy) return;
+            authActionBusy = true;
+            try {
+                await action();
+            } finally {
+                authActionBusy = false;
+            }
         }
 
         async function handleLogin() {
@@ -2333,21 +2398,6 @@
         }
 
 
-        function handleKeyPress(event) {
-
-            if (event.key === 'Enter') {
-
-                event.preventDefault();
-
-                if (document.getElementById("login-section").style.display !== "none") {
-
-                    handleLogin();
-
-                }
-
-            }
-
-        }
 
 
         if ('serviceWorker' in navigator) {
@@ -2365,6 +2415,21 @@
         }
 
         window.addEventListener('pagehide', stopCamera);
+
+        document.addEventListener('visibilitychange', () => {
+
+            // 別のアプリやタブに移るとカメラが止まり、戻っても黒い画面のままになるため一度停止する
+            if (document.visibilityState !== 'hidden' || !videoStream) return;
+
+            stopCamera();
+
+            const authStatus = document.getElementById('auth-status');
+
+            authStatus.innerText = "画面を離れたためカメラを停止しました。もう一度ボタンを押してください。";
+
+            authStatus.style.color = "#ef4444";
+
+        });
 
     </script>
 </body>

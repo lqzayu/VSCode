@@ -412,7 +412,6 @@
             margin: 0 auto 16px auto;
             border-radius: 14px;
             overflow: hidden;
-            transform: scaleX(-1);
             position: relative;
             aspect-ratio: 4 / 3;
             border: 2px solid #dbdbdb;
@@ -428,6 +427,8 @@
             left: 0;
         }
 
+        /* 鏡像表示は枠ではなく映像と点に付ける（角丸の枠に付けると Safari で映像が描画されないことがある） */
+        .camera-box-mini video, .camera-box-mini canvas { transform: scaleX(-1); }
         .camera-box-mini canvas { z-index: 10; pointer-events: none; }
 
         .face-status-text {
@@ -470,6 +471,7 @@
 
     <link rel="stylesheet" href="theme.css?v=20261006glass">
     <script src="ui.js?v=20261116jmPromo"></script>
+    <script src="face-camera.js?v=20261117cam"></script>
     <script src="online.js?v=20260917b" defer></script>
 </head>
 
@@ -849,7 +851,10 @@
             document.getElementById("image-input").value = "";
         }
 
+        let profileSaving = false;
+
         async function saveProfile() {
+            if (profileSaving) return;
             const name = document.getElementById("username-input").value.trim();
             const imageSrc = document.getElementById("profile-icon").src;
             const email = localStorage.getItem("userEmail");
@@ -860,6 +865,7 @@
             if (!grade || !dept) { alert("学年と学科を選択してください"); return; }
             if (!email) { alert("ログイン情報が見つかりません。一度再ログインしてください。"); return; }
 
+            profileSaving = true;
             try {
                 const result = await postGas({
                     mode: "updateProfile",
@@ -883,6 +889,8 @@
             } catch (e) {
                 alert("通信エラーが発生しました。");
                 console.error(e);
+            } finally {
+                profileSaving = false;
             }
         }
 
@@ -1098,73 +1106,64 @@
             });
         }
 
+        let faceStarting = false;
+
+        function setFaceStatus(text, color) {
+            const status = document.getElementById('face-status');
+            status.innerText = text;
+            status.style.color = color;
+        }
+
         async function startFaceUpdate() {
+            if (faceStarting || videoStream) return;
             const myEmail = localStorage.getItem("userEmail");
             if (!myEmail) { alert("ログインセッションが見つかりません。一度ログインし直してください。"); return; }
 
-            initFaceMesh();
             document.getElementById('faceModal').style.display = "flex";
-            document.getElementById('face-status').innerText = "カメラを起動中...";
-            document.getElementById('face-status').style.color = "#0095f6";
+            try {
+                initFaceMesh();
+            } catch (err) {
+                setFaceStatus("顔認証の部品を読み込めませんでした。通信環境を確認して、ページを再読み込みしてください。", "#ed4956");
+                return;
+            }
+            setFaceStatus("カメラを起動中...", "#0095f6");
 
             const video = document.getElementById('face-video');
+            const session = ++cameraSession;
+            faceStarting = true;
             try {
-                const constraints = {
-                    audio: false,
-                    video: {
-                        facingMode: { ideal: "user" },
-                        width: { ideal: 1280, max: 1920 },
-                        height: { ideal: 720, max: 1080 },
-                        frameRate: { ideal: 30, max: 30 }
-                    }
-                };
-
-                try {
-                    videoStream = await navigator.mediaDevices.getUserMedia(constraints);
-                } catch (err) {
-                    if (err.name === "NotAllowedError" || err.name === "SecurityError" || err.name === "AbortError") throw err;
-                    videoStream = await navigator.mediaDevices.getUserMedia({
-                        audio: false,
-                        video: { facingMode: "user" }
-                    });
-                }
-
-                video.srcObject = videoStream;
-                video.muted = true;
-                video.setAttribute("playsinline", "");
-                await new Promise(resolve => {
-                    if (video.readyState >= 1) {
-                        resolve();
-                    } else {
-                        video.addEventListener("loadedmetadata", resolve, { once: true });
-                    }
+                const stream = await HeikoFaceCamera.open(video, { isCancelled: () => session !== cameraSession });
+                videoStream = stream;
+                HeikoFaceCamera.watch(stream, () => {
+                    if (videoStream !== stream) return;
+                    stopFaceCamera();
+                    setFaceStatus("カメラが停止しました。キャンセルして、もう一度お試しください。", "#ed4956");
                 });
-                await video.play();
-                cameraSession++;
                 lastFaceCheck = 0;
-                scheduleFaceFrame(cameraSession);
+                scheduleFaceFrame(session);
 
                 let seconds = 3;
-                document.getElementById('face-status').innerText = `${seconds}秒後に自動で顔スキャンを実行します...`;
+                setFaceStatus(`${seconds}秒後に自動で顔スキャンを実行します...`, "#0095f6");
 
                 clearInterval(faceCountdownTimer);
                 faceCountdownTimer = setInterval(async () => {
+                    if (session !== cameraSession) return;
                     seconds--;
                     if (seconds > 0) {
-                        document.getElementById('face-status').innerText = `${seconds}秒後に自動で顔スキャンを実行します...`;
+                        setFaceStatus(`${seconds}秒後に自動で顔スキャンを実行します...`, "#0095f6");
                     } else {
                         clearInterval(faceCountdownTimer);
                         faceCountdownTimer = null;
                         await captureAndSaveFace(myEmail);
                     }
                 }, 1000);
-
             } catch (err) {
-                if (videoStream) videoStream.getTracks().forEach(track => track.stop());
-                videoStream = null;
-                video.srcObject = null;
-                document.getElementById('face-status').innerText = "カメラの起動に失敗しました。";
-                document.getElementById('face-status').style.color = "#ed4956";
+                // キャンセル済みなら closeFaceModal 側で片付け済み
+                if (session !== cameraSession) return;
+                HeikoFaceCamera.detach(video);
+                setFaceStatus(HeikoFaceCamera.describeError(err), "#ed4956");
+            } finally {
+                faceStarting = false;
             }
         }
 
@@ -1208,11 +1207,10 @@
             clearInterval(faceCountdownTimer);
             faceCountdownTimer = null;
             stopFaceLoop();
-            if (videoStream) { videoStream.getTracks().forEach(track => track.stop()); }
+            if (videoStream) HeikoFaceCamera.stopStream(videoStream);
             videoStream = null;
-            const video = document.getElementById('face-video');
-            video.pause();
-            video.srcObject = null;
+            faceProcessing = false;
+            HeikoFaceCamera.detach(document.getElementById('face-video'));
             lastFaceSeen = 0;
             lastLandmarks = null;
             drawFaceFeatures(null);
@@ -1233,7 +1231,15 @@
         function stopProfileTasks() {
             clearInterval(unreadPollTimer);
             unreadPollTimer = null;
+            const faceModal = document.getElementById('faceModal');
+            const capturing = faceModal.style.display === "flex" && (videoStream || faceStarting || faceCountdownTimer);
             stopFaceCamera();
+            // 画面を離れるとカメラが止まり、戻っても黒い枠のままになるので閉じておく
+            if (capturing) {
+                faceModal.style.display = "none";
+                const message = "画面を離れたため、顔データの撮影を中止しました。もう一度お試しください。";
+                if (window.showNotice) window.showNotice(message, "error"); else alert(message);
+            }
         }
 
         document.addEventListener("visibilitychange", () => {
