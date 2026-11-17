@@ -100,7 +100,7 @@ function doPost(e) {
     const mode = data.mode;
 
     const publicModes = ["register", "verifyEmail", "resendVerificationCode", "login", "verify_face_1toN", "verify_face_for_user", "forgotPassword", "resetPassword"];
-    const adminModes = ["adminGetOverview", "adminDeletePost", "adminBanUser", "adminClearChatHistory", "getReports", "updateReportStatus", "getDailyAnalysis"];
+    const adminModes = ["adminGetOverview", "adminDeletePost", "adminBanUser", "adminResetPassword", "adminClearChatHistory", "getReports", "updateReportStatus", "getDailyAnalysis"];
     if (!publicModes.includes(mode) && !adminModes.includes(mode)) {
       const actorId = getRequestActorId(mode, data);
       const adminProfileRequest = mode === "getUserProfile" && isAdminRequest(data);
@@ -459,6 +459,43 @@ function doPost(e) {
       }
 
       return createRes("success", newStatus ? "USER_UNBANNED" : "USER_BANNED");
+    }
+
+    if (mode === "adminResetPassword") {
+      // 管理者がパスワードを仮パスワードに再設定する。パスワード自体はこれまでどおりハッシュで保存し、
+      // 仮パスワードはこのレスポンスで一度だけ管理者に返す（シートやログには残さない）。
+      if (!isAdminRequest(data)) return createRes("error", "管理者権限がありません。再ログインしてください");
+      if (!sheetUser || sheetUser.getLastRow() <= 1) return createRes("error", "対象ユーザーが見つかりません");
+      const targetUserId = cleanCell(data.targetUserId);
+      if (!targetUserId) return createRes("error", "対象ユーザーが指定されていません");
+      if (targetUserId === ADMIN_USER_ID) return createRes("error", "管理者アカウントのパスワードはここでは再設定できません");
+
+      const resetLock = LockService.getScriptLock();
+      if (!resetLock.tryLock(5000)) return createRes("error", "処理が混み合っています。少し待ってからもう一度お試しください");
+      try {
+        const userRows = sheetUser.getDataRange().getValues();
+        let targetRowIndex = -1;
+        for (let u = 1; u < userRows.length; u++) {
+          if (cleanCell(userRows[u][0]) === targetUserId) {
+            targetRowIndex = u + 1;
+            break;
+          }
+        }
+        if (targetRowIndex === -1) return createRes("error", "対象ユーザーが見つかりません");
+
+        const temporaryPassword = generateTemporaryPassword();
+        ensureUserSessionColumn(sheetUser);
+        sheetUser.getRange(targetRowIndex, 2).setValue(hashPassword(temporaryPassword));
+        sheetUser.getRange(targetRowIndex, 10).setValue("");
+        sheetUser.getRange(targetRowIndex, 11).setValue("");
+        // ほかの端末でログイン中のセッションは無効にする
+        sheetUser.getRange(targetRowIndex, 13).setValue(Utilities.getUuid());
+        clearAttemptFailures("login-attempt-" + targetUserId);
+
+        return createRes("success", { userId: targetUserId, temporaryPassword });
+      } finally {
+        if (resetLock.hasLock()) resetLock.releaseLock();
+      }
     }
 
     if (mode === "adminClearChatHistory") {
@@ -2595,6 +2632,25 @@ function validatePasswordPolicy(password) {
   if (!/[^A-Za-z0-9]/.test(value)) return "パスワードに記号を1文字以上含めてください";
   if (hasWeakNumberSequence(value)) return "同じ数字4桁の繰り返しや、1234・4321のような4桁の連番は使用できません";
   return "";
+}
+
+// 管理者による再設定用の仮パスワード（12文字。英大文字・英小文字・数字・記号を必ず含み、紛らわしい文字は使わない）
+function generateTemporaryPassword() {
+  const sets = ["ABCDEFGHJKLMNPQRSTUVWXYZ", "abcdefghijkmnpqrstuvwxyz", "23456789", "#$%&+=?@"];
+  const all = sets.join("");
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, Utilities.getUuid() + Utilities.getUuid())
+      .map(b => (b + 256) % 256);
+    const chars = sets.map((set, i) => set[bytes[i] % set.length]);
+    for (let i = sets.length; i < 12; i++) chars.push(all[bytes[i] % all.length]);
+    for (let i = chars.length - 1; i > 0; i--) {
+      const j = bytes[12 + i] % (i + 1);
+      [chars[i], chars[j]] = [chars[j], chars[i]];
+    }
+    const password = chars.join("");
+    if (!validatePasswordPolicy(password)) return password;
+  }
+  throw new Error("仮パスワードを生成できませんでした");
 }
 
 function hashPassword(password) {

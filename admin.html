@@ -316,6 +316,77 @@
 
         .btn-action-unban:hover { background: #10b981; color: white; }
 
+        .btn-action-reset {
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 6px;
+        }
+
+        .btn-action-reset:hover { background: #2563eb; color: white; }
+        .btn-action-reset:disabled { opacity: 0.6; cursor: wait; }
+
+        .temp-password-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            z-index: 10000;
+        }
+
+        .temp-password-overlay.is-open { display: flex; }
+
+        .temp-password-dialog {
+            background: #fff;
+            color: #1f2937;
+            border-radius: 14px;
+            padding: 22px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .temp-password-dialog h3 { margin: 0 0 10px; font-size: 18px; }
+        .temp-password-dialog p { margin: 0 0 12px; font-size: 14px; line-height: 1.6; }
+
+        .temp-password-value {
+            display: block;
+            font-family: ui-monospace, Menlo, Consolas, monospace;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-align: center;
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 12px;
+            margin: 0 0 12px;
+            word-break: break-all;
+            user-select: all;
+        }
+
+        .temp-password-note { font-size: 12px !important; color: #b45309; }
+
+        .temp-password-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+        .temp-password-actions button {
+            border: 0;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .temp-password-copy { background: #2563eb; color: #fff; }
+        .temp-password-close { background: #e5e7eb; color: #1f2937; }
+
         .status-badge {
             display: inline-block;
             padding: 3px 8px;
@@ -653,7 +724,12 @@
                     actionButton.className = u.isVerified ? "btn-action-ban" : "btn-action-unban";
                     actionButton.textContent = u.isVerified ? "BAN (凍結)" : "BAN 解除";
                     actionButton.addEventListener("click", () => toggleBanUser(u.userId, u.isVerified));
-                    actionCell.appendChild(actionButton);
+                    const resetButton = document.createElement("button");
+                    resetButton.type = "button";
+                    resetButton.className = "btn-action-reset";
+                    resetButton.textContent = "パスワード再設定";
+                    resetButton.addEventListener("click", () => resetUserPassword(u.userId, resetButton));
+                    actionCell.append(actionButton, resetButton);
                 }
 
                 tr.append(idCell, nameCell, statusCell, actionCell);
@@ -877,6 +953,58 @@
             }
         }
 
+        async function resetUserPassword(targetUserId, button) {
+            if (!confirm(`ユーザー [ ${targetUserId} ] のパスワードを仮パスワードに再設定しますか？\n※今のパスワードは使えなくなり、ログイン中の端末もログアウトされます。`)) return;
+
+            if (button) button.disabled = true;
+            try {
+                const result = await postGas({ mode: "adminResetPassword", adminId: ADMIN_ID, adminToken: adminToken, targetUserId: targetUserId });
+                if (result.status === "success" && result.message && result.message.temporaryPassword) {
+                    showTemporaryPassword(result.message.userId || targetUserId, result.message.temporaryPassword);
+                } else {
+                    alert("処理失敗: " + (typeof result.message === "string" ? result.message : "パスワードを再設定できませんでした"));
+                }
+            } catch (e) {
+                alert("通信エラーが発生しました。パスワードが再設定されたか分からないため、もう一度実行してください。");
+            } finally {
+                if (button) button.disabled = false;
+            }
+        }
+
+        function showTemporaryPassword(targetUserId, temporaryPassword) {
+            const overlay = document.getElementById("temp-password-overlay");
+            // body に transform が付くと position:fixed が画面基準にならないため、html 直下に移す
+            if (overlay.parentElement !== document.documentElement) document.documentElement.appendChild(overlay);
+            document.getElementById("temp-password-user").textContent = targetUserId;
+            document.getElementById("temp-password-value").textContent = temporaryPassword;
+            const copyButton = document.getElementById("temp-password-copy");
+            copyButton.textContent = "コピー";
+            overlay.classList.add("is-open");
+        }
+
+        function closeTemporaryPassword() {
+            const overlay = document.getElementById("temp-password-overlay");
+            overlay.classList.remove("is-open");
+            // 閉じたら画面からも消す
+            document.getElementById("temp-password-value").textContent = "";
+        }
+
+        async function copyTemporaryPassword() {
+            const value = document.getElementById("temp-password-value").textContent;
+            const copyButton = document.getElementById("temp-password-copy");
+            try {
+                await navigator.clipboard.writeText(value);
+                copyButton.textContent = "コピーしました";
+            } catch (e) {
+                const range = document.createRange();
+                range.selectNodeContents(document.getElementById("temp-password-value"));
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+                copyButton.textContent = "選択しました";
+            }
+        }
+
         function logout() {
             clearHeikoSession();
             window.location.href = "index.html";
@@ -923,6 +1051,18 @@
             startAdminPolling();
         };
     </script>
+    <div class="temp-password-overlay" id="temp-password-overlay" role="dialog" aria-modal="true" aria-labelledby="temp-password-title">
+        <div class="temp-password-dialog">
+            <h3 id="temp-password-title">仮パスワードを発行しました</h3>
+            <p>ユーザー <strong id="temp-password-user"></strong> の新しいパスワードです。本人に直接伝えてください。</p>
+            <code class="temp-password-value" id="temp-password-value"></code>
+            <p class="temp-password-note">※この画面を閉じると、もう一度表示することはできません。分からなくなった場合は、もう一度再設定してください。</p>
+            <div class="temp-password-actions">
+                <button type="button" class="temp-password-copy" id="temp-password-copy" onclick="copyTemporaryPassword()">コピー</button>
+                <button type="button" class="temp-password-close" onclick="closeTemporaryPassword()">閉じる</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
