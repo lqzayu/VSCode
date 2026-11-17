@@ -450,7 +450,157 @@
         }
     </style>
     <link rel="stylesheet" href="theme.css?v=20261006glass">
-    <script src="ui.js?v=20261116jmPromo"></script>
+    <style>
+        /* 管理者ページのレイアウト（色は theme.css と既存の指定をそのまま使う） */
+        [data-page="admin"] .container { max-width: 1120px; margin: 28px auto 8px; }
+
+        [data-page="admin"] .page-title-bar {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px 24px;
+            padding: 8px 0 24px;
+            margin: 0;
+            background: transparent;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        [data-page="admin"] .page-title-text { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+        [data-page="admin"] .page-title-bar h1 { font-size: 28px; line-height: 1.2; }
+        [data-page="admin"] .page-subtitle { margin: 0; font-size: 13px; color: var(--ui-muted, #64748b); }
+
+        [data-page="admin"] .page-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        [data-page="admin"] .online-summary { margin: 0; padding: 8px 14px; }
+
+        [data-page="admin"] .btn-clear-chat,
+        [data-page="admin"] .btn-reload { white-space: nowrap; padding: 10px 16px; }
+
+        [data-page="admin"] .dashboard-grid { display: flex; flex-direction: column; gap: 20px; }
+
+        [data-page="admin"] .panel { padding: 22px 24px; overflow: hidden; }
+
+        [data-page="admin"] .panel-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            padding-bottom: 14px;
+            margin-bottom: 4px;
+            border-bottom: 1px solid var(--ui-line, rgba(0, 0, 0, 0.05));
+        }
+
+        [data-page="admin"] .panel-head h2 {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 1.1rem;
+            line-height: 1.4;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        [data-page="admin"] .panel-note { margin: 4px 0 0; font-size: 12.5px; color: var(--ui-muted, #64748b); }
+
+        [data-page="admin"] .panel-count {
+            flex-shrink: 0;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: var(--ui-soft, #f1f5f9);
+            color: var(--ui-muted, #64748b);
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        [data-page="admin"] .table-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 0 -24px;
+            padding: 0 24px;
+        }
+
+        [data-page="admin"] .panel table { margin-top: 0; min-width: 0; }
+        [data-page="admin"] .table-users { min-width: 560px; }
+        [data-page="admin"] .table-posts { min-width: 520px; }
+        [data-page="admin"] .table-reports { min-width: 720px; }
+
+        [data-page="admin"] th {
+            padding: 10px 12px;
+            font-size: 12px;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+        }
+
+        [data-page="admin"] th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+        [data-page="admin"] th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+
+        [data-page="admin"] td { padding: 12px; vertical-align: middle; line-height: 1.55; }
+        [data-page="admin"] tbody tr:last-child td { border-bottom: 0; }
+
+        [data-page="admin"] .col-nowrap { white-space: nowrap; }
+        [data-page="admin"] .col-action { width: 1%; white-space: nowrap; }
+        [data-page="admin"] .col-content { min-width: 240px; white-space: pre-wrap; word-break: break-word; }
+
+        [data-page="admin"] .row-actions { display: flex; flex-wrap: nowrap; gap: 6px; }
+        [data-page="admin"] .row-actions button,
+        [data-page="admin"] .btn-action-delete { white-space: nowrap; font-size: 12.5px; }
+        [data-page="admin"] .btn-action-reset { margin-left: 0; }
+        [data-page="admin"] .row-actions .btn-action-ban,
+        [data-page="admin"] .row-actions .btn-action-unban { min-width: 92px; text-align: center; }
+
+        [data-page="admin"] .status-badge { white-space: nowrap; }
+
+        [data-page="admin"] .cell-sub {
+            display: block;
+            margin-top: 2px;
+            font-size: 12px;
+            color: var(--ui-muted, #64748b);
+        }
+
+        [data-page="admin"] .empty-row td {
+            padding: 28px 12px;
+            text-align: center;
+            color: var(--ui-muted, #64748b);
+        }
+
+        [data-page="admin"] .report-status-cell select {
+            padding: 6px 28px 6px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--ui-line, #e2e8f0);
+            background-color: var(--ui-paper, #fff);
+            color: inherit;
+            font: inherit;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        @media screen and (max-width: 768px) {
+            [data-page="admin"] .container { margin-top: 16px; }
+            [data-page="admin"] .page-title-bar { align-items: stretch; padding-bottom: 18px; }
+            [data-page="admin"] .page-title-bar h1 { font-size: 23px; }
+            [data-page="admin"] .page-actions { width: 100%; }
+            [data-page="admin"] .online-summary { order: 0; }
+            [data-page="admin"] .page-actions .btn-clear-chat,
+            [data-page="admin"] .page-actions .btn-reload { flex: 1 1 0; }
+            [data-page="admin"] .page-actions .online-summary { flex: 1 1 100%; justify-content: center; }
+            [data-page="admin"] .panel { padding: 18px 16px; }
+            [data-page="admin"] .table-wrap { margin: 0 -16px; padding: 0 16px; }
+        }
+    </style>
+    <script src="ui.js?v=20261118admin"></script>
     <script src="online.js?v=20260917b" defer></script>
 </head>
 
@@ -484,71 +634,100 @@
 
     <main class="container">
         <div class="page-title-bar">
-            <h1>🛡️ 管理者ダッシュボード</h1>
-            <div class="online-summary" aria-live="polite" title="90秒以内に操作した利用者を表示しています">
-                <span class="online-dot" aria-hidden="true"></span>
-                <span>オンライン</span>
-                <strong id="online-user-count">--</strong>
-                <span>人</span>
+            <div class="page-title-text">
+                <h1>🛡️ 管理者ダッシュボード</h1>
+                <p class="page-subtitle">ユーザー・募集投稿・通報をまとめて管理できます</p>
             </div>
-            <button class="btn-clear-chat" type="button" onclick="clearAllChatHistory()">全チャット履歴を消去</button>
-            <button class="btn-reload" onclick="loadOverview()">データを更新</button>
+            <div class="page-actions">
+                <div class="online-summary" aria-live="polite" title="90秒以内に操作した利用者を表示しています">
+                    <span class="online-dot" aria-hidden="true"></span>
+                    <span>オンライン</span>
+                    <strong id="online-user-count">--</strong>
+                    <span>人</span>
+                </div>
+                <button class="btn-clear-chat" type="button" onclick="clearAllChatHistory()">全チャット履歴を消去</button>
+                <button class="btn-reload" type="button" onclick="loadOverview()">データを更新</button>
+            </div>
         </div>
 
         <div class="dashboard-grid">
 
-            <div class="panel">
-                <h2>👥 ユーザー管理一覧（IDクリックで代理ログイン）</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ユーザーID</th>
-                            <th>表示名</th>
-                            <th>ステータス</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="user-table-body">
-                        <tr><td colspan="4" style="text-align:center;">読み込み中...</td></tr>
-                    </tbody>
-                </table>
-            </div>
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h2>👥 ユーザー管理</h2>
+                        <p class="panel-note">ユーザーIDを押すと、そのユーザーとして代理ログインできます</p>
+                    </div>
+                    <span class="panel-count" id="user-count">--</span>
+                </div>
+                <div class="table-wrap">
+                    <table class="table-users">
+                        <thead>
+                            <tr>
+                                <th>ユーザーID</th>
+                                <th>表示名</th>
+                                <th>状態</th>
+                                <th class="col-action">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-table-body">
+                            <tr class="empty-row"><td colspan="4">読み込み中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
 
-            <div class="panel">
-                <h2>📢 募集投稿一覧（強制削除）</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>投稿者</th>
-                            <th>内容</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="post-table-body">
-                        <tr><td colspan="3" style="text-align:center;">読み込み中...</td></tr>
-                    </tbody>
-                </table>
-            </div>
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h2>📢 募集投稿</h2>
+                        <p class="panel-note">不適切な投稿は強制削除できます</p>
+                    </div>
+                    <span class="panel-count" id="post-count">--</span>
+                </div>
+                <div class="table-wrap">
+                    <table class="table-posts">
+                        <thead>
+                            <tr>
+                                <th>投稿者</th>
+                                <th>内容</th>
+                                <th class="col-action">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="post-table-body">
+                            <tr class="empty-row"><td colspan="3">読み込み中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
 
-            <div class="panel">
-                <h2>🚨 通報一覧</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>日時</th>
-                            <th>対象</th>
-                            <th>理由</th>
-                            <th>内容</th>
-                            <th>対応</th>
-                        </tr>
-                    </thead>
-                    <tbody id="report-table-body">
-                        <tr><td colspan="5" style="text-align:center;">読み込み中...</td></tr>
-                    </tbody>
-                </table>
-            </div>
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h2>🚨 通報</h2>
+                        <p class="panel-note">対応状況を変更すると、管理者メモを残せます</p>
+                    </div>
+                    <span class="panel-count" id="report-count">--</span>
+                </div>
+                <div class="table-wrap">
+                    <table class="table-reports">
+                        <thead>
+                            <tr>
+                                <th>日時</th>
+                                <th>対象</th>
+                                <th>理由</th>
+                                <th>内容</th>
+                                <th class="col-action">対応</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-table-body">
+                            <tr class="empty-row"><td colspan="5">読み込み中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </div>
     </main>
 
@@ -661,8 +840,8 @@
             const postBody = document.getElementById("post-table-body");
 
             if (!silent) {
-                userBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">読み込み中...</td></tr>`;
-                postBody.innerHTML = `<tr><td colspan="3" style="text-align:center;">読み込み中...</td></tr>`;
+                userBody.innerHTML = `<tr class="empty-row"><td colspan="4">読み込み中...</td></tr>`;
+                postBody.innerHTML = `<tr class="empty-row"><td colspan="3">読み込み中...</td></tr>`;
             }
 
             try {
@@ -691,14 +870,16 @@
             const userBody = document.getElementById("user-table-body");
             userBody.innerHTML = "";
 
+            setPanelCount("user-count", `${users.length}人`);
             if (users.length === 0) {
-                userBody.innerHTML = `<tr><td colspan="4" style="text-align:center;">ユーザーがいません</td></tr>`;
+                userBody.innerHTML = `<tr class="empty-row"><td colspan="4">ユーザーがいません</td></tr>`;
                 return;
             }
 
             users.forEach(u => {
                 const tr = document.createElement("tr");
                 const idCell = document.createElement("td");
+                idCell.className = "col-nowrap";
                 const idButton = document.createElement("button");
                 idButton.type = "button";
                 idButton.style.cssText = "border:0;background:none;padding:0;color:#1cbdc5;cursor:pointer;text-decoration:underline;font:inherit;font-weight:700;";
@@ -708,6 +889,7 @@
                 idCell.appendChild(idButton);
 
                 const nameCell = document.createElement("td");
+                nameCell.className = "col-nowrap";
                 nameCell.textContent = u.name;
 
                 const statusCell = document.createElement("td");
@@ -717,6 +899,7 @@
                 statusCell.appendChild(statusBadge);
 
                 const actionCell = document.createElement("td");
+                actionCell.className = "col-action";
                 if (u.userId === ADMIN_ID) {
                     actionCell.textContent = "-";
                 } else {
@@ -729,7 +912,10 @@
                     resetButton.className = "btn-action-reset";
                     resetButton.textContent = "パスワード再設定";
                     resetButton.addEventListener("click", () => resetUserPassword(u.userId, resetButton));
-                    actionCell.append(actionButton, resetButton);
+                    const actions = document.createElement("div");
+                    actions.className = "row-actions";
+                    actions.append(actionButton, resetButton);
+                    actionCell.appendChild(actions);
                 }
 
                 tr.append(idCell, nameCell, statusCell, actionCell);
@@ -761,29 +947,38 @@
             }
         }
 
+        function setPanelCount(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+
         function renderPosts(posts) {
             const postBody = document.getElementById("post-table-body");
             postBody.innerHTML = "";
 
+            setPanelCount("post-count", `${posts.length}件`);
             if (posts.length === 0) {
-                postBody.innerHTML = `<tr><td colspan="3" style="text-align:center;">募集はありません</td></tr>`;
+                postBody.innerHTML = `<tr class="empty-row"><td colspan="3">募集はありません</td></tr>`;
                 return;
             }
 
             posts.forEach(p => {
                 const tr = document.createElement("tr");
                 const userCell = document.createElement("td");
+                userCell.className = "col-nowrap";
                 const name = document.createElement("strong");
                 name.textContent = p.name;
-                const email = document.createElement("small");
-                email.style.color = "#64748b";
+                const email = document.createElement("span");
+                email.className = "cell-sub";
                 email.textContent = p.email;
-                userCell.append(name, document.createElement("br"), email);
+                userCell.append(name, email);
 
                 const contentCell = document.createElement("td");
+                contentCell.className = "col-content";
                 contentCell.textContent = p.content;
 
                 const actionCell = document.createElement("td");
+                actionCell.className = "col-action";
                 const deleteButton = document.createElement("button");
                 deleteButton.className = "btn-action-delete";
                 deleteButton.textContent = "強制削除";
@@ -819,7 +1014,7 @@
             if (!body) return;
 
             if (!silent) {
-                body.innerHTML = `<tr><td colspan="5" style="text-align:center;">読み込み中...</td></tr>`;
+                body.innerHTML = `<tr class="empty-row"><td colspan="5">読み込み中...</td></tr>`;
             }
 
             try {
@@ -828,10 +1023,10 @@
                 if (result.status === "success") {
                     renderReports(result.message);
                 } else {
-                    body.innerHTML = `<tr><td colspan="5" style="text-align:center;">取得失敗</td></tr>`;
+                    body.innerHTML = `<tr class="empty-row"><td colspan="5">取得失敗</td></tr>`;
                 }
             } catch (e) {
-                body.innerHTML = `<tr><td colspan="5" style="text-align:center;">通信エラー</td></tr>`;
+                body.innerHTML = `<tr class="empty-row"><td colspan="5">通信エラー</td></tr>`;
             }
         }
 
@@ -839,8 +1034,10 @@
             const body = document.getElementById("report-table-body");
             body.innerHTML = "";
 
+            const openCount = (reports || []).filter(report => report.status === "未対応" || report.status === "確認中" || !report.status).length;
+            setPanelCount("report-count", reports && reports.length ? `未対応 ${openCount}件 / 全${reports.length}件` : "0件");
             if (!reports || reports.length === 0) {
-                body.innerHTML = `<tr><td colspan="5" style="text-align:center;">通報はありません</td></tr>`;
+                body.innerHTML = `<tr class="empty-row"><td colspan="5">通報はありません</td></tr>`;
                 return;
             }
 
@@ -848,11 +1045,11 @@
                 const tr = document.createElement("tr");
                 const statuses = ["未対応", "確認中", "対応済み", "却下"];
                 tr.innerHTML = `
-                    <td>${escapeHtml(report.reportedAt)}</td>
-                    <td>${escapeHtml(report.targetUserId)}<br><small>${escapeHtml(report.targetType)}</small></td>
-                    <td>${escapeHtml(report.reason)}</td>
-                    <td style="max-width:260px; white-space:pre-wrap; word-break:break-word;">${escapeHtml(report.targetContent || report.detail || "—")}</td>
-                    <td class="report-status-cell"></td>
+                    <td class="col-nowrap">${escapeHtml(report.reportedAt)}</td>
+                    <td class="col-nowrap">${escapeHtml(report.targetUserId)}<span class="cell-sub">${escapeHtml(report.targetType)}</span></td>
+                    <td class="col-nowrap">${escapeHtml(report.reason)}</td>
+                    <td class="col-content">${escapeHtml(report.targetContent || report.detail || "—")}</td>
+                    <td class="report-status-cell col-action"></td>
                 `;
 
                 const select = document.createElement("select");

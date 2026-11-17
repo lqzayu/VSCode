@@ -237,7 +237,8 @@ function getHeaderActionStack() {
 }
 
 function installPageRefreshButton() {
-    if (!document.body || document.body.dataset.page === "index" || document.getElementById("heiko-page-refresh")) return;
+    // 管理者ページは独自の「データを更新」ボタンがあるため、更新ボタンと QUICK MATCH 欄を出さない
+    if (!document.body || ["index", "admin"].includes(document.body.dataset.page) || document.getElementById("heiko-page-refresh")) return;
 
     const stack = getHeaderActionStack();
     const button = document.createElement("button");
@@ -257,7 +258,7 @@ function installPageRefreshButton() {
 }
 
 function installRecruitmentPostButton() {
-    if (!document.body || document.getElementById("heiko-recruit-post-panel")) return;
+    if (!document.body || document.body.dataset.page === "admin" || document.getElementById("heiko-recruit-post-panel")) return;
     const navbar = document.querySelector(".navbar");
     const refreshButton = document.getElementById("heiko-page-refresh");
     if (!navbar || !refreshButton) return;
