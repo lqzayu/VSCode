@@ -567,12 +567,7 @@ function doPost(e) {
         if (registerLock.hasLock()) registerLock.releaseLock();
       }
 
-      MailApp.sendEmail({
-        to: registerEmail,
-        name: "平工マッチング",
-        subject: "【平工マッチング】認証コードのご案内",
-        body: `平工マッチングにご登録いただきありがとうございます。\n\n以下の認証コードを、登録画面に入力してください。\n\n認証コード: ${code}\n\n（10分間有効です）`
-      });
+      sendVerificationCodeMail(registerEmail, registerUserId, code);
 
       return createRes("success", "CODE_SENT");
     }
@@ -647,12 +642,7 @@ function doPost(e) {
       sheetUser.getRange(userRowIndex, 8).setValue(code);
       sheetUser.getRange(userRowIndex, 9).setValue(expiry);
 
-      MailApp.sendEmail({
-        to: email,
-        name: "平工マッチング",
-        subject: "【平工マッチング】認証コードの再送",
-        body: `認証コードを再送します。\n\n認証コード: ${code}`
-      });
+      sendVerificationCodeMail(email, cleanCell(row[0]), code);
 
       return createRes("success", "CODE_RESENT");
     }
@@ -1468,12 +1458,7 @@ function doPost(e) {
 
       const resetLink = `${SITE_URL}reset.html?id=${encodeURIComponent(userId)}&token=${token}`;
 
-      MailApp.sendEmail({
-        to: email,
-        name: "平工マッチング",
-        subject: "【平工マッチング】認証コードのご案内",
-        body: `パスワード再設定のリクエストを受け付けました。\n\n30分以内に、以下のリンクから新しいパスワードを設定してください。\n\n${resetLink}`
-      });
+      sendPasswordResetMail(email, cleanCell(userId), resetLink);
 
       return createRes("success", "MAIL_SENT_IF_EXISTS");
     }
@@ -2638,6 +2623,64 @@ function verifyPassword(savedPassword, inputPassword) {
 }
 
 function generateResetToken() { return Utilities.getUuid(); }
+// ---- アカウント関連メール ----
+// 迷惑メール判定を避けるため、件名と本文の内容を一致させ、送信元・受信理由・心当たりがない場合の案内を必ず入れる。
+// テキスト版と同じ内容の HTML 版も付ける（リンクは表示文字列と実際の URL を同じにする）。
+const MAIL_SENDER_NAME = "平工マッチング";
+
+function escapeMailHtml(value) {
+  return String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+}
+
+function sendAccountMail(to, subject, paragraphs, highlight, notes) {
+  const footer = [
+    "このメールに心当たりがない場合は、どなたかが誤ってあなたのメールアドレスを入力した可能性があります。何もせずにこのメールを削除してください。",
+    `${MAIL_SENDER_NAME}（平工生向けの学習マッチングサービス）`,
+    "※このメールは送信専用のため、返信いただいてもお答えできません。"
+  ];
+
+  const textParts = paragraphs.slice();
+  if (highlight) textParts.push(`${highlight.label}：${highlight.value}`);
+  const body = textParts.concat(notes || [], ["――――――――――"], footer).join("\n\n");
+
+  const p = text => `<p style="margin:0 0 16px;line-height:1.7;">${escapeMailHtml(text)}</p>`;
+  let highlightHtml = "";
+  if (highlight && highlight.isLink) {
+    const url = escapeMailHtml(highlight.value);
+    highlightHtml = `<p style="margin:0 0 16px;line-height:1.7;">${escapeMailHtml(highlight.label)}：<br><a href="${url}" style="color:#2563eb;word-break:break-all;">${url}</a></p>`;
+  } else if (highlight) {
+    highlightHtml = `<p style="margin:0 0 6px;color:#555;">${escapeMailHtml(highlight.label)}</p>`
+      + `<p style="margin:0 0 20px;font-size:28px;font-weight:bold;letter-spacing:6px;">${escapeMailHtml(highlight.value)}</p>`;
+  }
+  const htmlBody = `<div style="font-family:sans-serif;color:#222;font-size:15px;max-width:560px;">`
+    + paragraphs.map(p).join("")
+    + highlightHtml
+    + (notes || []).map(p).join("")
+    + `<hr style="border:none;border-top:1px solid #ddd;margin:24px 0;">`
+    + `<div style="font-size:13px;color:#666;">${footer.map(p).join("")}</div>`
+    + `</div>`;
+
+  MailApp.sendEmail({ to, name: MAIL_SENDER_NAME, subject, body, htmlBody });
+}
+
+function sendVerificationCodeMail(to, userId, code) {
+  sendAccountMail(to, `【${MAIL_SENDER_NAME}】メールアドレス確認用の認証コード`, [
+    `${userId} 様`,
+    `${MAIL_SENDER_NAME}へのご登録ありがとうございます。登録を完了するため、下記の6桁の認証コードを登録画面に入力してください。`
+  ], { label: "認証コード", value: code }, [
+    "認証コードの有効期限は、このメールの送信から10分間です。"
+  ]);
+}
+
+function sendPasswordResetMail(to, userId, resetLink) {
+  sendAccountMail(to, `【${MAIL_SENDER_NAME}】パスワード再設定のご案内`, [
+    `${userId} 様`,
+    `${MAIL_SENDER_NAME}で、パスワード再設定のお手続きを受け付けました。下記のページを開き、新しいパスワードを設定してください。`
+  ], { label: "パスワード再設定ページ", value: resetLink, isLink: true }, [
+    "このページの有効期限は、このメールの送信から30分間です。パスワードを再設定しない場合、現在のパスワードはそのまま使えます。"
+  ]);
+}
+
 function generateVerificationCode() { return Math.floor(100000 + Math.random() * 900000).toString(); }
 
 function generateLineLinkCode(linkSheet) {
