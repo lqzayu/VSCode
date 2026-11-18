@@ -679,6 +679,11 @@
                 width: 100%;
             }
 
+            /* スマホでは、来た目的である募集一覧を最初に出し、プロフィールと投稿カードはその下に回す */
+            .main-area {
+                order: -1;
+            }
+
             .toast-notification {
                 top: 10px;
                 left: 10px;
@@ -950,7 +955,7 @@
             margin-bottom: 22px !important;
         }
 
-        #search-area h2 {
+        #search-area h1 {
             color: var(--ink) !important;
             font-size: clamp(1.5rem, 2.4vw, 2rem) !important;
             letter-spacing: -.05em;
@@ -1261,8 +1266,8 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="theme.css?v=20261006glass">
-    <script src="ui.js?v=20261118admin"></script>
+    <link rel="stylesheet" href="theme.css?v=20261118home">
+    <script src="ui.js?v=20261118quick"></script>
     <script src="online.js?v=20260917b" defer></script>
 </head>
 
@@ -1287,7 +1292,7 @@
     <header class="navbar">
         <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
 
-        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
+        <button class="hamburger-btn" id="hud-menu-btn" type="button" onclick="toggleMenu()" aria-label="メニューを開く" aria-controls="nav-links" aria-expanded="false">
             <span></span>
             <span></span>
             <span></span>
@@ -1395,17 +1400,8 @@
 
             <div class="main-content">
                 <section id="search-area">
-                    <div class="usage-intro-card">
-                        <div>
-                            <span class="usage-intro-label">CLASS TRIAL GUIDE</span>
-                            <h1>募集を見つけて、勉強の相談を始めよう。</h1>
-                            <p>投稿、検索、チャット、安全機能まで、初めて使うときの流れをまとめています。</p>
-                        </div>
-                        <button type="button" class="usage-intro-button" onclick="openUsageGuide()">使い方を見る</button>
-                    </div>
-
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-                        <h2 style="font-size: 1.35rem; font-weight: 800; margin: 0; color: #1e293b;">他ユーザーの募集一覧</h2>
+                        <h1 style="font-size: 1.35rem; font-weight: 800; margin: 0; color: #1e293b;">他ユーザーの募集一覧</h1>
                         <button onclick="loadRecruitments()" class="btn-refresh">
                             <img class="refresh-icon"
                                 src="https://kotonohaworks.com/free-icons/wp-content/uploads/kkrn_icon_koushin_17.png"
@@ -1425,6 +1421,16 @@
                             <div class="spinner"></div>
                             <span>読み込み中...</span>
                         </div>
+                    </div>
+
+                    <!-- 使い方の案内は、目的の募集一覧より後ろに置く -->
+                    <div class="usage-intro-card">
+                        <div>
+                            <span class="usage-intro-label">CLASS TRIAL GUIDE</span>
+                            <h2>募集を見つけて、勉強の相談を始めよう。</h2>
+                            <p>投稿、検索、チャット、安全機能まで、初めて使うときの流れをまとめています。</p>
+                        </div>
+                        <button type="button" class="usage-intro-button" onclick="openUsageGuide()">使い方を見る</button>
                     </div>
                 </section>
             </div>

@@ -258,7 +258,8 @@ function installPageRefreshButton() {
 }
 
 function installRecruitmentPostButton() {
-    if (!document.body || document.body.dataset.page === "admin" || document.getElementById("heiko-recruit-post-panel")) return;
+    // QUICK MATCH カード（募集投稿への導線）はホーム画面だけに出す。ほかのページでは本来の内容を最上部に表示する
+    if (!document.body || document.body.dataset.page !== "main" || document.getElementById("heiko-recruit-post-panel")) return;
     const navbar = document.querySelector(".navbar");
     const refreshButton = document.getElementById("heiko-page-refresh");
     if (!navbar || !refreshButton) return;
@@ -978,6 +979,20 @@ function installHeikoSharedStyles() {
     });
 })();
 
+// メニューボタンの開閉状態を読み上げソフトに伝える（各ページの toggleMenu はクラスを切り替えるだけなので、クラスの変化に追従する）
+function installMenuButtonAccessibility() {
+    const button = document.getElementById("hud-menu-btn");
+    if (!button || button.dataset.ariaSync === "1") return;
+    button.dataset.ariaSync = "1";
+    const sync = () => {
+        const open = button.classList.contains("open");
+        button.setAttribute("aria-expanded", open ? "true" : "false");
+        button.setAttribute("aria-label", open ? "メニューを閉じる" : "メニューを開く");
+    };
+    new MutationObserver(sync).observe(button, { attributes: true, attributeFilter: ["class"] });
+    sync();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     if (document.body && document.body.dataset.page === "index" && isHeikoAuthSessionActive()) {
         window.location.replace("main.html");
@@ -986,6 +1001,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const selector = document.getElementById("theme-preference");
     if (selector) selector.value = readThemePreference();
     installHeikoSharedStyles();
+    installMenuButtonAccessibility();
     installPageRefreshButton();
     installRecruitmentPostButton();
     installHeikoPwaSupport();

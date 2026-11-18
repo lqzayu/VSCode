@@ -143,5 +143,31 @@
         return "カメラの起動に失敗しました。もう一度お試しください。";
     }
 
-    window.HeikoFaceCamera = { open, stopStream, isLive, watch, detach, describeError };
+    // 外部ライブラリは必要になったときに一度だけ読み込む（ページ表示を遅くしないため）
+    const scriptPromises = {};
+    function loadScript(src) {
+        if (scriptPromises[src]) return scriptPromises[src];
+        scriptPromises[src] = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = src;
+            script.async = true;
+            script.crossOrigin = "anonymous";
+            script.onload = () => resolve();
+            script.onerror = () => {
+                delete scriptPromises[src];
+                script.remove();
+                reject(makeError("ScriptLoadError"));
+            };
+            document.head.appendChild(script);
+        });
+        return scriptPromises[src];
+    }
+
+    const FACE_MESH_BASE = "https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/";
+    async function loadFaceMesh() {
+        if (typeof window.FaceMesh !== "function") await loadScript(FACE_MESH_BASE + "face_mesh.js");
+        if (typeof window.FaceMesh !== "function") throw makeError("ScriptLoadError");
+    }
+
+    window.HeikoFaceCamera = { open, stopStream, isLive, watch, detach, describeError, loadScript, loadFaceMesh, FACE_MESH_BASE };
 })();

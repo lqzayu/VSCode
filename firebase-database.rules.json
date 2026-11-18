@@ -6,9 +6,19 @@
       "$uidA": {
         "$uidB": {
           ".read": "auth != null && (auth.uid === $uidA || auth.uid === $uidB)",
-          "$messageId": {
-            ".write": "auth != null && newData.exists() && (( !data.exists() && auth.uid === newData.child('fromUid').val() && (auth.uid === $uidA || auth.uid === $uidB)) || (data.exists() && (auth.uid === data.child('fromUid').val() || auth.uid === data.child('toUid').val()) && newData.child('fromUid').val() === data.child('fromUid').val() && newData.child('toUid').val() === data.child('toUid').val()))",
-            ".validate": "newData.hasChildren(['messageId', 'from', 'to', 'fromUid', 'toUid', 'text', 'sentAt', 'isRead', 'isUnsent']) && newData.child('fromUid').val() !== newData.child('toUid').val() && newData.child('fromUid').val() !== '' && newData.child('toUid').val() !== '' && newData.child('text').isString() && newData.child('text').val().length <= 2000"
+          "$messageKey": {
+            ".write": "auth != null && newData.exists() && ((!data.exists() && auth.uid === newData.child('fromUid').val() && (auth.uid === $uidA || auth.uid === $uidB) && (newData.child('toUid').val() === $uidA || newData.child('toUid').val() === $uidB) && newData.child('from').val() === auth.token.userId) || (data.exists() && newData.child('messageId').val() === data.child('messageId').val() && newData.child('from').val() === data.child('from').val() && newData.child('to').val() === data.child('to').val() && newData.child('fromUid').val() === data.child('fromUid').val() && newData.child('toUid').val() === data.child('toUid').val() && newData.child('sentAt').val() === data.child('sentAt').val() && (auth.uid === data.child('fromUid').val() || (auth.uid === data.child('toUid').val() && newData.child('text').val() === data.child('text').val() && newData.child('isUnsent').val() === data.child('isUnsent').val()))))",
+            ".validate": "newData.hasChildren(['messageId', 'from', 'to', 'fromUid', 'toUid', 'text', 'sentAt', 'isRead', 'isUnsent']) && newData.child('fromUid').val() !== newData.child('toUid').val() && newData.child('from').val() !== newData.child('to').val()",
+            "messageId": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 128" },
+            "from": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 64" },
+            "to": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 64" },
+            "fromUid": { ".validate": "newData.isString() && newData.val().matches(/^u_[A-Za-z0-9_-]{1,160}$/)" },
+            "toUid": { ".validate": "newData.isString() && newData.val().matches(/^u_[A-Za-z0-9_-]{1,160}$/)" },
+            "text": { ".validate": "newData.isString() && newData.val().length <= 2000" },
+            "sentAt": { ".validate": "newData.isNumber() && newData.val() > 0" },
+            "isRead": { ".validate": "newData.isBoolean()" },
+            "isUnsent": { ".validate": "newData.isBoolean()" },
+            "$other": { ".validate": false }
           }
         }
       }
@@ -16,9 +26,19 @@
     "inbox": {
       "$uid": {
         ".read": "auth != null && auth.uid === $uid",
-        "$messageId": {
-          ".write": "auth != null && newData.exists() && ((!data.exists() && auth.uid === newData.child('fromUid').val()) || (data.exists() && (auth.uid === data.child('fromUid').val() || auth.uid === data.child('toUid').val())))",
-          ".validate": "newData.hasChildren(['messageId', 'from', 'to', 'fromUid', 'toUid', 'text', 'sentAt', 'isRead', 'isUnsent']) && newData.child('fromUid').val() !== newData.child('toUid').val() && newData.child('text').isString() && newData.child('text').val().length <= 2000"
+        "$messageKey": {
+          ".write": "auth != null && newData.exists() && ((!data.exists() && auth.uid === newData.child('fromUid').val() && ($uid === auth.uid || $uid === newData.child('toUid').val()) && newData.child('from').val() === auth.token.userId) || (data.exists() && newData.child('messageId').val() === data.child('messageId').val() && newData.child('from').val() === data.child('from').val() && newData.child('to').val() === data.child('to').val() && newData.child('fromUid').val() === data.child('fromUid').val() && newData.child('toUid').val() === data.child('toUid').val() && newData.child('sentAt').val() === data.child('sentAt').val() && (auth.uid === data.child('fromUid').val() || (auth.uid === data.child('toUid').val() && newData.child('text').val() === data.child('text').val() && newData.child('isUnsent').val() === data.child('isUnsent').val()))))",
+          ".validate": "newData.hasChildren(['messageId', 'from', 'to', 'fromUid', 'toUid', 'text', 'sentAt', 'isRead', 'isUnsent']) && newData.child('fromUid').val() !== newData.child('toUid').val() && newData.child('from').val() !== newData.child('to').val()",
+          "messageId": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 128" },
+          "from": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 64" },
+          "to": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 64" },
+          "fromUid": { ".validate": "newData.isString() && newData.val().matches(/^u_[A-Za-z0-9_-]{1,160}$/)" },
+          "toUid": { ".validate": "newData.isString() && newData.val().matches(/^u_[A-Za-z0-9_-]{1,160}$/)" },
+          "text": { ".validate": "newData.isString() && newData.val().length <= 2000" },
+          "sentAt": { ".validate": "newData.isNumber() && newData.val() > 0" },
+          "isRead": { ".validate": "newData.isBoolean()" },
+          "isUnsent": { ".validate": "newData.isBoolean()" },
+          "$other": { ".validate": false }
         }
       }
     },
@@ -27,7 +47,7 @@
         ".read": "auth != null && auth.uid === $uid",
         "$partnerUid": {
           ".write": "auth != null && auth.uid === $uid && newData.isNumber()",
-          ".validate": "newData.isNumber()"
+          ".validate": "newData.isNumber() && newData.val() > 0"
         }
       }
     }

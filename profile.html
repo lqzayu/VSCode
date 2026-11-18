@@ -13,10 +13,9 @@
 
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" crossorigin="anonymous" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" crossorigin="anonymous"></script>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/face_mesh.js" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
 
 
@@ -469,9 +468,9 @@
 
 
 
-    <link rel="stylesheet" href="theme.css?v=20261006glass">
-    <script src="ui.js?v=20261118admin"></script>
-    <script src="face-camera.js?v=20261117cam"></script>
+    <link rel="stylesheet" href="theme.css?v=20261118home">
+    <script src="ui.js?v=20261118quick"></script>
+    <script src="face-camera.js?v=20261118lazy"></script>
     <script src="online.js?v=20260917b" defer></script>
 </head>
 
@@ -479,7 +478,7 @@
     <header class="navbar">
         <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
 
-        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
+        <button class="hamburger-btn" id="hud-menu-btn" type="button" onclick="toggleMenu()" aria-label="メニューを開く" aria-controls="nav-links" aria-expanded="false">
             <span></span>
             <span></span>
             <span></span>
@@ -630,6 +629,7 @@
         let cropper = null;
         let videoStream = null;
         let faceMesh = null;
+        let faceMeshReady = null;
         let lastLandmarks = null;
         let faceFrameRequest = null;
         let faceFrameCallback = null;
@@ -809,7 +809,13 @@
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = async function (e) {
+                try {
+                    if (typeof window.Cropper !== "function") await HeikoFaceCamera.loadScript("https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js");
+                } catch (err) {
+                    alert("画像編集の部品を読み込めませんでした。通信環境を確認して、もう一度お試しください。");
+                    return;
+                }
                 const cropImage = document.getElementById("cropImage");
                 cropImage.src = e.target.result;
 
@@ -1104,6 +1110,8 @@
                     drawFaceFeatures(null);
                 }
             });
+            // 準備前に send() すると初期化が何度もやり直されるため、一度だけ初期化して終わるまで待つ
+            faceMeshReady = faceMesh.initialize();
         }
 
         let faceStarting = false;
@@ -1120,17 +1128,23 @@
             if (!myEmail) { alert("ログインセッションが見つかりません。一度ログインし直してください。"); return; }
 
             document.getElementById('faceModal').style.display = "flex";
+            faceStarting = true;
+            const session = ++cameraSession;
+            setFaceStatus("顔認証の準備をしています...", "#0095f6");
             try {
+                await HeikoFaceCamera.loadFaceMesh();
                 initFaceMesh();
             } catch (err) {
+                faceStarting = false;
+                if (session !== cameraSession) return;
                 setFaceStatus("顔認証の部品を読み込めませんでした。通信環境を確認して、ページを再読み込みしてください。", "#ed4956");
                 return;
             }
+            // 読み込み中に閉じられたらカメラは起動しない
+            if (session !== cameraSession) { faceStarting = false; return; }
             setFaceStatus("カメラを起動中...", "#0095f6");
 
             const video = document.getElementById('face-video');
-            const session = ++cameraSession;
-            faceStarting = true;
             try {
                 const stream = await HeikoFaceCamera.open(video, { isCancelled: () => session !== cameraSession });
                 videoStream = stream;
@@ -1139,6 +1153,18 @@
                     stopFaceCamera();
                     setFaceStatus("カメラが停止しました。キャンセルして、もう一度お試しください。", "#ed4956");
                 });
+                setFaceStatus("顔認証の準備をしています...", "#0095f6");
+                try {
+                    await faceMeshReady;
+                } catch (initError) {
+                    if (session !== cameraSession) return;
+                    faceMesh = null;
+                    faceMeshReady = null;
+                    stopFaceCamera();
+                    setFaceStatus("顔認証の部品を読み込めませんでした。キャンセルして、もう一度お試しください。", "#ed4956");
+                    return;
+                }
+                if (session !== cameraSession) return;
                 lastFaceCheck = 0;
                 scheduleFaceFrame(session);
 
@@ -1252,7 +1278,8 @@
         });
         window.addEventListener("pagehide", stopProfileTasks);
 
-        window.onload = () => {
+        // 画像や外部ファイルの読み込み完了（load）を待たず、HTML の準備ができた時点でデータ取得を始める
+        function initializePage() {
             document.getElementById("hud-menu-btn").classList.remove("open");
             document.getElementById("nav-links").classList.remove("open");
 
@@ -1280,7 +1307,13 @@
             updateUnreadBadge();
             startUnreadPoll();
             loadBlockedUsers();
-        };
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initializePage, { once: true });
+        } else {
+            initializePage();
+        }
     </script>
 </body>
 

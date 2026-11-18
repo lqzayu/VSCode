@@ -449,7 +449,7 @@
             .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg) !important; }
         }
     </style>
-    <link rel="stylesheet" href="theme.css?v=20261006glass">
+    <link rel="stylesheet" href="theme.css?v=20261118home">
     <style>
         /* 管理者ページのレイアウト（色は theme.css と既存の指定をそのまま使う） */
         [data-page="admin"] .container { max-width: 1120px; margin: 28px auto 8px; }
@@ -485,6 +485,22 @@
 
         [data-page="admin"] .btn-clear-chat,
         [data-page="admin"] .btn-reload { white-space: nowrap; padding: 10px 16px; }
+
+        [data-page="admin"] .danger-panel { border: 1px solid #fda4af !important; }
+        [data-page="admin"] .danger-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding-top: 14px;
+        }
+        [data-page="admin"] .danger-text strong { font-size: 14px; }
+        [data-page="admin"] .danger-text p {
+            margin: 4px 0 0;
+            font-size: 12.5px;
+            line-height: 1.7;
+            color: var(--ui-muted, #64748b);
+        }
 
         [data-page="admin"] .dashboard-grid { display: flex; flex-direction: column; gap: 20px; }
 
@@ -593,14 +609,14 @@
             [data-page="admin"] .page-title-bar h1 { font-size: 23px; }
             [data-page="admin"] .page-actions { width: 100%; }
             [data-page="admin"] .online-summary { order: 0; }
-            [data-page="admin"] .page-actions .btn-clear-chat,
             [data-page="admin"] .page-actions .btn-reload { flex: 1 1 0; }
+            [data-page="admin"] .danger-row { flex-direction: column; align-items: stretch; }
             [data-page="admin"] .page-actions .online-summary { flex: 1 1 100%; justify-content: center; }
             [data-page="admin"] .panel { padding: 18px 16px; }
             [data-page="admin"] .table-wrap { margin: 0 -16px; padding: 0 16px; }
         }
     </style>
-    <script src="ui.js?v=20261118admin"></script>
+    <script src="ui.js?v=20261118quick"></script>
     <script src="online.js?v=20260917b" defer></script>
 </head>
 
@@ -609,7 +625,7 @@
     <header class="navbar">
         <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
 
-        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
+        <button class="hamburger-btn" id="hud-menu-btn" type="button" onclick="toggleMenu()" aria-label="メニューを開く" aria-controls="nav-links" aria-expanded="false">
             <span></span>
             <span></span>
             <span></span>
@@ -645,7 +661,6 @@
                     <strong id="online-user-count">--</strong>
                     <span>人</span>
                 </div>
-                <button class="btn-clear-chat" type="button" onclick="clearAllChatHistory()">全チャット履歴を消去</button>
                 <button class="btn-reload" type="button" onclick="loadOverview()">データを更新</button>
             </div>
         </div>
@@ -726,6 +741,23 @@
                             <tr class="empty-row"><td colspan="5">読み込み中...</td></tr>
                         </tbody>
                     </table>
+                </div>
+            </section>
+
+            <!-- 取り返しのつかない操作は、日常的に押すボタンと離してページの最後に置く -->
+            <section class="panel danger-panel" aria-labelledby="danger-title">
+                <div class="panel-head">
+                    <div>
+                        <h2 id="danger-title">⚠️ 危険な操作</h2>
+                        <p class="panel-note">ここにある操作は元に戻せません。実行前に内容をよく確認してください。</p>
+                    </div>
+                </div>
+                <div class="danger-row">
+                    <div class="danger-text">
+                        <strong>全チャット履歴を消去</strong>
+                        <p>全ユーザーのチャット本体・非表示履歴・Firebase のチャットデータを削除します。chat-copy シートのバックアップは残ります。</p>
+                    </div>
+                    <button class="btn-clear-chat" type="button" onclick="clearAllChatHistory()">全チャット履歴を消去</button>
                 </div>
             </section>
         </div>
@@ -1238,7 +1270,8 @@
         });
         window.addEventListener("pagehide", stopAdminPolling);
 
-        window.onload = () => {
+        // 画像や外部ファイルの読み込み完了（load）を待たず、HTML の準備ができた時点でデータ取得を始める
+        function initializePage() {
             if (adminAccessDenied) return;
             document.getElementById("hud-menu-btn").classList.remove("open");
             document.getElementById("nav-links").classList.remove("open");
@@ -1246,7 +1279,13 @@
             loadOverview();
             updateUnreadBadge();
             startAdminPolling();
-        };
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initializePage, { once: true });
+        } else {
+            initializePage();
+        }
     </script>
     <div class="temp-password-overlay" id="temp-password-overlay" role="dialog" aria-modal="true" aria-labelledby="temp-password-title">
         <div class="temp-password-dialog">

@@ -15,7 +15,7 @@
     <link rel="icon" href="icon-192.png">
 
 
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/face_mesh.js" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
     <style>
         body {
@@ -899,7 +899,7 @@
 
     <link rel="apple-touch-icon" href="icon-192.png">
 
-    <link rel="stylesheet" href="theme.css?v=20261006glass">
+    <link rel="stylesheet" href="theme.css?v=20261118home">
 
     <style>
         #remember-login:checked + .remember-login-checkmark {
@@ -918,8 +918,8 @@
             transform: translateY(-1px);
         }
     </style>
-    <script src="ui.js?v=20261118admin"></script>
-    <script src="face-camera.js?v=20261117cam"></script>
+    <script src="ui.js?v=20261118quick"></script>
+    <script src="face-camera.js?v=20261118lazy"></script>
 </head>
 
 
@@ -1183,6 +1183,7 @@
         let videoStream = null;
 
         let faceMesh = null;
+        let faceMeshReady = null;
 
         let lastLandmarks = null;
 
@@ -1528,6 +1529,10 @@
 
             });
 
+            // モデルの準備前に send() すると、そのたびに初期化（大きなファイルの読み込み）がやり直されるため、
+            // 初期化は一度だけ行い、終わるまでフレームを送らない
+            faceMeshReady = faceMesh.initialize();
+
         }
 
 
@@ -1570,11 +1575,27 @@
 
             const authStatus = document.getElementById('auth-status');
 
+            const session = ++cameraSession;
+
+            container.style.display = "block";
+            container.classList.add("is-starting");
+            authStatus.innerText = "顔認証の準備をしています...";
+            authStatus.style.color = "#0095f6";
+
             try {
+
+                await HeikoFaceCamera.loadFaceMesh();
 
                 initFaceMesh();
 
             } catch (err) {
+
+                if (session !== cameraSession) return false;
+
+                container.classList.remove("is-starting");
+
+                container.style.display = "none";
+
 
                 authStatus.innerText = "顔認証の部品を読み込めませんでした。通信環境を確認して、ページを再読み込みしてください。";
 
@@ -1584,8 +1605,8 @@
 
             }
 
-
-            const session = ++cameraSession;
+            // 読み込み中にキャンセルされたらカメラは起動しない
+            if (session !== cameraSession) return false;
 
             container.style.display = "block";
 
@@ -1613,6 +1634,34 @@
                     authStatus.style.color = "#ef4444";
 
                 });
+
+                authStatus.innerText = "顔認証の準備をしています...";
+
+                authStatus.style.color = "#64748b";
+
+                try {
+
+                    await faceMeshReady;
+
+                } catch (initError) {
+
+                    if (session !== cameraSession) return false;
+
+                    faceMesh = null;
+
+                    faceMeshReady = null;
+
+                    stopCamera();
+
+                    authStatus.innerText = "顔認証の部品を読み込めませんでした。通信環境を確認して、もう一度お試しください。";
+
+                    authStatus.style.color = "#ef4444";
+
+                    return false;
+
+                }
+
+                if (session !== cameraSession) return false;
 
                 container.classList.remove("is-starting");
 

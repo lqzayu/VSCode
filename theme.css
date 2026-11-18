@@ -11,7 +11,8 @@ html[data-theme="dark"] .usage-intro-card {
  background:linear-gradient(135deg,#172a46 0%,#203b5c 58%,#312f5f 100%)!important; border-color:#3d5d7d!important;
  color:#f4f7fb!important;
 }
-html[data-theme="dark"] .usage-intro-card h1 {
+html[data-theme="dark"] .usage-intro-card h1,
+html[data-theme="dark"] .usage-intro-card h2 {
  color:#f4f7fb!important;
 }
 html[data-theme="dark"] .usage-intro-card p {
@@ -31,7 +32,7 @@ html[data-theme="dark"] .usage-intro-button:hover {
  html:not([data-theme="light"]) .usage-intro-card {
   background:linear-gradient(135deg,#172a46 0%,#203b5c 58%,#312f5f 100%)!important; border-color:#3d5d7d!important; color:#f4f7fb!important;
  }
- html:not([data-theme="light"]) .usage-intro-card h1 { color:#f4f7fb!important; }
+ html:not([data-theme="light"]) .usage-intro-card h1, html:not([data-theme="light"]) .usage-intro-card h2 { color:#f4f7fb!important; }
  html:not([data-theme="light"]) .usage-intro-card p { color:#c7d5e6!important; }
  html:not([data-theme="light"]) .usage-intro-label { color:#c4b5fd!important; }
  html:not([data-theme="light"]) .usage-intro-button { background:#d8d1ff!important; border-color:#d8d1ff!important; color:#243654!important; }
@@ -224,7 +225,7 @@ button:disabled { opacity:.5!important; cursor:wait; transform:none!important; }
  content:"STUDY TOGETHER"; color:var(--ui-muted); font-size:10px;
  letter-spacing:.22em; font-weight:700; margin-bottom:14px;
 }
-#search-area h2 { font-size:clamp(24px,3vw,38px)!important; font-weight:800; letter-spacing:-.055em; }
+#search-area h1 { margin:0; font-size:clamp(24px,3vw,38px)!important; font-weight:800; letter-spacing:-.055em; }
 #search-area > div:first-child { margin-bottom:28px!important; }
 input:not([type="file"]),select,textarea {
  border:1px solid var(--ui-line)!important; border-radius:10px!important;
@@ -501,7 +502,10 @@ td,th { border-bottom:1px solid var(--ui-line); }
 body {
  background-image:radial-gradient(circle at 8% 0%,rgba(216,239,153,.34),transparent 30rem),radial-gradient(circle at 96% 12%,rgba(184,218,205,.3),transparent 26rem),linear-gradient(125deg,var(--ui-bg),var(--glass-surface-strong),var(--ui-bg))!important;
  background-size:auto,auto,190% 190%!important;
- animation:heiko-glass-page-in .48s ease both,heiko-glass-drift 18s ease-in-out infinite alternate!important;
+ background-position:0 0,0 0,50% 50%!important;
+ /* 背景を動かし続けると、すりガラス（blur）の部品が毎フレーム描き直されて重くなるため、表示時のフェードだけにする。
+    transform を使うと body が position:fixed の基準になり、モーダルや通知の位置がずれるので opacity だけにする */
+ animation:heiko-glass-page-in .4s ease both!important;
 }
 html[data-theme="dark"] body {
  background-image:radial-gradient(circle at 8% 0%,rgba(125,211,252,.18),transparent 30rem),radial-gradient(circle at 96% 12%,rgba(196,181,253,.13),transparent 26rem),linear-gradient(125deg,var(--ui-bg),var(--glass-surface-strong),var(--ui-bg))!important;
@@ -545,17 +549,13 @@ button:not(:disabled):active,.nav-item:active,.footer-links a:active {
  box-shadow:0 10px 26px rgba(36,60,50,.16),inset 0 1px 0 rgba(255,255,255,.34)!important;
 }
 
-@keyframes heiko-glass-drift {
- 0% { background-position:0% 0%; }
- 100% { background-position:100% 100%; }
-}
 @keyframes heiko-glass-shine {
  0%,35% { background-position:180% 0; }
  65%,100% { background-position:-20% 0; }
 }
 @keyframes heiko-glass-page-in {
- from { opacity:0; transform:translateY(5px); }
- to { opacity:1; transform:translateY(0); }
+ from { opacity:0; }
+ to { opacity:1; }
 }
 @media (prefers-reduced-motion:reduce) {
  body,.navbar::after,.footer::after { animation:none!important; }
@@ -679,7 +679,8 @@ button:not(:disabled):active,.nav-item:active,.footer-links a:active {
  display:block; margin-bottom:9px; color:var(--ui-lime); font-size:10px;
  font-weight:800; letter-spacing:.2em;
 }
-.usage-intro-card h1 {
+.usage-intro-card h1,
+.usage-intro-card h2 {
  margin:0 0 8px; max-width:650px; color:var(--ui-paper); font-size:clamp(22px,3vw,34px);
  line-height:1.35; letter-spacing:-.05em;
 }

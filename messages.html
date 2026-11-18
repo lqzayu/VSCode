@@ -414,14 +414,14 @@
         }
     </style>
 
-    <link rel="stylesheet" href="theme.css?v=20261006glass">
-    <script src="ui.js?v=20261118admin"></script>
+    <link rel="stylesheet" href="theme.css?v=20261118home">
+    <script src="ui.js?v=20261118quick"></script>
     <script src="online.js?v=20260917b" defer></script>
     <script>window.HEIKO_FIREBASE_CHAT_ENABLED = true;</script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-    <script src="firebase-chat.js?v=20261117hide"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js" defer></script>
+    <script src="firebase-chat.js?v=20261117hide" defer></script>
 </head>
 
 <body data-page="messages">
@@ -429,7 +429,7 @@
     <header class="navbar">
         <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
 
-        <button class="hamburger-btn" id="hud-menu-btn" onclick="toggleMenu()">
+        <button class="hamburger-btn" id="hud-menu-btn" type="button" onclick="toggleMenu()" aria-label="メニューを開く" aria-controls="nav-links" aria-expanded="false">
             <span></span>
             <span></span>
             <span></span>
@@ -879,7 +879,8 @@
             }
         });
 
-        window.onload = async () => {
+        // 画像や外部ファイルの読み込み完了（load）を待たず、HTML の準備ができた時点でデータ取得を始める
+        async function initializePage() {
             document.getElementById("hud-menu-btn").classList.remove("open");
             document.getElementById("nav-links").classList.remove("open");
 
@@ -894,7 +895,13 @@
             updateUnreadBadge();
 
             startUnreadPoll();
-        };
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initializePage, { once: true });
+        } else {
+            initializePage();
+        }
     </script>
 </body>
 
