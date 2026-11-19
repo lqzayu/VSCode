@@ -795,6 +795,7 @@
                         </label>
                         <button class="btn-reload" id="se-extract-button" type="button" onclick="extractSchoolEvents()" disabled>AIで読み取る</button>
                         <button class="se-sub-button" type="button" onclick="loadBundledSchoolEvents()">令和8年度の年間行事計画を読み込む</button>
+                        <button class="se-sub-button" type="button" onclick="startManualSchoolEvents()">手入力で追加する</button>
                     </div>
                     <p class="se-status" id="se-status" aria-live="polite"></p>
                 </div>
@@ -1457,8 +1458,10 @@
             }
         }
 
-        function showSchoolEventPreview(events) {
+        // replace: 「この期間に登録済みの行事を置き換える」の初期状態。予定表の取り込みは置き換え、手入力は追加だけにする
+        function showSchoolEventPreview(events, { replace = true } = {}) {
             schoolEventPreview = events.map(event => ({ date: event.date || "", endDate: event.endDate || "", title: event.title || "", type: SCHOOL_EVENT_TYPE_LABELS[event.type] ? event.type : "event" }));
+            document.getElementById("se-replace").checked = replace;
             renderSchoolEventPreview();
             const preview = document.getElementById("se-preview");
             preview.hidden = false;
@@ -1489,6 +1492,13 @@
             document.getElementById("se-replace-label").textContent = range
                 ? `${range.from.replace(/-/g, "/")}〜${range.to.replace(/-/g, "/")} に登録済みの行事を置き換える`
                 : "この期間に登録済みの行事を置き換える";
+        }
+
+        // 手入力：空の表に1行だけ用意する。置き換えを既定ONにすると、入力した日付の範囲にある既存の行事が消えるため既定OFFにする
+        function startManualSchoolEvents() {
+            showSchoolEventPreview([], { replace: false });
+            addSchoolEventRow();
+            setSchoolEventStatus("行事を入力して「確認して保存する」を押してください。登録済みの行事は消えません");
         }
 
         function addSchoolEventRow() {
