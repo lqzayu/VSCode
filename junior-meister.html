@@ -1309,7 +1309,32 @@
         .jm-warn { margin: 12px 0 0; color: var(--ui-danger); font-size: 12px; font-weight: 700; line-height: 1.5; }
         .jm-card .card-action-row { margin-top: 16px; }
         .jm-empty { grid-column: 1 / -1; padding: 48px 20px; text-align: center; color: var(--ui-muted); font-size: 14px; font-weight: 700; border: 1px dashed var(--ui-line); border-radius: 20px; }
-        .jm-rec-lead { margin: -6px 0 16px; font-size: 13px; color: var(--ui-muted); }
+        .jm-rec-details { border: 1px solid var(--ui-line); border-radius: 20px; background: var(--ui-paper); overflow: hidden; transition: box-shadow .2s ease, border-color .2s ease; }
+        .jm-rec-details[open] { box-shadow: 0 14px 30px rgba(15, 23, 42, .08); }
+        .jm-rec-summary { display: flex; align-items: center; gap: 14px; padding: 18px 20px; cursor: pointer; list-style: none; user-select: none; }
+        .jm-rec-summary::-webkit-details-marker { display: none; }
+        .jm-rec-summary::marker { content: ""; }
+        .jm-rec-summary:hover { background: var(--ui-soft); }
+        .jm-rec-summary:focus-visible { outline: 3px solid var(--ui-green); outline-offset: -3px; border-radius: 20px; }
+        .jm-rec-summary-icon { flex: none; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 14px; background: var(--ui-soft); font-size: 20px; }
+        .jm-rec-summary-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+        .jm-rec-summary-text strong { font-size: 1.15rem; font-weight: 800; color: var(--ui-ink); }
+        .jm-rec-summary-text small { font-size: 12px; font-weight: 700; color: var(--ui-muted); line-height: 1.5; }
+        .jm-rec-summary-action { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--ui-line); color: var(--ui-green); font-size: 12px; font-weight: 800; }
+        .jm-rec-chevron { width: 8px; height: 8px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform .2s ease; }
+        .jm-rec-details[open] .jm-rec-chevron { transform: translateY(2px) rotate(-135deg); }
+        .jm-rec-close-label, .jm-rec-details[open] .jm-rec-open-label { display: none; }
+        .jm-rec-details[open] .jm-rec-close-label { display: inline; }
+        .jm-rec-body { padding: 4px 20px 20px; border-top: 1px solid var(--ui-line); }
+        .jm-rec-details[open] .jm-rec-body { animation: jm-rec-open .22s ease; }
+        @keyframes jm-rec-open { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+        @media (prefers-reduced-motion: reduce) { .jm-rec-details[open] .jm-rec-body { animation: none; } .jm-rec-chevron { transition: none; } }
+        @media screen and (max-width: 768px) {
+            .jm-rec-summary { padding: 16px; gap: 12px; }
+            .jm-rec-summary-icon { width: 36px; height: 36px; font-size: 18px; }
+            .jm-rec-body { padding: 4px 14px 16px; }
+        }
+        .jm-rec-lead { margin: 14px 0 16px; font-size: 13px; color: var(--ui-muted); }
         .jm-rec-grade { display: inline-block; margin-left: 8px; font-size: 13px; font-weight: 800; color: var(--ui-muted); }
         .jm-rec-gain { color: var(--ui-green); }
         .jm-rec-reach { margin: 0 0 8px; color: var(--ui-green); font-size: 13px; font-weight: 800; }
@@ -1390,13 +1415,20 @@
                 </section>
             </div>
 
-            <section id="jm-recommend-area" aria-labelledby="jm-recommend-title">
-                <div class="jm-list-head">
-                    <h2 id="jm-recommend-title" style="font-size: 1.35rem; font-weight: 800; margin: 0; color: var(--ui-ink);">おすすめの資格</h2>
+            <details id="jm-recommend-area" class="jm-rec-details">
+                <summary class="jm-rec-summary">
+                    <span class="jm-rec-summary-icon" aria-hidden="true">💡</span>
+                    <span class="jm-rec-summary-text">
+                        <strong id="jm-recommend-title">おすすめの資格</strong>
+                        <small id="jm-recommend-summary">持っている資格と学科から、次に取ると良い資格を表示します</small>
+                    </span>
+                    <span class="jm-rec-summary-action" aria-hidden="true"><span class="jm-rec-open-label">見る</span><span class="jm-rec-close-label">閉じる</span><span class="jm-rec-chevron"></span></span>
+                </summary>
+                <div class="jm-rec-body">
+                    <p id="jm-recommend-lead" class="jm-hint jm-rec-lead" aria-live="polite"></p>
+                    <div class="user-grid" id="jm-recommend-list"></div>
                 </div>
-                <p id="jm-recommend-lead" class="jm-hint jm-rec-lead" aria-live="polite"></p>
-                <div class="user-grid" id="jm-recommend-list"></div>
-            </section>
+            </details>
 
             <section id="recruit-form-area">
                 <div class="sidebar-form">
@@ -2013,9 +2045,16 @@
         }
 
         function renderRecommendations() {
+            const details = $("jm-recommend-area");
             const box = $("jm-recommend-list");
             const lead = $("jm-recommend-lead");
-            if (!box || !lead) return;
+            if (!details || !box || !lead) return;
+            // 閉じているときは見出しの一言だけ更新し、候補の計算は開いたときに行う
+            const summaryGoal = recommendationGoal(evaluate());
+            $("jm-recommend-summary").textContent = summaryGoal.need > 0
+                ? `${summaryGoal.label}まであと${summaryGoal.need}点。次に取ると良い資格を見る`
+                : "ゴールド達成。さらに点数を伸ばせる資格を見る";
+            if (!details.open) return;
             const { goal, top, combo, dept } = buildRecommendations();
             lead.textContent = goal.need > 0
                 ? `${goal.label}まであと${goal.need}点。${dept ? `学科（${dept}）と` : ""}持っている資格をもとに選びました。`
@@ -2077,6 +2116,13 @@
         itemSelect.addEventListener("change", fillGrades);
         $("jm-add").addEventListener("click", addEntry);
         $("jm-manual-add").addEventListener("click", addManual);
+        // 開いた・閉じた状態は端末ごとに覚えておく
+        const recommendOpenKey = "junior-meister:recommend-open:" + currentUserId;
+        try { $("jm-recommend-area").open = localStorage.getItem(recommendOpenKey) === "1"; } catch (error) { /* 保存できない環境では閉じたまま */ }
+        $("jm-recommend-area").addEventListener("toggle", event => {
+            try { localStorage.setItem(recommendOpenKey, event.currentTarget.open ? "1" : "0"); } catch (error) { /* 無視 */ }
+            if (event.currentTarget.open) renderRecommendations();
+        });
         $("jm-recommend-list").addEventListener("click", event => {
             const button = event.target.closest(".jm-rec-pick");
             if (button) pickRecommendation(button.dataset.key, Number(button.dataset.grade));
