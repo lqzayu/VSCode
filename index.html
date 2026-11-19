@@ -899,7 +899,7 @@
 
     <link rel="apple-touch-icon" href="icon-192.png">
 
-    <link rel="stylesheet" href="theme.css?v=20261118home">
+    <link rel="stylesheet" href="theme.css?v=20261119nav">
 
     <style>
         #remember-login:checked + .remember-login-checkmark {
@@ -918,7 +918,7 @@
             transform: translateY(-1px);
         }
     </style>
-    <script src="ui.js?v=20261118quick"></script>
+    <script src="ui.js?v=20261118ux"></script>
     <script src="face-camera.js?v=20261118lazy"></script>
 </head>
 
@@ -974,31 +974,31 @@
 			<form id="auth-form" autocomplete="on" novalidate onsubmit="handleAuthenticationSubmit(event)">
             <div class="input-group">
 
-                <input type="text" id="login-userid" name="username" maxlength="64" placeholder="ユーザID（顔認証にも使用）" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
+                <input type="text" id="login-userid" aria-label="ユーザID" name="username" maxlength="64" placeholder="ユーザID（顔認証にも使用）" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
 
 
                 <div class="name-wrapper" id="name-wrapper">
 
-                    <input type="text" id="display-name" name="nickname" maxlength="50" placeholder="表示名（ニックネーム）" autocomplete="nickname">
+                    <input type="text" id="display-name" aria-label="表示名（ニックネーム）" name="nickname" maxlength="50" placeholder="表示名（ニックネーム）" autocomplete="nickname">
 
                 </div>
 
                 <div class="name-wrapper" id="reg-email-wrapper">
 
-                    <input type="email" id="reg-email" name="email" maxlength="254" placeholder="メールアドレス（認証コード送信用）" autocomplete="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false">
+                    <input type="email" id="reg-email" aria-label="メールアドレス" name="email" maxlength="254" placeholder="メールアドレス（認証コード送信用）" autocomplete="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false">
 
                 </div>
 
 
                 <div class="password-wrapper">
-                    <input type="password" id="password" name="password" placeholder="パスワード" class="password-input" maxlength="128" autocomplete="current-password">
+                    <input type="password" id="password" aria-label="パスワード" name="password" placeholder="パスワード" class="password-input" maxlength="128" autocomplete="current-password">
                     <button type="button" id="toggle-password" onclick="togglePasswordVisibility()"
                         class="toggle-password-btn">表示</button>
                 </div>
 
 
                 <div class="confirm-password-wrapper">
-                    <input type="password" id="confirm-password" name="confirm-password" placeholder="パスワード（確認）" class="confirm-password-input" maxlength="128" autocomplete="new-password">
+                    <input type="password" id="confirm-password" aria-label="パスワード（確認）" name="confirm-password" placeholder="パスワード（確認）" class="confirm-password-input" maxlength="128" autocomplete="new-password">
                     <button type="button" id="toggle-confirm" onclick="toggleconfirmVisibility()"
                         class="toggle-confirm-btn">表示</button>
                 </div>
@@ -1051,7 +1051,7 @@
 
                         <p class="code-hint">※迷惑メールフォルダに入る場合があります。届かない場合は「コードを再送する」を押してください。</p>
 
-                        <input type="text" id="verify-code" placeholder="認証コード（6桁）" inputmode="numeric" maxlength="6">
+                        <input type="text" id="verify-code" aria-label="認証コード（6桁）" placeholder="認証コード（6桁）" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
 
                         <button type="button" class="btn-submit-primary"
                             style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);"
@@ -1067,7 +1067,7 @@
 
                     <div id="forgot-password-section">
 
-                        <input type="text" id="forgot-userid" placeholder="登録したユーザID">
+                        <input type="text" id="forgot-userid" aria-label="登録したユーザID" placeholder="登録したユーザID">
 
                         <button type="button" class="btn-submit-primary" onclick="runAuthAction(submitForgotPassword)">再設定メールを送信</button>
 

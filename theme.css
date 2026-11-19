@@ -667,7 +667,7 @@ button:not(:disabled):active,.nav-item:active,.footer-links a:active {
 
 
 .nav-guide-button {
- appearance:none; border:0; background:transparent; font:inherit;
+ appearance:none; border:0; background:transparent; font-family:inherit; cursor:pointer;
 }
 .usage-intro-card {
  display:flex; align-items:center; justify-content:space-between; gap:30px;
@@ -816,4 +816,29 @@ input:not([type="file"]),select,textarea {
 }
 @media (prefers-reduced-motion:reduce) {
  body,.navbar::after,.footer::after,.toast-notification,.ui-notice { animation:none!important; }
+}
+
+/* ヘッダー右上のメニュー：ページごとの指定に左右されないよう、和文が読みやすいフォントと大きさに統一する */
+.navbar .nav-links .nav-item,
+.navbar .nav-links .btn-logout,
+.navbar .nav-links button.nav-item {
+ font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI","Yu Gothic","Meiryo",sans-serif!important;
+ font-size:14px!important; font-weight:700!important; line-height:1.4!important; letter-spacing:.02em!important;
+}
+.navbar .nav-links .btn-logout { white-space:nowrap!important; flex-shrink:0!important; }
+/* 「更新」ボタンがあるページは横幅が足りなくなるので、広めの画面でもメニューを2段目に回して文字が縦に潰れないようにする */
+@media(max-width:1360px) and (min-width:769px) {
+ .navbar:has(.heiko-header-actions) { flex-wrap:wrap!important; row-gap:10px!important; }
+ .navbar:has(.heiko-header-actions) .nav-links { flex-basis:100%!important; justify-content:flex-end!important; }
+}
+@media(max-width:1100px) and (min-width:769px) {
+ .navbar .nav-links .nav-item,
+ .navbar .nav-links .btn-logout,
+ .navbar .nav-links button.nav-item { font-size:13px!important; }
+ .navbar .nav-links { flex-wrap:wrap!important; justify-content:flex-end!important; row-gap:4px!important; }
+}
+@media(max-width:768px) {
+ .navbar .nav-links .nav-item,
+ .navbar .nav-links .btn-logout,
+ .navbar .nav-links button.nav-item { font-size:15px!important; }
 }

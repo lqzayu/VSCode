@@ -243,6 +243,18 @@
             text-overflow: ellipsis;
         }
 
+        .partner-time {
+            margin-left: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .partner-item:focus-visible {
+            outline: 3px solid rgba(28, 189, 197, 0.55);
+            outline-offset: 2px;
+        }
+
         .partner-preview {
             font-size: 12px;
             color: #94a3b8;
@@ -414,8 +426,8 @@
         }
     </style>
 
-    <link rel="stylesheet" href="theme.css?v=20261118home">
-    <script src="ui.js?v=20261118quick"></script>
+    <link rel="stylesheet" href="theme.css?v=20261119nav">
+    <script src="ui.js?v=20261118ux"></script>
     <script src="online.js?v=20260917b" defer></script>
     <script>window.HEIKO_FIREBASE_CHAT_ENABLED = true;</script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" defer></script>
@@ -690,7 +702,16 @@
                 const avatarBg = bgGradients[index % bgGradients.length];
                 const item = document.createElement("div");
                 item.className = "partner-item";
-                item.onclick = () => openChat(partner.email);
+                item.onclick = () => openChat(partner.email, partner.name);
+                item.tabIndex = 0;
+                item.setAttribute("role", "link");
+                item.setAttribute("aria-label", `${partner.name || partner.email}とのチャットを開く`);
+                item.addEventListener("keydown", event => {
+                    if (event.target === item && (event.key === "Enter" || event.key === " ")) {
+                        event.preventDefault();
+                        openChat(partner.email, partner.name);
+                    }
+                });
                 const avatarRing = document.createElement("div");
                 avatarRing.className = "avatar-ring";
                 const avatar = document.createElement("div");
@@ -709,6 +730,13 @@
                 const preview = document.createElement("div");
                 preview.className = "partner-preview";
                 preview.textContent = partner.preview || "メッセージを開く";
+                const sentLabel = formatPartnerTime(partner.sentAt);
+                if (sentLabel) {
+                    const time = document.createElement("span");
+                    time.className = "partner-time";
+                    time.textContent = `・${sentLabel}`;
+                    email.appendChild(time);
+                }
                 contentBox.append(name, email, preview);
                 const arrow = document.createElement("div");
                 arrow.className = "arrow-badge";
@@ -799,8 +827,23 @@
             return unreadRequest;
         }
 
-        function openChat(email) {
+        // 最後のやり取りがいつかを一目でわかるようにする（今日は時刻、昨日は「昨日」、それ以前は日付）
+        function formatPartnerTime(value) {
+            const time = typeof value === "number" ? value : (Date.parse(value) || 0);
+            if (!time) return "";
+            const date = new Date(time);
+            const now = new Date();
+            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+            if (time >= startOfToday) return `${date.getHours()}:${String(date.getMinutes()).padStart(2, "0")}`;
+            if (time >= startOfToday - 86400000) return "昨日";
+            if (date.getFullYear() === now.getFullYear()) return `${date.getMonth() + 1}/${date.getDate()}`;
+            return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
+        }
+
+        function openChat(email, name) {
             localStorage.setItem("chatTarget", email);
+            if (name) localStorage.setItem("chatTargetName", name);
+            else localStorage.removeItem("chatTargetName");
             location.href = 'chat.html';
         }
 

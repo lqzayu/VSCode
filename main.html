@@ -430,14 +430,14 @@
         }
 
         .quick-reaction-area {
-            margin: 12px 0 2px;
+            margin: 12px 0 12px;
         }
 
         .quick-reaction-label {
             display: block;
             margin-bottom: 6px;
             color: #64748b;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 700;
         }
 
@@ -450,10 +450,11 @@
         .btn-quick-reaction {
             border: 1px solid #dbeafe;
             border-radius: 999px;
-            padding: 6px 9px;
+            min-height: 34px;
+            padding: 7px 12px;
             background: #f8fbff;
             color: #2563eb;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
         }
@@ -516,9 +517,46 @@
         }
 
         .refresh-icon {
-            width: 18px;
-            height: 18px;
-            object-fit: contain;
+            font-size: 20px;
+            font-weight: 800;
+            line-height: 1;
+            color: inherit;
+        }
+
+        .list-head-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        /* 投稿カードはスマホだと一覧の下に回るので、一覧の見出し横にも投稿の入口を置く */
+        .list-post-button {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            min-height: 40px;
+            padding: 0 12px;
+            border-radius: 12px;
+            background: var(--heiko-recruit-button-bg, linear-gradient(135deg, #129fa6 0%, #0b7782 100%));
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 800;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        @media screen and (max-width: 768px) {
+            .list-post-button {
+                display: inline-flex;
+            }
+        }
+
+        /* 投稿ボタンを並べても見出しが1行に収まるよう、狭い画面では少しだけ小さくする */
+        @media screen and (max-width: 420px) {
+            #search-area > div > h1 {
+                font-size: 21px !important;
+            }
         }
 
         .loading-box {
@@ -1266,8 +1304,8 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="theme.css?v=20261118home">
-    <script src="ui.js?v=20261118quick"></script>
+    <link rel="stylesheet" href="theme.css?v=20261119nav">
+    <script src="ui.js?v=20261118ux"></script>
     <script src="online.js?v=20260917b" defer></script>
 </head>
 
@@ -1402,11 +1440,12 @@
                 <section id="search-area">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
                         <h1 style="font-size: 1.35rem; font-weight: 800; margin: 0; color: #1e293b;">他ユーザーの募集一覧</h1>
-                        <button onclick="loadRecruitments()" class="btn-refresh">
-                            <img class="refresh-icon"
-                                src="https://kotonohaworks.com/free-icons/wp-content/uploads/kkrn_icon_koushin_17.png"
-                                alt="更新">
-                        </button>
+                        <div class="list-head-actions">
+                            <a class="list-post-button" href="main.html?tab=recruit" aria-label="募集を投稿する"><span aria-hidden="true">＋</span>投稿</a>
+                            <button type="button" onclick="loadRecruitments()" class="btn-refresh" aria-label="募集一覧を更新" title="募集一覧を更新">
+                                <span class="refresh-icon" aria-hidden="true">↻</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="search-box-container">
@@ -1895,7 +1934,7 @@
                     blockUser(item.email, item.name);
                 });
 
-                card.querySelector(".btn-match").addEventListener("click", () => startChat(item.email));
+                card.querySelector(".btn-match").addEventListener("click", () => startChat(item.email, item.name));
 
                 card.querySelectorAll(".js-search-tag").forEach(button => {
                     button.addEventListener("click", () => searchByTag(button.dataset.tag));
@@ -1938,11 +1977,14 @@
                     }
 
                     hasActiveTimer = true;
-                    const totalSeconds = Math.ceil(remainingMilliseconds / 1000);
-                    const hours = Math.floor(totalSeconds / 3600);
-                    const minutes = Math.floor((totalSeconds % 3600) / 60);
-                    const seconds = totalSeconds % 60;
-                    el.innerText = `⏳ 残り ${hours}時間${String(minutes).padStart(2, "0")}分${String(seconds).padStart(2, "0")}秒`;
+                    // 秒まで刻むと読みにくいので分単位で表示し、残り1分を切ったら「まもなく終了」にする
+                    const totalMinutes = Math.ceil(remainingMilliseconds / 60000);
+                    const hours = Math.floor(totalMinutes / 60);
+                    const minutes = totalMinutes % 60;
+                    const label = remainingMilliseconds < 60000
+                        ? "⏳ まもなく終了"
+                        : `⏳ 残り ${hours > 0 ? `${hours}時間` : ""}${hours > 0 && minutes === 0 ? "" : `${minutes}分`}`;
+                    if (el.innerText !== label) el.innerText = label;
                 });
 
                 if (!hasActiveTimer && countdownTimer) {
@@ -2208,8 +2250,12 @@
             }
         }
 
-        function startChat(email) {
+        function startChat(email, name) {
             localStorage.setItem("chatTarget", email);
+            const knownPost = allOtherPosts.find(post => post.email === email);
+            const targetName = name || (knownPost && knownPost.name) || "";
+            if (targetName) localStorage.setItem("chatTargetName", targetName);
+            else localStorage.removeItem("chatTargetName");
             location.href = 'chat.html';
         }
 

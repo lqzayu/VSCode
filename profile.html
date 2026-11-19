@@ -304,6 +304,24 @@
             cursor: pointer;
         }
 
+        .profile-account-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin: 24px 0 12px;
+        }
+
+        .profile-account-actions .btn-update-face {
+            margin-top: 0;
+        }
+
+        .profile-account-actions #line-link-button,
+        .profile-account-actions #line-link-result {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
         .btn-update-face:hover {
             color: #262626;
             background-color: #f0f0f0;
@@ -468,8 +486,8 @@
 
 
 
-    <link rel="stylesheet" href="theme.css?v=20261118home">
-    <script src="ui.js?v=20261118quick"></script>
+    <link rel="stylesheet" href="theme.css?v=20261119nav">
+    <script src="ui.js?v=20261118ux"></script>
     <script src="face-camera.js?v=20261118lazy"></script>
     <script src="online.js?v=20260917b" defer></script>
 </head>
@@ -557,19 +575,18 @@
                     <option value="dark">ダークモード</option>
                 </select>
             </section>
-            <br>
-            <button class="btn-update-face" onclick="startFaceUpdate()">顔認証情報をアップデートする</button>
-            <br>
+            <div class="profile-account-actions">
+            <button class="btn-update-face" type="button" onclick="startFaceUpdate()">顔認証情報をアップデートする</button>
             <button id="line-link-button" class="btn-large" type="button" onclick="createLineLinkCode()">LINE通知を連携する</button>
             <button id="line-unlink-button" class="btn-delete-account" type="button" onclick="unlinkLineAccount()" style="display:none; margin-top:8px;">LINE連携を解除する</button>
             <div id="line-link-status" style="margin-top:8px; color:#64748b; font-size:13px;" aria-live="polite">連携状態を確認中...</div>
             <div id="line-link-result" style="display:none; margin:12px 0 4px; padding:14px; border-radius:12px; background:rgba(28,189,197,.1); color:var(--ui-ink,#1e293b); line-height:1.7;"></div>
-            <br>
-            <button class="btn-delete-account" onclick="deleteAccount()">ユーザー情報を削除する</button>
+            </div>
+            <button class="btn-delete-account" type="button" onclick="deleteAccount()">ユーザー情報を削除する</button>
 
-            <div id="blocked-users-panel" style="margin-top:28px; padding-top:20px; border-top:1px solid rgba(0,0,0,0.08); text-align:left;">
-                <h3 style="margin:0 0 12px; color:#1e293b;">ブロック中のユーザー</h3>
-                <div id="blocked-users-list" style="color:#64748b; font-size:13px;">読み込み中...</div>
+            <div id="blocked-users-panel" style="margin-top:28px; padding-top:20px; border-top:1px solid var(--ui-line, rgba(0,0,0,0.08)); text-align:left;">
+                <h3 style="margin:0 0 12px; color:var(--ui-ink, #1e293b);">ブロック中のユーザー</h3>
+                <div id="blocked-users-list" style="color:var(--ui-muted, #64748b); font-size:13px;">読み込み中...</div>
             </div>
         </div>
     </main>

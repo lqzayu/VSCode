@@ -136,9 +136,16 @@ function installHeikoFooterNavigation() {
     if (!footerLinks) return;
     const isLoggedIn = Boolean(localStorage.getItem("sessionToken") && (localStorage.getItem("userId") || localStorage.getItem("userEmail")));
     const isAdmin = localStorage.getItem("userId") === "admin" && localStorage.getItem("isImpersonating") !== "true";
+    const feedbackLink = `<a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>`;
+    const legalLinks = `<a href="terms.html">利用規約</a><a href="privacy.html">プライバシーポリシー</a>`;
+    // 未ログインのときは、押してもログイン画面に戻されるだけのリンクを出さない
+    if (!isLoggedIn) {
+        footerLinks.innerHTML = `${feedbackLink}${legalLinks}`;
+        return;
+    }
     footerLinks.innerHTML = `<a href="main.html?guide=1">使い方</a><a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a><a href="main.html?tab=recruit">募集投稿</a><a href="main.html?tab=search">ユーザーを探す</a><a href="messages.html">メッセージ</a><a href="profile.html">マイページ</a><a href="ai-study.html">AI学習相談</a><a href="junior-meister.html">JM計算</a><a class="heiko-footer-admin" href="admin.html"${isAdmin ? "" : " style=\"display:none\""}>管理者</a>${isLoggedIn ? "<button type=\"button\" class=\"heiko-footer-logout\" onclick=\"if (typeof logout === 'function') { logout(); } else { clearHeikoSession(); location.href='index.html'; } return false;\">ログアウト</button>" : ""}<a href="terms.html">利用規約</a><a href="privacy.html">プライバシーポリシー</a>`;
 }
-const HEIKO_SESSION_KEYS = ["userId", "userEmail", "userName", "profileImage", "userGrade", "userDept", "sessionToken", "adminSessionToken", "adminToken", "isImpersonating", "chatTarget"];
+const HEIKO_SESSION_KEYS = ["userId", "userEmail", "userName", "profileImage", "userGrade", "userDept", "sessionToken", "adminSessionToken", "adminToken", "isImpersonating", "chatTarget", "chatTargetName"];
 const HEIKO_REMEMBER_UNTIL_KEY = "heikoRememberUntil";
 const HEIKO_SESSION_ONLY_KEY = "heikoSessionOnly";
 const HEIKO_SESSION_ACTIVE_KEY = "heikoSessionActive";
@@ -358,8 +365,6 @@ function installHeikoSharedStyles() {
         }
         .navbar .nav-guide-button {
             font-family: inherit;
-            font-size: inherit;
-            font-weight: inherit;
             line-height: inherit;
         }
         .navbar .nav-item#nav-admin-btn,

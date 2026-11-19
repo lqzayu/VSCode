@@ -449,7 +449,7 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="theme.css?v=20261118home">
+    <link rel="stylesheet" href="theme.css?v=20261119nav">
     <style id="chat-fixed-layout">
         html,
         body[data-page="chat"] {
@@ -540,7 +540,7 @@
             }
         }
     </style>
-    <script src="ui.js?v=20261118quick"></script>
+    <script src="ui.js?v=20261118ux"></script>
     <script src="online.js?v=20260917b" defer></script>
     <script>window.HEIKO_FIREBASE_CHAT_ENABLED = true;</script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js" defer></script>
@@ -801,7 +801,12 @@
             window.location.href = "messages.html";
         }
 
-        document.getElementById("chat-title").innerText = `💬 対話相手: ${targetEmail}`;
+        // 相手の表示名がわかるときは名前で出し、ユーザーIDは補足として添える
+        const targetName = localStorage.getItem("chatTargetName") || "";
+        document.getElementById("chat-title").innerText = targetName && targetName !== targetEmail
+            ? `💬 ${targetName}（${targetEmail}）`
+            : `💬 対話相手: ${targetEmail}`;
+        if (targetName) document.title = `${targetName}とのチャット - 平工マッチング`;
 
         function getReportReason() {
             const input = prompt(
@@ -992,6 +997,7 @@
                 });
                 alert("ユーザーをブロックしました。");
                 localStorage.removeItem("chatTarget");
+                localStorage.removeItem("chatTargetName");
                 window.location.href = "messages.html";
             } catch (e) {
                 alert(chatErrorMessage(e, "ブロックに失敗しました: "));
@@ -1215,6 +1221,7 @@
                     targetUserId: targetEmail
                 });
                 localStorage.removeItem("chatTarget");
+                localStorage.removeItem("chatTargetName");
                 window.location.href = "messages.html";
             } catch (e) {
                 if (deleteButton) {

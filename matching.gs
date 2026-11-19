@@ -2,7 +2,7 @@ function doGet(e) {
   return createRes("success", "GAS API is working");
 }
 
-const SITE_URL = "https://lqzayu.github.io/VSCode/";
+const SITE_URL = "https://lqzayu.github.io/Heiko-Matching/";
 const FIREBASE_DATABASE_URL = PropertiesService.getScriptProperties().getProperty("FIREBASE_DATABASE_URL") || "https://heiko-matching-chat-default-rtdb.asia-southeast1.firebasedatabase.app";
 
 const ADMIN_USER_ID = "admin";
