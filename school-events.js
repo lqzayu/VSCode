@@ -36,7 +36,8 @@
                     signal: controller.signal
                 });
                 const result = await res.json();
-                if (typeof window.handleHeikoSessionResponse === "function" && window.handleHeikoSessionResponse(result)) throw new Error("session");
+                // 学校行事はおまけの表示なので、読み込めなくてもログアウトさせない。
+                // GASが古いバージョンのままだと getSchoolEvents を知らず「ログインの有効期限」エラーが返るため、ここで判定するとログイン直後に追い出されてしまう
                 if (!result || result.status !== "success" || !Array.isArray(result.message)) throw new Error((result && result.message) || "学校行事を読み込めませんでした");
                 writeCache(result.message);
                 if (typeof onUpdate === "function") onUpdate(result.message, { fromCache: false });
