@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ジュニアマイスター計算 - 平工マッチング</title>
+    <title>ジュニアマイスター計算（β版） - 平工マッチング</title>
     <link rel="icon" href="icon-192.png">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#254f3d">
@@ -1262,8 +1262,8 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="theme.css?v=20261119nav">
-    <script src="ui.js?v=20261118ux"></script>
+    <link rel="stylesheet" href="theme.css?v=20261119beta">
+    <script src="ui.js?v=20261119beta"></script>
     <script src="online.js?v=20260917b" defer></script>
     <style>
         /* ジュニアマイスター計算ページ専用 */
@@ -1287,7 +1287,7 @@
         .jm-checks li.ok { color: var(--ui-ink); }
         .jm-checks li.ok::before { content: "✓"; color: var(--ui-green); }
         .jm-checks li.ng::before { content: "✕"; color: var(--ui-danger); }
-        #recruit-form-area { display: flex; flex-direction: column; gap: 24px; }
+        #recruit-form-area { display: flex; flex-direction: column; gap: 24px; scroll-margin-top: 140px; }
         #recruit-form-area .sidebar-form { max-width: none; }
         .jm-sub-title { font-size: 1.15rem; font-weight: 800; margin: 0 0 12px; color: var(--ui-ink); }
         .jm-sub-title + .jm-hint { margin-top: 0; }
@@ -1309,6 +1309,14 @@
         .jm-warn { margin: 12px 0 0; color: var(--ui-danger); font-size: 12px; font-weight: 700; line-height: 1.5; }
         .jm-card .card-action-row { margin-top: 16px; }
         .jm-empty { grid-column: 1 / -1; padding: 48px 20px; text-align: center; color: var(--ui-muted); font-size: 14px; font-weight: 700; border: 1px dashed var(--ui-line); border-radius: 20px; }
+        .jm-rec-lead { margin: -6px 0 16px; font-size: 13px; color: var(--ui-muted); }
+        .jm-rec-grade { display: inline-block; margin-left: 8px; font-size: 13px; font-weight: 800; color: var(--ui-muted); }
+        .jm-rec-gain { color: var(--ui-green); }
+        .jm-rec-reach { margin: 0 0 8px; color: var(--ui-green); font-size: 13px; font-weight: 800; }
+        .jm-rec-reason { margin: 0 0 10px; color: var(--ui-ink); font-size: 13px; line-height: 1.6; }
+        .jm-rec-combo { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border: 1px dashed var(--ui-line); border-radius: 16px; color: var(--ui-ink); font-size: 13px; line-height: 1.6; }
+        .jm-rec-combo strong { font-size: 12px; color: var(--ui-green); }
+        .jm-beta-note { margin: 14px 0 0; padding: 10px 12px; border: 1px dashed currentColor; border-radius: 12px; font-size: 12px; line-height: 1.7; opacity: .92; }
         .jm-note { margin: 0; color: var(--ui-muted); font-size: 12px; line-height: 1.8; }
         .jm-note a { color: var(--ui-green); font-weight: 700; }
         @media screen and (max-width: 768px) {
@@ -1372,14 +1380,23 @@
                 <section id="search-area">
                     <div class="usage-intro-card">
                         <div>
-                            <span class="usage-intro-label">POINT CALCULATOR</span>
+                            <span class="usage-intro-label">POINT CALCULATOR <span class="jm-beta-badge">β版</span></span>
                             <h1>取った資格から、ジュニアマイスターの点数を計算しよう。</h1>
                             <p>資格・検定と級を選ぶと、全工協の区分表に沿って合計点と認定の目安を出します。同じ区分の資格は高い方だけ数えるなど、申請のルールも反映します。</p>
+                            <p class="jm-beta-note"><strong>β版（試験公開中）</strong>：点数の計算やおすすめの資格は、内容を確認しながら改善している途中です。結果は目安として使い、実際の申請は学校の担当の先生に確認してください。おかしな点に気づいたら、意見箱から教えてください。</p>
                         </div>
                         <a class="usage-intro-button" href="https://zenkoukyo.or.jp/index_jm/" target="_blank" rel="noopener" style="text-decoration:none; text-align:center;">区分表を見る</a>
                     </div>
                 </section>
             </div>
+
+            <section id="jm-recommend-area" aria-labelledby="jm-recommend-title">
+                <div class="jm-list-head">
+                    <h2 id="jm-recommend-title" style="font-size: 1.35rem; font-weight: 800; margin: 0; color: var(--ui-ink);">おすすめの資格</h2>
+                </div>
+                <p id="jm-recommend-lead" class="jm-hint jm-rec-lead" aria-live="polite"></p>
+                <div class="user-grid" id="jm-recommend-list"></div>
+            </section>
 
             <section id="recruit-form-area">
                 <div class="sidebar-form">
@@ -1661,6 +1678,65 @@
         const KOSHU_KEY = ITEMS.find(item => item.no === 191).key;
         const OTSUSHU_NOS = new Set([192, 193, 194, 195, 196]);
 
+        // ===== おすすめ資格用のデータ（仮の値。学校の実情に合わせて直してください） =====
+        // 学科ごとに相性の良い分野。zenkoukyo（全工協の検定）は校内で受けやすいので全学科に入れている
+        const DEPT_CATS = {
+            "機械工学科": ["zenkoukyo", "kikai", "gino", "pc", "other"],
+            "電気工学科": ["zenkoukyo", "denki", "shobo", "joho"],
+            "制御工学科": ["zenkoukyo", "denki", "kikai", "joho", "pc"],
+            "土木環境工学科": ["zenkoukyo", "kenchiku", "kankyo"],
+            "情報工学科": ["zenkoukyo", "joho", "pc"]
+        };
+        // 学科で定番の資格（[キー, 級の番号]）。何も登録していない人にも、まずここから出す
+        const DEPT_STARTERS = {
+            "機械工学科": [["103:基礎製図検定", 0], ["104:機械製図検定", 1], ["101:計算技術検定", 2], ["191:危険物取扱者（甲種・乙種4類・丙種）", 1], ["131:技能講習（1つ目）", 0]],
+            "電気工学科": [["152:電気工事士", 1], ["191:危険物取扱者（甲種・乙種4類・丙種）", 1], ["101:計算技術検定", 2], ["102:情報技術検定", 3], ["236:アマチュア無線技士", 3]],
+            "制御工学科": [["152:電気工事士", 1], ["101:計算技術検定", 2], ["102:情報技術検定", 3], ["129:機械保全技能検定", 1], ["105:パソコン利用技術検定", 2]],
+            "土木環境工学科": [["179:測量士・測量士補", 1], ["103:基礎製図検定", 0], ["101:計算技術検定", 2], ["181:建築CAD検定", 3], ["215:eco検定（環境社会検定）", 0]],
+            "情報工学科": [["102:情報技術検定", 2], ["221:情報処理技術者試験（応用・基本・ITパスポート）", 2], ["105:パソコン利用技術検定", 2], ["101:計算技術検定", 2], ["282:MOS Excel", 1]]
+        };
+        // 分野をまたぐ「次の一歩」。左の資格を持っている人に、右の資格を優先して出す（区分番号:名前 のキーで指定）
+        const RELATED = {
+            "101:計算技術検定": ["114:実用数学技能検定", "102:情報技術検定"],
+            "102:情報技術検定": ["221:情報処理技術者試験（応用・基本・ITパスポート）", "105:パソコン利用技術検定", "222:情報セキュリティマネジメント試験"],
+            "103:基礎製図検定": ["104:機械製図検定", "107:初級CAD検定", "182:トレース技能検定"],
+            "104:機械製図検定": ["148:三次元CAD認定技術者試験", "289:3次元CAD利用技術者", "295:機械設計技術者試験"],
+            "105:パソコン利用技術検定": ["282:MOS Excel", "281:MOS Word", "287:ICTプロフィシエンシー検定（P検）"],
+            "106:リスニング英語検定": ["111:CEFRに対応している外国語検定（英検など）", "112:技術英語能力検定"],
+            "107:初級CAD検定": ["181:建築CAD検定", "289:2次元CAD利用技術者", "148:三次元CAD認定技術者試験"],
+            "108:グラフィックデザイン検定": ["163:色彩検定", "283:CGクリエイター検定", "283:DTP検定"],
+            "152:電気工事士": ["151:電気主任技術者", "173:電気工事施工管理技術検定", "200:消防設備士（4類）", "232:工事担任者（デジタル系）"],
+            "191:危険物取扱者（甲種・乙種4類・丙種）": ["214:毒物劇物取扱責任者", "200:消防設備士（4類）", "192:危険物取扱者（乙種1類）"],
+            "221:情報処理技術者試験（応用・基本・ITパスポート）": ["222:情報セキュリティマネジメント試験", "298:シスコ技術者認定", "271:ネットワークスペシャリスト試験"],
+            "236:アマチュア無線技士": ["233:陸上特殊無線技士", "232:工事担任者（デジタル系）"],
+            "129:機械保全技能検定": ["308:自主保全士", "253:品質管理検定（QC検定）"],
+            "142:JIS溶接技能者評価試験（1種類目）": ["266:非破壊試験技術者 レベル2"],
+            "163:色彩検定": ["161:色彩士検定", "162:カラーコーディネーター検定"],
+            "181:建築CAD検定": ["172:建築施工管理技術検定", "184:福祉住環境コーディネーター検定試験"]
+        };
+        // 「2つ目」「別の作業」のように、前の資格を取った人だけが申請できる項目（区分番号 → 前提の区分番号）
+        const FOLLOW_UP = { 122: 121, 123: 122, 124: 121, 125: 124, 130: 129, 132: 131, 133: 132, 135: 134, 136: 135, 143: 142, 144: 143, 146: 145, 147: 146, 252: 251 };
+        // 取りやすさ（1=取りやすい 2=ふつう 3=難しい 4=とても難しい）。指定がなければ点数から推定する
+        const DIFFICULTY_OVERRIDES = {
+            "191:危険物取扱者（甲種・乙種4類・丙種）": [4, 2, 1],
+            "152:電気工事士": [3, 2],
+            "221:情報処理技術者試験（応用・基本・ITパスポート）": [4, 3, 2]
+        };
+        const DIFFICULTY_LABELS = ["", "取りやすい", "ふつう", "難しい", "とても難しい"];
+        function difficultyOf(item, grade) {
+            const override = DIFFICULTY_OVERRIDES[item.key];
+            if (override && override[grade]) return override[grade];
+            const pts = item.grades[grade][1];
+            return pts >= 30 ? 4 : pts >= 20 ? 3 : pts >= 7 ? 2 : 1;
+        }
+        Object.values(DEPT_STARTERS).forEach(list => list.forEach(([key, grade]) => {
+            const item = ITEMS.find(i => i.key === key);
+            if (!item || !item.grades[grade]) console.warn("おすすめ用データに存在しない資格があります:", key, grade);
+        }));
+        Object.entries(RELATED).forEach(([from, list]) => [from, ...list].forEach(key => {
+            if (!ITEMS.some(item => item.key === key)) console.warn("おすすめ用データに存在しない資格があります:", key);
+        }));
+
         const currentUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";
         const adminButton = document.getElementById("nav-admin-btn");
         if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") {
@@ -1802,6 +1878,8 @@
             spEl.className = special ? "ok" : "";
             spEl.textContent = `特別表彰の目安（ゴールド＋S/Aランク資格＋上位8資格で60点以上）：上位8資格 ${top8}点`;
 
+            renderRecommendations();
+
             const list = $("jm-list");
             if (!rows.length) {
                 list.innerHTML = '<div class="jm-empty">まだ資格が登録されていません。上のフォームから追加してください。</div>';
@@ -1824,6 +1902,172 @@
                 </div>`).join("");
         }
 
+        // ===== おすすめ資格 =====
+        // 資格を1つずつ仮に追加して evaluate() で計算し直し、実際に増える点数を求める（同じ区分は高い方だけ、などのルールを二重に持たないため）
+        function simulate(extra) {
+            const saved = entries;
+            entries = [...saved.filter(e => e.manual || !extra.some(x => x.key === e.key)), ...extra];
+            try { return evaluate(); } finally { entries = saved; }
+        }
+
+        function recommendationGoal(state) {
+            if (state.base < 20) return { useBase: true, need: 20 - state.base, label: "申請できる20点" };
+            if (state.total < 30) return { useBase: false, need: 30 - state.total, label: "シルバー" };
+            if (state.total < 45) return { useBase: false, need: 45 - state.total, label: "ゴールド" };
+            return { useBase: false, need: 0, label: "" };
+        }
+
+        function relevanceOf(item, grade, held, dept, beginner) {
+            const reasons = [];
+            let score = 0;
+            const sameGroup = held.find(h => h.item.group === item.group);
+            if (sameGroup) {
+                score += 30;
+                reasons.push(sameGroup.item.key === item.key
+                    ? `持っている${sameGroup.item.grades[sameGroup.grade][0]}の次のステップ`
+                    : `${sameGroup.item.name}と同じ区分で、より高い点数`);
+            }
+            const relatedFrom = held.find(h => (RELATED[h.item.key] || []).includes(item.key));
+            if (relatedFrom && !sameGroup) {
+                score += 20;
+                reasons.push(`${relatedFrom.item.name}の次の一歩`);
+            }
+            const sameCat = held.filter(h => h.item.cat === item.cat && h.item.group !== item.group).length;
+            if (sameCat > 0) {
+                score += Math.min(24, sameCat * 8);
+                const catName = ((CATEGORIES.find(c => c.id === item.cat) || {}).name || "").replace(/（.*）/, "");
+                const catLabel = item.cat === "zenkoukyo" ? "全工協の検定" : `${catName}の資格`;
+                reasons.push(`${catLabel}を${sameCat}つ持っている`);
+            }
+            const starter = dept && (DEPT_STARTERS[dept] || []).some(([key, g]) => key === item.key && g === grade);
+            if (starter) {
+                // 定番資格は、まだ申請条件を満たしていない人ほど強く勧める
+                score += beginner ? 30 : 10;
+                reasons.push(`${dept}で定番`);
+            }
+            if (dept && !starter && (DEPT_CATS[dept] || []).includes(item.cat)) {
+                score += item.cat === "zenkoukyo" ? 10 : 15;
+                reasons.push(item.cat === "zenkoukyo" ? "校内で受けやすい全工協の検定" : `${dept}向け`);
+            }
+            const level = difficultyOf(item, grade);
+            score -= level * 12;
+            return { score, reasons, level };
+        }
+
+        function buildRecommendations() {
+            const state = evaluate();
+            const goal = recommendationGoal(state);
+            const held = entries.filter(e => !e.manual).map(e => ({ item: ITEM_BY_KEY.get(e.key), grade: e.grade })).filter(h => h.item);
+            const heldNos = new Set(held.map(h => h.item.no));
+            const dept = localStorage.getItem("userDept") || "";
+            const bestPerItem = new Map();
+
+            ITEMS.forEach(item => {
+                if (FOLLOW_UP[item.no] && !heldNos.has(FOLLOW_UP[item.no])) return;
+                item.grades.forEach(([label], grade) => {
+                    // 特別表彰・特別賞は狙って取るものではないので候補にしない
+                    if (label.includes("特別")) return;
+                    const after = simulate([{ key: item.key, grade }]);
+                    const gain = goal.useBase ? after.base - state.base : after.total - state.total;
+                    if (gain <= 0) return;
+                    const rel = relevanceOf(item, grade, held, dept, goal.useBase);
+                    const reaches = goal.need > 0 && gain >= goal.need;
+                    // 1つで届く資格は少し優先するが、難しい資格ばかりにならないよう関連度・取りやすさと合わせて比べる
+                    const candidate = { item, grade, gain, reaches, ...rel, score: rel.score + (reaches ? 8 : 0) + Math.min(gain, goal.need || gain) * 0.5 };
+                    const prev = bestPerItem.get(item.key);
+                    if (!prev || compareCandidates(candidate, prev) < 0) bestPerItem.set(item.key, candidate);
+                });
+            });
+
+            const ranked = [...bestPerItem.values()].sort(compareCandidates);
+            // 同じ分野ばかり並ばないよう、1つの分野からは2件まで
+            const top = [];
+            const perCat = {};
+            for (const c of ranked) {
+                if ((perCat[c.item.cat] || 0) >= 2) continue;
+                perCat[c.item.cat] = (perCat[c.item.cat] || 0) + 1;
+                top.push(c);
+                if (top.length >= 5) break;
+            }
+            // 1つでは届かないときは、関連度の高い順に足していき、届く組み合わせを1つ作る
+            let combo = null;
+            if (goal.need > 0 && !top.some(c => c.reaches && c.level <= 2)) {
+                const picked = [];
+                // 取りやすい資格（ふつう以下）だけで届く組み合わせを探す
+                const pool = ranked.filter(c => c.level <= 2).sort((a, b) => (b.score + b.gain * 2) - (a.score + a.gain * 2));
+                for (const c of pool) {
+                    if (picked.some(p => p.item.group === c.item.group)) continue;
+                    if (picked.filter(p => p.item.cat === c.item.cat).length >= 2) continue;
+                    picked.push(c);
+                    const after = simulate(picked.map(p => ({ key: p.item.key, grade: p.grade })));
+                    const gained = goal.useBase ? after.base - state.base : after.total - state.total;
+                    if (gained >= goal.need) { combo = { picked: [...picked], gained }; break; }
+                    if (picked.length >= 6) break;
+                }
+            }
+            return { goal, top, combo, dept };
+        }
+
+        function compareCandidates(a, b) {
+            return (b.score - a.score) || (b.gain - a.gain) || (a.level - b.level);
+        }
+
+        function renderRecommendations() {
+            const box = $("jm-recommend-list");
+            const lead = $("jm-recommend-lead");
+            if (!box || !lead) return;
+            const { goal, top, combo, dept } = buildRecommendations();
+            lead.textContent = goal.need > 0
+                ? `${goal.label}まであと${goal.need}点。${dept ? `学科（${dept}）と` : ""}持っている資格をもとに選びました。`
+                : `ゴールドの基準に達しています。さらに点数を伸ばすならこちら。${dept ? "" : "マイページで学科を設定すると、学科に合った資格を優先します。"}`;
+            if (!dept && goal.need > 0) lead.textContent += "マイページで学科を設定すると、より合った資格を出せます。";
+            if (!top.length) {
+                box.innerHTML = '<div class="jm-empty">おすすめできる資格が見つかりませんでした。</div>';
+                return;
+            }
+            const card = c => {
+                const [label, pts] = c.item.grades[c.grade];
+                const reasons = c.reasons.length ? c.reasons.join("・") : "点数を伸ばしやすい資格";
+                return `
+                <div class="user-card jm-card jm-rec-card">
+                    <div class="jm-card-head">
+                        <h3>${escapeHtml(c.item.name)}<span class="jm-rec-grade">${escapeHtml(label)}</span></h3>
+                        <div class="jm-pts jm-rec-gain">+${c.gain}<small>点</small></div>
+                    </div>
+                    ${c.reaches ? `<p class="jm-rec-reach">これ1つで${escapeHtml(goal.label)}に届きます</p>` : ""}
+                    <p class="jm-rec-reason">${escapeHtml(reasons)}</p>
+                    <div class="card-tags">
+                        <span class="user-badge">取りやすさ：${DIFFICULTY_LABELS[c.level]}</span>
+                        <span class="user-badge">区分表 ${pts}点</span>
+                    </div>
+                    <div class="card-action-row">
+                        <button class="btn-card-action jm-rec-pick" type="button" data-key="${escapeHtml(c.item.key)}" data-grade="${c.grade}">取得したら登録する</button>
+                    </div>
+                </div>`;
+            };
+            let html = top.map(card).join("");
+            if (combo) {
+                const names = combo.picked.map(c => `${c.item.name}（${c.item.grades[c.grade][0]}）`).join(" ＋ ");
+                html = `<div class="jm-rec-combo"><strong>組み合わせ例</strong><span>${escapeHtml(names)} で +${combo.gained}点 → ${escapeHtml(goal.label)}に届きます</span></div>` + html;
+            }
+            box.innerHTML = html;
+        }
+
+        // おすすめカードから、追加フォームにその資格と級を入れた状態で移動する
+        function pickRecommendation(key, grade) {
+            const item = ITEM_BY_KEY.get(key);
+            if (!item) return;
+            searchInput.value = "";
+            categorySelect.value = item.cat;
+            fillItems();
+            itemSelect.value = key;
+            fillGrades();
+            gradeSelect.value = String(grade);
+            $("recruit-form-area").scrollIntoView({ behavior: "smooth", block: "start" });
+            itemSelect.focus({ preventScroll: true });
+            notify(`${item.name}（${item.grades[grade][0]}）をフォームに入れました。取得したら「追加する」を押してください`, "info");
+        }
+
         function escapeHtml(value) {
             return String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
         }
@@ -1833,6 +2077,10 @@
         itemSelect.addEventListener("change", fillGrades);
         $("jm-add").addEventListener("click", addEntry);
         $("jm-manual-add").addEventListener("click", addManual);
+        $("jm-recommend-list").addEventListener("click", event => {
+            const button = event.target.closest(".jm-rec-pick");
+            if (button) pickRecommendation(button.dataset.key, Number(button.dataset.grade));
+        });
         $("jm-list").addEventListener("click", event => {
             const button = event.target.closest(".jm-remove");
             if (button) removeEntry(Number(button.dataset.index));

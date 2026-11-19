@@ -304,7 +304,7 @@ function installRecruitmentPostButton() {
     if (document.body.dataset.page !== "junior-meister") {
         const promo = document.createElement("div");
         promo.className = "heiko-jm-promo";
-        promo.innerHTML = "<p>ジュニアマイスターを計算してみませんか？</p><a class=\"heiko-jm-promo-link\" href=\"junior-meister.html\"><span>点数を計算する</span><span class=\"heiko-recruit-post-arrow\" aria-hidden=\"true\">→</span></a>";
+        promo.innerHTML = "<p>ジュニアマイスターを計算してみませんか？<span class=\"jm-beta-badge\">β版</span></p><a class=\"heiko-jm-promo-link\" href=\"junior-meister.html\"><span>点数を計算する</span><span class=\"heiko-recruit-post-arrow\" aria-hidden=\"true\">→</span></a>";
         panel.appendChild(promo);
     }
 
