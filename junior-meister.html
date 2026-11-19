@@ -1262,8 +1262,8 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="theme.css?v=20261119beta">
-    <script src="ui.js?v=20261119beta"></script>
+    <link rel="stylesheet" href="theme.css?v=20261119events">
+    <script src="ui.js?v=20261119events"></script>
     <script src="online.js?v=20260917b" defer></script>
     <style>
         /* ジュニアマイスター計算ページ専用 */
@@ -1326,9 +1326,56 @@
         .jm-rec-close-label, .jm-rec-details[open] .jm-rec-open-label { display: none; }
         .jm-rec-details[open] .jm-rec-close-label { display: inline; }
         .jm-rec-body { padding: 4px 20px 20px; border-top: 1px solid var(--ui-line); }
-        .jm-rec-details[open] .jm-rec-body { animation: jm-rec-open .22s ease; }
-        @keyframes jm-rec-open { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
-        @media (prefers-reduced-motion: reduce) { .jm-rec-details[open] .jm-rec-body { animation: none; } .jm-rec-chevron { transition: none; } }
+        /* 開くとき：パネル全体がふわっと広がり、カードが上から順に浮かび上がる。アイコンは一度だけ弾む */
+        .jm-rec-chevron { transition: transform .35s cubic-bezier(.34, 1.56, .64, 1); }
+        .jm-rec-summary-icon { transition: transform .3s ease, background-color .3s ease; }
+        .jm-rec-details[open] { animation: jm-rec-glow 1s ease-out; }
+        .jm-rec-details[open] .jm-rec-summary-icon { animation: jm-rec-pop .55s cubic-bezier(.34, 1.56, .64, 1); }
+        .jm-rec-details[open] .jm-rec-body { animation: jm-rec-open .38s cubic-bezier(.22, 1, .36, 1); transform-origin: top center; }
+        .jm-rec-details[open] .jm-rec-lead { animation: jm-rec-rise .4s ease both .08s; }
+        .jm-rec-details[open] #jm-recommend-list > * { animation: jm-rec-rise .5s cubic-bezier(.22, 1, .36, 1) both; }
+        .jm-rec-details[open] #jm-recommend-list > :nth-child(1) { animation-delay: .12s; }
+        .jm-rec-details[open] #jm-recommend-list > :nth-child(2) { animation-delay: .19s; }
+        .jm-rec-details[open] #jm-recommend-list > :nth-child(3) { animation-delay: .26s; }
+        .jm-rec-details[open] #jm-recommend-list > :nth-child(4) { animation-delay: .33s; }
+        .jm-rec-details[open] #jm-recommend-list > :nth-child(5) { animation-delay: .40s; }
+        .jm-rec-details[open] #jm-recommend-list > :nth-child(n+6) { animation-delay: .47s; }
+        .jm-rec-details[open] .jm-rec-gain { animation: jm-rec-gain .6s cubic-bezier(.34, 1.56, .64, 1) both .45s; display: inline-block; }
+        @keyframes jm-rec-open { from { opacity: 0; transform: translateY(-10px) scaleY(.96); } to { opacity: 1; transform: none; } }
+        @keyframes jm-rec-rise { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
+        @keyframes jm-rec-pop { 0% { transform: scale(1) rotate(0); } 40% { transform: scale(1.22) rotate(-10deg); } 70% { transform: scale(.94) rotate(4deg); } 100% { transform: scale(1) rotate(0); } }
+        @keyframes jm-rec-gain { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: scale(1); } }
+        @keyframes jm-rec-glow { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, .35), 0 14px 30px rgba(15, 23, 42, .08); } 100% { box-shadow: 0 0 0 14px rgba(245, 158, 11, 0), 0 14px 30px rgba(15, 23, 42, .08); } }
+        .jm-rec-summary:hover .jm-rec-summary-icon { transform: rotate(-8deg) scale(1.06); }
+        /* 閉じるとき：開くときの逆順。カードが下から順に沈んで消え、最後にパネルがすっと畳まれる */
+        .jm-rec-details.is-closing { animation: jm-rec-glow-out .5s ease-out; }
+        .jm-rec-details.is-closing .jm-rec-summary-icon { animation: jm-rec-pop-out .45s cubic-bezier(.34, 1.56, .64, 1); }
+        .jm-rec-details.is-closing .jm-rec-chevron { transform: translateY(-2px) rotate(45deg); }
+        .jm-rec-details.is-closing .jm-rec-open-label { display: inline; }
+        .jm-rec-details.is-closing .jm-rec-close-label { display: none; }
+        .jm-rec-details.is-closing .jm-rec-lead { animation: jm-rec-sink .25s ease both .2s; }
+        .jm-rec-details.is-closing #jm-recommend-list > * { animation: jm-rec-sink .28s cubic-bezier(.64, 0, .78, 0) both; }
+        .jm-rec-details.is-closing #jm-recommend-list > :nth-last-child(1) { animation-delay: 0s; }
+        .jm-rec-details.is-closing #jm-recommend-list > :nth-last-child(2) { animation-delay: .04s; }
+        .jm-rec-details.is-closing #jm-recommend-list > :nth-last-child(3) { animation-delay: .08s; }
+        .jm-rec-details.is-closing #jm-recommend-list > :nth-last-child(4) { animation-delay: .12s; }
+        .jm-rec-details.is-closing #jm-recommend-list > :nth-last-child(5) { animation-delay: .16s; }
+        .jm-rec-details.is-closing #jm-recommend-list > :nth-last-child(n+6) { animation-delay: .2s; }
+        .jm-rec-details.is-closing .jm-rec-body { animation: none; }
+        .jm-rec-body.is-expanding { overflow: hidden; transition: height .4s cubic-bezier(.22, 1, .36, 1), padding .4s cubic-bezier(.22, 1, .36, 1); }
+        .jm-rec-body.is-collapsing {
+            overflow: hidden; height: 0 !important; padding-top: 0; padding-bottom: 0; border-top-color: transparent; opacity: 0;
+            transition: height .36s cubic-bezier(.4, 0, .2, 1) .18s, padding .36s cubic-bezier(.4, 0, .2, 1) .18s, border-color .2s ease .3s, opacity .3s ease .22s;
+        }
+        @keyframes jm-rec-sink { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(14px) scale(.97); } }
+        @keyframes jm-rec-pop-out { 0% { transform: scale(1) rotate(0); } 45% { transform: scale(.82) rotate(12deg); } 100% { transform: scale(1) rotate(0); } }
+        @keyframes jm-rec-glow-out { 0% { box-shadow: 0 0 0 0 rgba(148, 163, 184, .3); } 100% { box-shadow: 0 0 0 10px rgba(148, 163, 184, 0); } }
+        @media (prefers-reduced-motion: reduce) {
+            .jm-rec-details[open], .jm-rec-details[open] .jm-rec-summary-icon, .jm-rec-details[open] .jm-rec-body,
+            .jm-rec-details[open] .jm-rec-lead, .jm-rec-details[open] #jm-recommend-list > *, .jm-rec-details[open] .jm-rec-gain,
+            .jm-rec-details.is-closing, .jm-rec-details.is-closing * { animation: none !important; }
+            .jm-rec-chevron, .jm-rec-summary-icon { transition: none; }
+        }
         @media screen and (max-width: 768px) {
             .jm-rec-summary { padding: 16px; gap: 12px; }
             .jm-rec-summary-icon { width: 36px; height: 36px; font-size: 18px; }
@@ -1368,6 +1415,7 @@
             <a href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header" class="nav-item">意見箱</a>
             <a class="nav-item" href="main.html?tab=search">ユーザーを探す</a>
             <a class="nav-item" href="messages.html">メッセージ</a>
+            <a class="nav-item" href="events.html">学校行事</a>
             <a class="nav-item" href="ai-study.html">AI学習相談</a>
             <a class="nav-item active" href="junior-meister.html">JM計算</a>
 
@@ -2119,9 +2167,65 @@
         // 開いた・閉じた状態は端末ごとに覚えておく
         const recommendOpenKey = "junior-meister:recommend-open:" + currentUserId;
         try { $("jm-recommend-area").open = localStorage.getItem(recommendOpenKey) === "1"; } catch (error) { /* 保存できない環境では閉じたまま */ }
+        // <details> は閉じると中身が一瞬で消えるので、閉じるときだけ一度止めてアニメーションを見せてから閉じる
+        // <details> は開閉すると高さが一瞬で変わるので、高さを実際の値と0の間で滑らかに動かしてから開閉を確定する
+        const RECOMMEND_OPEN_MS = 420;
+        const RECOMMEND_CLOSE_MS = 560;
+        let recommendRenderedByClick = false;
+        let recommendTimer = null;
+        function recommendBody() { return $("jm-recommend-area").querySelector(".jm-rec-body"); }
+        function clearRecommendHeight() {
+            const body = recommendBody();
+            body.classList.remove("is-expanding", "is-collapsing");
+            body.style.height = "";
+            body.style.paddingTop = "";
+            body.style.paddingBottom = "";
+        }
+        $("jm-recommend-area").querySelector("summary").addEventListener("click", event => {
+            const details = $("jm-recommend-area");
+            event.preventDefault();
+            if (details.classList.contains("is-closing")) return;
+            const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            const body = recommendBody();
+            clearTimeout(recommendTimer);
+            clearRecommendHeight();
+
+            if (!details.open) {
+                // 開く：中身を作ってから高さ0→実際の高さへ広げる（描画前に高さ0にするのでちらつかない）
+                details.open = true;
+                recommendRenderedByClick = true;
+                renderRecommendations();
+                if (reduceMotion) return;
+                const target = body.scrollHeight;
+                body.style.height = "0px";
+                body.style.paddingTop = "0px";
+                body.style.paddingBottom = "0px";
+                body.classList.add("is-expanding");
+                body.getBoundingClientRect();
+                body.style.height = target + "px";
+                body.style.paddingTop = "";
+                body.style.paddingBottom = "";
+                recommendTimer = setTimeout(clearRecommendHeight, RECOMMEND_OPEN_MS);
+                return;
+            }
+
+            if (reduceMotion) { details.open = false; return; }
+            // 閉じる：カードが沈むのを見せつつ、今の高さ→0へ畳んでから閉じる
+            body.style.height = body.offsetHeight + "px";
+            details.classList.add("is-closing");
+            body.getBoundingClientRect();
+            body.classList.add("is-collapsing");
+            recommendTimer = setTimeout(() => {
+                details.classList.remove("is-closing");
+                clearRecommendHeight();
+                details.open = false;
+            }, RECOMMEND_CLOSE_MS);
+        });
         $("jm-recommend-area").addEventListener("toggle", event => {
             try { localStorage.setItem(recommendOpenKey, event.currentTarget.open ? "1" : "0"); } catch (error) { /* 無視 */ }
-            if (event.currentTarget.open) renderRecommendations();
+            // クリックで開いたときは描画済みなので、二重に作り直してカードの動きがやり直しにならないようにする
+            if (event.currentTarget.open && !recommendRenderedByClick) renderRecommendations();
+            recommendRenderedByClick = false;
         });
         $("jm-recommend-list").addEventListener("click", event => {
             const button = event.target.closest(".jm-rec-pick");

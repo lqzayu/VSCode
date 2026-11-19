@@ -1,0 +1,990 @@
+{
+ "source": "令和8年度 年間行事計画（令和8年4月6日版・生徒配布用）",
+ "startYear": 2026,
+ "events": [
+  {
+   "date": "2026-04-08",
+   "endDate": "",
+   "title": "着任式",
+   "type": "event"
+  },
+  {
+   "date": "2026-04-08",
+   "endDate": "",
+   "title": "1学期始業式",
+   "type": "event"
+  },
+  {
+   "date": "2026-04-09",
+   "endDate": "",
+   "title": "入学式",
+   "type": "event"
+  },
+  {
+   "date": "2026-04-09",
+   "endDate": "",
+   "title": "PTA入会式",
+   "type": "event"
+  },
+  {
+   "date": "2026-04-10",
+   "endDate": "",
+   "title": "対面式、新入生歓迎会",
+   "type": "event"
+  },
+  {
+   "date": "2026-04-10",
+   "endDate": "",
+   "title": "女子生徒集会",
+   "type": "event"
+  },
+  {
+   "date": "2026-04-14",
+   "endDate": "",
+   "title": "委員会編成",
+   "type": "event"
+  },
+  {
+   "date": "2026-04-17",
+   "endDate": "",
+   "title": "部活動編成",
+   "type": "event"
+  },
+  {
+   "date": "2026-04-24",
+   "endDate": "",
+   "title": "身体測定（AM）",
+   "type": "event"
+  },
+  {
+   "date": "2026-04-24",
+   "endDate": "",
+   "title": "思春期講話（PM）",
+   "type": "event"
+  },
+  {
+   "date": "2026-04-25",
+   "endDate": "",
+   "title": "PTA総会",
+   "type": "event"
+  },
+  {
+   "date": "2026-04-25",
+   "endDate": "",
+   "title": "3年生進路説明会",
+   "type": "event"
+  },
+  {
+   "date": "2026-04-27",
+   "endDate": "",
+   "title": "PTA総会（4/25）代休",
+   "type": "holiday"
+  },
+  {
+   "date": "2026-04-28",
+   "endDate": "2026-05-20",
+   "title": "面接週間",
+   "type": "event"
+  },
+  {
+   "date": "2026-04-29",
+   "endDate": "",
+   "title": "昭和の日",
+   "type": "holiday"
+  },
+  {
+   "date": "2026-04-30",
+   "endDate": "",
+   "title": "生徒総会（5～6校時）",
+   "type": "event"
+  },
+  {
+   "date": "2026-05-03",
+   "endDate": "",
+   "title": "憲法記念日",
+   "type": "holiday"
+  },
+  {
+   "date": "2026-05-04",
+   "endDate": "",
+   "title": "みどりの日",
+   "type": "holiday"
+  },
+  {
+   "date": "2026-05-05",
+   "endDate": "",
+   "title": "こどもの日",
+   "type": "holiday"
+  },
+  {
+   "date": "2026-05-06",
+   "endDate": "",
+   "title": "振替休日",
+   "type": "holiday"
+  },
+  {
+   "date": "2026-05-12",
+   "endDate": "",
+   "title": "歯科検診①",
+   "type": "event"
+  },
+  {
+   "date": "2026-05-14",
+   "endDate": "",
+   "title": "創立記念日（生徒休業日）",
+   "type": "holiday"
+  },
+  {
+   "date": "2026-05-19",
+   "endDate": "",
+   "title": "歯科検診②",
+   "type": "event"
+  },
+  {
+   "date": "2026-05-20",
+   "endDate": "",
+   "title": "尿検査（一次）",
+   "type": "event"
+  },
+  {
+   "date": "2026-05-21",
+   "endDate": "",
+   "title": "内科検診（PM）",
+   "type": "event"
+  },
+  {
+   "date": "2026-05-22",
+   "endDate": "",
+   "title": "中間考査①",
+   "type": "exam"
+  },
+  {
+   "date": "2026-05-24",
+   "endDate": "",
+   "title": "第二種電工筆記試験（上期）",
+   "type": "license"
+  },
+  {
+   "date": "2026-05-25",
+   "endDate": "",
+   "title": "中間考査②",
+   "type": "exam"
+  },
+  {
+   "date": "2026-05-26",
+   "endDate": "",
+   "title": "中間考査③",
+   "type": "exam"
+  },
+  {
+   "date": "2026-05-26",
+   "endDate": "",
+   "title": "県高体連壮行会",
+   "type": "event"
+  },
+  {
+   "date": "2026-05-28",
+   "endDate": "",
+   "title": "心電図・結核検診（1年）",
+   "type": "event"
+  },
+  {
+   "date": "2026-05-29",
+   "endDate": "",
+   "title": "避難訓練",
+   "type": "event"
+  },
+  {
+   "date": "2026-06-01",
+   "endDate": "",
+   "title": "県下一斉服装指導",
+   "type": "event"
+  },
+  {
+   "date": "2026-06-02",
+   "endDate": "",
+   "title": "歯科検診（予備日）",
+   "type": "event"
+  },
+  {
+   "date": "2026-06-03",
+   "endDate": "",
+   "title": "尿検査（二次）",
+   "type": "event"
+  },
+  {
+   "date": "2026-06-04",
+   "endDate": "",
+   "title": "C科EE東北",
+   "type": "event"
+  },
+  {
+   "date": "2026-06-06",
+   "endDate": "2026-06-07",
+   "title": "リーダー研修会",
+   "type": "event"
+  },
+  {
+   "date": "2026-06-07",
+   "endDate": "",
+   "title": "土木施工管理試験（前期）",
+   "type": "license"
+  },
+  {
+   "date": "2026-06-09",
+   "endDate": "",
+   "title": "校外進路ガイダンス（2、3年）",
+   "type": "event"
+  },
+  {
+   "date": "2026-06-11",
+   "endDate": "",
+   "title": "芸術鑑賞教室",
+   "type": "event"
+  },
+  {
+   "date": "2026-06-17",
+   "endDate": "",
+   "title": "尿検査（予備日）",
+   "type": "event"
+  },
+  {
+   "date": "2026-06-19",
+   "endDate": "",
+   "title": "計算技術検定",
+   "type": "license"
+  },
+  {
+   "date": "2026-06-25",
+   "endDate": "",
+   "title": "期末考査①",
+   "type": "exam"
+  },
+  {
+   "date": "2026-06-26",
+   "endDate": "",
+   "title": "期末考査②",
+   "type": "exam"
+  },
+  {
+   "date": "2026-06-26",
+   "endDate": "",
+   "title": "情報技術検定",
+   "type": "license"
+  },
+  {
+   "date": "2026-06-29",
+   "endDate": "",
+   "title": "期末考査③",
+   "type": "exam"
+  },
+  {
+   "date": "2026-06-30",
+   "endDate": "",
+   "title": "期末考査④",
+   "type": "exam"
+  },
+  {
+   "date": "2026-07-01",
+   "endDate": "",
+   "title": "求人票受付",
+   "type": "event"
+  },
+  {
+   "date": "2026-07-04",
+   "endDate": "",
+   "title": "第一種電工技能試験（上期）",
+   "type": "license"
+  },
+  {
+   "date": "2026-07-07",
+   "endDate": "",
+   "title": "パソコン利用技術検定",
+   "type": "license"
+  },
+  {
+   "date": "2026-07-17",
+   "endDate": "",
+   "title": "薬物乱用防止講話",
+   "type": "event"
+  },
+  {
+   "date": "2026-07-17",
+   "endDate": "",
+   "title": "終業式",
+   "type": "event"
+  },
+  {
+   "date": "2026-07-18",
+   "endDate": "",
+   "title": "危険物取扱者試験（本校）",
+   "type": "license"
+  },
+  {
+   "date": "2026-07-19",
+   "endDate": "",
+   "title": "第二種電工技能試験（上期）",
+   "type": "license"
+  },
+  {
+   "date": "2026-07-20",
+   "endDate": "",
+   "title": "海の日",
+   "type": "holiday"
+  },
+  {
+   "date": "2026-07-21",
+   "endDate": "",
+   "title": "企業見学開始",
+   "type": "event"
+  },
+  {
+   "date": "2026-07-21",
+   "endDate": "2026-07-22",
+   "title": "ボイラー講習（K2）",
+   "type": "license"
+  },
+  {
+   "date": "2026-07-28",
+   "endDate": "",
+   "title": "中学生体験入学",
+   "type": "event"
+  },
+  {
+   "date": "2026-08-01",
+   "endDate": "",
+   "title": "危険物取扱者試験",
+   "type": "license"
+  },
+  {
+   "date": "2026-08-04",
+   "endDate": "2026-08-05",
+   "title": "ものコン東北（測量）",
+   "type": "event"
+  },
+  {
+   "date": "2026-08-06",
+   "endDate": "",
+   "title": "進路希望最終締切",
+   "type": "event"
+  },
+  {
+   "date": "2026-08-08",
+   "endDate": "2026-08-09",
+   "title": "生徒会役員OBOG合同研修会",
+   "type": "event"
+  },
+  {
+   "date": "2026-08-11",
+   "endDate": "",
+   "title": "山の日",
+   "type": "holiday"
+  },
+  {
+   "date": "2026-08-12",
+   "endDate": "",
+   "title": "閉庁日",
+   "type": "closed"
+  },
+  {
+   "date": "2026-08-13",
+   "endDate": "",
+   "title": "閉庁日",
+   "type": "closed"
+  },
+  {
+   "date": "2026-08-14",
+   "endDate": "",
+   "title": "閉庁日",
+   "type": "closed"
+  },
+  {
+   "date": "2026-08-19",
+   "endDate": "",
+   "title": "フォークリフト特別講習（学科）",
+   "type": "license"
+  },
+  {
+   "date": "2026-08-20",
+   "endDate": "2026-08-21",
+   "title": "フォークリフト特別講習（実技）",
+   "type": "license"
+  },
+  {
+   "date": "2026-08-27",
+   "endDate": "",
+   "title": "始業式",
+   "type": "event"
+  },
+  {
+   "date": "2026-09-04",
+   "endDate": "",
+   "title": "就職校内面接指導",
+   "type": "event"
+  },
+  {
+   "date": "2026-09-08",
+   "endDate": "",
+   "title": "グループワーク指導",
+   "type": "event"
+  },
+  {
+   "date": "2026-09-08",
+   "endDate": "",
+   "title": "県ロボット競技大会",
+   "type": "event"
+  },
+  {
+   "date": "2026-09-09",
+   "endDate": "",
+   "title": "就職外部面接指導",
+   "type": "event"
+  },
+  {
+   "date": "2026-09-16",
+   "endDate": "",
+   "title": "就職試験開始",
+   "type": "event"
+  },
+  {
+   "date": "2026-09-17",
+   "endDate": "",
+   "title": "修旅前健康診断",
+   "type": "event"
+  },
+  {
+   "date": "2026-09-21",
+   "endDate": "",
+   "title": "敬老の日",
+   "type": "holiday"
+  },
+  {
+   "date": "2026-09-22",
+   "endDate": "",
+   "title": "国民の休日",
+   "type": "holiday"
+  },
+  {
+   "date": "2026-09-23",
+   "endDate": "",
+   "title": "秋分の日",
+   "type": "holiday"
+  },
+  {
+   "date": "2026-09-24",
+   "endDate": "",
+   "title": "生徒会役員選挙",
+   "type": "event"
+  },
+  {
+   "date": "2026-09-29",
+   "endDate": "2026-10-02",
+   "title": "修学旅行",
+   "type": "event"
+  },
+  {
+   "date": "2026-10-02",
+   "endDate": "",
+   "title": "遠足（1、3年）",
+   "type": "event"
+  },
+  {
+   "date": "2026-10-04",
+   "endDate": "",
+   "title": "第一種電工筆記試験（下期）",
+   "type": "license"
+  },
+  {
+   "date": "2026-10-05",
+   "endDate": "",
+   "title": "県下一斉服装指導",
+   "type": "event"
+  },
+  {
+   "date": "2026-10-06",
+   "endDate": "",
+   "title": "進学校内面接指導",
+   "type": "event"
+  },
+  {
+   "date": "2026-10-08",
+   "endDate": "",
+   "title": "進学外部面接指導",
+   "type": "event"
+  },
+  {
+   "date": "2026-10-08",
+   "endDate": "",
+   "title": "県ものコン",
+   "type": "event"
+  },
+  {
+   "date": "2026-10-09",
+   "endDate": "",
+   "title": "リスニング検定（1、2年）",
+   "type": "license"
+  },
+  {
+   "date": "2026-10-09",
+   "endDate": "",
+   "title": "県ものコン",
+   "type": "event"
+  },
+  {
+   "date": "2026-10-12",
+   "endDate": "",
+   "title": "スポーツの日",
+   "type": "holiday"
+  },
+  {
+   "date": "2026-10-14",
+   "endDate": "",
+   "title": "中間考査①",
+   "type": "exam"
+  },
+  {
+   "date": "2026-10-15",
+   "endDate": "",
+   "title": "中間考査②",
+   "type": "exam"
+  },
+  {
+   "date": "2026-10-16",
+   "endDate": "",
+   "title": "中間考査③",
+   "type": "exam"
+  },
+  {
+   "date": "2026-10-19",
+   "endDate": "",
+   "title": "インターンシップ説明会（C2）",
+   "type": "event"
+  },
+  {
+   "date": "2026-10-23",
+   "endDate": "",
+   "title": "避難訓練、献血",
+   "type": "event"
+  },
+  {
+   "date": "2026-10-24",
+   "endDate": "",
+   "title": "危険物取扱者試験",
+   "type": "license"
+  },
+  {
+   "date": "2026-10-25",
+   "endDate": "",
+   "title": "土木施工管理試験（後期）",
+   "type": "license"
+  },
+  {
+   "date": "2026-10-25",
+   "endDate": "",
+   "title": "第二種電工筆記試験（下期）",
+   "type": "license"
+  },
+  {
+   "date": "2026-10-27",
+   "endDate": "2026-10-29",
+   "title": "校内レクリエーション大会",
+   "type": "event"
+  },
+  {
+   "date": "2026-10-30",
+   "endDate": "",
+   "title": "レク予備日",
+   "type": "event"
+  },
+  {
+   "date": "2026-11-03",
+   "endDate": "",
+   "title": "文化の日",
+   "type": "holiday"
+  },
+  {
+   "date": "2026-11-05",
+   "endDate": "",
+   "title": "県ものコン溶接部門",
+   "type": "event"
+  },
+  {
+   "date": "2026-11-06",
+   "endDate": "",
+   "title": "ミニ文化祭",
+   "type": "event"
+  },
+  {
+   "date": "2026-11-06",
+   "endDate": "",
+   "title": "県ものコン溶接部門",
+   "type": "event"
+  },
+  {
+   "date": "2026-11-09",
+   "endDate": "2026-11-13",
+   "title": "読書週間",
+   "type": "event"
+  },
+  {
+   "date": "2026-11-10",
+   "endDate": "",
+   "title": "S1ロボット出前授業",
+   "type": "event"
+  },
+  {
+   "date": "2026-11-11",
+   "endDate": "2026-11-13",
+   "title": "E1インターンシップ",
+   "type": "event"
+  },
+  {
+   "date": "2026-11-12",
+   "endDate": "",
+   "title": "県ものコン旋盤作業部門",
+   "type": "event"
+  },
+  {
+   "date": "2026-11-13",
+   "endDate": "",
+   "title": "県ものコン旋盤作業部門",
+   "type": "event"
+  },
+  {
+   "date": "2026-11-17",
+   "endDate": "2026-11-20",
+   "title": "C2インターンシップ",
+   "type": "event"
+  },
+  {
+   "date": "2026-11-18",
+   "endDate": "",
+   "title": "甲状腺検査",
+   "type": "event"
+  },
+  {
+   "date": "2026-11-20",
+   "endDate": "",
+   "title": "計算技術検定",
+   "type": "license"
+  },
+  {
+   "date": "2026-11-21",
+   "endDate": "",
+   "title": "第一種電工技能試験（下期）",
+   "type": "license"
+  },
+  {
+   "date": "2026-11-23",
+   "endDate": "",
+   "title": "勤労感謝の日",
+   "type": "holiday"
+  },
+  {
+   "date": "2026-12-01",
+   "endDate": "",
+   "title": "期末考査①",
+   "type": "exam"
+  },
+  {
+   "date": "2026-12-02",
+   "endDate": "",
+   "title": "期末考査②",
+   "type": "exam"
+  },
+  {
+   "date": "2026-12-03",
+   "endDate": "",
+   "title": "期末考査③",
+   "type": "exam"
+  },
+  {
+   "date": "2026-12-04",
+   "endDate": "",
+   "title": "期末考査④",
+   "type": "exam"
+  },
+  {
+   "date": "2026-12-04",
+   "endDate": "",
+   "title": "JMCR福島大会",
+   "type": "event"
+  },
+  {
+   "date": "2026-12-09",
+   "endDate": "",
+   "title": "C科課研発表会",
+   "type": "event"
+  },
+  {
+   "date": "2026-12-10",
+   "endDate": "",
+   "title": "K科課研発表会",
+   "type": "event"
+  },
+  {
+   "date": "2026-12-11",
+   "endDate": "",
+   "title": "パソコン利用技術検定",
+   "type": "license"
+  },
+  {
+   "date": "2026-12-11",
+   "endDate": "",
+   "title": "C2日大工学部見学会",
+   "type": "event"
+  },
+  {
+   "date": "2026-12-13",
+   "endDate": "",
+   "title": "第二種電工技能試験（下期）",
+   "type": "license"
+  },
+  {
+   "date": "2026-12-13",
+   "endDate": "",
+   "title": "IPA修了試験",
+   "type": "license"
+  },
+  {
+   "date": "2026-12-15",
+   "endDate": "",
+   "title": "E科課研発表会",
+   "type": "event"
+  },
+  {
+   "date": "2026-12-16",
+   "endDate": "",
+   "title": "S科・J科課研発表会",
+   "type": "event"
+  },
+  {
+   "date": "2026-12-17",
+   "endDate": "",
+   "title": "C2インターンシップ報告会",
+   "type": "event"
+  },
+  {
+   "date": "2026-12-21",
+   "endDate": "",
+   "title": "終業式",
+   "type": "event"
+  },
+  {
+   "date": "2026-12-22",
+   "endDate": "2026-12-24",
+   "title": "ガス溶接講習（K1）",
+   "type": "license"
+  },
+  {
+   "date": "2026-12-28",
+   "endDate": "",
+   "title": "仕事納め",
+   "type": "event"
+  },
+  {
+   "date": "2026-12-29",
+   "endDate": "",
+   "title": "閉庁日",
+   "type": "closed"
+  },
+  {
+   "date": "2026-12-30",
+   "endDate": "",
+   "title": "閉庁日",
+   "type": "closed"
+  },
+  {
+   "date": "2026-12-31",
+   "endDate": "",
+   "title": "閉庁日",
+   "type": "closed"
+  },
+  {
+   "date": "2027-01-01",
+   "endDate": "",
+   "title": "元日",
+   "type": "holiday"
+  },
+  {
+   "date": "2027-01-02",
+   "endDate": "",
+   "title": "閉庁日",
+   "type": "closed"
+  },
+  {
+   "date": "2027-01-03",
+   "endDate": "",
+   "title": "閉庁日",
+   "type": "closed"
+  },
+  {
+   "date": "2027-01-04",
+   "endDate": "",
+   "title": "仕事始め",
+   "type": "event"
+  },
+  {
+   "date": "2027-01-08",
+   "endDate": "",
+   "title": "始業式",
+   "type": "event"
+  },
+  {
+   "date": "2027-01-11",
+   "endDate": "",
+   "title": "成人の日",
+   "type": "holiday"
+  },
+  {
+   "date": "2027-01-15",
+   "endDate": "",
+   "title": "情報技術検定",
+   "type": "license"
+  },
+  {
+   "date": "2027-01-21",
+   "endDate": "",
+   "title": "校内課題研究発表会",
+   "type": "event"
+  },
+  {
+   "date": "2027-01-22",
+   "endDate": "",
+   "title": "就職準備講習",
+   "type": "event"
+  },
+  {
+   "date": "2027-01-24",
+   "endDate": "",
+   "title": "IPA修了試験",
+   "type": "license"
+  },
+  {
+   "date": "2027-01-26",
+   "endDate": "",
+   "title": "学年末考査①（3年）",
+   "type": "exam"
+  },
+  {
+   "date": "2027-01-27",
+   "endDate": "",
+   "title": "学年末考査②（3年）",
+   "type": "exam"
+  },
+  {
+   "date": "2027-01-28",
+   "endDate": "",
+   "title": "学年末考査③（3年）",
+   "type": "exam"
+  },
+  {
+   "date": "2027-01-29",
+   "endDate": "",
+   "title": "学年末考査④（3年）",
+   "type": "exam"
+  },
+  {
+   "date": "2027-01-30",
+   "endDate": "",
+   "title": "危険物取扱者試験（本校）",
+   "type": "license"
+  },
+  {
+   "date": "2027-02-04",
+   "endDate": "",
+   "title": "学年末考査①（1・2年）",
+   "type": "exam"
+  },
+  {
+   "date": "2027-02-05",
+   "endDate": "",
+   "title": "学年末考査②（1・2年）",
+   "type": "exam"
+  },
+  {
+   "date": "2027-02-05",
+   "endDate": "",
+   "title": "工業基礎学力テスト",
+   "type": "license"
+  },
+  {
+   "date": "2027-02-08",
+   "endDate": "",
+   "title": "学年末考査③（1・2年）",
+   "type": "exam"
+  },
+  {
+   "date": "2027-02-09",
+   "endDate": "",
+   "title": "学年末考査④（1・2年）",
+   "type": "exam"
+  },
+  {
+   "date": "2027-02-11",
+   "endDate": "",
+   "title": "建国記念の日",
+   "type": "holiday"
+  },
+  {
+   "date": "2027-02-13",
+   "endDate": "",
+   "title": "危険物取扱者試験",
+   "type": "license"
+  },
+  {
+   "date": "2027-02-17",
+   "endDate": "",
+   "title": "ハローワーク企業説明会",
+   "type": "event"
+  },
+  {
+   "date": "2027-02-23",
+   "endDate": "",
+   "title": "天皇誕生日",
+   "type": "holiday"
+  },
+  {
+   "date": "2027-02-26",
+   "endDate": "",
+   "title": "表彰・賞状伝達式",
+   "type": "event"
+  },
+  {
+   "date": "2027-02-26",
+   "endDate": "",
+   "title": "卒業式予行",
+   "type": "event"
+  },
+  {
+   "date": "2027-03-01",
+   "endDate": "",
+   "title": "卒業式",
+   "type": "event"
+  },
+  {
+   "date": "2027-03-18",
+   "endDate": "",
+   "title": "教室移動",
+   "type": "event"
+  },
+  {
+   "date": "2027-03-19",
+   "endDate": "",
+   "title": "3学期終業式",
+   "type": "event"
+  },
+  {
+   "date": "2027-03-20",
+   "endDate": "",
+   "title": "春分の日",
+   "type": "holiday"
+  },
+  {
+   "date": "2027-03-22",
+   "endDate": "",
+   "title": "振替休日",
+   "type": "holiday"
+  }
+ ]
+}

@@ -523,6 +523,30 @@
             color: inherit;
         }
 
+        /* ホームの「これから1か月の学校行事」 */
+        .se-strip { margin: 0 0 28px; padding: 18px 20px; border: 1px solid var(--ui-line, #e2e8f0); border-radius: 18px; background: var(--ui-paper, #fff); }
+        .se-strip-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+        .se-strip-head h2 { margin: 0; font-size: 1rem; font-weight: 800; color: var(--ui-ink, #1e293b); }
+        .se-strip-link { flex: none; font-size: 13px; font-weight: 800; color: var(--ui-green, #0f766e); text-decoration: none; white-space: nowrap; }
+        .se-strip-link:hover { text-decoration: underline; }
+        .se-strip-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+        .se-strip-item a { display: flex; flex-direction: column; gap: 2px; height: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--ui-line, #e2e8f0); border-left-width: 4px; text-decoration: none; color: inherit; transition: background-color .15s, transform .15s; }
+        .se-strip-item a:hover { background: var(--ui-soft, #f1f5f9); transform: translateY(-1px); }
+        .se-strip-date { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--ui-muted, #64748b); font-variant-numeric: tabular-nums; }
+        .se-strip-when { padding: 0 6px; border-radius: 999px; background: var(--ui-soft, #f1f5f9); color: var(--ui-ink, #1e293b); font-size: 11px; }
+        .se-strip-when.is-soon { background: #f59e0b; color: #3b2300; }
+        .se-strip-title { font-size: 14px; font-weight: 800; color: var(--ui-ink, #1e293b); line-height: 1.45; overflow-wrap: anywhere; }
+        .se-strip-item.type-event a { border-left-color: var(--ui-green, #0f766e); }
+        .se-strip-item.type-exam a { border-left-color: #9333ea; }
+        .se-strip-item.type-license a { border-left-color: #2563eb; }
+        .se-strip-item.type-holiday a { border-left-color: #dc2626; }
+        .se-strip-more { margin: 10px 0 0; font-size: 12.5px; font-weight: 700; color: var(--ui-muted, #64748b); }
+        @media screen and (max-width: 768px) {
+            .se-strip { margin-bottom: 22px; padding: 14px; }
+            .se-strip-list { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+            .se-strip-item { flex: 0 0 72%; scroll-snap-align: start; }
+        }
+
         .list-head-actions {
             display: flex;
             align-items: center;
@@ -1304,9 +1328,10 @@
             }
         }
     </style>
-    <link rel="stylesheet" href="theme.css?v=20261119beta">
-    <script src="ui.js?v=20261119beta"></script>
+    <link rel="stylesheet" href="theme.css?v=20261119events">
+    <script src="ui.js?v=20261119events"></script>
     <script src="online.js?v=20260917b" defer></script>
+    <script src="school-events.js?v=20261119a"></script>
 </head>
 
 <body data-page="main">
@@ -1344,6 +1369,7 @@
                 メッセージ
                 <span id="unread-badge" class="unread-badge" style="display: none;">0</span>
             </a>
+            <a class="nav-item" href="events.html">学校行事</a>
             <a class="nav-item" href="ai-study.html">AI学習相談</a>
             <a class="nav-item" href="junior-meister.html">JM計算</a>
 
@@ -1437,6 +1463,15 @@
             </section>
 
             <div class="main-content">
+                <!-- 直近1か月の学校行事（行事がないときは表示しない） -->
+                <section id="school-events-strip" class="se-strip" aria-labelledby="se-strip-title" hidden>
+                    <div class="se-strip-head">
+                        <h2 id="se-strip-title"><span aria-hidden="true">📅</span> これから1か月の学校行事</h2>
+                        <a class="se-strip-link" href="events.html">カレンダーを見る <span aria-hidden="true">›</span></a>
+                    </div>
+                    <ul class="se-strip-list" id="se-strip-list"></ul>
+                    <p class="se-strip-more" id="se-strip-more" hidden></p>
+                </section>
                 <section id="search-area">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
                         <h1 style="font-size: 1.35rem; font-weight: 800; margin: 0; color: #1e293b;">他ユーザーの募集一覧</h1>
@@ -1561,6 +1596,19 @@
                         <p>AI相談は1日5回までです。個人情報、パスワード、住所、電話番号は入力しないでください。</p>
                     </div>
                     <a class="usage-guide-primary-link" href="ai-study.html">AI学習相談を開く</a>
+                </section>
+
+                <section class="usage-guide-section">
+                    <div class="usage-guide-section-title">
+                        <span>学校行事</span>
+                        <h3>行事予定をカレンダーで確認する</h3>
+                    </div>
+                    <div class="usage-guide-note">
+                        <p><strong>カレンダー：</strong>メニューの「学校行事」から、月ごとのカレンダーで年間行事を確認できます。日付を押すとその日の行事が、下にはその月の行事一覧が表示されます。考査・検定・休日などは色分けされています。</p>
+                        <p><strong>ホーム画面：</strong>これから1か月の行事は、ホーム画面の募集一覧の上にも表示されます。押すとカレンダーのその日に移動します。</p>
+                        <p>行事は学校の予定表をもとに管理者が登録しています。予定は変わることがあるので、最新の情報は学校からのお知らせで確認してください。</p>
+                    </div>
+                    <a class="usage-guide-primary-link" href="events.html">学校行事を開く</a>
                 </section>
 
                 <section class="usage-guide-section">
@@ -2365,7 +2413,36 @@
             window.location.href = "admin.html";
         }
 
+        // 直近1か月の学校行事をホームに出す（最大4件、残りは件数だけ）
+        function renderSchoolEventStrip(events) {
+            const strip = document.getElementById("school-events-strip");
+            const SE = window.HeikoSchoolEvents;
+            if (!strip || !SE) return;
+            const upcoming = SE.upcoming(events, 30).filter(event => event.type !== "holiday" || SE.daysUntil(event.date) <= 7);
+            if (!upcoming.length) { strip.hidden = true; return; }
+            const shown = upcoming.slice(0, 4);
+            document.getElementById("se-strip-list").innerHTML = shown.map(event => {
+                const when = SE.relativeLabel(event);
+                const soon = when === "今日" || when === "明日" || when === "開催中";
+                const date = event.endDate ? `${SE.formatShort(event.date)}〜${SE.formatShort(event.endDate)}` : SE.formatDay(event.date);
+                return `<li class="se-strip-item type-${event.type}"><a href="events.html?date=${event.date}">
+                    <span class="se-strip-date">${escapeHtml(date)}<span class="se-strip-when${soon ? " is-soon" : ""}">${escapeHtml(when)}</span></span>
+                    <span class="se-strip-title">${escapeHtml(event.title)}</span>
+                </a></li>`;
+            }).join("");
+            const more = document.getElementById("se-strip-more");
+            more.hidden = upcoming.length <= shown.length;
+            more.textContent = `ほかに${upcoming.length - shown.length}件の行事があります`;
+            strip.hidden = false;
+        }
+
+        function loadSchoolEventStrip() {
+            if (!window.HeikoSchoolEvents) return;
+            window.HeikoSchoolEvents.load({ onUpdate: renderSchoolEventStrip }).catch(error => console.warn("学校行事を読み込めませんでした", error));
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
+            loadSchoolEventStrip();
             document.getElementById("hud-menu-btn").classList.remove("open");
             document.getElementById("nav-links").classList.remove("open");
 

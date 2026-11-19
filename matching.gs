@@ -100,7 +100,7 @@ function doPost(e) {
     const mode = data.mode;
 
     const publicModes = ["register", "verifyEmail", "resendVerificationCode", "login", "verify_face_1toN", "verify_face_for_user", "forgotPassword", "resetPassword"];
-    const adminModes = ["adminGetOverview", "adminDeletePost", "adminBanUser", "adminResetPassword", "adminClearChatHistory", "getReports", "updateReportStatus", "getDailyAnalysis"];
+    const adminModes = ["adminGetOverview", "adminDeletePost", "adminBanUser", "adminResetPassword", "adminClearChatHistory", "getReports", "updateReportStatus", "getDailyAnalysis", "adminExtractSchoolEvents", "adminSaveSchoolEvents", "adminDeleteSchoolEvent"];
     if (!publicModes.includes(mode) && !adminModes.includes(mode)) {
       const actorId = getRequestActorId(mode, data);
       const adminProfileRequest = mode === "getUserProfile" && isAdminRequest(data);
@@ -364,6 +364,92 @@ function doPost(e) {
         }
       }
       return createRes("error", "評価対象が見つかりません");
+    }
+
+    // ===== 学校行事 =====
+    if (mode === "getSchoolEvents") {
+      const from = normalizeSchoolEventDate(data.from);
+      const to = normalizeSchoolEventDate(data.to);
+      const events = readSchoolEvents(ss).filter(event => {
+        const end = event.endDate || event.date;
+        if (from && end < from) return false;
+        if (to && event.date > to) return false;
+        return true;
+      });
+      return createRes("success", events);
+    }
+
+    if (mode === "adminExtractSchoolEvents") {
+      if (!isAdminRequest(data)) return createRes("error", "管理者権限がありません。再ログインしてください");
+      const apiKey = PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY");
+      if (!apiKey) return createRes("error", "AI機能の設定がまだ完了していません。GEMINI_API_KEYを確認してください");
+      const mimeType = cleanCell(data.mimeType).toLowerCase();
+      if (SCHOOL_EVENT_FILE_TYPES.indexOf(mimeType) < 0) return createRes("error", "PDF・JPEG・PNG・WebP・HEICのファイルを選んでください");
+      const fileBase64 = String(data.fileBase64 || "").replace(/^data:[^,]*,/, "").replace(/\s/g, "");
+      if (!fileBase64 || !/^[A-Za-z0-9+/]+=*$/.test(fileBase64)) return createRes("error", "ファイルを読み込めませんでした");
+      if (fileBase64.length * 3 / 4 > SCHOOL_EVENT_FILE_MAX_BYTES) return createRes("error", "ファイルが大きすぎます（15MBまで）");
+      if (!claimCooldown("school-event-extract", 10)) return createRes("error", "読み取り中です。少し待ってからもう一度お試しください");
+      const startYear = Number(data.startYear) || inferSchoolYearStart();
+      const result = extractSchoolEventsWithGemini(apiKey, mimeType, fileBase64, startYear);
+      if (result.error) return createRes("error", result.error);
+      return createRes("success", { events: result.events, model: GEMINI_MODEL });
+    }
+
+    if (mode === "adminSaveSchoolEvents") {
+      if (!isAdminRequest(data)) return createRes("error", "管理者権限がありません。再ログインしてください");
+      if (!Array.isArray(data.events) || data.events.length > 600) return createRes("error", "保存する行事が正しくありません（600件まで）");
+      const events = data.events.map(sanitizeSchoolEvent).filter(Boolean);
+      if (events.length !== data.events.length) return createRes("error", "日付か行事名が正しくない行があります。確認してから保存してください");
+      const replaceFrom = normalizeSchoolEventDate(data.replaceFrom);
+      const replaceTo = normalizeSchoolEventDate(data.replaceTo);
+      if ((replaceFrom || replaceTo) && (!replaceFrom || !replaceTo || replaceFrom > replaceTo)) return createRes("error", "置き換える期間が正しくありません");
+
+      const lock = LockService.getScriptLock();
+      if (!lock.tryLock(10000)) return createRes("error", "混み合っています。少し待ってからお試しください");
+      try {
+        const sheet = getSchoolEventSheet(ss);
+        let removed = 0;
+        if (replaceFrom && replaceTo && sheet.getLastRow() > 1) {
+          const rows = sheet.getRange(2, 1, sheet.getLastRow() - 1, SCHOOL_EVENT_HEADERS.length).getValues();
+          for (let i = rows.length - 1; i >= 0; i--) {
+            const date = normalizeSchoolEventDate(rows[i][1]);
+            if (date && date >= replaceFrom && date <= replaceTo) {
+              sheet.deleteRow(i + 2);
+              removed++;
+            }
+          }
+        }
+        if (events.length) {
+          const now = new Date();
+          const values = events.map(event => [Utilities.getUuid(), event.date, event.endDate, safeSheetText(event.title, 100), event.type, safeSheetText(event.note, 200), now, ADMIN_USER_ID]);
+          const start = sheet.getLastRow() + 1;
+          sheet.getRange(start, 1, values.length, values[0].length).setValues(values);
+        }
+        CacheService.getScriptCache().remove(SCHOOL_EVENT_CACHE_KEY);
+        return createRes("success", { saved: events.length, removed: removed });
+      } finally {
+        lock.releaseLock();
+      }
+    }
+
+    if (mode === "adminDeleteSchoolEvent") {
+      if (!isAdminRequest(data)) return createRes("error", "管理者権限がありません。再ログインしてください");
+      const eventId = cleanCell(data.eventId);
+      if (!eventId) return createRes("error", "削除する行事を確認できませんでした");
+      const lock = LockService.getScriptLock();
+      if (!lock.tryLock(10000)) return createRes("error", "混み合っています。少し待ってからお試しください");
+      try {
+        const sheet = getSchoolEventSheet(ss);
+        if (sheet.getLastRow() <= 1) return createRes("error", "行事が見つかりません");
+        const ids = sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues();
+        const index = ids.findIndex(row => cleanCell(row[0]) === eventId);
+        if (index < 0) return createRes("error", "行事が見つかりません");
+        sheet.deleteRow(index + 2);
+        CacheService.getScriptCache().remove(SCHOOL_EVENT_CACHE_KEY);
+        return createRes("success", "削除しました");
+      } finally {
+        lock.releaseLock();
+      }
     }
 
     if (mode === "adminGetOverview") {
@@ -1823,6 +1909,137 @@ function callGeminiStudyAdvisor(apiKey, profile, analysis, history, message, sta
   }
 }
 
+// ===== 学校行事の補助関数 =====
+const SCHOOL_EVENT_HEADERS = ["ID", "開始日", "終了日", "行事名", "種類", "メモ", "登録日時", "登録者"];
+const SCHOOL_EVENT_TYPES = ["event", "exam", "license", "holiday", "closed"];
+const SCHOOL_EVENT_FILE_TYPES = ["application/pdf", "image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+const SCHOOL_EVENT_FILE_MAX_BYTES = 15 * 1024 * 1024;
+const SCHOOL_EVENT_CACHE_KEY = "school-events-v1";
+
+function getSchoolEventSheet(ss) {
+  const sheet = getOrCreateSheet(ss, "学校行事", SCHOOL_EVENT_HEADERS);
+  // 日付が自動で日付型に変わらないよう、開始日・終了日の列は文字列として扱う
+  sheet.getRange("B:C").setNumberFormat("@");
+  return sheet;
+}
+
+function readSchoolEvents(ss) {
+  const cache = CacheService.getScriptCache();
+  const cached = cache.get(SCHOOL_EVENT_CACHE_KEY);
+  if (cached) {
+    try { return JSON.parse(cached); } catch (e) { cache.remove(SCHOOL_EVENT_CACHE_KEY); }
+  }
+  const sheet = ss.getSheetByName("学校行事");
+  if (!sheet || sheet.getLastRow() <= 1) return [];
+  const rows = sheet.getRange(2, 1, sheet.getLastRow() - 1, SCHOOL_EVENT_HEADERS.length).getValues();
+  const events = rows.map(row => ({
+    id: cleanCell(row[0]),
+    date: normalizeSchoolEventDate(row[1]),
+    endDate: normalizeSchoolEventDate(row[2]),
+    title: cleanCell(row[3]),
+    type: SCHOOL_EVENT_TYPES.indexOf(cleanCell(row[4])) >= 0 ? cleanCell(row[4]) : "event",
+    note: cleanCell(row[5])
+  })).filter(event => event.id && event.date && event.title);
+  events.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  try {
+    const text = JSON.stringify(events);
+    if (text.length < 90000) cache.put(SCHOOL_EVENT_CACHE_KEY, text, 600);
+  } catch (e) { /* キャッシュできなくても表示は続ける */ }
+  return events;
+}
+
+function normalizeSchoolEventDate(value) {
+  if (value instanceof Date && !isNaN(value.getTime())) return Utilities.formatDate(value, "Asia/Tokyo", "yyyy-MM-dd");
+  const text = cleanCell(value).replace(/^'/, "").replace(/\//g, "-");
+  const match = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (!match) return "";
+  const year = Number(match[1]), month = Number(match[2]), day = Number(match[3]);
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return "";
+  return year + "-" + ("0" + month).slice(-2) + "-" + ("0" + day).slice(-2);
+}
+
+function sanitizeSchoolEvent(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const date = normalizeSchoolEventDate(raw.date);
+  let endDate = normalizeSchoolEventDate(raw.endDate);
+  const title = cleanCell(raw.title).replace(/[\u0000-\u001F\u007F]/g, " ").slice(0, 100);
+  if (!date || !title) return null;
+  if (endDate && endDate <= date) endDate = "";
+  const type = SCHOOL_EVENT_TYPES.indexOf(cleanCell(raw.type)) >= 0 ? cleanCell(raw.type) : "event";
+  return { date: date, endDate: endDate, title: title, type: type, note: cleanCell(raw.note).slice(0, 200) };
+}
+
+function inferSchoolYearStart() {
+  const now = new Date();
+  const month = Number(Utilities.formatDate(now, "Asia/Tokyo", "M"));
+  const year = Number(Utilities.formatDate(now, "Asia/Tokyo", "yyyy"));
+  return month >= 4 ? year : year - 1;
+}
+
+// 予定表のPDF・写真から行事を読み取る。保存はせず、管理者が確認してから保存する
+function extractSchoolEventsWithGemini(apiKey, mimeType, fileBase64, startYear) {
+  const instruction = [
+    "あなたは日本の高校の年間行事予定表を読み取るアシスタントです。",
+    "画像またはPDFに書かれた行事を、日付ごとにすべて抜き出してください。",
+    "年度は" + startYear + "年4月から" + (startYear + 1) + "年3月までです。1月〜3月は" + (startYear + 1) + "年として扱ってください。",
+    "曜日だけの空欄は行事ではありません。行事名は表記どおりに書き、推測で作らないでください。",
+    "同じ日に複数の行事があるときは別々の項目にしてください。",
+    "「（～5/20）」「(～13日)」のように期間が書かれているときは endDate に終了日を入れてください。期間でなければ endDate は空文字にしてください。",
+    "type は次から選びます: 祝日・休日は holiday、中間考査・期末考査・学年末考査は exam、資格試験・検定・講習は license、閉庁日は closed、それ以外は event。",
+    "《》で囲まれた祝日名は《》を外して書いてください。"
+  ].join("\n");
+  const payload = {
+    contents: [{ role: "user", parts: [
+      { inline_data: { mime_type: mimeType, data: fileBase64 } },
+      { text: instruction }
+    ] }],
+    generationConfig: {
+      temperature: 0,
+      maxOutputTokens: 32768,
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: "ARRAY",
+        items: {
+          type: "OBJECT",
+          properties: {
+            date: { type: "STRING", description: "YYYY-MM-DD" },
+            endDate: { type: "STRING", description: "期間の終了日 YYYY-MM-DD。期間でなければ空文字" },
+            title: { type: "STRING" },
+            type: { type: "STRING", enum: SCHOOL_EVENT_TYPES }
+          },
+          required: ["date", "title", "type"]
+        }
+      }
+    }
+  };
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(GEMINI_MODEL) + ":generateContent";
+  try {
+    const response = UrlFetchApp.fetch(url, {
+      method: "post",
+      contentType: "application/json",
+      headers: { "x-goog-api-key": apiKey },
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    });
+    if (response.getResponseCode() < 200 || response.getResponseCode() >= 300) {
+      return { error: "AIでの読み取りに失敗しました（HTTP " + response.getResponseCode() + "）。ファイルを小さくするか、時間をおいてお試しください" };
+    }
+    const body = JSON.parse(response.getContentText());
+    const parts = body.candidates && body.candidates[0] && body.candidates[0].content && body.candidates[0].content.parts;
+    const text = Array.isArray(parts) ? parts.map(part => part.text || "").join("") : "";
+    let list;
+    try { list = JSON.parse(text); } catch (e) { return { error: "読み取り結果を解析できませんでした。もう一度お試しください" }; }
+    if (!Array.isArray(list)) return { error: "行事を読み取れませんでした" };
+    const events = list.map(sanitizeSchoolEvent).filter(Boolean).slice(0, 600);
+    if (!events.length) return { error: "行事を読み取れませんでした。予定表がはっきり写ったファイルを選んでください" };
+    events.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+    return { events: events };
+  } catch (error) {
+    return { error: "AIでの読み取り中にエラーが発生しました。時間をおいてお試しください" };
+  }
+}
+
 function createRes(status, msg) {
   return ContentService.createTextOutput(JSON.stringify({ status: status, message: msg }))
     .setMimeType(ContentService.MimeType.JSON);
@@ -1952,6 +2169,7 @@ function getRequestActorId(mode, data) {
     getLatestIncomingMessage: "email",
     getUnreadCount: "email",
     getNotificationSummary: "email",
+    getSchoolEvents: "userId",
     markAsRead: "myEmail",
     deleteAccount: "email"
   };

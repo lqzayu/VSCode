@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学校行事 - 平工マッチング</title>
+    <link rel="icon" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#254f3d">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="stylesheet" href="theme.css?v=20261119events">
+    <script src="ui.js?v=20261119events"></script>
+    <script src="online.js?v=20260917b" defer></script>
+    <script src="school-events.js?v=20261119a"></script>
+    <style>
+        .ev-page { max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; display: grid; gap: 24px; }
+        .ev-hero { position: relative; overflow: hidden; padding: 28px 30px; border-radius: 20px; background: linear-gradient(135deg, var(--ui-green), var(--ui-green-deep, var(--ui-green))); color: #fff; }
+        .ev-hero::after { content: ""; position: absolute; width: 220px; height: 220px; right: -70px; top: -90px; border-radius: 50%; background: var(--ui-lime, #d9f99d); opacity: .22; }
+        .ev-kicker { margin: 0 0 6px; font-size: 11px; font-weight: 800; letter-spacing: .14em; opacity: .85; }
+        .ev-hero h1 { margin: 0 0 8px; font-size: clamp(24px, 3vw, 34px); letter-spacing: -.03em; }
+        .ev-hero p { margin: 0; font-size: 13.5px; line-height: 1.7; opacity: .92; max-width: 640px; }
+
+        .ev-card { background: var(--ui-paper); border: 1px solid var(--ui-line); border-radius: 20px; padding: 22px; box-shadow: 0 12px 30px rgba(36, 60, 50, .06); }
+        .ev-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .ev-month { display: flex; align-items: center; gap: 8px; }
+        .ev-month h2 { margin: 0; min-width: 9.5em; text-align: center; font-size: 1.3rem; color: var(--ui-ink); font-variant-numeric: tabular-nums; }
+        .ev-nav-button, .ev-today-button { display: inline-grid; place-items: center; min-width: 40px; height: 40px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--ui-line); background: var(--ui-paper); color: var(--ui-ink); font: inherit; font-weight: 800; cursor: pointer; }
+        .ev-nav-button:hover, .ev-today-button:hover { background: var(--ui-soft); }
+        .ev-nav-button:focus-visible, .ev-today-button:focus-visible, .ev-day:focus-visible { outline: 3px solid var(--ui-green); outline-offset: 2px; }
+        .ev-legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--ui-muted); font-weight: 700; }
+        .ev-legend span { display: inline-flex; align-items: center; gap: 5px; }
+        .ev-legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+        .ev-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+        .ev-weekday { text-align: center; font-size: 12px; font-weight: 800; color: var(--ui-muted); padding: 4px 0; }
+        .ev-weekday.sun { color: #dc2626; }
+        .ev-weekday.sat { color: #2563eb; }
+        .ev-day { position: relative; min-height: 96px; padding: 6px; border-radius: 12px; border: 1px solid var(--ui-line); background: var(--ui-paper); text-align: left; font: inherit; color: inherit; cursor: pointer; display: flex; flex-direction: column; gap: 3px; overflow: hidden; transition: border-color .15s, background-color .15s, transform .15s; }
+        .ev-day:hover { border-color: var(--ui-green); }
+        .ev-day.is-outside { opacity: .38; }
+        .ev-day.is-today { border: 2px solid var(--ui-green); }
+        .ev-day.is-selected { background: var(--ui-soft); border-color: var(--ui-green); }
+        .ev-day.is-holiday { background: rgba(220, 38, 38, .05); }
+        .ev-date { font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--ui-ink); }
+        .ev-day.sun .ev-date, .ev-day.is-holiday .ev-date { color: #dc2626; }
+        .ev-day.sat .ev-date { color: #2563eb; }
+        .ev-day.is-today .ev-date::after { content: "今日"; margin-left: 4px; padding: 0 5px; border-radius: 999px; background: var(--ui-green); color: #fff; font-size: 10px; vertical-align: 1px; }
+        .ev-chip { display: block; padding: 2px 5px; border-radius: 6px; font-size: 11px; font-weight: 700; line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ev-more { font-size: 11px; font-weight: 800; color: var(--ui-muted); }
+        .ev-dots { display: none; gap: 3px; flex-wrap: wrap; }
+        .ev-dots i { width: 6px; height: 6px; border-radius: 50%; }
+
+        .type-event { background: rgba(37, 79, 61, .12); color: var(--ui-green); }
+        .type-exam { background: rgba(147, 51, 234, .13); color: #7e22ce; }
+        .type-license { background: rgba(37, 99, 235, .13); color: #1d4ed8; }
+        .type-holiday { background: rgba(220, 38, 38, .1); color: #dc2626; }
+        .type-closed { background: rgba(100, 116, 139, .14); color: #475569; }
+        i.type-event { background: var(--ui-green); }
+        i.type-exam { background: #9333ea; }
+        i.type-license { background: #2563eb; }
+        i.type-holiday { background: #dc2626; }
+        i.type-closed { background: #94a3b8; }
+        html[data-theme="dark"] .type-exam { color: #d8b4fe; }
+        html[data-theme="dark"] .type-license { color: #93c5fd; }
+        html[data-theme="dark"] .type-holiday { color: #fca5a5; }
+        html[data-theme="dark"] .type-closed { color: #cbd5e1; }
+        @media (prefers-color-scheme: dark) {
+            html:not([data-theme="light"]) .type-exam { color: #d8b4fe; }
+            html:not([data-theme="light"]) .type-license { color: #93c5fd; }
+            html:not([data-theme="light"]) .type-holiday { color: #fca5a5; }
+            html:not([data-theme="light"]) .type-closed { color: #cbd5e1; }
+        }
+
+        .ev-detail h3 { margin: 0 0 12px; font-size: 1.1rem; color: var(--ui-ink); }
+        .ev-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+        .ev-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--ui-line); }
+        .ev-item-date { flex: none; min-width: 5.5em; font-size: 13px; font-weight: 800; color: var(--ui-ink); font-variant-numeric: tabular-nums; }
+        .ev-item-title { flex: 1; min-width: 0; font-weight: 700; color: var(--ui-ink); overflow-wrap: anywhere; }
+        .ev-item-title small { display: block; margin-top: 2px; font-size: 12px; font-weight: 700; color: var(--ui-muted); }
+        .ev-badge { flex: none; padding: 3px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 800; white-space: nowrap; }
+        .ev-empty { padding: 26px 12px; text-align: center; color: var(--ui-muted); font-weight: 700; border: 1px dashed var(--ui-line); border-radius: 14px; }
+        .ev-status { margin: 0; font-size: 12.5px; color: var(--ui-muted); }
+
+        @media screen and (max-width: 768px) {
+            .ev-page { padding: 24px 16px 60px; gap: 18px; }
+            .ev-hero { padding: 22px 20px; }
+            .ev-card { padding: 16px; }
+            .ev-grid { gap: 4px; }
+            .ev-day { min-height: 58px; padding: 5px 4px; align-items: center; }
+            .ev-day .ev-chip, .ev-day .ev-more { display: none; }
+            .ev-dots { display: flex; justify-content: center; }
+            .ev-day.is-today .ev-date::after { display: none; }
+            .ev-month h2 { min-width: 7.5em; font-size: 1.1rem; }
+        }
+    </style>
+</head>
+
+<body data-page="events">
+    <header class="navbar">
+        <div class="logo" onclick="location.href='main.html'">平工マッチング</div>
+        <button class="hamburger-btn" id="hud-menu-btn" type="button" onclick="toggleMenu()" aria-label="メニューを開く" aria-controls="nav-links" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+        <nav class="nav-links" id="nav-links">
+            <a class="nav-item" href="main.html?guide=1">使い方</a>
+            <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSft5k1kroOLIzgbv5YArbYzkpBQfPG4CWsJsqjOE9YvUSK3gA/viewform?usp=header">意見箱</a>
+            <a class="nav-item" href="main.html?tab=search">ユーザーを探す</a>
+            <a class="nav-item" href="messages.html">メッセージ</a>
+            <a class="nav-item active" href="events.html">学校行事</a>
+            <a class="nav-item" href="ai-study.html">AI学習相談</a>
+            <a class="nav-item" href="junior-meister.html">JM計算</a>
+            <a class="nav-item" id="nav-admin-btn" style="display:none;color:#a84738;" href="admin.html">管理者</a>
+            <a class="nav-item" href="profile.html">マイページ</a>
+            <button type="button" class="btn-logout" onclick="logout(); return false;">ログアウト</button>
+        </nav>
+    </header>
+
+    <main class="ev-page">
+        <section class="ev-hero">
+            <p class="ev-kicker">SCHOOL CALENDAR</p>
+            <h1>学校行事</h1>
+            <p>年間行事予定をカレンダーで確認できます。日付を押すと、その日の行事が下に表示されます。予定は変わることがあるので、最新の情報は学校からのお知らせで確認してください。</p>
+        </section>
+
+        <section class="ev-card" aria-labelledby="ev-month-title">
+            <div class="ev-toolbar">
+                <div class="ev-month">
+                    <button class="ev-nav-button" type="button" id="ev-prev" aria-label="前の月">‹</button>
+                    <h2 id="ev-month-title" aria-live="polite">----年--月</h2>
+                    <button class="ev-nav-button" type="button" id="ev-next" aria-label="次の月">›</button>
+                </div>
+                <button class="ev-today-button" type="button" id="ev-today">今日</button>
+            </div>
+            <div class="ev-grid" id="ev-grid" role="grid" aria-labelledby="ev-month-title"></div>
+            <div class="ev-legend" style="margin-top:14px;">
+                <span><i class="type-event"></i>行事</span>
+                <span><i class="type-exam"></i>考査</span>
+                <span><i class="type-license"></i>検定・試験</span>
+                <span><i class="type-holiday"></i>休日</span>
+                <span><i class="type-closed"></i>閉庁日</span>
+            </div>
+        </section>
+
+        <section class="ev-card ev-detail" aria-live="polite">
+            <h3 id="ev-detail-title">行事</h3>
+            <ul class="ev-list" id="ev-detail-list"></ul>
+        </section>
+
+        <section class="ev-card ev-detail">
+            <h3 id="ev-month-list-title">この月の行事</h3>
+            <ul class="ev-list" id="ev-month-list"></ul>
+            <p class="ev-status" id="ev-status" style="margin-top:12px;"></p>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-links"></div>
+            <p class="copyright">&copy; 2026 Heiko Matching. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        const SE = window.HeikoSchoolEvents;
+        const currentUserId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";
+        const adminButton = document.getElementById("nav-admin-btn");
+        if (adminButton && currentUserId === "admin" && localStorage.getItem("isImpersonating") !== "true") adminButton.style.display = "inline-block";
+
+        let allEvents = [];
+        const today = new Date();
+        let viewYear = today.getFullYear();
+        let viewMonth = today.getMonth();
+        let selectedKey = SE.todayKey();
+
+        function toggleMenu() {
+            document.getElementById("nav-links").classList.toggle("open");
+            document.getElementById("hud-menu-btn").classList.toggle("open");
+        }
+        function logout() {
+            clearHeikoSession();
+            location.href = "index.html";
+        }
+        function escapeHtml(value) {
+            return String(value ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+        }
+
+        function eventsOn(key) {
+            return allEvents.filter(event => SE.occursOn(event, key));
+        }
+
+        function renderCalendar() {
+            document.getElementById("ev-month-title").textContent = `${viewYear}年${viewMonth + 1}月`;
+            const grid = document.getElementById("ev-grid");
+            const first = new Date(viewYear, viewMonth, 1);
+            const start = new Date(viewYear, viewMonth, 1 - first.getDay());
+            const todayKey = SE.todayKey();
+            let html = SE.WEEKDAYS.map((w, i) => `<div class="ev-weekday${i === 0 ? " sun" : i === 6 ? " sat" : ""}" role="columnheader">${w}</div>`).join("");
+            for (let i = 0; i < 42; i++) {
+                const date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+                if (i >= 35 && date.getMonth() !== viewMonth) break;
+                const key = SE.toKey(date);
+                const events = eventsOn(key);
+                const isHoliday = events.some(event => event.type === "holiday");
+                const classes = ["ev-day", date.getDay() === 0 ? "sun" : date.getDay() === 6 ? "sat" : "", date.getMonth() !== viewMonth ? "is-outside" : "", key === todayKey ? "is-today" : "", key === selectedKey ? "is-selected" : "", isHoliday ? "is-holiday" : ""].filter(Boolean).join(" ");
+                const chips = events.slice(0, 3).map(event => `<span class="ev-chip type-${event.type}">${escapeHtml(event.title)}</span>`).join("");
+                const more = events.length > 3 ? `<span class="ev-more">ほか${events.length - 3}件</span>` : "";
+                const dots = events.length ? `<span class="ev-dots">${events.slice(0, 4).map(event => `<i class="type-${event.type}"></i>`).join("")}</span>` : "";
+                const label = `${SE.formatDay(key)}${events.length ? `、行事${events.length}件` : ""}`;
+                html += `<button type="button" class="${classes}" data-key="${key}" aria-label="${escapeHtml(label)}" aria-pressed="${key === selectedKey}"><span class="ev-date">${date.getDate()}</span>${chips}${more}${dots}</button>`;
+            }
+            grid.innerHTML = html;
+        }
+
+        function itemHtml(event, { showDate = true } = {}) {
+            const range = event.endDate ? `${SE.formatShort(event.date)}〜${SE.formatShort(event.endDate)}` : "";
+            return `<li class="ev-item">
+                ${showDate ? `<span class="ev-item-date">${escapeHtml(SE.formatShort(event.date))}（${SE.WEEKDAYS[SE.parseKey(event.date).getDay()]}）</span>` : ""}
+                <span class="ev-item-title">${escapeHtml(event.title)}${range ? `<small>期間：${escapeHtml(range)}</small>` : ""}</span>
+                <span class="ev-badge type-${event.type}">${escapeHtml(SE.TYPE_LABELS[event.type] || "行事")}</span>
+            </li>`;
+        }
+
+        function renderDetail() {
+            document.getElementById("ev-detail-title").textContent = `${SE.formatDay(selectedKey, { withYear: true })}の行事`;
+            const events = eventsOn(selectedKey);
+            document.getElementById("ev-detail-list").innerHTML = events.length
+                ? events.map(event => itemHtml(event, { showDate: false })).join("")
+                : '<li class="ev-empty">この日の行事はありません</li>';
+        }
+
+        function renderMonthList() {
+            const prefix = `${viewYear}-${String(viewMonth + 1).padStart(2, "0")}`;
+            const monthStart = `${prefix}-01`;
+            const monthEnd = `${prefix}-31`;
+            const events = allEvents.filter(event => event.date <= monthEnd && (event.endDate || event.date) >= monthStart);
+            document.getElementById("ev-month-list-title").textContent = `${viewMonth + 1}月の行事（${events.length}件）`;
+            document.getElementById("ev-month-list").innerHTML = events.length
+                ? events.map(event => itemHtml(event)).join("")
+                : '<li class="ev-empty">この月の行事は登録されていません</li>';
+        }
+
+        function renderAll() {
+            renderCalendar();
+            renderDetail();
+            renderMonthList();
+        }
+
+        function moveMonth(delta) {
+            const date = new Date(viewYear, viewMonth + delta, 1);
+            viewYear = date.getFullYear();
+            viewMonth = date.getMonth();
+            renderCalendar();
+            renderMonthList();
+        }
+
+        document.getElementById("ev-prev").addEventListener("click", () => moveMonth(-1));
+        document.getElementById("ev-next").addEventListener("click", () => moveMonth(1));
+        document.getElementById("ev-today").addEventListener("click", () => {
+            viewYear = today.getFullYear();
+            viewMonth = today.getMonth();
+            selectedKey = SE.todayKey();
+            renderAll();
+        });
+        document.getElementById("ev-grid").addEventListener("click", event => {
+            const day = event.target.closest(".ev-day");
+            if (!day) return;
+            selectedKey = day.dataset.key;
+            const date = SE.parseKey(selectedKey);
+            if (date.getMonth() !== viewMonth) {
+                viewYear = date.getFullYear();
+                viewMonth = date.getMonth();
+                renderMonthList();
+            }
+            renderCalendar();
+            renderDetail();
+            if (window.matchMedia("(max-width: 768px)").matches) document.querySelector(".ev-detail").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        async function start() {
+            const params = new URLSearchParams(location.search);
+            const dateParam = params.get("date");
+            if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+                selectedKey = dateParam;
+                const date = SE.parseKey(dateParam);
+                viewYear = date.getFullYear();
+                viewMonth = date.getMonth();
+            }
+            renderAll();
+            const status = document.getElementById("ev-status");
+            status.textContent = "読み込み中...";
+            try {
+                await SE.load({ onUpdate: events => { allEvents = events; renderAll(); } });
+                status.textContent = allEvents.length ? "" : "まだ行事が登録されていません。";
+            } catch (error) {
+                status.textContent = "学校行事を読み込めませんでした。通信状態を確認してください。";
+            }
+        }
+
+        if (!currentUserId || !localStorage.getItem("sessionToken")) {
+            if (typeof showNotice === "function") showNotice("ログインしてから利用してください", "error");
+            clearHeikoSession();
+            window.location.replace("index.html");
+        } else {
+            start();
+        }
+    </script>
+</body>
+
+</html>
