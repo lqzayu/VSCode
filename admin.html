@@ -630,6 +630,8 @@
         [data-page="admin"] .se-replace { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; margin-right: auto; }
         [data-page="admin"] .se-registered { margin-top: 16px; }
         [data-page="admin"] .se-registered summary { cursor: pointer; font-weight: 700; font-size: 13.5px; padding: 8px 0; }
+        [data-page="admin"] .se-row-warn td { background: rgba(245, 158, 11, .12); }
+        [data-page="admin"] .se-warn-text { display: block; margin-top: 4px; font-size: 11.5px; font-weight: 800; color: #b45309; white-space: nowrap; }
         [data-page="admin"] .se-type { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 800; white-space: nowrap; background: var(--ui-soft, #f1f5f9); }
 
         @media screen and (max-width: 768px) {
@@ -1438,7 +1440,8 @@
                     return;
                 }
                 showSchoolEventPreview(result.message.events);
-                setSchoolEventStatus(`${result.message.events.length}件の行事を読み取りました。内容を確認してください`);
+                const mismatches = result.message.events.filter(event => event.weekdayMismatch).length;
+                setSchoolEventStatus(`${result.message.events.length}件の行事を読み取りました。内容を確認してください` + (mismatches ? `（曜日が予定表と合わない行が${mismatches}件あります。⚠の行の日付を確認してください）` : ""), mismatches > 0);
             } catch (error) {
                 setSchoolEventStatus(error && error.name === "AbortError" ? "時間がかかりすぎたため中断しました。ファイルを小さくしてお試しください" : "通信エラーが発生しました", true);
             } finally {
@@ -1460,7 +1463,7 @@
 
         // replace: 「この期間に登録済みの行事を置き換える」の初期状態。予定表の取り込みは置き換え、手入力は追加だけにする
         function showSchoolEventPreview(events, { replace = true } = {}) {
-            schoolEventPreview = events.map(event => ({ date: event.date || "", endDate: event.endDate || "", title: event.title || "", type: SCHOOL_EVENT_TYPE_LABELS[event.type] ? event.type : "event" }));
+            schoolEventPreview = events.map(event => ({ date: event.date || "", endDate: event.endDate || "", title: event.title || "", type: SCHOOL_EVENT_TYPE_LABELS[event.type] ? event.type : "event", weekdayMismatch: Boolean(event.weekdayMismatch) }));
             document.getElementById("se-replace").checked = replace;
             renderSchoolEventPreview();
             const preview = document.getElementById("se-preview");
@@ -1472,8 +1475,8 @@
             const body = document.getElementById("se-preview-body");
             document.getElementById("se-preview-count").textContent = `（${schoolEventPreview.length}件）`;
             body.innerHTML = schoolEventPreview.length ? schoolEventPreview.map((event, index) => `
-                <tr data-index="${index}">
-                    <td><input type="date" data-field="date" value="${escapeHtml(event.date)}" aria-label="開始日"></td>
+                <tr data-index="${index}"${event.weekdayMismatch ? ' class="se-row-warn"' : ""}>
+                    <td><input type="date" data-field="date" value="${escapeHtml(event.date)}" aria-label="開始日">${event.weekdayMismatch ? '<span class="se-warn-text">⚠ 曜日が予定表と合いません</span>' : ""}</td>
                     <td><input type="date" data-field="endDate" value="${escapeHtml(event.endDate)}" aria-label="終了日"></td>
                     <td><input type="text" data-field="title" maxlength="100" value="${escapeHtml(event.title)}" aria-label="行事名"></td>
                     <td><select data-field="type" aria-label="種類">${Object.entries(SCHOOL_EVENT_TYPE_LABELS).map(([value, label]) => `<option value="${value}"${value === event.type ? " selected" : ""}>${label}</option>`).join("")}</select></td>
@@ -1538,6 +1541,11 @@
                     replaceFrom: replace ? range.from : "", replaceTo: replace ? range.to : ""
                 }, 60000);
                 if (result.status !== "success") { alert(result.message || "保存に失敗しました"); return; }
+                // 保存件数が返ってこないときは、GASが古いバージョンのままで保存されていない
+                if (!result.message || typeof result.message.saved !== "number") {
+                    alert("保存できませんでした。GASが新しいバージョンでデプロイされているか確認してください");
+                    return;
+                }
                 schoolEventPreview = [];
                 document.getElementById("se-preview").hidden = true;
                 setSchoolEventStatus(`${result.message.saved}件を保存しました` + (result.message.removed ? `（置き換えで${result.message.removed}件を削除）` : ""));
@@ -1587,6 +1595,12 @@
             const row = event.target.closest && event.target.closest("#se-preview-body tr");
             if (!field || !row) return;
             schoolEventPreview[Number(row.dataset.index)][field] = event.target.value;
+            if (field === "date" && schoolEventPreview[Number(row.dataset.index)].weekdayMismatch) {
+                schoolEventPreview[Number(row.dataset.index)].weekdayMismatch = false;
+                row.classList.remove("se-row-warn");
+                const warn = row.querySelector(".se-warn-text");
+                if (warn) warn.remove();
+            }
             if (field === "date" || field === "endDate") updateSchoolEventReplaceLabel();
         });
         document.addEventListener("click", event => {

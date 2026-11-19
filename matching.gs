@@ -47,7 +47,8 @@ function doPost(e) {
     const sheetReport = sheetsByName["通報"] || null;
     const sheetLineLink = sheetsByName["LINE連携"] || null;
 
-    if (Array.isArray(data.events)) {
+    // LINEのWebhookは mode を持たない。mode 付きのリクエスト（学校行事の保存で events を送る場合など）をLINEと取り違えないようにする
+    if (!data.mode && Array.isArray(data.events)) {
       const lineData = data;
 
       if (lineData.events && lineData.events.length === 0) {
@@ -1959,6 +1960,11 @@ function normalizeSchoolEventDate(value) {
   return year + "-" + ("0" + month).slice(-2) + "-" + ("0" + day).slice(-2);
 }
 
+function schoolEventDateValue(key) {
+  const parts = String(key).split("-").map(Number);
+  return new Date(parts[0], parts[1] - 1, parts[2]).getTime();
+}
+
 function sanitizeSchoolEvent(raw) {
   if (!raw || typeof raw !== "object") return null;
   const date = normalizeSchoolEventDate(raw.date);
@@ -1983,9 +1989,12 @@ function extractSchoolEventsWithGemini(apiKey, mimeType, fileBase64, startYear) 
     "あなたは日本の高校の年間行事予定表を読み取るアシスタントです。",
     "画像またはPDFに書かれた行事を、日付ごとにすべて抜き出してください。",
     "年度は" + startYear + "年4月から" + (startYear + 1) + "年3月までです。1月〜3月は" + (startYear + 1) + "年として扱ってください。",
+    "年間行事表は、横に月（4月・5月…3月）の列が並び、縦に日付（1〜31）の行が並ぶ表であることが多いです。各月の列は「曜」と「行事」の2列に分かれています。",
+    "行事がどの月の列にあるかを、列の見出しの月で必ず確かめてください。隣の月の列と取り違えないでください。",
+    "各行事について、表に書かれている曜日（日・月・火・水・木・金・土）を weekday に1文字で入れてください。",
     "曜日だけの空欄は行事ではありません。行事名は表記どおりに書き、推測で作らないでください。",
     "同じ日に複数の行事があるときは別々の項目にしてください。",
-    "「（～5/20）」「(～13日)」のように期間が書かれているときは endDate に終了日を入れてください。期間でなければ endDate は空文字にしてください。",
+    "「（～5/20）」「(～13日)」のように表の中に終了日がはっきり書かれているときだけ endDate に終了日を入れてください。それ以外はすべて endDate を空文字にしてください。今日の日付を入れてはいけません。",
     "type は次から選びます: 祝日・休日は holiday、中間考査・期末考査・学年末考査は exam、資格試験・検定・講習は license、閉庁日は closed、それ以外は event。",
     "《》で囲まれた祝日名は《》を外して書いてください。"
   ].join("\n");
@@ -2004,7 +2013,8 @@ function extractSchoolEventsWithGemini(apiKey, mimeType, fileBase64, startYear) 
           type: "OBJECT",
           properties: {
             date: { type: "STRING", description: "YYYY-MM-DD" },
-            endDate: { type: "STRING", description: "期間の終了日 YYYY-MM-DD。期間でなければ空文字" },
+            endDate: { type: "STRING", description: "表に終了日が書かれているときだけ YYYY-MM-DD。それ以外は空文字" },
+            weekday: { type: "STRING", description: "表に書かれている曜日（日月火水木金土のどれか1文字）" },
             title: { type: "STRING" },
             type: { type: "STRING", enum: SCHOOL_EVENT_TYPES }
           },
@@ -2031,7 +2041,19 @@ function extractSchoolEventsWithGemini(apiKey, mimeType, fileBase64, startYear) 
     let list;
     try { list = JSON.parse(text); } catch (e) { return { error: "読み取り結果を解析できませんでした。もう一度お試しください" }; }
     if (!Array.isArray(list)) return { error: "行事を読み取れませんでした" };
-    const events = list.map(sanitizeSchoolEvent).filter(Boolean).slice(0, 600);
+    const events = list.map(raw => {
+      const event = sanitizeSchoolEvent(raw);
+      if (!event) return null;
+      // 終了日が開始日から60日以上先なら、読み取りの誤りとみなして期間をつけない
+      if (event.endDate && (schoolEventDateValue(event.endDate) - schoolEventDateValue(event.date)) / 86400000 > 60) event.endDate = "";
+      // 表の曜日と日付の曜日が合わない行は、月や日を読み違えている可能性が高いので印をつける
+      const weekday = cleanCell(raw.weekday).charAt(0);
+      if (weekday && "日月火水木金土".indexOf(weekday) >= 0) {
+        const actual = "日月火水木金土".charAt(new Date(schoolEventDateValue(event.date)).getDay());
+        if (actual !== weekday) event.weekdayMismatch = true;
+      }
+      return event;
+    }).filter(Boolean).slice(0, 600);
     if (!events.length) return { error: "行事を読み取れませんでした。予定表がはっきり写ったファイルを選んでください" };
     events.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
     return { events: events };
