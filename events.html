@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="theme.css?v=20261119events">
     <script src="ui.js?v=20261119events"></script>
     <script src="online.js?v=20260917b" defer></script>
-    <script src="school-events.js?v=20261120a"></script>
+    <script src="school-events.js?v=20261120b"></script>
     <style>
         .ev-page { max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; display: grid; gap: 24px; }
         .ev-hero { position: relative; overflow: hidden; padding: 28px 30px; border-radius: 20px; background: linear-gradient(135deg, var(--ui-green), var(--ui-green-deep, var(--ui-green))); color: #fff; }
@@ -303,6 +303,13 @@
             window.location.replace("index.html");
         } else {
             start();
+            // 開きっぱなしのタブに戻ってきたときも、最新の行事を取り直す
+            document.addEventListener("visibilitychange", () => {
+                if (document.visibilityState !== "visible") return;
+                SE.load({ force: true, onUpdate: events => { allEvents = events; renderAll(); } })
+                    .then(() => { document.getElementById("ev-status").textContent = allEvents.length ? "" : "まだ行事が登録されていません。"; })
+                    .catch(() => {});
+            });
         }
     </script>
 </body>

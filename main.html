@@ -1331,7 +1331,7 @@
     <link rel="stylesheet" href="theme.css?v=20261119events">
     <script src="ui.js?v=20261119events"></script>
     <script src="online.js?v=20260917b" defer></script>
-    <script src="school-events.js?v=20261120a"></script>
+    <script src="school-events.js?v=20261120b"></script>
 </head>
 
 <body data-page="main">
@@ -2440,6 +2440,12 @@
             if (!window.HeikoSchoolEvents) return;
             window.HeikoSchoolEvents.load({ onUpdate: renderSchoolEventStrip }).catch(error => console.warn("学校行事を読み込めませんでした", error));
         }
+        // 開きっぱなしのタブに戻ってきたときも、最新の行事を取り直す
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible" && window.HeikoSchoolEvents) {
+                window.HeikoSchoolEvents.load({ force: true, onUpdate: renderSchoolEventStrip }).catch(() => {});
+            }
+        });
 
         document.addEventListener("DOMContentLoaded", () => {
             loadSchoolEventStrip();

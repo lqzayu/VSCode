@@ -2,7 +2,7 @@
 (function () {
     const GAS_URL = window.HEIKO_GAS_URL || "https://script.google.com/macros/s/AKfycbyQgkizdGw9MiZjxtlxAHpfMXw5ehLfj9HkzDcR9YLRo1Cm11kfEp4cWYqnNBdDR96w/exec";
     const CACHE_KEY = "heiko-school-events-v1";
-    const CACHE_MS = 10 * 60 * 1000;
+    const CACHE_MS = 60 * 1000;
     const TYPE_LABELS = { event: "行事", exam: "考査", license: "検定・試験", holiday: "休日", closed: "閉庁日" };
     const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
     let pending = null;
@@ -19,11 +19,13 @@
         try { localStorage.setItem(CACHE_KEY, JSON.stringify({ savedAt: Date.now(), events })); } catch (error) { /* 保存できなくても表示は続ける */ }
     }
 
-    // まずキャッシュをすぐ返し（onUpdate）、古ければ裏で取り直す
+    // まずキャッシュをすぐ返し（onUpdate）、裏で必ず取り直す。
+    // 取り直しを省くのは「1分以内に取得済みで、行事が1件以上ある」ときだけ。
+    // 空の結果を長く使い回すと、管理者が保存した直後でも何も表示されない状態が続いてしまう
     async function load({ force = false, onUpdate } = {}) {
         const cached = readCache();
         if (cached && typeof onUpdate === "function") onUpdate(cached.events, { fromCache: true });
-        if (!force && cached && Date.now() - cached.savedAt < CACHE_MS) return cached.events;
+        if (!force && cached && cached.events.length > 0 && Date.now() - cached.savedAt < CACHE_MS) return cached.events;
         if (pending) return pending;
         pending = (async () => {
             const userId = localStorage.getItem("userId") || localStorage.getItem("userEmail") || "";
